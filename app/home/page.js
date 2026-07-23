@@ -53,6 +53,21 @@ export default async function Home() {
   }
 
   // ---- Feed "Em alta agora" (jornadas públicas recentes) ----
+  // ---- Pontos (privados, não-competitivos): continuar + apoiar ----
+  let updatesCount = 0, setbackCount = 0, maxStreak = 0;
+  if (list.length) {
+    const jIdsOwn = list.map(j => j.id);
+    const [{ count: uc }, { count: sc }] = await Promise.all([
+      supabase.from('updates').select('*', { count: 'exact', head: true }).in('journey_id', jIdsOwn),
+      supabase.from('updates').select('*', { count: 'exact', head: true }).in('journey_id', jIdsOwn).eq('kind', 'setback'),
+    ]);
+    updatesCount = uc || 0; setbackCount = sc || 0;
+    Object.values(statsById).forEach(s => { if ((s.streak || 0) > maxStreak) maxStreak = s.streak; });
+  }
+  const { count: encGiven } = await supabase.from('encouragements')
+    .select('*', { count: 'exact', head: true }).eq('user_id', user.id);
+  const points = updatesCount * 10 + setbackCount * 15 + (encGiven || 0) * 5 + maxStreak * 2;
+
   const { data: pub } = await supabase.from('journeys')
     .select('id').eq('is_public', true).neq('owner_id', user.id)
     .order('created_at', { ascending: false }).limit(20);
@@ -78,7 +93,8 @@ export default async function Home() {
     feed = ups.map(u => {
       const j = jMap[u.journey_id]; if (!j) return null;
       return { ...u, journey: j, owner: pMap[j.owner_id] || {}, enc: encCount[u.id] || 0 };
-    }).filter(Boolean);
+    }).filter(Boolean)
+      .sort((a, b) => (b.enc - a.enc) || (new Date(b.created_at) - new Date(a.created_at)));
   }
   const kindTag = { setback: t.tagSetback, win: t.tagWin };
 
@@ -137,6 +153,9 @@ export default async function Home() {
             <div className="pc-meta">
               <h1>{profile.name}</h1>
               <span>{profile.handle}</span>
+              <div className="points-chip" title={t.pointsExplain}>
+                <b>{points}</b> {t.pointsWord}
+              </div>
             </div>
           </div>
         </section>

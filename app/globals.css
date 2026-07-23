@@ -572,3 +572,10 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .progress-meta{display:flex;justify-content:space-between;align-items:baseline;margin-top:9px;
   font-size:13px;font-weight:800;color:var(--muted)}
 .progress-pct{font-size:15px;color:var(--night);letter-spacing:-.02em}
+
+/* ---------- Pontos (privados, não-competitivos) ---------- */
+.points-chip{display:inline-flex;align-items:baseline;gap:5px;margin-top:8px;
+  background:linear-gradient(135deg,rgba(240,47,135,.10),rgba(255,211,61,.16));
+  border:1px solid var(--line);border-radius:999px;padding:5px 12px;
+  font-size:13px;font-weight:800;color:var(--night);cursor:help}
+.points-chip b{font-size:15px;letter-spacing:-.02em}
