@@ -1,0 +1,84 @@
+:root{
+  --bg:#f6f4ef; --surface:#fff; --ink:#151515; --night:#090c2a; --night-2:#15194b;
+  --muted:#6b7280; --line:#e6e3dd; --pink:#f02f87; --orange:#ff7a45; --yellow:#ffd33d;
+  --up:linear-gradient(135deg,var(--pink),var(--orange) 52%,var(--yellow));
+  --shadow:0 16px 42px rgba(25,25,25,.08);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;color:var(--ink);
+  background:radial-gradient(circle at 8% 4%,rgba(255,211,61,.22),transparent 28%),
+    radial-gradient(circle at 92% 2%,rgba(9,12,42,.11),transparent 30%),var(--bg);
+  font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+a{color:inherit;text-decoration:none}
+
+/* topbar */
+.top{display:flex;align-items:center;justify-content:space-between;
+  max-width:720px;margin:0 auto;padding:18px 20px}
+.wordmark{font-weight:950;font-size:20px;letter-spacing:-.04em}
+.wordmark b{color:var(--orange)}
+.cta{background:var(--night);color:#fff;font-weight:800;padding:10px 18px;border-radius:999px;border:0}
+
+/* journey public page */
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 80px}
+.cover{border-radius:26px;padding:30px;color:#fff;box-shadow:var(--shadow);
+  background:linear-gradient(135deg,var(--night),var(--night-2))}
+.cover .eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin:0}
+.cover h1{margin:8px 0 6px;font-size:40px;line-height:1.02;letter-spacing:-.04em}
+.cover p{margin:0;opacity:.85;font-size:17px}
+
+.who{display:flex;align-items:center;gap:14px;margin:22px 4px}
+.ava{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;
+  color:#fff;font-weight:900;font-size:22px}
+.who b{display:block;font-size:17px}
+.who span{color:var(--muted);font-size:14px}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.stats article{background:var(--surface);border:1px solid var(--line);border-radius:18px;
+  padding:16px;text-align:center}
+.stats b{display:block;font-size:26px;letter-spacing:-.03em}
+.stats span{color:var(--muted);font-size:13px}
+
+.bar{height:12px;border-radius:999px;background:#eceae4;overflow:hidden;margin:6px 0 26px}
+.bar span{display:block;height:100%;background:var(--up)}
+
+.timeline article{display:flex;gap:16px;padding:0 4px}
+.timeline .rail{display:flex;flex-direction:column;align-items:center}
+.timeline .dot{width:14px;height:14px;border-radius:50%;background:#d6d3cc;margin-top:5px}
+.timeline .dot.win{background:var(--up)}
+.timeline .dot.setback{background:var(--night)}
+.timeline .line{flex:1;width:2px;background:var(--line)}
+.timeline .body{padding-bottom:26px}
+.timeline .day{font-weight:900}
+.timeline .tag{display:inline-block;margin-left:8px;font-size:11px;font-weight:800;
+  padding:2px 9px;border-radius:999px;vertical-align:middle}
+.timeline .tag.setback{background:var(--night);color:#fff}
+.timeline .tag.win{background:rgba(255,211,61,.25);color:var(--ink)}
+.timeline p{margin:4px 0 0;color:#374151}
+
+.encourage{margin-top:20px;background:var(--surface);border:1px solid var(--line);
+  border-radius:22px;padding:22px;text-align:center;box-shadow:var(--shadow)}
+.encourage h3{margin:0 0 6px}
+.encourage p{margin:0 0 14px;color:var(--muted)}
+.encourage .cta{padding:13px 22px}
+
+.foot{max-width:720px;margin:40px auto 0;padding:20px;text-align:center;color:var(--muted);font-size:13px}
+
+/* landing */
+.hero{max-width:720px;margin:0 auto;padding:60px 20px;text-align:center}
+.hero h1{font-size:52px;line-height:.98;letter-spacing:-.05em;margin:0 0 14px}
+.hero p{font-size:19px;color:#4b5563;max-width:520px;margin:0 auto 26px}
+.hero .cta{padding:15px 28px;font-size:16px}
+.demo{margin-top:44px}
+.demo b{font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.demo-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.demo-links a{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:12px 18px;font-weight:800}
+
+@media(max-width:640px){
+  .cover h1{font-size:32px}
+  .hero h1{font-size:38px}
+  .stats{grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .stats b{font-size:22px}
+}
