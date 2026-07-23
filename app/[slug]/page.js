@@ -5,6 +5,7 @@ import Logo from '../../components/Logo';
 import ShareButton from './ShareButton';
 import EncourageBar from './EncourageBar';
 import FollowButton from './FollowButton';
+import ProgressBar from '../../components/ProgressBar';
 import ReportButton from './ReportButton';
 import { notFound } from 'next/navigation';
 
@@ -85,7 +86,7 @@ async function ProfilePage({ handle }) {
                 </div>
                 <div className="pj-body">
                   <b>{j.title}</b>
-                  <div className="bar"><span style={{ width: pct + '%' }} /></div>
+                  <ProgressBar day={stats.current_day || 0} total={journey.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
                   <small>{fill(t.dayOf, { d: st.current_day || 0, t: j.total_days, s: st.streak || 0 })}</small>
                 </div>
               </a>
@@ -163,7 +164,7 @@ export default async function JourneyPage({ params }) {
           <article><b>{stats.streak || 0}</b><span>{t.dayStreakLabel}</span></article>
           <article><b>{pct}%</b><span>{t.progress}</span></article>
         </div>
-        <div className="bar"><span style={{ width: pct + '%' }} /></div>
+        <ProgressBar day={stats.current_day || 0} total={journey.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
 
         {showBeforeNow && (
           <section className="before-now">

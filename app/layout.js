@@ -6,7 +6,7 @@ export async function generateMetadata() {
   const t = getDict(getLocale());
   return {
     title: `One Up Day — ${t.tagline}`,
-    description: t.heroSub,
+    description: `${t.thesis1} ${t.thesis2}`,
     metadataBase: new URL('https://oneupday.app'),
     manifest: '/site.webmanifest',
     icons: {

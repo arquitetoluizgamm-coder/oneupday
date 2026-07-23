@@ -8,6 +8,7 @@ import NewJourneyForm from '../new/NewJourneyForm';
 import EditBanner from '../../components/EditBanner';
 import BottomNav from '../../components/BottomNav';
 import PrivacyToggle from './PrivacyToggle';
+import ProgressBar from '../../components/ProgressBar';
 
 export const dynamic = 'force-dynamic';
 
@@ -185,7 +186,7 @@ export default async function Home() {
                   <a className="view-link" href={`/${j.slug}`} target="_blank" rel="noreferrer">{t.viewPublic}</a>
                 </div>
               </div>
-              <div className="bar"><span style={{ width: pct + '%' }} /></div>
+              <ProgressBar day={day} total={j.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
               <Composer journeyId={j.id} nextDay={day + 1} labels={kindLabels} t={{
                 placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
                 addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded,

@@ -41,7 +41,7 @@ a{color:inherit;text-decoration:none}
 .stats span{color:var(--muted);font-size:13px}
 
 .bar{height:12px;border-radius:999px;background:#eceae4;overflow:hidden;margin:6px 0 26px}
-.bar span{display:block;height:100%;background:var(--up)}
+.bar span{display:block;height:100%;background:var(--up);border-radius:999px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
 
 .timeline article{display:flex;gap:16px;padding:0 4px}
 .timeline .rail{display:flex;flex-direction:column;align-items:center}
@@ -551,3 +551,24 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .feed-lead .feed-head h2{font-size:22px;letter-spacing:-.03em}
 .feed-more{display:inline-block;margin-top:4px;font-weight:800;font-size:14px;color:var(--night)}
 .feed-more:hover{color:var(--orange)}
+
+/* ---------- Manifesto (tese) ---------- */
+.manifesto{margin:52px auto 0;max-width:34rem;text-align:center;padding:30px 20px;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.manifesto-1{font-size:26px;font-weight:900;letter-spacing:-.03em;line-height:1.15;color:var(--night);margin:0}
+.manifesto-2{font-size:26px;font-weight:900;letter-spacing:-.03em;line-height:1.15;margin:2px 0 0;
+  background:var(--up-gradient);-webkit-background-clip:text;background-clip:text;color:transparent}
+.manifesto-sub{margin:14px 0 0;color:var(--muted);font-size:15px;font-weight:600}
+@media(max-width:600px){.manifesto-1,.manifesto-2{font-size:22px}}
+
+/* ---------- Progress bar animada ---------- */
+.progress{margin:10px 0 22px}
+.progress-track{position:relative;height:14px;border-radius:999px;background:#eceae4;
+  box-shadow:inset 0 1px 2px rgba(9,12,42,.07);overflow:visible}
+.progress-fill{height:100%;border-radius:999px;background:var(--up-gradient);box-shadow:0 1px 8px rgba(255,122,69,.45)}
+.progress-goal{position:absolute;right:0;top:-19px;font-size:10px;font-weight:900;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted)}
+.progress-goal::after{content:"";position:absolute;right:6px;top:15px;width:2px;height:9px;background:var(--line);border-radius:2px}
+.progress-meta{display:flex;justify-content:space-between;align-items:baseline;margin-top:9px;
+  font-size:13px;font-weight:800;color:var(--muted)}
+.progress-pct{font-size:15px;color:var(--night);letter-spacing:-.02em}

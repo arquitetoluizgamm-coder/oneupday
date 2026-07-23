@@ -81,13 +81,19 @@ export default async function Home() {
                     </span>
                     <b>{demo.journey.title}</b>
                   </div>
-                  <div className="bar"><span style={{ width: pct + '%' }} /></div>
+                  <div className="bar"><span style={{ width: (pct > 0 ? Math.max(pct, 6) : 0) + '%' }} /></div>
                   <small>{demo.owner.name} · {fill(t.dayXofY, { d: day, t: demo.journey.total_days })}</small>
                 </div>
               </a>
             </section>
           );
         })()}
+
+        <section className="manifesto">
+          <p className="manifesto-1">{t.thesis1}</p>
+          <p className="manifesto-2">{t.thesis2}</p>
+          <p className="manifesto-sub">{t.thesisSub}</p>
+        </section>
 
         <section className="land-ideas">
           {ideas.map(i => (

@@ -64,7 +64,7 @@ export default async function Explore({ searchParams }) {
                 </div>
                 <div className="pj-body">
                   <b>{j.title}</b>
-                  <div className="bar"><span style={{ width: pct + '%' }} /></div>
+                  <div className="bar"><span style={{ width: (pct > 0 ? Math.max(pct, 6) : 0) + '%' }} /></div>
                   <small>{catLabel[j.category] || ''} · {fill(t.dayOf, { d: st.current_day || 0, t: j.total_days, s: st.streak || 0 })}</small>
                 </div>
               </a>
