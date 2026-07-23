@@ -90,11 +90,12 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     setSaving(true);
     const supabase = createClient();
     const fallback = photoUrl ? '📷' : (videoUrl ? '🎥' : '');
-    const { error } = await supabase.from('updates').insert({
+    const row = {
       journey_id: journeyId, day_number: dayNumber, kind,
       text: value || fallback, photo_url: photoUrl, video_url: videoUrl,
-      track_id: track?.id || null, track_start: 0,
-    });
+    };
+    if (track) { row.track_id = track.id; row.track_start = 0; }
+    const { error } = await supabase.from('updates').insert(row);
     setSaving(false);
     if (error) { alert(t.error); return; }
     setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null);

@@ -40,7 +40,7 @@ export async function GET(req) {
   if (!targetIds.length) return NextResponse.json({ items: [] });
 
   const { data: ups } = await supabase.from('updates')
-    .select('id, day_number, kind, text, photo_url, video_url, journey_id, track_id, track_start')
+    .select('id, day_number, kind, text, photo_url, video_url, journey_id')
     .in('journey_id', targetIds).order('created_at', { ascending: false }).order('id', { ascending: false })
     .range(offset, offset + PAGE - 1);
   const list = ups || [];
@@ -51,15 +51,21 @@ export async function GET(req) {
   const { data: profs } = await supabase.from('profiles').select('id, name, avatar_color, avatar_url, handle').in('id', oIds);
   const pMap = {}; (profs || []).forEach(pr => { pMap[pr.id] = pr; });
 
-  const tIds = [...new Set(list.map(u => u.track_id).filter(Boolean))];
+  const trackByUpdate = {};
   const tMap = {};
-  if (tIds.length) {
-    const { data: trks } = await supabase.from('tracks').select('id, title, artist, audio_url').in('id', tIds);
-    (trks || []).forEach(tr => { tMap[tr.id] = tr; });
-  }
+  try {
+    const { data: utr } = await supabase.from('updates').select('id, track_id').in('id', list.map(u => u.id)).not('track_id', 'is', null);
+    (utr || []).forEach(u => { trackByUpdate[u.id] = u.track_id; });
+    const tIds = [...new Set(Object.values(trackByUpdate))];
+    if (tIds.length) {
+      const { data: trks } = await supabase.from('tracks').select('id, title, artist, audio_url').in('id', tIds);
+      (trks || []).forEach(tr => { tMap[tr.id] = tr; });
+    }
+  } catch { /* colunas/tabela de música ainda não instaladas */ }
+
   const items = list.map(u => {
     const j = jMap[u.journey_id]; if (!j) return null;
-    return { ...u, journey: { slug: j.slug, title: j.title, category: j.category }, owner: pMap[j.owner_id] || {}, track: u.track_id ? (tMap[u.track_id] || null) : null };
+    return { ...u, journey: { slug: j.slug, title: j.title, category: j.category }, owner: pMap[j.owner_id] || {}, track: tMap[trackByUpdate[u.id]] || null };
   }).filter(Boolean);
   return NextResponse.json({ items });
 }
