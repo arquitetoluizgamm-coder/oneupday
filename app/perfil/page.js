@@ -75,7 +75,10 @@ export default async function Perfil() {
   const points = updatesCount * 10 + setbackCount * 15 + (encGiven || 0) * 5 + maxStreak * 2;
 
   const kindLabels = { step: t.kindStep, win: t.kindWin, setback: t.kindSetback, learned: t.kindLearned };
-  const aiOn = !!process.env.OPENAI_API_KEY && list.length > 0;
+  let aiPrefOff = false;
+  try { const { data: pref } = await supabase.from('profiles').select('ai_opt_out').eq('id', user.id).maybeSingle(); aiPrefOff = !!pref?.ai_opt_out; } catch { }
+  const aiConfigured = !!process.env.OPENAI_API_KEY && list.length > 0;
+  const aiOn = aiConfigured && !aiPrefOff;
 
   return (
     <>
@@ -129,7 +132,7 @@ export default async function Perfil() {
             </>)}
         </section>
 
-        {aiOn && <CompanionCard title={t.companionTitle} btn={t.companionBtn} loading={t.companionLoading} labels={{ consent: t.aiConsent, off: t.aiOff, offState: t.aiOffState, reactivate: t.aiReactivate, err: t.aiErr, rateErr: t.aiRateErr }} />}
+        {aiConfigured && <CompanionCard userId={user.id} title={t.companionTitle} btn={t.companionBtn} loading={t.companionLoading} initialOff={aiPrefOff} labels={{ consent: t.aiConsent, off: t.aiOff, offState: t.aiOffState, reactivate: t.aiReactivate, err: t.aiErr, rateErr: t.aiRateErr }} />}
 
         <section className="home-head">
           <div>

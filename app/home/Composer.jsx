@@ -27,7 +27,6 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [videoUrl, setVideoUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [track, setTrack] = useState(null);
-  const [aiOff, setAiOff] = useState(false);
   const [aiErr, setAiErr] = useState('');
   const photoRef = useRef(null);
   const videoRef = useRef(null);
@@ -39,7 +38,6 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 220) + 'px'; }
   }, [text]);
 
-  useEffect(() => { try { setAiOff(localStorage.getItem('oud_ai_off') === '1'); } catch { } }, []);
 
   async function upload(file) {
     const supabase = createClient();
@@ -169,7 +167,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPickPhoto} />
           <input ref={videoRef} type="file" accept="video/*" hidden onChange={onPickVideo} />
           <TrackPicker selected={track} onSelect={setTrack} labels={{ add: '🎵', title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded }} />
-          {aiOn && !aiOff && <button type="button" className="tool ai" title={t.aiWrite} aria-label={t.aiWrite} onClick={aiWrite} disabled={saving || uploading}>✨</button>}
+          {aiOn && <button type="button" className="tool ai" title={t.aiWrite} aria-label={t.aiWrite} onClick={aiWrite} disabled={saving || uploading}>✨</button>}
         </div>
         <button className="post-btn" onClick={post} disabled={saving || uploading || (!text.trim() && !photoUrl && !videoUrl)}>
           {saving ? t.posting : t.post}
@@ -177,7 +175,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       </div>
       {aiErr && <p className="ai-err">{aiErr}</p>}
       {kind === 'setback' && <p className="setback-note">{t.setbackNote}</p>}
-      {aiOn && !aiOff && kind === 'setback' && (
+      {aiOn && kind === 'setback' && (
         <div className="ai-context">
           <span className="ai-context-q">{t.aiCareQ}</span>
           <div className="ai-context-btns">

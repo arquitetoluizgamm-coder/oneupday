@@ -1,14 +1,23 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { createClient } from '../../lib/supabase/client';
 
-export default function CompanionCard({ title, btn, loading, labels }) {
+export default function CompanionCard({ userId, title, btn, loading, initialOff, labels }) {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
-  const [off, setOff] = useState(false);
-  useEffect(() => { try { setOff(localStorage.getItem('oud_ai_off') === '1'); } catch { } }, []);
-  function turnOff() { try { localStorage.setItem('oud_ai_off', '1'); } catch { } setOff(true); }
-  function turnOn() { try { localStorage.removeItem('oud_ai_off'); } catch { } setOff(false); }
+  const [off, setOff] = useState(!!initialOff);
+  const [saving, setSaving] = useState(false);
+
+  async function setPref(v) {
+    setSaving(true);
+    try {
+      const sb = createClient();
+      await sb.from('profiles').update({ ai_opt_out: v }).eq('id', userId);
+      try { v ? localStorage.setItem('oud_ai_off', '1') : localStorage.removeItem('oud_ai_off'); } catch { }
+    } catch { }
+    location.reload();
+  }
 
   async function go() {
     if (busy) return; setBusy(true); setErr(''); setText('');
@@ -26,7 +35,7 @@ export default function CompanionCard({ title, btn, loading, labels }) {
     return (
       <section className="companion companion-off">
         <span>{labels.offState}</span>
-        <button className="link-btn" onClick={turnOn}>{labels.reactivate}</button>
+        <button className="link-btn" onClick={() => setPref(false)} disabled={saving}>{labels.reactivate}</button>
       </section>
     );
   }
@@ -38,7 +47,7 @@ export default function CompanionCard({ title, btn, loading, labels }) {
       </div>
       {text && <p className="companion-text">{text}</p>}
       {err && <p className="companion-err">{err}</p>}
-      <p className="companion-consent">{labels.consent} <button className="link-btn" onClick={turnOff}>{labels.off}</button></p>
+      <p className="companion-consent">{labels.consent} <button className="link-btn" onClick={() => setPref(true)} disabled={saving}>{labels.off}</button></p>
     </section>
   );
 }

@@ -8,7 +8,9 @@ import ProgressBar from '../components/ProgressBar';
 
 export const dynamic = 'force-dynamic';
 
+let _demoCache = { at: 0, val: undefined };
 async function loadDemo() {
+  if (_demoCache.val !== undefined && Date.now() - _demoCache.at < 90000) return _demoCache.val;
   try {
     const sb = getSupabase();
     const { data: journeys } = await sb.from('journeys')
@@ -34,8 +36,11 @@ async function loadDemo() {
       if (!best) best = { journey: j, stats: st, owner: pById[j.owner_id] || {}, photo };
     }
     // só mostra jornada real quando já há volume (3+ com foto); até lá, usa a demo
-    return photoCount >= 3 ? best : null;
+    const out = photoCount >= 3 ? best : null;
+    _demoCache = { at: Date.now(), val: out };
+    return out;
   } catch (e) {}
+  _demoCache = { at: Date.now(), val: null };
   return null;
 }
 
@@ -84,6 +89,7 @@ export default async function Home() {
                   ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.05), rgba(9,12,42,.55)), url(${demo.photo})`, backgroundSize: 'cover', backgroundPosition: 'center' }
                   : { background: `linear-gradient(135deg, var(--night), ${demo.journey.cover_color})` }}>
                   <span className="demo-day">{t.cardDay} {day}</span>
+                  {demo.fallback && <span className="demo-example">{t.demoExample}</span>}
                 </div>
                 <div className="demo-body">
                   <div className="demo-who">

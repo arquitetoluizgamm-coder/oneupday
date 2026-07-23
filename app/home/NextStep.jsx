@@ -1,13 +1,10 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function NextStep({ journeyId, label, thinking, errLabel, rateLabel }) {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
-  const [off, setOff] = useState(false);
-  useEffect(() => { try { setOff(localStorage.getItem('oud_ai_off') === '1'); } catch { } }, []);
-  if (off) return null;
 
   async function go() {
     if (busy) return; setBusy(true); setErr(''); setText('');

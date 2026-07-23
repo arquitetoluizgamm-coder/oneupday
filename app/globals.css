@@ -937,3 +937,4 @@ main.wrap > section{margin-bottom:16px}
 .link-btn{border:0;background:transparent;color:var(--pink,#f02f87);font-weight:700;cursor:pointer;padding:0;font-size:inherit}
 .link-btn:hover{text-decoration:underline}
 .ai-err{color:#e11d48;font-size:13px;margin:8px 0 0}
+.demo-example{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.92);color:#0b1030;font-weight:800;font-size:11px;letter-spacing:.04em;padding:3px 10px;border-radius:999px}
