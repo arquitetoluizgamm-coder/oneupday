@@ -29,7 +29,7 @@ a{color:inherit;text-decoration:none}
 .cover p{margin:0;opacity:.85;font-size:17px}
 
 .who{display:flex;align-items:center;gap:14px;margin:22px 4px}
-.ava{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;
+.ava{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;
   color:#fff;font-weight:900;font-size:22px}
 .who b{display:block;font-size:17px}
 .who span{color:var(--muted);font-size:14px}
@@ -339,7 +339,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm);
   transition:transform .14s, box-shadow .14s}
 .feed-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
-.feed-ava{flex:0 0 auto;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;
+.feed-ava{flex:0 0 auto;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
   color:#fff;font-weight:900;font-size:18px}
 .feed-body{flex:1;min-width:0}
 .feed-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px}
@@ -357,14 +357,14 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   display:block;width:100%;height:auto;max-height:70vh;border-radius:14px;border:1px solid var(--line);background:#000}
 .ava img,.feed-ava img,.me-ava img{width:100%;height:100%;object-fit:cover;object-position:center top}
 .ava,.feed-ava,.me-ava{overflow:hidden}
-.me-ava{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:13px}
+.me-ava{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:900;font-size:13px}
 
 /* ---------- Profile card (premium) ---------- */
 .profile-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
   overflow:hidden;box-shadow:var(--shadow-md);margin:4px 0 22px}
 .pc-banner{position:relative;height:160px;background:var(--up-gradient);background-size:cover;background-position:center}
 .pc-info{position:relative;z-index:2;display:flex;align-items:flex-end;gap:16px;padding:0 24px 20px;margin-top:-44px}
-.pc-avatar{flex:0 0 auto;width:92px;height:92px;border-radius:26px;border:4px solid var(--surface);
+.pc-avatar{flex:0 0 auto;width:92px;height:92px;border-radius:50%;border:4px solid var(--surface);
   display:grid;place-items:center;color:#fff;font-weight:900;font-size:36px;overflow:hidden;box-shadow:var(--shadow-sm)}
 .pc-avatar img{width:100%;height:100%;object-fit:cover;object-position:center top}
 .pc-meta{padding-bottom:8px;min-width:0}
@@ -379,7 +379,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:520px){
   .pc-banner{height:120px}
   .pc-info{padding:0 16px 16px;gap:12px}
-  .pc-avatar{width:76px;height:76px;border-radius:22px;font-size:30px}
+  .pc-avatar{width:76px;height:76px;font-size:30px}
   .pc-meta h1{font-size:21px}
 }
 
@@ -394,3 +394,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .pj-body b{display:block;font-size:16px;letter-spacing:-.02em;margin-bottom:8px}
 .pj-body .bar{margin:0 0 8px}
 .pj-body small{color:var(--muted);font-size:12px}
+
+/* ---------- Journey cover with custom banner ---------- */
+.cover.has-banner{background-size:cover;background-position:center}
+.cover.has-banner::after{display:none}

@@ -14,7 +14,7 @@ async function loadJourney(slug) {
   const { data: journey } = await sb.from('journeys').select('*').eq('slug', slug).eq('is_public', true).maybeSingle();
   if (!journey) return null;
   const [{ data: owner }, { data: updates }, { data: stats }] = await Promise.all([
-    sb.from('profiles').select('name, handle, avatar_color, avatar_url').eq('id', journey.owner_id).maybeSingle(),
+    sb.from('profiles').select('name, handle, avatar_color, avatar_url, banner_url').eq('id', journey.owner_id).maybeSingle(),
     sb.from('updates').select('*').eq('journey_id', journey.id).order('day_number', { ascending: true }),
     sb.from('journey_stats').select('*').eq('journey_id', journey.id).maybeSingle(),
   ]);
@@ -139,7 +139,9 @@ export default async function JourneyPage({ params }) {
       </header>
 
       <main className="wrap">
-        <section className="cover" style={{ background: `linear-gradient(135deg, var(--night), ${journey.cover_color})` }}>
+        <section className={`cover${owner?.banner_url ? ' has-banner' : ''}`} style={owner?.banner_url
+          ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.25), rgba(9,12,42,.82)), url(${owner.banner_url})` }
+          : { background: `linear-gradient(135deg, var(--night), ${journey.cover_color})` }}>
           <p className="eyebrow">{t.publicJourney}</p>
           <h1>{journey.title}</h1>
           <p>{journey.goal}</p>
