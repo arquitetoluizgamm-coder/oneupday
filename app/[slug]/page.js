@@ -193,7 +193,7 @@ export default async function JourneyPage({ params }) {
                 {u.video_url && <div className="update-photo"><video src={u.video_url} controls playsInline preload="metadata" /></div>}
                 {u.text && u.text !== '📷' && u.text !== '🎥' && <p>{u.text}</p>}
                 <div className="update-foot">
-                  <EncourageBar updateId={u.id} initialCount={encById[u.id] || 0} />
+                  <EncourageBar updateId={u.id} labelIdle={t.withYouIdle} labelActive={t.withYouActive} />
                   <ReportButton updateId={u.id} label={t.report} doneLabel={t.reported} />
                 </div>
               </div>

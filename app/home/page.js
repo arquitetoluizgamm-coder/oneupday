@@ -81,20 +81,15 @@ export default async function Home() {
       .order('created_at', { ascending: false }).limit(20);
     const ups = feedUpdates || [];
     const jIds = [...new Set(ups.map(u => u.journey_id))];
-    const [{ data: js }, { data: encs }] = await Promise.all([
-      supabase.from('journeys').select('id, slug, title, cover_color, total_days, owner_id').in('id', jIds),
-      supabase.from('encouragements').select('update_id').in('update_id', ups.map(u => u.id)),
-    ]);
+    const { data: js } = await supabase.from('journeys').select('id, slug, title, cover_color, total_days, owner_id').in('id', jIds);
     const jMap = {}; (js || []).forEach(j => { jMap[j.id] = j; });
     const oIds = [...new Set((js || []).map(j => j.owner_id))];
     const { data: profs } = await supabase.from('profiles').select('id, name, avatar_color, avatar_url, handle').in('id', oIds);
     const pMap = {}; (profs || []).forEach(pr => { pMap[pr.id] = pr; });
-    const encCount = {}; (encs || []).forEach(e => { encCount[e.update_id] = (encCount[e.update_id] || 0) + 1; });
     feed = ups.map(u => {
       const j = jMap[u.journey_id]; if (!j) return null;
-      return { ...u, journey: j, owner: pMap[j.owner_id] || {}, enc: encCount[u.id] || 0 };
-    }).filter(Boolean)
-      .sort((a, b) => (b.enc - a.enc) || (new Date(b.created_at) - new Date(a.created_at)));
+      return { ...u, journey: j, owner: pMap[j.owner_id] || {} };
+    }).filter(Boolean);
   }
   const kindTag = { setback: t.tagSetback, win: t.tagWin };
 
@@ -133,7 +128,6 @@ export default async function Home() {
                   {f.photo_url && <a href={`/${f.journey.slug}`} className="feed-photo"><img src={f.photo_url} alt="" /></a>}
                   {f.video_url && <div className="feed-photo"><video src={f.video_url} controls playsInline preload="metadata" /></div>}
                   <div className="feed-actions">
-                    <span className="feed-enc">♡ {f.enc}</span>
                     <a className="feed-open" href={`/${f.journey.slug}`}>{t.viewPublic}</a>
                   </div>
                 </div>
@@ -163,6 +157,7 @@ export default async function Home() {
           <div>
             <p className="eyebrow">{t.yourJourneys}</p>
             <h1>{t.homeTitle}</h1>
+            {maxStreak > 0 && <p className="consistency">{t.consistencyLine.replace('{n}', maxStreak)}</p>}
           </div>
           <a className="cta" href="/new">{t.newJourney}</a>
         </section>

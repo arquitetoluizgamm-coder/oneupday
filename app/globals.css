@@ -579,3 +579,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   border:1px solid var(--line);border-radius:999px;padding:5px 12px;
   font-size:13px;font-weight:800;color:var(--night);cursor:help}
 .points-chip b{font-size:15px;letter-spacing:-.02em}
+
+/* ---------- Apoio silencioso (sem número) ---------- */
+.support-pill{display:inline-flex;align-items:center;gap:7px;margin-top:8px;
+  background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 16px;
+  font-weight:800;font-size:14px;color:var(--muted);cursor:pointer;transition:border-color .14s,color .14s,transform .14s}
+.support-pill:hover{transform:translateY(-1px);border-color:#d8d4cc}
+.support-pill span{font-size:16px;line-height:1}
+.support-pill.on{color:var(--pink);border-color:var(--pink);background:rgba(240,47,135,.05)}
+.support-pill:disabled{opacity:.6}
+.consistency{margin:6px 0 0;font-size:14px;font-weight:700;color:var(--muted)}
