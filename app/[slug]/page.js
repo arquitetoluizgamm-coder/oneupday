@@ -90,7 +90,7 @@ async function ProfilePage({ handle }) {
                 </div>
                 <div className="pj-body">
                   <b>{j.title}</b>
-                  <ProgressBar day={stats.current_day || 0} total={journey.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+                  <div className="bar"><span style={{ width: (pct > 0 ? Math.max(pct, 6) : 0) + '%' }} /></div>
                   <small>{fill(t.dayOf, { d: st.current_day || 0, t: j.total_days, s: st.streak || 0 })}</small>
                 </div>
               </a>
