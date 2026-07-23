@@ -744,3 +744,14 @@ a.moment-tag:hover{background:rgba(255,255,255,.28)}
 @media(max-width:520px){.create-form{padding:18px}}
 .pj-thumb{color:#fff}
 .feed-sentinel{text-align:center;color:var(--muted);font-size:13px;padding:20px}
+.followers-block{background:var(--card,#fff);border:1px solid var(--line,#eceaf3);border-radius:16px;padding:16px 18px;margin:14px 0}
+.followers-block .fb-head{display:flex;align-items:center;justify-content:space-between}
+.followers-block .fb-count{font-size:22px;font-weight:800;color:var(--night,#0b1030)}
+.followers-block .fb-who{color:var(--muted);font-size:13px;margin:2px 0 12px}
+.followers-block .fb-empty{color:var(--muted);font-size:14px;margin:8px 0 0;line-height:1.5}
+.followers-list{display:flex;flex-wrap:wrap;gap:10px}
+.follower-chip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border:1px solid var(--line,#eceaf3);border-radius:999px;text-decoration:none;color:inherit;transition:background .15s}
+.follower-chip:hover{background:var(--soft,#f7f6fb)}
+.follower-chip .fc-ava{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;overflow:hidden;flex:0 0 auto}
+.follower-chip .fc-ava img{width:100%;height:100%;object-fit:cover}
+.follower-chip .fc-name{font-weight:600;font-size:14px}

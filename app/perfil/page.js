@@ -46,9 +46,9 @@ export default async function Perfil() {
   const { data: journeys } = await supabase.from('journeys').select('*').eq('owner_id', user.id).order('created_at', { ascending: false });
   const list = journeys || [];
   const statsById = {};
-  let maxStreak = 0, updatesCount = 0, setbackCount = 0;
-  if (list.length) {
-    const jIds = list.map(j => j.id);
+  let maxStreak = 0, updatesCount = 0, setbackCount = 0, followers = [];
+  const jIds = list.map(j => j.id);
+  if (jIds.length) {
     const { data: stats } = await supabase.from('journey_stats').select('*').in('journey_id', jIds);
     (stats || []).forEach(s => { statsById[s.journey_id] = s; if ((s.streak || 0) > maxStreak) maxStreak = s.streak; });
     const [{ count: uc }, { count: sc }] = await Promise.all([
@@ -56,6 +56,12 @@ export default async function Perfil() {
       supabase.from('updates').select('*', { count: 'exact', head: true }).in('journey_id', jIds).eq('kind', 'setback'),
     ]);
     updatesCount = uc || 0; setbackCount = sc || 0;
+    const { data: fl } = await supabase.from('follows').select('user_id').in('journey_id', jIds);
+    const ids = [...new Set((fl || []).map(f => f.user_id).filter(id => id !== user.id))];
+    if (ids.length) {
+      const { data: profs } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', ids);
+      followers = profs || [];
+    }
   }
   const { count: encGiven } = await supabase.from('encouragements').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
   const points = updatesCount * 10 + setbackCount * 15 + (encGiven || 0) * 5 + maxStreak * 2;
@@ -91,6 +97,28 @@ export default async function Perfil() {
               </div>
             </div>
           </div>
+        </section>
+
+        <section className="followers-block">
+          <div className="fb-head">
+            <p className="eyebrow">{t.followersTitle}</p>
+            <b className="fb-count">{followers.length}</b>
+          </div>
+          {followers.length === 0
+            ? <p className="fb-empty">{t.followersNone}</p>
+            : (<>
+              <p className="fb-who">{t.followersWho}</p>
+              <div className="followers-list">
+                {followers.map(f => (
+                  <a className="follower-chip" key={f.id} href={`/${f.handle}`}>
+                    <span className="fc-ava" style={{ background: f.avatar_color || 'var(--orange)' }}>
+                      {f.avatar_url ? <img src={f.avatar_url} alt="" /> : (f.name || '?')[0]}
+                    </span>
+                    <span className="fc-name">{f.name}</span>
+                  </a>
+                ))}
+              </div>
+            </>)}
         </section>
 
         {aiOn && <CompanionCard title={t.companionTitle} btn={t.companionBtn} loading={t.companionLoading} />}
