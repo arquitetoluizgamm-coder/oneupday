@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { track } from '../../lib/track';
 
 async function copyText(text) {
   try { await navigator.clipboard.writeText(text); return true; } catch { }
@@ -14,7 +15,8 @@ async function copyText(text) {
 export default function FeedShare({ slug, title, label, copiedLabel }) {
   const [copied, setCopied] = useState(false);
   async function share() {
-    const url = `${window.location.origin}/${slug}`;
+    const url = `${window.location.origin}/${slug}?r=s`;
+    track('card_shared', { kind: 'link', slug });
     const isTouch = (navigator.maxTouchPoints || 0) > 0
       || (typeof window.matchMedia === 'function' && window.matchMedia('(pointer:coarse)').matches);
     // Compartilhamento nativo só no celular; no desktop é instável, então copiamos o link.

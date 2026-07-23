@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 import TrackPicker from './TrackPicker';
+import { track } from '../../lib/track';
 
 const ORDER = ['step', 'win', 'setback', 'learned'];
 
@@ -105,6 +106,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     const { error } = await supabase.from('updates').insert({ journey_id: journeyId, day_number: dayNumber, kind, text: defaultText });
     setSaving(false);
     if (error) { alert(t.error); return; }
+    track('update_posted', { journeyId, kind, quick: true });
     router.refresh();
   }
 
@@ -122,6 +124,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     const { error } = await supabase.from('updates').insert(row);
     setSaving(false);
     if (error) { alert(t.error); return; }
+    track('update_posted', { journeyId, kind });
     setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null);
     if (photoRef.current) photoRef.current.value = '';
     if (videoRef.current) videoRef.current.value = '';

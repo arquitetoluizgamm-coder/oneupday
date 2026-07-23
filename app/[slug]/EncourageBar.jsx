@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { createClient } from '../../lib/supabase/client';
+import { track } from '../../lib/track';
 
 export default function EncourageBar({ updateId, labelIdle, labelActive, initialActive = false }) {
   const [active, setActive] = useState(initialActive);
@@ -20,7 +21,7 @@ export default function EncourageBar({ updateId, labelIdle, labelActive, initial
       if (error) {
         await supabase.from('encouragements').delete().eq('update_id', updateId).eq('user_id', user.id);
         setActive(false);
-      } else setActive(true);
+      } else { setActive(true); track('encourage_sent', { updateId }); }
     }
     setBusy(false);
   }

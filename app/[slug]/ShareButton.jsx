@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { track } from '../../lib/track';
 
 function wrap(ctx, text, x, y, maxW, lh, maxLines = 3) {
   const words = String(text).split(' ');
@@ -102,6 +103,7 @@ export default function ShareButton({ journey, owner, stats, latest, label, down
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url; a.download = `one-up-day-${journey.slug}.png`; a.click();
+      track('card_generated', { kind: 'progress', slug: journey.slug });
       URL.revokeObjectURL(url); setBusy(false);
     }, 'image/png');
   }

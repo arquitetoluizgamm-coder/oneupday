@@ -5,6 +5,7 @@ import { getDict } from '../../lib/i18n';
 import Logo from '../../components/Logo';
 import BottomNav from '../../components/BottomNav';
 import FeedClient from './FeedClient';
+import Track from '../../components/Track';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -23,6 +24,7 @@ async function ensureProfile(supabase, user) {
   if (taken) handle = '@' + base + Math.floor(1000 + Math.random() * 9000);
   const profile = { id: user.id, name: meta.full_name || meta.name || base, handle, avatar_color: COLORS[Math.floor(Math.random() * COLORS.length)], avatar_url: googleAvatar };
   await supabase.from('profiles').insert(profile);
+  try { await supabase.from('events').insert({ user_id: user.id, type: 'signup' }); } catch { }
   return profile;
 }
 
@@ -59,6 +61,7 @@ export default async function Home() {
         </div>
       </header>
 
+      <Track type="visit" meta={{ page: "home" }} />
       <main className="wrap feed-page">
         {(!myJourneys || myJourneys === 0) && (
           <section className="first-journey">

@@ -938,3 +938,18 @@ main.wrap > section{margin-bottom:16px}
 .link-btn:hover{text-decoration:underline}
 .ai-err{color:#e11d48;font-size:13px;margin:8px 0 0}
 .demo-example{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.92);color:#0b1030;font-weight:800;font-size:11px;letter-spacing:.04em;padding:3px 10px;border-radius:999px}
+/* Painel admin v2 */
+.metric-h2{font-size:18px;font-weight:800;letter-spacing:-.02em;margin:26px 0 10px;color:var(--night,#0b1030)}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:var(--surface,#fff);border:1px solid var(--line,#eceaf3);border-radius:14px;padding:14px 12px;text-align:center}
+.kpi b{display:block;font-size:26px;font-weight:900;letter-spacing:-.03em;color:var(--night,#0b1030)}
+.kpi span{font-size:12px;color:var(--muted)}
+.ret-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ret-card{background:var(--surface,#fff);border:1px solid var(--line,#eceaf3);border-radius:16px;padding:16px;text-align:center}
+.ret-card.hi{background:linear-gradient(135deg,#0b1030,#26134d);color:#fff;border:0}
+.ret-card span{font-size:13px;color:var(--muted)}
+.ret-card.hi span{color:rgba(255,255,255,.7)}
+.ret-card b{display:block;font-size:34px;font-weight:900;letter-spacing:-.03em;margin:4px 0}
+.ret-card small{font-size:12px;color:var(--muted)}
+.ret-card.hi small{color:rgba(255,255,255,.6)}
+@media(max-width:560px){.kpi-row{grid-template-columns:repeat(2,1fr)}.ret-grid{grid-template-columns:1fr}}

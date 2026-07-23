@@ -13,6 +13,7 @@ import ReportButton from './ReportButton';
 import FollowUserButton from './FollowUserButton';
 import UpdateManage from './UpdateManage';
 import { notFound } from 'next/navigation';
+import Track from '../../components/Track';
 
 export const revalidate = 60;
 
@@ -136,7 +137,7 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function JourneyPage({ params }) {
+export default async function JourneyPage({ params, searchParams }) {
   let slug; try { slug = decodeURIComponent(params.slug); } catch { slug = params.slug; }
   if (slug.startsWith('@')) return <ProfilePage handle={slug} />;
   const data = await loadJourney(slug);
@@ -144,6 +145,7 @@ export default async function JourneyPage({ params }) {
   const { journey, owner, updates, stats, encById, viewerId, myEnc } = data;
   const isOwner = viewerId && viewerId === journey.owner_id;
   const myEncSet = new Set(myEnc || []);
+  const fromShare = searchParams?.r === 's';
   const locale = getLocale();
   const t = getDict(locale);
   const pct = Math.min(100, stats.progress_pct || 0);
@@ -166,6 +168,8 @@ export default async function JourneyPage({ params }) {
         </div>
       </header>
 
+      <Track type="journey_view" meta={{ slug: journey.slug }} />
+      {fromShare && <Track type="card_clicked" meta={{ slug: journey.slug }} />}
       <main className="wrap">
         <section className={`cover${owner?.banner_url ? ' has-banner' : ''}`} style={owner?.banner_url
           ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.25), rgba(9,12,42,.82)), url(${owner.banner_url})` }

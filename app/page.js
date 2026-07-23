@@ -5,6 +5,7 @@ import Logo from '../components/Logo';
 import { createClient } from '../lib/supabase/server';
 import { redirect } from 'next/navigation';
 import ProgressBar from '../components/ProgressBar';
+import Track from '../components/Track';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,6 +69,7 @@ export default async function Home() {
     <>
       <header className="top land-top"><Logo href="/" size={40} /></header>
 
+      <Track type="landing_view" />
       <main className="landing">
         <section className="land-hero">
           <h1>{t.landHeadline}</h1>

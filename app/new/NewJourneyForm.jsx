@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
+import { track } from '../../lib/track';
 
 const COLORS = {
   art: '#6c5ce7', body: '#0ea5e9', home: '#ff7a45', work: '#111827', life: '#16a34a',
@@ -105,6 +106,8 @@ export default function NewJourneyForm({ userId, t }) {
       text: first || (photoUrl ? '\u{1F4F7}' : (videoUrl ? '\u{1F3A5}' : '')),
       photo_url: photoUrl, video_url: videoUrl,
     });
+    track('journey_created', { slug, visibility });
+    track('day1_posted', { slug });
     router.push(`/created/${slug}`); router.refresh();
   }
 

@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { track } from '../../lib/track';
 
 function wrap(ctx, text, x, y, maxW, lh, maxLines = 2) {
   const words = String(text).split(' ');
@@ -69,6 +70,7 @@ export default function Dia1Card({ journey, owner, theme, label, downloading, te
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url; a.download = `meu-dia-1-${journey.slug}.png`; a.click();
+      track('card_generated', { kind: 'dia1', slug: journey.slug });
       URL.revokeObjectURL(url); setBusy(false);
     }, 'image/png');
   }
