@@ -203,7 +203,8 @@ export default async function Home() {
               <Composer journeyId={j.id} nextDay={day + 1} labels={kindLabels} t={{
                 placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
                 addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded,
-                addVideo: t.addVideo, videoAdded: t.videoAdded, videoTooBig: t.videoTooBig, error: t.postError
+                addVideo: t.addVideo, videoAdded: t.videoAdded, videoTooBig: t.videoTooBig, error: t.postError,
+                crisisTitle: t.crisisTitle, crisisText: t.crisisText
               }} />
             </section>
           );

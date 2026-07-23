@@ -117,7 +117,7 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="foot">One <b>Up</b> Day · {t.tagline}</footer>
+      <footer className="foot"><p>One <b>Up</b> Day · {t.tagline}</p><p className="foot-care">{t.notTherapy}</p></footer>
     </>
   );
 }

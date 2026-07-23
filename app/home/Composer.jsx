@@ -4,6 +4,18 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 
 const ORDER = ['step', 'win', 'setback', 'learned'];
+
+// Frases que podem indicar sofrimento intenso — mostra apoio, nunca bloqueia.
+const RISK = [
+  'nao aguento mais', 'não aguento mais', 'quero morrer', 'não quero mais viver', 'nao quero mais viver',
+  'me matar', 'tirar minha vida', 'acabar com tudo', 'quero sumir', 'quero desaparecer', 'me machucar',
+  'sem saida', 'sem saída', 'desistir de tudo', 'nao vale a pena viver', 'não vale a pena viver',
+  'i want to die', 'kill myself', 'end it all', 'hurt myself', 'cant go on', "can't go on", 'no reason to live',
+];
+function looksRisky(t) {
+  const x = (t || '').toLowerCase();
+  return RISK.some(w => x.includes(w));
+}
 const MAX_VIDEO = 60 * 1024 * 1024; // 60MB
 
 export default function Composer({ journeyId, nextDay, labels, t }) {
@@ -67,10 +79,17 @@ export default function Composer({ journeyId, nextDay, labels, t }) {
     router.refresh();
   }
 
+  const showCare = looksRisky(text);
   const ph = t.placeholder.replace('{n}', nextDay);
 
   return (
     <div className="composer2">
+      {showCare && (
+        <div className="care-box" role="note">
+          <b>{t.crisisTitle}</b>
+          <p>{t.crisisText}</p>
+        </div>
+      )}
       <input value={text} onChange={e => setText(e.target.value)} maxLength={180} placeholder={ph}
         onKeyDown={e => { if (e.key === 'Enter') post(); }} />
       {photoUrl && <div className="photo-preview"><img src={photoUrl} alt="" /></div>}
