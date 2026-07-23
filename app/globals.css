@@ -654,3 +654,20 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .companion-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .companion-head b{font-size:16px;letter-spacing:-.02em}
 .companion-text{margin:14px 0 0;font-size:16px;line-height:1.6;color:var(--ink)}
+
+/* ---------- Retrospectiva ---------- */
+.retro-cover{border-radius:var(--radius-lg);padding:30px;color:#fff;box-shadow:var(--shadow);margin-bottom:16px}
+.retro-cover .eyebrow{opacity:.75;letter-spacing:.1em}
+.retro-cover h1{margin:6px 0 0;font-size:34px;letter-spacing:-.04em}
+.retro-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 14px}
+.retro-stats article{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;text-align:center;box-shadow:var(--shadow-sm)}
+.retro-stats article.hl{background:linear-gradient(135deg,rgba(240,47,135,.08),rgba(255,211,61,.14))}
+.retro-stats b{display:block;font-size:30px;letter-spacing:-.04em}
+.retro-stats span{color:var(--muted);font-size:13px}
+.retro-started{text-align:center;font-size:16px;font-weight:700;color:var(--night);margin:6px 0 22px}
+.retro-hl{margin:8px 0 20px}
+.retro-hl h2{font-size:20px;letter-spacing:-.03em;margin:0 0 12px}
+.retro-item{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:10px}
+.retro-item.setback{border-left:3px solid var(--night)}
+.retro-day{font-weight:900;margin-right:8px}
+.retro-item p{margin:8px 0 0;color:#374151}

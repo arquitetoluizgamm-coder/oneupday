@@ -199,6 +199,7 @@ export default async function Home() {
                 </div>
                 <div className="jcard-tools">
                   <PrivacyToggle journeyId={j.id} initial={j.visibility || (j.is_public ? 'public' : 'private')} labels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} />
+                  <a className="view-link" href={`/retro/${j.slug}`}>{t.retroLink}</a>
                   <a className="view-link" href={`/${j.slug}`}>{t.viewPublic}</a>
                 </div>
               </div>
