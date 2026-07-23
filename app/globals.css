@@ -953,3 +953,14 @@ main.wrap > section{margin-bottom:16px}
 .ret-card small{font-size:12px;color:var(--muted)}
 .ret-card.hi small{color:rgba(255,255,255,.6)}
 @media(max-width:560px){.kpi-row{grid-template-columns:repeat(2,1fr)}.ret-grid{grid-template-columns:1fr}}
+/* Home premium: seu passo primeiro, feed como apoio */
+.today{background:var(--surface,#fff);border:1px solid var(--line,#eceaf3);border-radius:22px;padding:18px 18px 16px;margin:4px 0 14px}
+.today-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.today-head .eyebrow{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--muted)}
+.today-journey{margin-bottom:8px}
+.tj-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px}
+.tj-top b{font-size:19px;letter-spacing:-.02em}
+.tiny-link{font-size:13px;font-weight:600;color:var(--pink,#f02f87);text-decoration:none}
+.tiny-link:hover{text-decoration:underline}
+.feed-lead{margin:18px 0 6px}
+.feed-lead .eyebrow{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--muted)}

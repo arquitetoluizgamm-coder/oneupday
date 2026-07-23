@@ -5,6 +5,9 @@ import { getDict } from '../../lib/i18n';
 import Logo from '../../components/Logo';
 import BottomNav from '../../components/BottomNav';
 import FeedClient from './FeedClient';
+import Composer from './Composer';
+import NextStep from './NextStep';
+import ProgressBar from '../../components/ProgressBar';
 import Track from '../../components/Track';
 
 export const dynamic = 'force-dynamic';
@@ -35,9 +38,28 @@ export default async function Home() {
   const profile = await ensureProfile(supabase, user);
   const t = getDict(getLocale());
   const { count: unread } = await supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('recipient_id', user.id).eq('read', false);
-  const { count: myJourneys } = await supabase.from('journeys').select('*', { count: 'exact', head: true }).eq('owner_id', user.id);
 
-  const labels = {
+  const { data: journeys } = await supabase.from('journeys').select('*').eq('owner_id', user.id).order('created_at', { ascending: false });
+  const list = journeys || [];
+  const primary = list[0] || null;
+  let pstats = {};
+  if (primary) { const { data: st } = await supabase.from('journey_stats').select('*').eq('journey_id', primary.id).maybeSingle(); pstats = st || {}; }
+
+  let aiPrefOff = false;
+  try { const { data: pref } = await supabase.from('profiles').select('ai_opt_out').eq('id', user.id).maybeSingle(); aiPrefOff = !!pref?.ai_opt_out; } catch { }
+  const aiOn = !!process.env.OPENAI_API_KEY && !aiPrefOff && !!primary;
+
+  const kindLabels = { step: t.kindStep, win: t.kindWin, setback: t.kindSetback, learned: t.kindLearned };
+  const composerT = {
+    placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
+    addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded, addVideo: t.addVideo, videoAdded: t.videoAdded, videoTooBig: t.videoTooBig,
+    crisisTitle: t.crisisTitle, crisisText: t.crisisText, ritualQ: t.ritualQ, rDid: t.rDid, rTried: t.rTried, rPaused: t.rPaused,
+    rDidText: t.rDidText, rTriedText: t.rTriedText, rPausedText: t.rPausedText, aiWrite: t.aiWrite,
+    musicAdd: t.musicAdd, musicTitle: t.musicTitle, musicUse: t.musicUse, musicRemove: t.musicRemove, musicEmpty: t.musicEmpty, musicSearchPh: t.musicSearchPh, musicKeyNeeded: t.musicKeyNeeded,
+    aiErr: t.aiErr, aiRateErr: t.aiRateErr,
+  };
+
+  const feedLabels = {
     dayShort: t.dayShort, tagSetback: t.tagSetback, tagWin: t.tagWin,
     viewPublic: t.viewPublic, muteTopic: t.muteTopic,
     inviteTitle: t.feedInviteTitle, inviteSub: t.feedInviteSub, inviteCta: t.feedInviteCta, loading: '',
@@ -63,7 +85,7 @@ export default async function Home() {
 
       <Track type="visit" meta={{ page: "home" }} />
       <main className="wrap feed-page">
-        {(!myJourneys || myJourneys === 0) && (
+        {!primary && (
           <section className="first-journey">
             <span className="fj-eyebrow">{t.fjEyebrow}</span>
             <h1>{t.fjTitle.replace('{name}', (profile.name || '').split(' ')[0])}</h1>
@@ -72,7 +94,24 @@ export default async function Home() {
             <p className="fj-hint">{t.fjHint}</p>
           </section>
         )}
-        <FeedClient mutedCats={profile.muted_cats || ''} labels={labels} />
+
+        {primary && (
+          <section className="today">
+            <div className="today-head">
+              <span className="eyebrow">{t.homeTitle}</span>
+              <a className="tiny-link" href="/perfil">{t.manageJourneys}{list.length > 1 ? ` · ${list.length}` : ''}</a>
+            </div>
+            <div className="today-journey">
+              <div className="tj-top"><b>{primary.title}</b><a href={`/${primary.slug}`} className="tiny-link">{t.viewPublic}</a></div>
+              <ProgressBar day={pstats.current_day || 0} total={primary.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+            </div>
+            <Composer journeyId={primary.id} startDate={primary.created_at} aiOn={aiOn} labels={kindLabels} t={composerT} />
+            {aiOn && <NextStep journeyId={primary.id} label={t.aiNextStep} thinking={t.aiThinking} errLabel={t.aiErr} rateLabel={t.aiRateErr} />}
+          </section>
+        )}
+
+        <section className="feed-lead"><span className="eyebrow">{t.feedQuestion}</span></section>
+        <FeedClient mutedCats={profile.muted_cats || ''} labels={feedLabels} />
       </main>
       <BottomNav active="home" t={t} />
     </>
