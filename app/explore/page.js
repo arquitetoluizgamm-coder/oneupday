@@ -57,7 +57,7 @@ export default async function Explore({ searchParams }) {
         <div className="cat-chips moments">
           <a className={`chip${!moment ? ' on' : ''}`} href="/explore">{t.momentAll}</a>
           {MOMENTS.map(([v, l]) => (
-            <a key={v} className={`chip moment${moment === v ? ' on' : ''}`} href={`/explore?moment=${v}`}>{l}</a>
+            <a key={v} className={`chip moment${moment === v ? ' on' : ''}`} href={`/grupo/${v}`}>{l}</a>
           ))}
         </div>
 

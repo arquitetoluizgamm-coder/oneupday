@@ -153,7 +153,7 @@ export default async function JourneyPage({ params }) {
           ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.25), rgba(9,12,42,.82)), url(${owner.banner_url})` }
           : { background: `linear-gradient(135deg, var(--night), ${journey.cover_color})` }}>
           <p className="eyebrow">{t.publicJourney}</p>
-          {momentLabel && <span className="moment-tag">{momentLabel}</span>}
+          {momentLabel && <a className="moment-tag" href={`/grupo/${journey.moment}`}>{momentLabel}</a>}
           <h1>{journey.title}</h1>
           <p>{journey.goal}</p>
         </section>

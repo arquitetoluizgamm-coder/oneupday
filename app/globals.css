@@ -671,3 +671,14 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .retro-item.setback{border-left:3px solid var(--night)}
 .retro-day{font-weight:900;margin-right:8px}
 .retro-item p{margin:8px 0 0;color:#374151}
+
+/* ---------- Comunidades (grupos por momento) ---------- */
+.group-hero{margin:8px 0 20px}
+.group-hero h1{font-size:34px;letter-spacing:-.04em;margin:4px 0 8px}
+.group-sub{color:var(--muted);font-weight:700}
+.pj-who{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.pj-ava{width:26px;height:26px;border-radius:50%;overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:900;font-size:12px;flex:0 0 auto}
+.pj-ava img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.pj-who b{font-size:15px;letter-spacing:-.02em}
+a.moment-tag{text-decoration:none}
+a.moment-tag:hover{background:rgba(255,255,255,.28)}
