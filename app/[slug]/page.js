@@ -4,6 +4,7 @@ import { getDict, fill } from '../../lib/i18n';
 import Logo from '../../components/Logo';
 import ShareButton from './ShareButton';
 import EncourageBar from './EncourageBar';
+import FollowButton from './FollowButton';
 import { notFound } from 'next/navigation';
 
 export const revalidate = 60;
@@ -45,6 +46,10 @@ export default async function JourneyPage({ params }) {
   const pct = Math.min(100, stats.progress_pct || 0);
   const initial = (owner?.name || '?')[0];
   const latest = updates.length ? updates[updates.length - 1] : null;
+  const withPhoto = updates.filter(u => u.photo_url);
+  const beforePhoto = withPhoto[0] || null;
+  const nowPhoto = withPhoto.length > 1 ? withPhoto[withPhoto.length - 1] : null;
+  const showBeforeNow = beforePhoto && nowPhoto && beforePhoto.id !== nowPhoto.id;
   const tagFor = k => k === 'setback' ? t.tagSetback : k === 'win' ? t.tagWin : null;
 
   return (
@@ -69,6 +74,7 @@ export default async function JourneyPage({ params }) {
             <b>{owner?.name}</b>
             <span>{owner?.handle} · {fill(t.dayXofY, { d: stats.current_day || 0, t: journey.total_days })}</span>
           </div>
+          <FollowButton journeyId={journey.id} labelFollow={t.follow} labelFollowing={t.following} />
         </div>
 
         <div className="stats">
@@ -77,6 +83,19 @@ export default async function JourneyPage({ params }) {
           <article><b>{pct}%</b><span>{t.progress}</span></article>
         </div>
         <div className="bar"><span style={{ width: pct + '%' }} /></div>
+
+        {showBeforeNow && (
+          <section className="before-now">
+            <figure>
+              <img src={beforePhoto.photo_url} alt="" />
+              <figcaption><span>{t.before}</span><small>{fill(t.dayShort, { d: beforePhoto.day_number })}</small></figcaption>
+            </figure>
+            <figure>
+              <img src={nowPhoto.photo_url} alt="" />
+              <figcaption><span>{t.now}</span><small>{fill(t.dayShort, { d: nowPhoto.day_number })}</small></figcaption>
+            </figure>
+          </section>
+        )}
 
         <section className="timeline">
           {updates.slice().reverse().map((u, i, arr) => (

@@ -296,3 +296,58 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   .cover h1{font-size:32px}
   .brand-logo{font-size:17px}
 }
+
+/* ---------- Before / Now ---------- */
+.before-now{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 22px}
+.before-now figure{margin:0;position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line)}
+.before-now img{display:block;width:100%;height:240px;object-fit:cover}
+.before-now figcaption{position:absolute;left:10px;bottom:10px;display:flex;align-items:center;gap:8px;
+  background:rgba(9,12,42,.72);color:#fff;padding:5px 12px;border-radius:999px;backdrop-filter:blur(6px)}
+.before-now figcaption span{font-weight:900;font-size:13px;letter-spacing:.02em}
+.before-now figcaption small{opacity:.75;font-size:12px}
+.before-now figure:last-child figcaption{background:var(--up-gradient);color:#111}
+.before-now figure:last-child figcaption small{opacity:.7}
+@media(max-width:520px){.before-now img{height:180px}}
+
+/* ---------- Onboarding block ---------- */
+.onboarding-block{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+  padding:28px;box-shadow:var(--shadow-md);position:relative;overflow:hidden}
+.onboarding-block::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--up-gradient)}
+.ob-head h2{font-size:26px;letter-spacing:-.035em;margin:2px 0 6px}
+.ob-head p{color:var(--muted);margin:0 0 18px;max-width:520px}
+.ob-steps{list-style:none;display:flex;flex-wrap:wrap;gap:10px;padding:0;margin:0 0 22px}
+.ob-steps li{display:flex;align-items:center;gap:8px;background:#fbfbfa;border:1px solid var(--line);
+  border-radius:999px;padding:8px 14px;font-weight:800;font-size:13px}
+.ob-steps li span{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;
+  background:var(--night);color:#fff;font-size:12px}
+@media(max-width:520px){.ob-steps{flex-direction:column;align-items:stretch}}
+
+/* ---------- Follow button ---------- */
+.follow-btn{background:var(--night);color:#fff;border:0;border-radius:999px;padding:9px 18px;
+  font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap;transition:transform .14s, opacity .14s}
+.follow-btn.on{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.follow-btn:hover{transform:translateY(-1px)}
+.follow-btn:disabled{opacity:.6}
+
+/* ---------- Home feed ---------- */
+.feed{margin-top:30px}
+.feed-head{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+.feed-head h2{font-size:20px;letter-spacing:-.03em;margin:0}
+.feed-badge{background:var(--up-gradient);color:#111;font-weight:900;font-size:11px;
+  padding:3px 10px;border-radius:999px;letter-spacing:.02em}
+.feed-card{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm);
+  transition:transform .14s, box-shadow .14s}
+.feed-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.feed-ava{flex:0 0 auto;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;
+  color:#fff;font-weight:900;font-size:18px}
+.feed-body{flex:1;min-width:0}
+.feed-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px}
+.feed-top b{font-size:15px}
+.feed-top span{color:var(--muted);font-size:13px}
+.feed-body p{margin:6px 0 0;color:#2b2f38}
+.feed-photo{display:block;margin-top:10px}
+.feed-photo img{width:100%;max-height:320px;object-fit:cover;border-radius:14px;border:1px solid var(--line)}
+.feed-actions{display:flex;align-items:center;gap:14px;margin-top:10px}
+.feed-enc{color:var(--pink);font-weight:800;font-size:14px}
+.feed-open{color:var(--muted);font-weight:800;font-size:13px}

@@ -4,6 +4,7 @@ import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
 import Logo from '../../components/Logo';
 import Composer from './Composer';
+import NewJourneyForm from '../new/NewJourneyForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +39,42 @@ export default async function Home() {
     (stats || []).forEach(s => { statsById[s.journey_id] = s; });
   }
 
+  // ---- Feed (seguidas; se não segue ninguém, descoberta) ----
+  const { data: follows } = await supabase.from('follows').select('journey_id').eq('user_id', user.id);
+  const followedIds = (follows || []).map(f => f.journey_id);
+  let targetIds = followedIds;
+  const discovery = followedIds.length === 0;
+  if (discovery) {
+    const { data: pub } = await supabase.from('journeys')
+      .select('id').eq('is_public', true).neq('owner_id', user.id)
+      .order('created_at', { ascending: false }).limit(20);
+    targetIds = (pub || []).map(j => j.id);
+  }
+
+  let feed = [];
+  if (targetIds.length) {
+    const { data: feedUpdates } = await supabase.from('updates')
+      .select('id, day_number, kind, text, photo_url, created_at, journey_id')
+      .in('journey_id', targetIds)
+      .order('created_at', { ascending: false }).limit(20);
+    const ups = feedUpdates || [];
+    const jIds = [...new Set(ups.map(u => u.journey_id))];
+    const [{ data: js }, { data: encs }] = await Promise.all([
+      supabase.from('journeys').select('id, slug, title, cover_color, total_days, owner_id').in('id', jIds),
+      supabase.from('encouragements').select('update_id').in('update_id', ups.map(u => u.id)),
+    ]);
+    const jMap = {}; (js || []).forEach(j => { jMap[j.id] = j; });
+    const oIds = [...new Set((js || []).map(j => j.owner_id))];
+    const { data: profs } = await supabase.from('profiles').select('id, name, avatar_color').in('id', oIds);
+    const pMap = {}; (profs || []).forEach(pr => { pMap[pr.id] = pr; });
+    const encCount = {}; (encs || []).forEach(e => { encCount[e.update_id] = (encCount[e.update_id] || 0) + 1; });
+    feed = ups.map(u => {
+      const j = jMap[u.journey_id]; if (!j) return null;
+      return { ...u, journey: j, owner: pMap[j.owner_id] || {}, enc: encCount[u.id] || 0 };
+    }).filter(Boolean);
+  }
+  const kindTag = { setback: t.tagSetback, win: t.tagWin };
+
   const kindLabels = { step: t.kindStep, win: t.kindWin, setback: t.kindSetback, learned: t.kindLearned };
 
   return (
@@ -60,11 +97,24 @@ export default async function Home() {
         </section>
 
         {list.length === 0 && (
-          <div className="empty">
-            <b>{t.noJourneyTitle}</b>
-            <p>{t.noJourneySub}</p>
-            <a className="cta" href="/new">{t.createFirst}</a>
-          </div>
+          <section className="onboarding-block">
+            <div className="ob-head">
+              <h2>{t.obTitle.replace('{name}', profile.name.split(' ')[0])}</h2>
+              <p>{t.obSub}</p>
+            </div>
+            <ol className="ob-steps">
+              <li><span>1</span>{t.obStep1}</li>
+              <li><span>2</span>{t.obStep2}</li>
+              <li><span>3</span>{t.obStep3}</li>
+            </ol>
+            <NewJourneyForm userId={user.id} t={{
+              fName: t.fName, fNamePh: t.fNamePh, fCategory: t.fCategory, fDuration: t.fDuration,
+              fWhy: t.fWhy, fWhyPh: t.fWhyPh, fFirst: t.fFirst, fFirstPh: t.fFirstPh,
+              createBtn: t.createBtn, creating: t.creating, error: t.createError,
+              catArt: t.catArt, catLife: t.catLife, catBody: t.catBody, catHome: t.catHome, catWork: t.catWork,
+              dur7: t.dur7, dur30: t.dur30, dur60: t.dur60, dur100: t.dur100,
+            }} />
+          </section>
         )}
 
         {list.map(j => {
@@ -88,6 +138,35 @@ export default async function Home() {
             </section>
           );
         })}
+
+        {feed.length > 0 && (
+          <section className="feed">
+            <div className="feed-head">
+              <h2>{t.feedTitle}</h2>
+              {discovery && <span className="feed-badge">{t.discover}</span>}
+            </div>
+            {feed.map(f => (
+              <article className="feed-card" key={f.id}>
+                <a className="feed-ava" href={`/${f.journey.slug}`} style={{ background: f.owner.avatar_color || 'var(--orange)' }}>
+                  {(f.owner.name || '?')[0]}
+                </a>
+                <div className="feed-body">
+                  <div className="feed-top">
+                    <a href={`/${f.journey.slug}`}><b>{f.owner.name}</b></a>
+                    <span>{fill(t.dayShort, { d: f.day_number })} · {f.journey.title}</span>
+                  </div>
+                  {kindTag[f.kind] && <span className={`post-tag ${f.kind}`}>{kindTag[f.kind]}</span>}
+                  {f.text && f.text !== '\u{1F4F7}' && <p>{f.text}</p>}
+                  {f.photo_url && <a href={`/${f.journey.slug}`} className="feed-photo"><img src={f.photo_url} alt="" /></a>}
+                  <div className="feed-actions">
+                    <span className="feed-enc">♡ {f.enc}</span>
+                    <a className="feed-open" href={`/${f.journey.slug}`}>{t.viewPublic}</a>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </section>
+        )}
       </main>
     </>
   );
