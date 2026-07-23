@@ -4,6 +4,7 @@ import { getLocale } from '../../lib/locale';
 import { getDict } from '../../lib/i18n';
 import Logo from '../../components/Logo';
 import NewJourneyForm from './NewJourneyForm';
+import BottomNav from '../../components/BottomNav';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,6 +37,7 @@ export default async function NewJourney() {
           dur7: t.dur7, dur30: t.dur30, dur60: t.dur60, dur100: t.dur100,
         }} />
       </main>
+      <BottomNav active="create" t={t} />
     </>
   );
 }

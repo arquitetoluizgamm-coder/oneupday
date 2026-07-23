@@ -5,6 +5,7 @@ import Logo from '../../components/Logo';
 import ShareButton from './ShareButton';
 import EncourageBar from './EncourageBar';
 import FollowButton from './FollowButton';
+import ReportButton from './ReportButton';
 import { notFound } from 'next/navigation';
 
 export const revalidate = 60;
@@ -109,6 +110,7 @@ export async function generateMetadata({ params }) {
   return {
     title: `${journey.title} — Day ${stats.current_day || 0} of ${journey.total_days} · One Up Day`,
     description: journey.goal || '',
+    twitter: { card: 'summary_large_image' },
   };
 }
 
@@ -189,7 +191,10 @@ export default async function JourneyPage({ params }) {
                 {u.photo_url && <div className="update-photo"><img src={u.photo_url} alt="" /></div>}
                 {u.video_url && <div className="update-photo"><video src={u.video_url} controls playsInline preload="metadata" /></div>}
                 {u.text && u.text !== '📷' && u.text !== '🎥' && <p>{u.text}</p>}
-                <EncourageBar updateId={u.id} initialCount={encById[u.id] || 0} />
+                <div className="update-foot">
+                  <EncourageBar updateId={u.id} initialCount={encById[u.id] || 0} />
+                  <ReportButton updateId={u.id} label={t.report} doneLabel={t.reported} />
+                </div>
               </div>
             </article>
           ))}

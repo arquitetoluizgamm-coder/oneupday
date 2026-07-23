@@ -6,6 +6,8 @@ import Logo from '../../components/Logo';
 import Composer from './Composer';
 import NewJourneyForm from '../new/NewJourneyForm';
 import EditBanner from '../../components/EditBanner';
+import BottomNav from '../../components/BottomNav';
+import PrivacyToggle from './PrivacyToggle';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,6 +41,8 @@ export default async function Home() {
   const locale = getLocale();
   const t = getDict(locale);
 
+  const { count: unread } = await supabase.from('notifications')
+    .select('*', { count: 'exact', head: true }).eq('recipient_id', user.id).eq('read', false);
   const { data: journeys } = await supabase.from('journeys').select('*').eq('owner_id', user.id).order('created_at', { ascending: false });
   const list = journeys || [];
   const statsById = {};
@@ -89,7 +93,14 @@ export default async function Home() {
     <>
       <header className="top">
         <Logo />
-        <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
+        <div className="top-right">
+          <a className="bell" href="/notifications" aria-label={t.notifications}>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" /></svg>
+            {unread > 0 && <b>{unread > 9 ? '9+' : unread}</b>}
+          </a>
+          <a className="ghost-btn" href="/explore">{t.explore}</a>
+          <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
+        </div>
       </header>
 
       <main className="wrap">
@@ -147,7 +158,10 @@ export default async function Home() {
                   <h2>{j.title}</h2>
                   <span>{fill(t.dayOf, { d: day, t: j.total_days, s: s.streak || 0 })}</span>
                 </div>
-                <a className="view-link" href={`/${j.slug}`} target="_blank" rel="noreferrer">{t.viewPublic}</a>
+                <div className="jcard-tools">
+                  <PrivacyToggle journeyId={j.id} initialPublic={j.is_public} labelPublic={t.pubPublic} labelPrivate={t.pubPrivate} />
+                  <a className="view-link" href={`/${j.slug}`} target="_blank" rel="noreferrer">{t.viewPublic}</a>
+                </div>
               </div>
               <div className="bar"><span style={{ width: pct + '%' }} /></div>
               <Composer journeyId={j.id} nextDay={day + 1} labels={kindLabels} t={{
@@ -189,6 +203,7 @@ export default async function Home() {
           </section>
         )}
       </main>
+      <BottomNav active="home" t={t} />
     </>
   );
 }

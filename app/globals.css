@@ -405,3 +405,60 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .who-name:hover b{text-decoration:underline}
 .feed-top a{color:inherit}
 .feed-top a:hover b{text-decoration:underline}
+
+/* ---------- Explore ---------- */
+.search-box{margin:0 0 14px}
+.search-box input{width:100%;border:1px solid var(--line);border-radius:16px;padding:13px 16px;
+  font:inherit;background:#fbfbfa}
+.search-box input:focus{outline:0;border-color:var(--night);box-shadow:0 0 0 4px rgba(9,12,42,.06)}
+.cat-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+.chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 15px;
+  font-weight:800;font-size:13px;color:var(--ink);transition:border-color .14s,transform .14s}
+.chip:hover{transform:translateY(-1px);border-color:#d8d4cc}
+.chip.on{background:var(--night);color:#fff;border-color:var(--night)}
+
+/* ---------- Desktop pass ---------- */
+@media(min-width:1000px){
+  .wrap,.top{max-width:768px}
+  .hero{max-width:768px;padding-top:64px}
+  .hero h1{font-size:66px}
+  .pj-grid{grid-template-columns:repeat(auto-fill,minmax(232px,1fr))}
+}
+
+/* ---------- Bottom nav (mobile) ---------- */
+.bottom-nav{display:none}
+@media(max-width:860px){
+  body{padding-bottom:74px}
+  .bottom-nav{display:grid;grid-template-columns:repeat(3,1fr);position:fixed;left:0;right:0;bottom:0;z-index:30;
+    background:rgba(255,255,255,.95);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
+  .bottom-nav a{display:grid;place-items:center;gap:3px;padding:10px 6px 12px;color:var(--muted);font-weight:800;font-size:11px}
+  .bottom-nav a.on{color:var(--ink)}
+  .bottom-nav a.on svg{color:var(--orange)}
+}
+
+/* ---------- Privacy toggle + tools ---------- */
+.jcard-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.privacy-toggle{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;
+  font-weight:800;font-size:12px;color:var(--muted);cursor:pointer}
+.privacy-toggle.pub{color:var(--green);border-color:rgba(22,163,74,.35)}
+.privacy-toggle:disabled{opacity:.6}
+
+/* ---------- Report ---------- */
+.update-foot{display:flex;align-items:center;gap:14px;margin-top:8px}
+.report-btn{background:none;border:0;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;opacity:.7}
+.report-btn:hover{opacity:1;color:var(--pink)}
+.report-btn:disabled{opacity:.5}
+
+/* ---------- Notifications ---------- */
+.bell{position:relative;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;
+  border:1px solid var(--line);background:#fff;color:var(--ink)}
+.bell b{position:absolute;top:-4px;right:-4px;background:var(--pink);color:#fff;font-size:11px;
+  min-width:18px;height:18px;border-radius:999px;display:grid;place-items:center;padding:0 4px}
+.notif-list{display:flex;flex-direction:column;gap:2px}
+.notif-item{display:flex;gap:12px;align-items:center;padding:14px 12px;border-radius:14px;color:inherit}
+.notif-item:hover{background:var(--surface)}
+.notif-item.unread{background:rgba(240,47,135,.05)}
+.notif-ava{flex:0 0 auto;width:40px;height:40px;border-radius:50%;overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:900}
+.notif-ava img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.notif-item p{margin:0;font-weight:600}
+.notif-item small{color:var(--muted)}
