@@ -1,8 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Comments({ updateId, labels }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [items, setItems] = useState([]);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -15,6 +15,7 @@ export default function Comments({ updateId, labels }) {
     const data = await response.json().catch(() => ({}));
     setItems(data.comments || []);
   }
+  useEffect(() => { load(); }, [updateId]);
   async function toggle() {
     const next = !open; setOpen(next); setMessage('');
     if (next) await load();

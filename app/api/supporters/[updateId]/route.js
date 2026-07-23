@@ -18,6 +18,6 @@ export async function GET(_req, { params }) {
   const ids = [...new Set((encouragements || []).map(e => e.user_id))];
   if (!ids.length) return NextResponse.json({ people: [] });
   const { data: profiles } = await supabase
-    .from('profiles').select('id, name, avatar_url, avatar_color').in('id', ids);
+    .from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', ids);
   return NextResponse.json({ people: profiles || [] });
 }

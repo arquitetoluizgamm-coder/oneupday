@@ -50,7 +50,10 @@ export default function EncourageBar({ updateId, labelIdle, labelActive, support
       <button type="button" className="supporters-link" onClick={showPeople} aria-expanded={supportersOpen}>
         {loadingPeople ? supportersLoading : supportersLabel}
       </button>
-      {supportersOpen && people && <div className="supporters-popover">{people.length ? people.map(p => <span key={p.id}>{p.name}</span>) : <span>{supportersEmpty}</span>}</div>}
+      {supportersOpen && people && <div className="supporters-popover">
+        <button type="button" className="supporters-close" onClick={() => setSupportersOpen(false)} aria-label="Fechar">×</button>
+        {people.length ? people.map(p => p.handle ? <a key={p.id} href={`/${p.handle}`}>{p.name}</a> : <span key={p.id}>{p.name}</span>) : <span>{supportersEmpty}</span>}
+      </div>}
     </div>
   );
 }
