@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 import TrackPicker from './TrackPicker';
@@ -29,7 +29,13 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [track, setTrack] = useState(null);
   const photoRef = useRef(null);
   const videoRef = useRef(null);
+  const inputRef = useRef(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const el = inputRef.current;
+    if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 220) + 'px'; }
+  }, [text]);
 
   async function upload(file) {
     const supabase = createClient();
@@ -124,8 +130,9 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           <p>{t.crisisText}</p>
         </div>
       )}
-      <input value={text} onChange={e => setText(e.target.value)} maxLength={500} placeholder={ph}
-        onKeyDown={e => { if (e.key === 'Enter') post(); }} />
+      <textarea ref={inputRef} className="composer2-input" value={text} onChange={e => setText(e.target.value)}
+        maxLength={500} placeholder={ph} rows={1}
+        onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); post(); } }} />
       {aiOn && <button type="button" className="ai-write" onClick={aiWrite} disabled={saving || uploading}>{t.aiWrite}</button>}
       {photoUrl && <div className="photo-preview"><img src={photoUrl} alt="" /></div>}
       {videoUrl && <div className="photo-preview"><video src={videoUrl} controls playsInline /></div>}
