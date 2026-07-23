@@ -1,6 +1,7 @@
 import { getSupabase } from '../../lib/supabase';
 import { getLocale } from '../../lib/locale';
 import { getDict } from '../../lib/i18n';
+import { looksRisky } from '../../lib/risky';
 import Logo from '../../components/Logo';
 
 export const revalidate = 300;
@@ -21,12 +22,20 @@ async function loadWall() {
     const ids = js.map(j => j.id);
     const jMap = {}; js.forEach(j => { jMap[j.id] = j; });
     const { data: ups } = await sb.from('updates')
-      .select('journey_id, text, photo_url, day_number').in('journey_id', ids).eq('day_number', 1);
+      .select('id, journey_id, text, photo_url, day_number').in('journey_id', ids).eq('day_number', 1);
+    const upList = ups || [];
+    let reported = new Set();
+    if (upList.length) {
+      const { data: reps } = await sb.from('reports').select('update_id').in('update_id', upList.map(u => u.id));
+      reported = new Set((reps || []).map(r => r.update_id));
+    }
     const owners = [...new Set(js.map(j => j.owner_id))];
     const { data: profs } = await sb.from('profiles').select('id, name, avatar_url, avatar_color').in('id', owners);
     const pMap = {}; (profs || []).forEach(p => { pMap[p.id] = p; });
-    const cards = (ups || []).map(u => {
+    const cards = upList.map(u => {
       const j = jMap[u.journey_id]; if (!j) return null;
+      if (reported.has(u.id)) return null;
+      if (looksRisky(u.text)) return null;
       return { slug: j.slug, title: j.title, cover_color: j.cover_color, photo: u.photo_url, text: u.text, owner: pMap[j.owner_id] || {} };
     }).filter(Boolean);
     // fotos primeiro

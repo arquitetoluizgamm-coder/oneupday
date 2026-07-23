@@ -9,7 +9,7 @@ const COLORS = {
   relationship: '#f02f87', habit: '#ff7a45', creative: '#a855f7',
 };
 const MAX_VIDEO = 60 * 1024 * 1024;
-const STEPS = 4;
+const STEPS = 6;
 
 function slugify(title) {
   const base = title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -46,7 +46,12 @@ export default function NewJourneyForm({ userId, t }) {
     ['health', t.mHealth], ['courage', t.mCourage], ['hardphase', t.mHardphase], ['building', t.mBuilding],
   ];
   const heads = [
-    [t.wizT1, t.wizS1], [t.wizT2, t.wizS2], [t.wizT3, t.wizS3], [t.wizT4, t.wizS4],
+    [t.wizT1, t.wizS1],       // Nome
+    [t.wizTcat, t.wizScat],   // Categoria
+    [t.wizTmom, t.wizSmom],   // Momento
+    [t.wizTpriv, t.wizSpriv], // Privacidade
+    [t.wizT3, t.wizS3],       // Meta
+    [t.wizT4, t.wizS4],       // Primeiro dia
   ];
 
   async function upload(file) {
@@ -71,7 +76,7 @@ export default function NewJourneyForm({ userId, t }) {
     setVideoUrl(url); setPhotoUrl(null); if (photoRef.current) photoRef.current.value = '';
   }
 
-  const canNext = (step === 0 && title.trim()) || (step === 1) || (step === 2 && goal.trim()) || step === 3;
+  const canNext = (step === 0 && !!title.trim()) || step === 1 || step === 2 || step === 3 || (step === 4 && !!goal.trim()) || step === 5;
   function next() { if (canNext && step < STEPS - 1) setStep(step + 1); }
   function back() { if (step > 0) setStep(step - 1); }
 
@@ -84,10 +89,15 @@ export default function NewJourneyForm({ userId, t }) {
 
     const supabase = createClient();
     const slug = slugify(title);
-    const { data: journey, error } = await supabase.from('journeys').insert({
+    const payload = {
       owner_id: userId, slug, title: title.trim(), category, goal: goal.trim(), total_days,
       cover_color: COLORS[category] || '#ff7a45', is_public: visibility === 'public', visibility, moment: moment || null,
-    }).select().single();
+    };
+    let { data: journey, error } = await supabase.from('journeys').insert(payload).select().single();
+    if (error && /visibility|column/i.test(error.message || '')) {
+      const { visibility: _v, ...noVis } = payload;
+      ({ data: journey, error } = await supabase.from('journeys').insert(noVis).select().single());
+    }
     if (error || !journey) { setSaving(false); alert(t.createError); return; }
 
     await supabase.from('updates').insert({
@@ -129,9 +139,8 @@ export default function NewJourneyForm({ userId, t }) {
         </div>
       </div>
 
-      {/* Step 1 — Categoria + momento */}
+      {/* Step 1 — Categoria */}
       <div className="wiz-step" style={{ display: step === 1 ? 'block' : 'none' }}>
-        <div className="field-label">{t.fCategory}</div>
         <div className="cat-pick">
           {CATS.map(([v, l]) => (
             <button key={v} type="button" className={`chip${cat === v ? ' on' : ''}`} onClick={() => setCat(v)}>{l}</button>
@@ -139,13 +148,19 @@ export default function NewJourneyForm({ userId, t }) {
           <button type="button" className={`chip${cat === 'other' ? ' on' : ''}`} onClick={() => setCat('other')}>+ {t.catOther}</button>
         </div>
         {cat === 'other' && <input ref={customRef} className="custom-cat" maxLength={24} placeholder={t.customCatPh} />}
-        <div className="field-label" style={{ marginTop: 16 }}>{t.momentQ} <span className="opt">({t.optional})</span></div>
+      </div>
+
+      {/* Step 2 — Momento */}
+      <div className="wiz-step" style={{ display: step === 2 ? 'block' : 'none' }}>
         <div className="cat-pick">
           {MOMENTS.map(([v, l]) => (
             <button key={v} type="button" className={`chip moment${moment === v ? ' on' : ''}`} onClick={() => setMoment(moment === v ? '' : v)}>{l}</button>
           ))}
         </div>
-        <div className="field-label" style={{ marginTop: 16 }}>{t.privacyQ}</div>
+      </div>
+
+      {/* Step 3 — Privacidade */}
+      <div className="wiz-step" style={{ display: step === 3 ? 'block' : 'none' }}>
         <div className="vis-pick">
           {[['public', t.pubPublic, t.pubPublicSub], ['followers', t.pubFollowers, t.pubFollowersSub], ['private', t.pubPrivate, t.pubPrivateSub]].map(([v, l, sub]) => (
             <button key={v} type="button" className={`vis-opt${visibility === v ? ' on' : ''}`} onClick={() => setVisibility(v)}>
@@ -155,8 +170,8 @@ export default function NewJourneyForm({ userId, t }) {
         </div>
       </div>
 
-      {/* Step 2 — Duração + porquê */}
-      <div className="wiz-step" style={{ display: step === 2 ? 'block' : 'none' }}>
+      {/* Step 4 — Duração + porquê */}
+      <div className="wiz-step" style={{ display: step === 4 ? 'block' : 'none' }}>
         <label>{t.fDuration}
           <select ref={durRef} defaultValue="30">
             <option value="7">{t.dur7}</option>
@@ -170,8 +185,8 @@ export default function NewJourneyForm({ userId, t }) {
         </label>
       </div>
 
-      {/* Step 3 — Primeiro dia */}
-      <div className="wiz-step" style={{ display: step === 3 ? 'block' : 'none' }}>
+      {/* Step 5 — Primeiro dia */}
+      <div className="wiz-step" style={{ display: step === 5 ? 'block' : 'none' }}>
         <label>{t.fFirst}
           <textarea ref={firstRef} maxLength={500} placeholder={t.fFirstPh} />
         </label>

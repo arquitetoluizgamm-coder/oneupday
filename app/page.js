@@ -14,19 +14,24 @@ async function loadDemo() {
     const { data: journeys } = await sb.from('journeys')
       .select('id, slug, title, cover_color, total_days, owner_id')
       .eq('visibility', 'public').order('created_at', { ascending: false }).limit(12);
+    const js = journeys || [];
+    if (!js.length) return null;
+    const ids = js.map(j => j.id);
+    // 3 consultas em lote (sem N+1)
+    const [{ data: stats }, { data: photos }, { data: profs }] = await Promise.all([
+      sb.from('journey_stats').select('*').in('journey_id', ids),
+      sb.from('updates').select('journey_id, photo_url, day_number').in('journey_id', ids).not('photo_url', 'is', null).order('day_number', { ascending: false }),
+      sb.from('profiles').select('id, name, avatar_color, avatar_url').in('id', js.map(j => j.owner_id)),
+    ]);
+    const stById = {}; (stats || []).forEach(s => { stById[s.journey_id] = s; });
+    const photoBy = {}; (photos || []).forEach(u => { if (!photoBy[u.journey_id]) photoBy[u.journey_id] = u.photo_url; });
+    const pById = {}; (profs || []).forEach(pr => { pById[pr.id] = pr; });
     let best = null, photoCount = 0;
-    for (const j of (journeys || [])) {
-      const { data: st } = await sb.from('journey_stats').select('*').eq('journey_id', j.id).maybeSingle();
-      if (!st || (st.current_day || 0) < 1) continue;
-      const { data: ups } = await sb.from('updates')
-        .select('photo_url, day_number').eq('journey_id', j.id)
-        .not('photo_url', 'is', null).order('day_number', { ascending: false }).limit(1);
-      const photo = ups && ups[0] ? ups[0].photo_url : null;
-      if (photo) photoCount++;
-      if (photo && !best) {
-        const { data: owner } = await sb.from('profiles').select('name, avatar_color, avatar_url').eq('id', j.owner_id).maybeSingle();
-        best = { journey: j, stats: st, owner: owner || {}, photo };
-      }
+    for (const j of js) {
+      const st = stById[j.id]; const photo = photoBy[j.id];
+      if (!st || (st.current_day || 0) < 1 || !photo) continue;
+      photoCount++;
+      if (!best) best = { journey: j, stats: st, owner: pById[j.owner_id] || {}, photo };
     }
     // só mostra jornada real quando já há volume (3+ com foto); até lá, usa a demo
     return photoCount >= 3 ? best : null;

@@ -129,7 +129,7 @@ export default async function Perfil() {
             </>)}
         </section>
 
-        {aiOn && <CompanionCard title={t.companionTitle} btn={t.companionBtn} loading={t.companionLoading} />}
+        {aiOn && <CompanionCard title={t.companionTitle} btn={t.companionBtn} loading={t.companionLoading} labels={{ consent: t.aiConsent, off: t.aiOff, offState: t.aiOffState, reactivate: t.aiReactivate, err: t.aiErr, rateErr: t.aiRateErr }} />}
 
         <section className="home-head">
           <div>
@@ -173,8 +173,9 @@ export default async function Perfil() {
                 ritualQ: t.ritualQ, rDid: t.rDid, rTried: t.rTried, rPaused: t.rPaused,
                 rDidText: t.rDidText, rTriedText: t.rTriedText, rPausedText: t.rPausedText, aiWrite: t.aiWrite,
                 musicAdd: t.musicAdd, musicTitle: t.musicTitle, musicUse: t.musicUse, musicRemove: t.musicRemove, musicEmpty: t.musicEmpty, musicSearchPh: t.musicSearchPh, musicKeyNeeded: t.musicKeyNeeded,
+                aiErr: t.aiErr, aiRateErr: t.aiRateErr,
               }} />
-              {aiOn && <NextStep journeyId={j.id} label={t.aiNextStep} thinking={t.aiThinking} />}
+              {aiOn && <NextStep journeyId={j.id} label={t.aiNextStep} thinking={t.aiThinking} errLabel={t.aiErr} rateLabel={t.aiRateErr} />}
             </section>
           );
         })}

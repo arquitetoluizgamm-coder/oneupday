@@ -27,6 +27,8 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [videoUrl, setVideoUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [track, setTrack] = useState(null);
+  const [aiOff, setAiOff] = useState(false);
+  const [aiErr, setAiErr] = useState('');
   const photoRef = useRef(null);
   const videoRef = useRef(null);
   const inputRef = useRef(null);
@@ -36,6 +38,8 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     const el = inputRef.current;
     if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 220) + 'px'; }
   }, [text]);
+
+  useEffect(() => { try { setAiOff(localStorage.getItem('oud_ai_off') === '1'); } catch { } }, []);
 
   async function upload(file) {
     const supabase = createClient();
@@ -72,23 +76,27 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   async function aiSoftWrite() { await aiWrite(); }
   async function aiSmallStep() {
     if (saving || uploading) return;
-    setSaving(true);
+    setSaving(true); setAiErr('');
     try {
       const r = await fetch('/api/assist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'nextstep', journeyId, draft: text }) });
+      if (r.status === 429) { setAiErr(t.aiRateErr); setSaving(false); return; }
+      if (!r.ok) { setAiErr(t.aiErr); setSaving(false); return; }
       const j = await r.json();
-      if (j.text) setText(j.text);
-    } catch { }
+      if (j.text) setText(j.text); else setAiErr(t.aiErr);
+    } catch { setAiErr(t.aiErr); }
     setSaving(false);
   }
 
   async function aiWrite() {
     if (saving || uploading) return;
-    setSaving(true);
+    setSaving(true); setAiErr('');
     try {
       const r = await fetch('/api/assist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'write', journeyId, draft: text }) });
+      if (r.status === 429) { setAiErr(t.aiRateErr); setSaving(false); return; }
+      if (!r.ok) { setAiErr(t.aiErr); setSaving(false); return; }
       const j = await r.json();
-      if (j.text) setText(j.text);
-    } catch { }
+      if (j.text) setText(j.text); else setAiErr(t.aiErr);
+    } catch { setAiErr(t.aiErr); }
     setSaving(false);
   }
 
@@ -161,14 +169,15 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPickPhoto} />
           <input ref={videoRef} type="file" accept="video/*" hidden onChange={onPickVideo} />
           <TrackPicker selected={track} onSelect={setTrack} labels={{ add: '🎵', title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded }} />
-          {aiOn && <button type="button" className="tool ai" title={t.aiWrite} aria-label={t.aiWrite} onClick={aiWrite} disabled={saving || uploading}>✨</button>}
+          {aiOn && !aiOff && <button type="button" className="tool ai" title={t.aiWrite} aria-label={t.aiWrite} onClick={aiWrite} disabled={saving || uploading}>✨</button>}
         </div>
         <button className="post-btn" onClick={post} disabled={saving || uploading || (!text.trim() && !photoUrl && !videoUrl)}>
           {saving ? t.posting : t.post}
         </button>
       </div>
+      {aiErr && <p className="ai-err">{aiErr}</p>}
       {kind === 'setback' && <p className="setback-note">{t.setbackNote}</p>}
-      {aiOn && kind === 'setback' && (
+      {aiOn && !aiOff && kind === 'setback' && (
         <div className="ai-context">
           <span className="ai-context-q">{t.aiCareQ}</span>
           <div className="ai-context-btns">

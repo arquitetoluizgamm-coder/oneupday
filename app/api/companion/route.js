@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '../../../lib/supabase/server';
 import { getLocale } from '../../../lib/locale';
+import { rateLimit } from '../../../lib/ratelimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,6 +13,7 @@ export async function POST() {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'unauth' }, { status: 401 });
+  if (!rateLimit('comp:' + user.id, 12, 3600000)) return NextResponse.json({ error: 'rate' }, { status: 429 });
 
   // Só os dados do próprio usuário (RLS garante).
   const { data: journeys } = await supabase.from('journeys')
@@ -22,7 +24,7 @@ export async function POST() {
   const ids = list.map(j => j.id);
   const { data: updates } = await supabase.from('updates')
     .select('journey_id, day_number, kind, text, created_at').in('journey_id', ids)
-    .order('created_at', { ascending: false }).limit(40);
+    .order('created_at', { ascending: false }).limit(24);
   const ups = updates || [];
 
   // Resumo compacto (fatos), sem expor nada de terceiros.
@@ -32,7 +34,7 @@ export async function POST() {
     const days = new Set(ju.map(u => u.day_number)).size;
     const setbacks = ju.filter(u => u.kind === 'setback').length;
     lines.push(`Jornada "${j.title}" (meta ${j.total_days} dias, começou ${new Date(j.created_at).toISOString().slice(0,10)}): ${days} dias registrados, ${setbacks} recaídas. Motivo: ${j.goal || '-'}.`);
-    ju.slice(0, 6).forEach(u => lines.push(`  - Dia ${u.day_number} [${u.kind}]: ${(u.text || '').slice(0, 140)}`));
+    ju.slice(0, 5).forEach(u => lines.push(`  - Dia ${u.day_number} [${u.kind}]: ${(u.text || '').slice(0, 110)}`));
   }
   const facts = lines.join('\n');
 

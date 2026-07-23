@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '../../../lib/supabase/server';
 import { getLocale } from '../../../lib/locale';
+import { rateLimit } from '../../../lib/ratelimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,6 +12,7 @@ export async function POST(req) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'unauth' }, { status: 401 });
+  if (!rateLimit('assist:' + user.id, 30, 3600000)) return NextResponse.json({ error: 'rate' }, { status: 429 });
 
   const body = await req.json().catch(() => ({}));
   const { mode, journeyId, draft } = body;
