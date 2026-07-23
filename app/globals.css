@@ -1143,6 +1143,17 @@ body{background:var(--bg);color:var(--ink)}
 .supporters-popover{position:absolute;z-index:20;left:0;top:calc(100% + 6px);min-width:190px;max-width:280px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;box-shadow:0 12px 30px rgba(16,19,45,.1);display:flex;flex-wrap:wrap;gap:6px}
 .supporters-popover span{font-size:12px;color:var(--ink);background:#f7f7f4;border-radius:999px;padding:5px 9px}
 .comments{margin-top:8px}
+.comment-thread{padding:8px 0;border-bottom:1px solid var(--line)}
+.comment-item{padding:2px 0}
+.comment-item-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.comment-item-reply{padding:7px 0 2px 14px;margin-left:8px;border-left:2px solid #ebeae5}
+.comment-replies{margin-top:2px}
+.comment-reply{border:0;background:transparent;color:var(--muted);font:inherit;font-size:11px;font-weight:650;cursor:pointer;padding:2px 0}
+.comment-reply:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.comment-more{display:block;margin:10px auto 2px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.comment-more:hover{text-decoration:underline;text-underline-offset:3px}
+.comment-replying{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:8px 0;padding:7px 9px;border-radius:8px;background:#f2f2ef;color:var(--muted);font-size:12px}
+.comment-replying button{border:0;background:transparent;color:var(--ink);font:inherit;font-size:11px;font-weight:700;cursor:pointer}
 .comment-panel{margin-top:8px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fafaf8}
 .comment-empty{margin:0 0 10px;color:var(--muted);font-size:13px}
 .comment-item{padding:7px 0;border-bottom:1px solid #ecece7}

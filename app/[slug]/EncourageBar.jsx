@@ -8,6 +8,7 @@ export default function EncourageBar({ updateId, labelIdle, labelActive, support
   const [busy, setBusy] = useState(false);
   const [people, setPeople] = useState(null);
   const [loadingPeople, setLoadingPeople] = useState(false);
+  const [supportersOpen, setSupportersOpen] = useState(false);
 
   async function toggle() {
     if (busy) return;
@@ -29,7 +30,10 @@ export default function EncourageBar({ updateId, labelIdle, labelActive, support
   }
 
   async function showPeople() {
+    if (supportersOpen) { setSupportersOpen(false); return; }
     if (loadingPeople) return;
+    setSupportersOpen(true);
+    if (people !== null) return;
     setLoadingPeople(true);
     const response = await fetch(`/api/supporters/${updateId}`);
     const data = await response.json().catch(() => ({}));
@@ -43,10 +47,10 @@ export default function EncourageBar({ updateId, labelIdle, labelActive, support
       <button className={`support-pill${active ? ' on' : ''}`} onClick={toggle} disabled={busy}>
         <span aria-hidden="true">{active ? '♥' : '♡'}</span>{active ? labelActive : labelIdle}
       </button>
-      <button type="button" className="supporters-link" onClick={showPeople}>
+      <button type="button" className="supporters-link" onClick={showPeople} aria-expanded={supportersOpen}>
         {loadingPeople ? supportersLoading : supportersLabel}
       </button>
-      {people && <div className="supporters-popover">{people.length ? people.map(p => <span key={p.id}>{p.name}</span>) : <span>{supportersEmpty}</span>}</div>}
+      {supportersOpen && people && <div className="supporters-popover">{people.length ? people.map(p => <span key={p.id}>{p.name}</span>) : <span>{supportersEmpty}</span>}</div>}
     </div>
   );
 }

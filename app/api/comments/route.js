@@ -32,7 +32,7 @@ export async function GET(req) {
   if (!updateId) return NextResponse.json({ comments: [] });
   const supabase = createClient();
   const { data: comments } = await supabase.from('comments')
-    .select('id, user_id, body, created_at').eq('update_id', updateId)
+    .select('id, user_id, parent_id, body, created_at').eq('update_id', updateId)
     .eq('status', 'published').order('created_at', { ascending: true }).limit(50);
   const ids = [...new Set((comments || []).map(c => c.user_id))];
   const { data: profiles } = ids.length
@@ -50,16 +50,21 @@ export async function POST(req) {
   const body = await req.json().catch(() => ({}));
   const updateId = String(body.updateId || '');
   const text = String(body.text || '').trim();
+  const parentId = body.parentId ? String(body.parentId) : null;
   if (!updateId || !text || text.length > 500) return NextResponse.json({ error: 'invalid' }, { status: 400 });
   const { data: update } = await supabase.from('updates').select('journey_id').eq('id', updateId).maybeSingle();
   if (!update) return NextResponse.json({ error: 'notfound' }, { status: 404 });
   const { data: journey } = await supabase.from('journeys').select('visibility, owner_id').eq('id', update.journey_id).maybeSingle();
   if (!journey || (journey.visibility !== 'public' && journey.owner_id !== user.id)) return NextResponse.json({ error: 'notfound' }, { status: 404 });
+  if (parentId) {
+    const { data: parent } = await supabase.from('comments').select('id').eq('id', parentId).eq('update_id', updateId).eq('status', 'published').maybeSingle();
+    if (!parent) return NextResponse.json({ error: 'invalid_parent' }, { status: 400 });
+  }
   if (locallyUnsafe(text) || await aiUnsafe(text)) return NextResponse.json({ error: 'unsafe' }, { status: 422 });
 
   const { data: comment, error } = await supabase.from('comments').insert({
-    update_id: updateId, user_id: user.id, body: text, status: 'published',
-  }).select('id, user_id, body, created_at').single();
+    update_id: updateId, user_id: user.id, parent_id: parentId, body: text, status: 'published',
+  }).select('id, user_id, parent_id, body, created_at').single();
   if (error) return NextResponse.json({ error: 'save' }, { status: 500 });
   return NextResponse.json({ comment });
 }

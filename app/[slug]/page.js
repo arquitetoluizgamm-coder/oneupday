@@ -226,7 +226,7 @@ export default async function JourneyPage({ params, searchParams }) {
                 {u.text && u.text !== '📷' && u.text !== '🎥' && <p>{u.text}</p>}
                 <div className="update-foot">
                   <EncourageBar updateId={u.id} initialActive={myEncSet.has(u.id)} labelIdle={t.withYouIdle} labelActive={t.withYouActive} supportersLabel={t.supporters} supportersLoading={t.supportersLoading} supportersEmpty={t.supportersEmpty} />
-                  <Comments updateId={u.id} labels={{ comment: t.comment, close: t.commentClose, empty: t.commentEmpty, placeholder: t.commentPlaceholder, send: t.commentSend, sending: t.commentSending, unsafe: t.commentUnsafe, error: t.commentError, someone: t.commentSomeone }} />
+                  <Comments updateId={u.id} labels={{ comment: t.comment, close: t.commentClose, empty: t.commentEmpty, placeholder: t.commentPlaceholder, send: t.commentSend, sending: t.commentSending, unsafe: t.commentUnsafe, error: t.commentError, someone: t.commentSomeone, reply: t.commentReply, more: t.commentMore, less: t.commentLess, replying: t.commentReplying, cancel: t.commentCancel }} />
                   {isOwner
                     ? <UpdateManage updateId={u.id} hasMedia={!!(u.photo_url || u.video_url)} labels={{ manage: t.managePost, replace: t.mediaReplace, remove: t.mediaRemove, delete: t.postDelete, deleteConfirm: t.postDeleteConfirm, uploading: t.uploading, error: t.postError }} />
                     : <ReportButton updateId={u.id} label={t.report} doneLabel={t.reported} />}
