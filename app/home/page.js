@@ -47,7 +47,7 @@ export default async function Home() {
   if (targetIds.length) {
     const { data: feedUpdates } = await supabase.from('updates')
       .select('id, day_number, kind, text, photo_url, video_url, created_at, journey_id')
-      .in('journey_id', targetIds).or('photo_url.not.is.null,video_url.not.is.null')
+      .in('journey_id', targetIds)
       .order('created_at', { ascending: false }).limit(24);
     const ups = feedUpdates || [];
     const jIds = [...new Set(ups.map(u => u.journey_id))];
