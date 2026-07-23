@@ -14,7 +14,7 @@ async function loadJourney(slug) {
   const { data: journey } = await sb.from('journeys').select('*').eq('slug', slug).eq('is_public', true).maybeSingle();
   if (!journey) return null;
   const [{ data: owner }, { data: updates }, { data: stats }] = await Promise.all([
-    sb.from('profiles').select('name, handle, avatar_color').eq('id', journey.owner_id).maybeSingle(),
+    sb.from('profiles').select('name, handle, avatar_color, avatar_url').eq('id', journey.owner_id).maybeSingle(),
     sb.from('updates').select('*').eq('journey_id', journey.id).order('day_number', { ascending: true }),
     sb.from('journey_stats').select('*').eq('journey_id', journey.id).maybeSingle(),
   ]);
@@ -69,7 +69,7 @@ export default async function JourneyPage({ params }) {
         </section>
 
         <div className="who">
-          <div className="ava" style={{ background: owner?.avatar_color || 'var(--orange)' }}>{initial}</div>
+          <div className="ava" style={{ background: owner?.avatar_color || 'var(--orange)' }}>{owner?.avatar_url ? <img src={owner.avatar_url} alt="" /> : initial}</div>
           <div>
             <b>{owner?.name}</b>
             <span>{owner?.handle} · {fill(t.dayXofY, { d: stats.current_day || 0, t: journey.total_days })}</span>

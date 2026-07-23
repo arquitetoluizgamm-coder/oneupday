@@ -354,4 +354,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* ---------- Video ---------- */
 .photo-preview video,.update-photo video,.feed-photo video{
-  display:block;width:100%;height:360px;object-fit:cover;border-radius:14px;border:1px solid var(--line);background:#000}
+  display:block;width:100%;height:auto;max-height:70vh;border-radius:14px;border:1px solid var(--line);background:#000}
+.ava img,.feed-ava img,.me-ava img{width:100%;height:100%;object-fit:cover}
+.ava,.feed-ava,.me-ava{overflow:hidden}
+.me-ava{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:13px}

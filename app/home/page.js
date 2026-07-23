@@ -11,14 +11,21 @@ export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
 
 async function ensureProfile(supabase, user) {
-  const { data: existing } = await supabase.from('profiles').select('id, name, handle').eq('id', user.id).maybeSingle();
-  if (existing) return existing;
   const meta = user.user_metadata || {};
+  const googleAvatar = meta.avatar_url || meta.picture || null;
+  const { data: existing } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').eq('id', user.id).maybeSingle();
+  if (existing) {
+    if (!existing.avatar_url && googleAvatar) {
+      await supabase.from('profiles').update({ avatar_url: googleAvatar }).eq('id', user.id);
+      existing.avatar_url = googleAvatar;
+    }
+    return existing;
+  }
   const base = (user.email || 'user').split('@')[0].toLowerCase().replace(/[^a-z0-9._]/g, '');
   let handle = '@' + base;
   const { data: taken } = await supabase.from('profiles').select('id').eq('handle', handle).maybeSingle();
   if (taken) handle = '@' + base + Math.floor(1000 + Math.random() * 9000);
-  const profile = { id: user.id, name: meta.full_name || meta.name || base, handle, avatar_color: COLORS[Math.floor(Math.random() * COLORS.length)] };
+  const profile = { id: user.id, name: meta.full_name || meta.name || base, handle, avatar_color: COLORS[Math.floor(Math.random() * COLORS.length)], avatar_url: googleAvatar };
   await supabase.from('profiles').insert(profile);
   return profile;
 }
@@ -65,7 +72,7 @@ export default async function Home() {
     ]);
     const jMap = {}; (js || []).forEach(j => { jMap[j.id] = j; });
     const oIds = [...new Set((js || []).map(j => j.owner_id))];
-    const { data: profs } = await supabase.from('profiles').select('id, name, avatar_color').in('id', oIds);
+    const { data: profs } = await supabase.from('profiles').select('id, name, avatar_color, avatar_url').in('id', oIds);
     const pMap = {}; (profs || []).forEach(pr => { pMap[pr.id] = pr; });
     const encCount = {}; (encs || []).forEach(e => { encCount[e.update_id] = (encCount[e.update_id] || 0) + 1; });
     feed = ups.map(u => {
@@ -82,6 +89,7 @@ export default async function Home() {
       <header className="top">
         <Logo />
         <div className="top-right">
+          <span className="me-ava" style={{ background: profile.avatar_color || 'var(--orange)' }}>{profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : profile.name[0]}</span>
           <span className="hi">{profile.name}</span>
           <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
         </div>
@@ -149,7 +157,7 @@ export default async function Home() {
             {feed.map(f => (
               <article className="feed-card" key={f.id}>
                 <a className="feed-ava" href={`/${f.journey.slug}`} style={{ background: f.owner.avatar_color || 'var(--orange)' }}>
-                  {(f.owner.name || '?')[0]}
+                  {f.owner.avatar_url ? <img src={f.owner.avatar_url} alt="" /> : (f.owner.name || '?')[0]}
                 </a>
                 <div className="feed-body">
                   <div className="feed-top">
