@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function Comments({ updateId, labels }) {
   const [open, setOpen] = useState(false);
@@ -29,8 +29,6 @@ export default function Comments({ updateId, labels }) {
     else { setText(''); await load(); }
     setBusy(false);
   }
-  useEffect(() => { if (!open) return; }, [open]);
-
   return (
     <div className="comments">
       <button type="button" className="comment-toggle" onClick={toggle}>{open ? labels.close : labels.comment}</button>

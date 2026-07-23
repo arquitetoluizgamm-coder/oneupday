@@ -34,7 +34,7 @@ export async function GET(req) {
   } else {
     const { data: pub } = await supabase.from('journeys')
       .select('id, owner_id, category').eq('visibility', 'public').neq('owner_id', user.id)
-      .order('created_at', { ascending: false }).limit(300);
+      .order('created_at', { ascending: false }).limit(80);
     targetIds = (pub || []).filter(j => !blocked.has(j.owner_id) && !mutedCats.has(j.category)).map(j => j.id);
   }
   if (!targetIds.length) return NextResponse.json({ items: [] });

@@ -58,7 +58,7 @@ export default function FeedClient({ mutedCats, labels }) {
   useEffect(() => { load(); }, []);
   useEffect(() => {
     const el = sentinel.current; if (!el) return;
-    const io = new IntersectionObserver(es => { if (es[0].isIntersecting) load(); }, { rootMargin: '600px' });
+    const io = new IntersectionObserver(es => { if (es[0].isIntersecting) load(); }, { rootMargin: '120px' });
     io.observe(el);
     return () => io.disconnect();
   }, [done, scope]);
