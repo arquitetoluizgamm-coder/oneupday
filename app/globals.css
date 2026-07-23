@@ -964,3 +964,74 @@ main.wrap > section{margin-bottom:16px}
 .tiny-link:hover{text-decoration:underline}
 .feed-lead{margin:18px 0 6px}
 .feed-lead .eyebrow{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--muted)}
+
+/* ==========================================================
+   EDITORIAL SYSTEM — retune calmo (sobrescreve o acumulado)
+   ========================================================== */
+:root{
+  --bg:#F8F8F6; --surface:#FFFFFF; --ink:#10132D; --night:#10132D; --night-2:#1b1f45;
+  --muted:#69707D; --line:#EAEAE5; --violet:#5b53c6;
+  --shadow:0 10px 30px rgba(16,19,45,.05);
+  --r-field:12px; --r-card:16px;
+}
+body{ background:var(--bg); color:var(--ink); }
+
+/* raios coerentes: 12 campos, 16 cards */
+.jcard,.stats,.profile-card,.companion,.today,.followers-block,.explore-card,.auth-card,
+.share-card-section,.metric-funnel,.onboarding-block,.kpi,.ret-card,.wall-cover,.demo-card,
+.mcard-media,.entry-media,.update-photo,.pj-card,.notif-item{border-radius:var(--r-card)}
+input,textarea,select,.composer2 input,.composer2 textarea,.wiz-title,.custom-cat,
+.track-search input,.vis-opt,.kind-seg,.tool{border-radius:var(--r-field)}
+.cover{border-radius:18px;box-shadow:none;background:linear-gradient(140deg,#10132D,#1b1f45)}
+
+/* TELAS ABERTAS — sem card em conteúdo não interativo */
+.land-hero,.manifesto,.land-ideas,.examples,.land-demo,.feed-invite,.feed-lead,.home-head,
+.create-head,.tema-hero,.dia1-hero,.dia1-campaigns,.encourage,.first-journey{
+  background:transparent!important;border:0!important;box-shadow:none!important;
+}
+.first-journey{color:var(--ink)!important}
+.first-journey .fj-eyebrow{color:var(--pink)}
+.first-journey h1{color:var(--ink)}
+.first-journey p,.first-journey .fj-hint{color:var(--muted)}
+.stats article{background:transparent;border:0;padding:10px 4px}
+.feed-invite{padding:34px 8px;text-align:center}
+
+/* gradiente só no botão principal e na barra de progresso */
+.bar span{background:var(--up)}
+.cta{background:var(--night);color:#fff}
+.cta.grow{background:var(--up);color:#fff}
+.composer-toolbar .track-picker .kind.music{background:var(--night)}
+.tool.ai{background:#fff;border-color:var(--line)}
+
+/* recaída em violeta calmo (nunca vermelho agressivo); vitória verde discreto */
+.entry-tag.setback,.post-tag.setback,.timeline .tag.setback{color:#fff;background:var(--violet)}
+.timeline .dot.setback{background:var(--violet)}
+.kseg.on.k-setback{color:var(--violet)}
+.ritual-btn.paused{color:var(--violet)}
+.entry-tag.win,.post-tag.win{background:rgba(22,101,52,.10);color:#166534}
+.kseg.on.k-win{color:#166534}
+
+/* FEED estilo diário */
+.feed-page .entry{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;padding:22px 2px;margin:0}
+.entry-head{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.entry-ava{width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;overflow:hidden;flex:0 0 auto}
+.entry-ava img{width:100%;height:100%;object-fit:cover}
+.entry-id{display:flex;flex-direction:column;min-width:0}
+.entry-id b{font-size:15px;letter-spacing:-.01em}
+.entry-id small{color:var(--muted);font-size:13px}
+.entry-tag{margin-left:auto;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;flex:0 0 auto}
+.entry-text{margin:12px 2px 0;font-size:16.5px;line-height:1.62;color:var(--ink);white-space:pre-wrap}
+.entry-media{display:block;margin:12px 0 0;overflow:hidden}
+.entry-media img,.entry-media video{width:100%;display:block}
+.entry-actions{display:flex;align-items:center;gap:18px;margin-top:12px}
+.entry-actions .feed-share,.entry-actions .support-pill{border:0;background:transparent;color:var(--muted);padding:4px 0;font-weight:600}
+.entry-actions .feed-share:hover,.entry-actions .support-pill:hover{background:transparent;color:var(--ink)}
+.entry-actions .support-pill.on{color:var(--pink)}
+
+/* tabs do feed discretas (editorial) */
+.feed-tabs{background:transparent;border:0;padding:0;gap:20px;margin-bottom:6px;width:auto}
+.feed-tabs button{padding:6px 0;border-radius:0}
+.feed-tabs button.on{background:transparent;box-shadow:none;color:var(--ink);border-bottom:2px solid var(--ink)}
+
+/* tipografia editorial da landing */
+.land-hero h1{font-weight:800;letter-spacing:-.03em;line-height:1.1}

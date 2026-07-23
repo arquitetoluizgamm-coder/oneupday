@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import MuteTopic from './MuteTopic';
 import EncourageBar from '../[slug]/EncourageBar';
 import FeedShare from './FeedShare';
 
@@ -82,25 +81,25 @@ export default function FeedClient({ mutedCats, labels }) {
         </div>
       )}
       {items.map(f => (
-        <article className="mcard" key={f.id}>
-          {f.photo_url && <a href={`/${f.journey.slug}`} className="mcard-media"><img src={f.photo_url} alt="" /></a>}
-          {f.video_url && !f.photo_url && <div className="mcard-media"><video src={f.video_url} controls playsInline preload="metadata" /></div>}
-          <div className="mcard-body">
-            <a className="mcard-who" href={`/${f.owner.handle || f.journey.slug}`}>
-              <span className="mcard-ava" style={{ background: f.owner.avatar_color || 'var(--orange)' }}>
-                {f.owner.avatar_url ? <img src={f.owner.avatar_url} alt="" /> : (f.owner.name || '?')[0]}
-              </span>
-              <span className="mcard-id"><b>{f.owner.name}</b><small>{dayLabel(f.day_number)} · {f.journey.title}</small></span>
-            </a>
-            {f.kind === 'setback' && <span className="post-tag setback">{labels.tagSetback}</span>}
-            {f.kind === 'win' && <span className="post-tag win">{labels.tagWin}</span>}
-            {f.text && f.text !== '\u{1F4F7}' && f.text !== '\u{1F3A5}' && <p>{f.text}</p>}
-            {f.track && <TrackTag track={f.track} />}
-            <div className="mcard-actions">
-              <EncourageBar updateId={f.id} initialActive={f.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} />
-              <FeedShare slug={f.journey.slug} title={f.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
-              <MuteTopic category={f.journey.category} current={mutedCats} label={labels.muteTopic} />
-            </div>
+        <article className="entry" key={f.id}>
+          <a className="entry-head" href={`/${f.owner.handle || f.journey.slug}`}>
+            <span className="entry-ava" style={{ background: f.owner.avatar_color || 'var(--orange)' }}>
+              {f.owner.avatar_url ? <img src={f.owner.avatar_url} alt="" /> : (f.owner.name || '?')[0]}
+            </span>
+            <span className="entry-id">
+              <b>{f.owner.name}</b>
+              <small>{dayLabel(f.day_number)} · {f.journey.title}</small>
+            </span>
+            {f.kind === 'setback' && <span className="entry-tag setback">{labels.tagSetback}</span>}
+            {f.kind === 'win' && <span className="entry-tag win">{labels.tagWin}</span>}
+          </a>
+          {f.text && f.text !== '\u{1F4F7}' && f.text !== '\u{1F3A5}' && <p className="entry-text">{f.text}</p>}
+          {f.photo_url && <a href={`/${f.journey.slug}`} className="entry-media"><img src={f.photo_url} alt="" /></a>}
+          {f.video_url && !f.photo_url && <div className="entry-media"><video src={f.video_url} controls playsInline preload="metadata" /></div>}
+          {f.track && <TrackTag track={f.track} />}
+          <div className="entry-actions">
+            <EncourageBar updateId={f.id} initialActive={f.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} />
+            <FeedShare slug={f.journey.slug} title={f.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
           </div>
         </article>
       ))}
