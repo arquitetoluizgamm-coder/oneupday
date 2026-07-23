@@ -758,3 +758,5 @@ a.moment-tag:hover{background:rgba(255,255,255,.28)}
 .feed-tabs{display:flex;gap:6px;background:var(--soft,#f7f6fb);border:1px solid var(--line,#eceaf3);border-radius:999px;padding:4px;margin:0 0 14px;position:sticky;top:8px;z-index:5;width:max-content}
 .feed-tabs button{border:0;background:transparent;padding:8px 18px;border-radius:999px;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer;transition:all .15s}
 .feed-tabs button.on{background:#fff;color:var(--night,#0b1030);box-shadow:0 1px 4px rgba(9,12,42,.08)}
+.profile-card .pc-follow{margin-left:auto;align-self:center}
+.profile-card .pc-info{display:flex;align-items:flex-start;gap:14px}

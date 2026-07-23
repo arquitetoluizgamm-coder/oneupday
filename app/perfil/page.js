@@ -56,8 +56,16 @@ export default async function Perfil() {
       supabase.from('updates').select('*', { count: 'exact', head: true }).in('journey_id', jIds).eq('kind', 'setback'),
     ]);
     updatesCount = uc || 0; setbackCount = sc || 0;
-    const { data: fl } = await supabase.from('follows').select('user_id').in('journey_id', jIds);
-    const ids = [...new Set((fl || []).map(f => f.user_id).filter(id => id !== user.id))];
+  }
+  {
+    let followerIds = [];
+    if (jIds.length) {
+      const { data: fl } = await supabase.from('follows').select('user_id').in('journey_id', jIds);
+      followerIds = (fl || []).map(f => f.user_id);
+    }
+    const { data: pf } = await supabase.from('profile_follows').select('follower_id').eq('following_id', user.id);
+    followerIds = followerIds.concat((pf || []).map(f => f.follower_id));
+    const ids = [...new Set(followerIds.filter(id => id !== user.id))];
     if (ids.length) {
       const { data: profs } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', ids);
       followers = profs || [];

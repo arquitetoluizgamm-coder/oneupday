@@ -8,6 +8,7 @@ import FollowButton from './FollowButton';
 import BlockButton from './BlockButton';
 import ProgressBar from '../../components/ProgressBar';
 import ReportButton from './ReportButton';
+import FollowUserButton from './FollowUserButton';
 import { notFound } from 'next/navigation';
 
 export const revalidate = 60;
@@ -77,6 +78,9 @@ async function ProfilePage({ handle }) {
             <div className="pc-meta">
               <h1>{profile.name}</h1>
               <span>{profile.handle}</span>
+            </div>
+            <div className="pc-follow">
+              <FollowUserButton profileId={profile.id} labelFollow={t.follow} labelFollowing={t.following} labelBack={t.followBack} />
             </div>
           </div>
         </section>

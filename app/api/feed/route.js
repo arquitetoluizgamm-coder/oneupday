@@ -20,7 +20,14 @@ export async function GET(req) {
   let targetIds = [];
   if (scope === 'following') {
     const { data: fl } = await supabase.from('follows').select('journey_id').eq('user_id', user.id);
-    const fids = [...new Set((fl || []).map(f => f.journey_id))];
+    let fids = (fl || []).map(f => f.journey_id);
+    const { data: pf } = await supabase.from('profile_follows').select('following_id').eq('follower_id', user.id);
+    const pids = [...new Set((pf || []).map(f => f.following_id))];
+    if (pids.length) {
+      const { data: oj } = await supabase.from('journeys').select('id').in('owner_id', pids).eq('visibility', 'public');
+      fids = fids.concat((oj || []).map(j => j.id));
+    }
+    fids = [...new Set(fids)];
     if (!fids.length) return NextResponse.json({ items: [] });
     const { data: fj } = await supabase.from('journeys').select('id, owner_id, category').in('id', fids);
     targetIds = (fj || []).filter(j => !blocked.has(j.owner_id) && !mutedCats.has(j.category)).map(j => j.id);
