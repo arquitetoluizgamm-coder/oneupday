@@ -8,7 +8,7 @@ export default function ProgressBar({ day = 0, total = 30, dayTpl = 'Day {d} of 
 
   useEffect(() => {
     let raf;
-    const dur = 1700;                       // cresce devagar
+    const dur = 3200;                       // cresce bem devagar
     const start = performance.now();
     const step = (now) => {
       const p = Math.min(1, (now - start) / dur);
