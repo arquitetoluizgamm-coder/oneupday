@@ -24,7 +24,7 @@ export async function GET(req) {
 
   const { data: ups } = await supabase.from('updates')
     .select('id, day_number, kind, text, photo_url, video_url, journey_id')
-    .in('journey_id', targetIds).order('created_at', { ascending: false })
+    .in('journey_id', targetIds).order('created_at', { ascending: false }).order('id', { ascending: false })
     .range(offset, offset + PAGE - 1);
   const list = ups || [];
   const jIds = [...new Set(list.map(u => u.journey_id))];

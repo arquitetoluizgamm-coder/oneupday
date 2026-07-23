@@ -18,7 +18,7 @@ export default function FeedClient({ mutedCats, labels }) {
       const r = await fetch(`/api/feed?offset=${offset}`);
       const j = await r.json();
       const batch = j.items || [];
-      setItems(prev => [...prev, ...batch]);
+      setItems(prev => { const seen = new Set(prev.map(x => x.id)); return [...prev, ...batch.filter(x => !seen.has(x.id))]; });
       setOffset(o => o + batch.length);
       if (batch.length < 8) setDone(true);
     } catch { }
