@@ -135,6 +135,8 @@ export default async function JourneyPage({ params }) {
   const beforePhoto = withPhoto[0] || null;
   const nowPhoto = withPhoto.length > 1 ? withPhoto[withPhoto.length - 1] : null;
   const showBeforeNow = beforePhoto && nowPhoto && beforePhoto.id !== nowPhoto.id;
+  const momentLabels = { starting: t.mStarting, notgiveup: t.mNotgiveup, rebuilding: t.mRebuilding, health: t.mHealth, courage: t.mCourage, hardphase: t.mHardphase, building: t.mBuilding };
+  const momentLabel = momentLabels[journey.moment];
   const tagFor = k => k === 'setback' ? t.tagSetback : k === 'win' ? t.tagWin : null;
 
   return (
@@ -151,6 +153,7 @@ export default async function JourneyPage({ params }) {
           ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.25), rgba(9,12,42,.82)), url(${owner.banner_url})` }
           : { background: `linear-gradient(135deg, var(--night), ${journey.cover_color})` }}>
           <p className="eyebrow">{t.publicJourney}</p>
+          {momentLabel && <span className="moment-tag">{momentLabel}</span>}
           <h1>{journey.title}</h1>
           <p>{journey.goal}</p>
         </section>

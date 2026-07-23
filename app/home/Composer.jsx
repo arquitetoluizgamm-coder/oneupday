@@ -61,6 +61,16 @@ export default function Composer({ journeyId, startDate, labels, t }) {
     if (photoRef.current) photoRef.current.value = '';
   }
 
+  async function quick(kind, defaultText) {
+    if (saving || uploading) return;
+    setSaving(true);
+    const supabase = createClient();
+    const { error } = await supabase.from('updates').insert({ journey_id: journeyId, day_number: dayNumber, kind, text: defaultText });
+    setSaving(false);
+    if (error) { alert(t.error); return; }
+    router.refresh();
+  }
+
   async function post() {
     const value = text.trim();
     if ((!value && !photoUrl && !videoUrl) || saving) return;
@@ -85,6 +95,14 @@ export default function Composer({ journeyId, startDate, labels, t }) {
 
   return (
     <div className="composer2">
+      <div className="ritual">
+        <span className="ritual-q">{t.ritualQ}</span>
+        <div className="ritual-btns">
+          <button type="button" className="ritual-btn did" onClick={() => quick('win', t.rDidText)} disabled={saving || uploading}>{t.rDid}</button>
+          <button type="button" className="ritual-btn tried" onClick={() => quick('step', t.rTriedText)} disabled={saving || uploading}>{t.rTried}</button>
+          <button type="button" className="ritual-btn paused" onClick={() => quick('setback', t.rPausedText)} disabled={saving || uploading}>{t.rPaused}</button>
+        </div>
+      </div>
       {showCare && (
         <div className="care-box" role="note">
           <b>{t.crisisTitle}</b>

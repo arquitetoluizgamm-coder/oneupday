@@ -12,11 +12,14 @@ export default async function Explore({ searchParams }) {
   const t = getDict(getLocale());
   const q = (searchParams?.q || '').trim();
   const cat = searchParams?.cat || '';
+  const moment = searchParams?.moment || '';
   const catLabel = { art: t.catArt, body: t.catBody, work: t.catWork, home: t.catHome, life: t.catLife };
+  const MOMENTS = [['starting', t.mStarting], ['notgiveup', t.mNotgiveup], ['rebuilding', t.mRebuilding], ['health', t.mHealth], ['courage', t.mCourage], ['hardphase', t.mHardphase], ['building', t.mBuilding]];
 
   const sb = getSupabase();
   let query = sb.from('journeys').select('*').eq('visibility', 'public').order('created_at', { ascending: false }).limit(40);
   if (cat) query = query.eq('category', cat);
+  if (moment) query = query.eq('moment', moment);
   if (q) query = query.ilike('title', `%${q}%`);
   const { data: journeys } = await query;
   const js = journeys || [];
@@ -49,6 +52,12 @@ export default async function Explore({ searchParams }) {
           <a className={`chip${!cat ? ' on' : ''}`} href="/explore">{t.allCats}</a>
           {CATS.map(c => (
             <a key={c} className={`chip${cat === c ? ' on' : ''}`} href={`/explore?cat=${c}`}>{catLabel[c]}</a>
+          ))}
+        </div>
+        <div className="cat-chips moments">
+          <a className={`chip${!moment ? ' on' : ''}`} href="/explore">{t.momentAll}</a>
+          {MOMENTS.map(([v, l]) => (
+            <a key={v} className={`chip moment${moment === v ? ' on' : ''}`} href={`/explore?moment=${v}`}>{l}</a>
           ))}
         </div>
 

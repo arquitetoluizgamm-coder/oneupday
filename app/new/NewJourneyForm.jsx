@@ -19,6 +19,7 @@ function slugify(title) {
 export default function NewJourneyForm({ userId, t }) {
   const [saving, setSaving] = useState(false);
   const [cat, setCat] = useState('art');
+  const [moment, setMoment] = useState('');
   const [photoUrl, setPhotoUrl] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -34,6 +35,10 @@ export default function NewJourneyForm({ userId, t }) {
     ['habit', t.catHabit], ['creative', t.catCreative], ['home', t.catHome], ['life', t.catLife],
   ];
   const suggestions = [t.ex1, t.ex2, t.ex3, t.ex4, t.ex5];
+  const MOMENTS = [
+    ['starting', t.mStarting], ['notgiveup', t.mNotgiveup], ['rebuilding', t.mRebuilding],
+    ['health', t.mHealth], ['courage', t.mCourage], ['hardphase', t.mHardphase], ['building', t.mBuilding],
+  ];
 
   function pick(text) { if (titleRef.current) { titleRef.current.value = text; titleRef.current.focus(); } }
 
@@ -73,7 +78,7 @@ export default function NewJourneyForm({ userId, t }) {
     const slug = slugify(title);
     const { data: journey, error } = await supabase.from('journeys').insert({
       owner_id: userId, slug, title, category, goal, total_days,
-      cover_color: COLORS[category] || '#ff7a45', is_public: true, visibility: 'public',
+      cover_color: COLORS[category] || '#ff7a45', is_public: true, visibility: 'public', moment: moment || null,
     }).select().single();
     if (error || !journey) { setSaving(false); alert(t.createError); return; }
 
@@ -110,6 +115,13 @@ export default function NewJourneyForm({ userId, t }) {
       {cat === 'other' && (
         <input ref={customRef} className="custom-cat" maxLength={24} placeholder={t.customCatPh} />
       )}
+
+      <div className="field-label">{t.momentQ}</div>
+      <div className="cat-pick">
+        {MOMENTS.map(([v, l]) => (
+          <button key={v} type="button" className={`chip moment${moment === v ? ' on' : ''}`} onClick={() => setMoment(moment === v ? '' : v)}>{l}</button>
+        ))}
+      </div>
 
       <label>{t.fDuration}
         <select name="duration" defaultValue="30">

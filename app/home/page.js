@@ -10,6 +10,7 @@ import BottomNav from '../../components/BottomNav';
 import PrivacyToggle from './PrivacyToggle';
 import MuteTopic from './MuteTopic';
 import EditAvatar from '../../components/EditAvatar';
+import CompanionCard from './CompanionCard';
 import ProgressBar from '../../components/ProgressBar';
 
 export const dynamic = 'force-dynamic';
@@ -99,6 +100,7 @@ export default async function Home() {
   const kindTag = { setback: t.tagSetback, win: t.tagWin };
 
   const kindLabels = { step: t.kindStep, win: t.kindWin, setback: t.kindSetback, learned: t.kindLearned };
+  const aiOn = !!process.env.OPENAI_API_KEY && list.length > 0;
 
   return (
     <>
@@ -159,6 +161,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
+        {aiOn && <CompanionCard title={t.companionTitle} btn={t.companionBtn} loading={t.companionLoading} />}
         <section className="home-head">
           <div>
             <p className="eyebrow">{t.yourJourneys}</p>
@@ -204,7 +207,9 @@ export default async function Home() {
                 placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
                 addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded,
                 addVideo: t.addVideo, videoAdded: t.videoAdded, videoTooBig: t.videoTooBig, error: t.postError,
-                crisisTitle: t.crisisTitle, crisisText: t.crisisText
+                crisisTitle: t.crisisTitle, crisisText: t.crisisText,
+                ritualQ: t.ritualQ, rDid: t.rDid, rTried: t.rTried, rPaused: t.rPaused,
+                rDidText: t.rDidText, rTriedText: t.rTriedText, rPausedText: t.rPausedText
               }} />
             </section>
           );

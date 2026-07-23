@@ -625,3 +625,32 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .custom-cat{border:1px solid var(--line);border-radius:14px;padding:11px 14px;font:inherit;background:#fbfbfa}
 .media-row{display:flex;gap:8px;flex-wrap:wrap}
 .chip.photo{border-style:dashed}
+
+/* ---------- Ritual diário ---------- */
+.ritual{margin:0 0 14px}
+.ritual-q{display:block;font-weight:800;font-size:15px;letter-spacing:-.01em;margin-bottom:10px}
+.ritual-btns{display:flex;gap:8px;flex-wrap:wrap}
+.ritual-btn{flex:1;min-width:120px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;
+  font-weight:800;font-size:14px;cursor:pointer;background:#fff;transition:transform .14s,border-color .14s,background .14s}
+.ritual-btn:hover{transform:translateY(-1px)}
+.ritual-btn.did{color:var(--green);border-color:rgba(22,163,74,.35)}
+.ritual-btn.did:hover{background:rgba(22,163,74,.06)}
+.ritual-btn.tried{color:var(--orange);border-color:rgba(255,122,69,.4)}
+.ritual-btn.tried:hover{background:rgba(255,122,69,.06)}
+.ritual-btn.paused{color:var(--night);border-color:var(--line)}
+.ritual-btn.paused:hover{background:#f6f4ef}
+.ritual-btn:disabled{opacity:.6}
+@media(max-width:520px){.ritual-btn{flex-basis:100%}}
+
+/* ---------- Momento de vida ---------- */
+.chip.moment.on{background:var(--blue);border-color:var(--blue)}
+.cat-chips.moments{margin-top:-8px}
+.moment-tag{display:inline-block;margin:2px 0 6px;background:rgba(255,255,255,.16);color:#fff;
+  font-weight:800;font-size:12px;padding:4px 12px;border-radius:999px;backdrop-filter:blur(4px)}
+
+/* ---------- IA companheira ---------- */
+.companion{background:linear-gradient(135deg,rgba(240,47,135,.06),rgba(255,211,61,.10));
+  border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px 22px;margin:0 0 20px;box-shadow:var(--shadow-sm)}
+.companion-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.companion-head b{font-size:16px;letter-spacing:-.02em}
+.companion-text{margin:14px 0 0;font-size:16px;line-height:1.6;color:var(--ink)}
