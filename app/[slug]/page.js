@@ -148,11 +148,11 @@ export default async function JourneyPage({ params }) {
         </section>
 
         <div className="who">
-          <div className="ava" style={{ background: owner?.avatar_color || 'var(--orange)' }}>{owner?.avatar_url ? <img src={owner.avatar_url} alt="" /> : initial}</div>
-          <div>
+          <a className="ava" href={`/${owner?.handle || ''}`} style={{ background: owner?.avatar_color || 'var(--orange)' }}>{owner?.avatar_url ? <img src={owner.avatar_url} alt="" /> : initial}</a>
+          <a className="who-name" href={`/${owner?.handle || ''}`}>
             <b>{owner?.name}</b>
             <span>{owner?.handle} · {fill(t.dayXofY, { d: stats.current_day || 0, t: journey.total_days })}</span>
-          </div>
+          </a>
           <FollowButton journeyId={journey.id} labelFollow={t.follow} labelFollowing={t.following} />
         </div>
 

@@ -73,7 +73,7 @@ export default async function Home() {
     ]);
     const jMap = {}; (js || []).forEach(j => { jMap[j.id] = j; });
     const oIds = [...new Set((js || []).map(j => j.owner_id))];
-    const { data: profs } = await supabase.from('profiles').select('id, name, avatar_color, avatar_url').in('id', oIds);
+    const { data: profs } = await supabase.from('profiles').select('id, name, avatar_color, avatar_url, handle').in('id', oIds);
     const pMap = {}; (profs || []).forEach(pr => { pMap[pr.id] = pr; });
     const encCount = {}; (encs || []).forEach(e => { encCount[e.update_id] = (encCount[e.update_id] || 0) + 1; });
     feed = ups.map(u => {
@@ -167,12 +167,12 @@ export default async function Home() {
             </div>
             {feed.map(f => (
               <article className="feed-card" key={f.id}>
-                <a className="feed-ava" href={`/${f.journey.slug}`} style={{ background: f.owner.avatar_color || 'var(--orange)' }}>
+                <a className="feed-ava" href={`/${f.owner.handle || f.journey.slug}`} style={{ background: f.owner.avatar_color || 'var(--orange)' }}>
                   {f.owner.avatar_url ? <img src={f.owner.avatar_url} alt="" /> : (f.owner.name || '?')[0]}
                 </a>
                 <div className="feed-body">
                   <div className="feed-top">
-                    <a href={`/${f.journey.slug}`}><b>{f.owner.name}</b></a>
+                    <a href={`/${f.owner.handle || f.journey.slug}`}><b>{f.owner.name}</b></a>
                     <span>{fill(t.dayShort, { d: f.day_number })} · {f.journey.title}</span>
                   </div>
                   {kindTag[f.kind] && <span className={`post-tag ${f.kind}`}>{kindTag[f.kind]}</span>}

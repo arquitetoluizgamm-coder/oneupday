@@ -398,3 +398,10 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 /* ---------- Journey cover with custom banner ---------- */
 .cover.has-banner{background-size:cover;background-position:center}
 .cover.has-banner::after{display:none}
+
+/* ---------- Clickable profile links ---------- */
+.who-name{flex:1;min-width:0;color:inherit}
+.who-name b{display:block}
+.who-name:hover b{text-decoration:underline}
+.feed-top a{color:inherit}
+.feed-top a:hover b{text-decoration:underline}
