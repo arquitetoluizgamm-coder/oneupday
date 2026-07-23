@@ -1,5 +1,8 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '../../lib/supabase/server';
+import { getLocale } from '../../lib/locale';
+import { getDict } from '../../lib/i18n';
+import LangSwitcher from '../../components/LangSwitcher';
 import NewJourneyForm from './NewJourneyForm';
 
 export const dynamic = 'force-dynamic';
@@ -8,20 +11,31 @@ export default async function NewJourney() {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
+  const locale = getLocale();
+  const t = getDict(locale);
 
   return (
     <>
       <header className="top">
         <a className="wordmark" href="/">One <b>Up</b> Day</a>
-        <a className="ghost-btn" href="/home">Back</a>
+        <div className="top-right">
+          <LangSwitcher locale={locale} />
+          <a className="ghost-btn" href="/home">{t.back}</a>
+        </div>
       </header>
       <main className="wrap">
         <div className="create-head">
-          <p className="eyebrow">Create</p>
-          <h1>Start a journey in under a minute.</h1>
-          <p className="sub">Pick something real, post the first step, come back tomorrow.</p>
+          <p className="eyebrow">{t.createEyebrow}</p>
+          <h1>{t.createTitle}</h1>
+          <p className="sub">{t.createSub}</p>
         </div>
-        <NewJourneyForm userId={user.id} />
+        <NewJourneyForm userId={user.id} t={{
+          fName: t.fName, fNamePh: t.fNamePh, fCategory: t.fCategory, fDuration: t.fDuration,
+          fWhy: t.fWhy, fWhyPh: t.fWhyPh, fFirst: t.fFirst, fFirstPh: t.fFirstPh,
+          createBtn: t.createBtn, creating: t.creating, error: t.createError,
+          catArt: t.catArt, catLife: t.catLife, catBody: t.catBody, catHome: t.catHome, catWork: t.catWork,
+          dur7: t.dur7, dur30: t.dur30, dur60: t.dur60, dur100: t.dur100,
+        }} />
       </main>
     </>
   );

@@ -1,46 +1,47 @@
 import { getSupabase } from '../lib/supabase';
+import { getLocale } from '../lib/locale';
+import { getDict } from '../lib/i18n';
+import LangSwitcher from '../components/LangSwitcher';
 
 export const revalidate = 60;
 
 export default async function Home() {
+  const locale = getLocale();
+  const t = getDict(locale);
+
   let journeys = [];
   try {
     const sb = getSupabase();
-    const { data } = await sb
-      .from('journeys')
-      .select('slug, title')
-      .eq('is_public', true)
-      .limit(6);
+    const { data } = await sb.from('journeys').select('slug, title').eq('is_public', true).limit(6);
     journeys = data || [];
-  } catch (e) {
-    // sem env configurado ainda — mostra a landing sem demos
-  }
+  } catch (e) {}
 
   return (
     <>
       <header className="top">
         <span className="wordmark">One <b>Up</b> Day</span>
-        <a className="cta" href="/login">Start</a>
+        <div className="top-right">
+          <LangSwitcher locale={locale} />
+          <a className="cta" href="/login">{t.start}</a>
+        </div>
       </header>
 
       <main className="hero">
-        <h1>Start small.<br />Keep going.</h1>
-        <p>Follow real journeys, post one honest step a day, and help people continue when it gets hard.</p>
-        <a className="cta" href="/login">Start a journey</a>
+        <h1>{t.hero1}<br />{t.hero2}</h1>
+        <p>{t.heroSub}</p>
+        <a className="cta" href="/login">{t.heroCta}</a>
 
         {journeys.length > 0 && (
           <div className="demo">
-            <b>See a real journey</b>
+            <b>{t.seeReal}</b>
             <div className="demo-links">
-              {journeys.map(j => (
-                <a key={j.slug} href={`/${j.slug}`}>{j.title}</a>
-              ))}
+              {journeys.map(j => (<a key={j.slug} href={`/${j.slug}`}>{j.title}</a>))}
             </div>
           </div>
         )}
       </main>
 
-      <footer className="foot">One <b>Up</b> Day · One day. One step up.</footer>
+      <footer className="foot">One <b>Up</b> Day · {t.tagline}</footer>
     </>
   );
 }

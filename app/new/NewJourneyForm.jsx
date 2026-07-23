@@ -11,7 +11,7 @@ function slugify(title) {
   return `${base}-${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
-export default function NewJourneyForm({ userId }) {
+export default function NewJourneyForm({ userId, t }) {
   const [saving, setSaving] = useState(false);
   const router = useRouter();
 
@@ -28,63 +28,46 @@ export default function NewJourneyForm({ userId }) {
 
     const supabase = createClient();
     const { data: journey, error } = await supabase.from('journeys').insert({
-      owner_id: userId,
-      slug: slugify(title),
-      title,
-      category,
-      goal,
-      total_days,
-      cover_color: COLORS[category] || '#ff7a45',
-      is_public: true,
+      owner_id: userId, slug: slugify(title), title, category, goal, total_days,
+      cover_color: COLORS[category] || '#ff7a45', is_public: true,
     }).select().single();
 
-    if (error || !journey) {
-      setSaving(false);
-      alert('Could not create the journey. Try again.');
-      return;
-    }
-
-    await supabase.from('updates').insert({
-      journey_id: journey.id, day_number: 1, kind: 'step', text: first,
-    });
-
-    router.push('/home');
-    router.refresh();
+    if (error || !journey) { setSaving(false); alert(t.error); return; }
+    await supabase.from('updates').insert({ journey_id: journey.id, day_number: 1, kind: 'step', text: first });
+    router.push('/home'); router.refresh();
   }
 
   return (
     <form className="create-form" onSubmit={onSubmit}>
-      <label>Journey name
-        <input name="title" required maxLength={60} placeholder="Ex.: 30 days drawing again" />
+      <label>{t.fName}
+        <input name="title" required maxLength={60} placeholder={t.fNamePh} />
       </label>
       <div className="form-grid">
-        <label>Category
+        <label>{t.fCategory}
           <select name="category" defaultValue="art">
-            <option value="art">Art</option>
-            <option value="life">Life</option>
-            <option value="body">Body</option>
-            <option value="home">Home</option>
-            <option value="work">Work</option>
+            <option value="art">{t.catArt}</option>
+            <option value="life">{t.catLife}</option>
+            <option value="body">{t.catBody}</option>
+            <option value="home">{t.catHome}</option>
+            <option value="work">{t.catWork}</option>
           </select>
         </label>
-        <label>Duration
+        <label>{t.fDuration}
           <select name="duration" defaultValue="30">
-            <option value="7">7 days</option>
-            <option value="30">30 days</option>
-            <option value="60">60 days</option>
-            <option value="100">100 days</option>
+            <option value="7">{t.dur7}</option>
+            <option value="30">{t.dur30}</option>
+            <option value="60">{t.dur60}</option>
+            <option value="100">{t.dur100}</option>
           </select>
         </label>
       </div>
-      <label>Why are you starting?
-        <textarea name="goal" required maxLength={180} placeholder="What do you want to build, change or overcome?" />
+      <label>{t.fWhy}
+        <textarea name="goal" required maxLength={180} placeholder={t.fWhyPh} />
       </label>
-      <label>First update
-        <textarea name="firstUpdate" required maxLength={180} placeholder="What is the first small step you can post today?" />
+      <label>{t.fFirst}
+        <textarea name="firstUpdate" required maxLength={180} placeholder={t.fFirstPh} />
       </label>
-      <button className="cta wide" type="submit" disabled={saving}>
-        {saving ? 'Creating…' : 'Create journey'}
-      </button>
+      <button className="cta wide" type="submit" disabled={saving}>{saving ? t.creating : t.createBtn}</button>
     </form>
   );
 }

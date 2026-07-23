@@ -3,14 +3,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 
-const KINDS = [
-  { id: 'step', label: 'Step' },
-  { id: 'win', label: 'Small win' },
-  { id: 'setback', label: 'Setback' },
-  { id: 'learned', label: 'Learned' },
-];
+const ORDER = ['step', 'win', 'setback', 'learned'];
 
-export default function Composer({ journeyId, nextDay }) {
+export default function Composer({ journeyId, nextDay, labels, t }) {
   const [text, setText] = useState('');
   const [kind, setKind] = useState('step');
   const [saving, setSaving] = useState(false);
@@ -21,51 +16,29 @@ export default function Composer({ journeyId, nextDay }) {
     if (!value || saving) return;
     setSaving(true);
     const supabase = createClient();
-    const { error } = await supabase.from('updates').insert({
-      journey_id: journeyId,
-      day_number: nextDay,
-      kind,
-      text: value,
-    });
+    const { error } = await supabase.from('updates').insert({ journey_id: journeyId, day_number: nextDay, kind, text: value });
     setSaving(false);
-    if (error) {
-      alert('Could not post. Try again.');
-      return;
-    }
-    setText('');
-    setKind('step');
-    router.refresh();
+    if (error) { alert(t.error); return; }
+    setText(''); setKind('step'); router.refresh();
   }
+
+  const ph = t.placeholder.replace('{n}', nextDay);
 
   return (
     <div className="composer2">
-      <input
-        value={text}
-        onChange={e => setText(e.target.value)}
-        maxLength={180}
-        placeholder={`Post day ${nextDay}: one honest step from today`}
-        onKeyDown={e => { if (e.key === 'Enter') post(); }}
-      />
+      <input value={text} onChange={e => setText(e.target.value)} maxLength={180} placeholder={ph}
+        onKeyDown={e => { if (e.key === 'Enter') post(); }} />
       <div className="composer2-row">
         <div className="kinds">
-          {KINDS.map(k => (
-            <button
-              key={k.id}
-              type="button"
-              className={`kind${kind === k.id ? ' active' : ''}${k.id === 'setback' ? ' setback' : ''}`}
-              onClick={() => setKind(k.id)}
-            >
-              {k.label}
-            </button>
+          {ORDER.map(k => (
+            <button key={k} type="button"
+              className={`kind${kind === k ? ' active' : ''}${k === 'setback' ? ' setback' : ''}`}
+              onClick={() => setKind(k)}>{labels[k]}</button>
           ))}
         </div>
-        <button className="post-btn" onClick={post} disabled={saving || !text.trim()}>
-          {saving ? 'Posting…' : 'Post'}
-        </button>
+        <button className="post-btn" onClick={post} disabled={saving || !text.trim()}>{saving ? t.posting : t.post}</button>
       </div>
-      {kind === 'setback' && (
-        <p className="setback-note">A setback still counts as showing up. Your streak stays safe.</p>
-      )}
+      {kind === 'setback' && <p className="setback-note">{t.setbackNote}</p>}
     </div>
   );
 }
