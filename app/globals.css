@@ -1167,3 +1167,41 @@ body{background:var(--bg);color:var(--ink)}
 .comment-form button{border:0;border-radius:9px;background:var(--night);color:#fff;padding:0 13px;font-weight:750;cursor:pointer}
 .comment-form button:disabled{opacity:.45;cursor:default}
 .comment-message{margin:8px 0 0;color:var(--support);font-size:12px}
+
+/* Design system 2026: interface editorial, uma ação de destaque por tela. */
+:root{
+  --bg:#f7f6f2;
+  --surface:#ffffff;
+  --ink:#18243b;
+  --night:#18243b;
+  --night-2:#273653;
+  --muted:#687386;
+  --line:#e5e3dd;
+  --pink:#bd5b52;
+  --orange:#d87932;
+  --yellow:#efb34b;
+  --violet:#68748a;
+  --link:#34445f;
+  --support:#bd5b52;
+  --support-soft:#faeeeb;
+  --up:linear-gradient(90deg,#d87932,#efb34b);
+  --shadow:0 8px 24px rgba(24,36,59,.055);
+  --shadow-md:0 12px 30px rgba(24,36,59,.07);
+}
+body{background:var(--bg);color:var(--ink)}
+.top{background:rgba(247,246,242,.9);border-bottom-color:var(--line)}
+.tiny-link,.link-btn,.ai-write,.feed-more,.feed-open,.feed-enc{color:var(--link)}
+.tiny-link{border-color:var(--line);background:var(--surface)}
+.tiny-link:hover,.link-btn:hover,.ai-write:hover,.feed-more:hover,.feed-open:hover{color:var(--ink)}
+.feed-enc:hover{color:var(--support)}
+.cta.grow,.post-btn{background:var(--night);color:#fff;background-image:none}
+.post-btn:hover,.cta.grow:hover{background:var(--night-2)}
+.bar span{background:var(--up)}
+.wiz-dot.on{background:var(--orange)}
+.first-journey .fj-eyebrow{color:var(--orange)}
+.entry-actions .support-pill.on,.support-pill.on{color:var(--support);border-color:var(--support);background:var(--support-soft)}
+.entry-tag.setback,.post-tag.setback,.timeline .tag.setback{background:var(--night-2)}
+.timeline .dot.setback{background:var(--night-2)}
+.tag.win,.entry-tag.win,.post-tag.win{background:#eef4ee;color:#356044}
+.bell b{background:var(--support)}
+.bottom-nav a.on svg{color:var(--orange)}
