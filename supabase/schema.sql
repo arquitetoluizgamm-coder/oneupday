@@ -3,13 +3,9 @@
 -- Cole no Supabase: SQL Editor > New query > Run
 -- ============================================================
 
--- 1. PERFIS
--- id = o mesmo id do usuário no Supabase Auth (preenchido no cadastro,
--- quando o login existir). Sem foreign key rígido para auth.users, para
--- permitir perfis de teste (seed) antes de o login estar pronto.
--- Quando o login entrar, o cadastro insere o profile com id = auth.uid().
+-- 1. PERFIS (1:1 com auth.users do Supabase)
 create table if not exists public.profiles (
-  id          uuid primary key default gen_random_uuid(),
+  id          uuid primary key references auth.users(id) on delete cascade,
   handle      text unique not null,
   name        text not null,
   bio         text,

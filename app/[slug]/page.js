@@ -27,11 +27,16 @@ async function loadJourney(slug) {
   ]);
   const ups = updates || [];
   const encById = {};
+  const myEnc = [];
   if (ups.length) {
     const { data: encs } = await sb.from('encouragements').select('update_id').in('update_id', ups.map(u => u.id));
     (encs || []).forEach(e => { encById[e.update_id] = (encById[e.update_id] || 0) + 1; });
+    if (user) {
+      const { data: mine } = await sb.from('encouragements').select('update_id').eq('user_id', user.id).in('update_id', ups.map(u => u.id));
+      (mine || []).forEach(e => myEnc.push(e.update_id));
+    }
   }
-  return { journey, owner, updates: ups, stats: stats || {}, encById, viewerId: user?.id || null };
+  return { journey, owner, updates: ups, stats: stats || {}, encById, viewerId: user?.id || null, myEnc };
   } catch (e) { return null; }
 }
 
@@ -134,8 +139,9 @@ export default async function JourneyPage({ params }) {
   if (slug.startsWith('@')) return <ProfilePage handle={slug} />;
   const data = await loadJourney(slug);
   if (!data) notFound();
-  const { journey, owner, updates, stats, encById, viewerId } = data;
+  const { journey, owner, updates, stats, encById, viewerId, myEnc } = data;
   const isOwner = viewerId && viewerId === journey.owner_id;
+  const myEncSet = new Set(myEnc || []);
   const locale = getLocale();
   const t = getDict(locale);
   const pct = Math.min(100, stats.progress_pct || 0);
@@ -212,7 +218,7 @@ export default async function JourneyPage({ params }) {
                 {u.video_url && <div className="update-photo"><video src={u.video_url} controls playsInline preload="metadata" /></div>}
                 {u.text && u.text !== '📷' && u.text !== '🎥' && <p>{u.text}</p>}
                 <div className="update-foot">
-                  <EncourageBar updateId={u.id} labelIdle={t.withYouIdle} labelActive={t.withYouActive} />
+                  <EncourageBar updateId={u.id} initialActive={myEncSet.has(u.id)} labelIdle={t.withYouIdle} labelActive={t.withYouActive} />
                   {isOwner
                     ? <UpdateManage updateId={u.id} hasMedia={!!(u.photo_url || u.video_url)} labels={{ manage: t.managePost, replace: t.mediaReplace, remove: t.mediaRemove, delete: t.postDelete, deleteConfirm: t.postDeleteConfirm, uploading: t.uploading, error: t.postError }} />
                     : <ReportButton updateId={u.id} label={t.report} doneLabel={t.reported} />}

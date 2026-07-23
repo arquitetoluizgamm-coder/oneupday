@@ -51,21 +51,21 @@ export async function GET(req) {
   const { data: profs } = await supabase.from('profiles').select('id, name, avatar_color, avatar_url, handle').in('id', oIds);
   const pMap = {}; (profs || []).forEach(pr => { pMap[pr.id] = pr; });
 
-  const trackByUpdate = {};
-  const tMap = {};
+  const myEnc = new Set();
   try {
-    const { data: utr } = await supabase.from('updates').select('id, track_id').in('id', list.map(u => u.id)).not('track_id', 'is', null);
-    (utr || []).forEach(u => { trackByUpdate[u.id] = u.track_id; });
-    const tIds = [...new Set(Object.values(trackByUpdate))];
-    if (tIds.length) {
-      const { data: trks } = await supabase.from('tracks').select('id, title, artist, audio_url').in('id', tIds);
-      (trks || []).forEach(tr => { tMap[tr.id] = tr; });
-    }
-  } catch { /* colunas/tabela de música ainda não instaladas */ }
+    const { data: enc } = await supabase.from('encouragements').select('update_id').eq('user_id', user.id).in('update_id', list.map(u => u.id));
+    (enc || []).forEach(e => myEnc.add(e.update_id));
+  } catch { }
+
+  const trackByUpdate = {};
+  try {
+    const { data: utr } = await supabase.from('updates').select('id, track_title, track_artist, track_audio_url').in('id', list.map(u => u.id)).not('track_audio_url', 'is', null);
+    (utr || []).forEach(u => { trackByUpdate[u.id] = { title: u.track_title, artist: u.track_artist, audio_url: u.track_audio_url }; });
+  } catch { /* colunas de música ainda não instaladas */ }
 
   const items = list.map(u => {
     const j = jMap[u.journey_id]; if (!j) return null;
-    return { ...u, journey: { slug: j.slug, title: j.title, category: j.category }, owner: pMap[j.owner_id] || {}, track: tMap[trackByUpdate[u.id]] || null };
+    return { ...u, journey: { slug: j.slug, title: j.title, category: j.category }, owner: pMap[j.owner_id] || {}, track: trackByUpdate[u.id] || null, encouraged: myEnc.has(u.id) };
   }).filter(Boolean);
   return NextResponse.json({ items });
 }

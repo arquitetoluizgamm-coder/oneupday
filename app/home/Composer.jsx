@@ -94,7 +94,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       journey_id: journeyId, day_number: dayNumber, kind,
       text: value || fallback, photo_url: photoUrl, video_url: videoUrl,
     };
-    if (track) { row.track_id = track.id; row.track_start = 0; }
+    if (track) { row.track_title = track.title; row.track_artist = track.artist; row.track_audio_url = track.audio_url; }
     const { error } = await supabase.from('updates').insert(row);
     setSaving(false);
     if (error) { alert(t.error); return; }
@@ -144,7 +144,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           </button>
           <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPickPhoto} />
           <input ref={videoRef} type="file" accept="video/*" hidden onChange={onPickVideo} />
-          <TrackPicker selected={track} onSelect={setTrack} labels={{ add: t.musicAdd, title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty }} />
+          <TrackPicker selected={track} onSelect={setTrack} labels={{ add: t.musicAdd, title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded }} />
         </div>
         <button className="post-btn" onClick={post} disabled={saving || (!text.trim() && !photoUrl && !videoUrl)}>
           {saving ? t.posting : t.post}

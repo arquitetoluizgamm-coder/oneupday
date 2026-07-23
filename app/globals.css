@@ -810,3 +810,7 @@ a.moment-tag:hover{background:rgba(255,255,255,.28)}
 .mcard-actions .feed-share{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line,#eceaf3);background:#fff;color:var(--night,#0b1030);font-weight:600;font-size:13px;padding:6px 13px;border-radius:999px;cursor:pointer;transition:background .15s}
 .mcard-actions .feed-share:hover{background:var(--soft,#f7f6fb)}
 .mcard-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.track-search{display:flex;gap:6px;margin-bottom:8px}
+.track-search input{flex:1;border:1px solid var(--line,#eceaf3);border-radius:10px;padding:8px 10px;font-size:14px}
+.track-search button{border:0;background:var(--soft,#f2f0f9);border-radius:10px;padding:0 12px;cursor:pointer}
+.track-credit{font-size:11px;color:var(--muted);text-align:center;margin:8px 0 0}

@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { createClient } from '../../lib/supabase/client';
 
-export default function EncourageBar({ updateId, labelIdle, labelActive }) {
-  const [active, setActive] = useState(false);
+export default function EncourageBar({ updateId, labelIdle, labelActive, initialActive = false }) {
+  const [active, setActive] = useState(initialActive);
   const [busy, setBusy] = useState(false);
 
   async function toggle() {

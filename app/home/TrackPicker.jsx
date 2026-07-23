@@ -1,29 +1,37 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
-import { createClient } from '../../lib/supabase/client';
+import { useState, useRef } from 'react';
 
 export default function TrackPicker({ selected, onSelect, labels }) {
   const [open, setOpen] = useState(false);
+  const [q, setQ] = useState('');
   const [tracks, setTracks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [configured, setConfigured] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [playing, setPlaying] = useState(null);
   const audioRef = useRef(null);
 
-  async function loadTracks() {
-    if (loaded) return;
-    const supabase = createClient();
-    const { data } = await supabase.from('tracks').select('*').order('title');
-    setTracks(data || []); setLoaded(true);
+  async function search(query) {
+    setLoading(true);
+    try {
+      const r = await fetch(`/api/tracks?q=${encodeURIComponent(query || '')}`);
+      const j = await r.json();
+      setConfigured(j.configured !== false);
+      setTracks(j.tracks || []);
+    } catch { setTracks([]); }
+    setLoading(false); setLoaded(true);
   }
-  function toggleOpen() { setOpen(o => { const n = !o; if (n) loadTracks(); return n; }); }
+  function toggleOpen() { setOpen(o => { const n = !o; if (n && !loaded) search(''); return n; }); }
   function preview(tk) {
     if (!audioRef.current) return;
     if (playing === tk.id) { audioRef.current.pause(); setPlaying(null); return; }
     audioRef.current.src = tk.audio_url; audioRef.current.currentTime = 0;
     audioRef.current.play().catch(() => {}); setPlaying(tk.id);
   }
-  function choose(tk) { onSelect(tk); setOpen(false); if (audioRef.current) audioRef.current.pause(); setPlaying(null); }
-  useEffect(() => () => { if (audioRef.current) audioRef.current.pause(); }, []);
+  function choose(tk) {
+    onSelect({ title: tk.title, artist: tk.artist, audio_url: tk.audio_url });
+    setOpen(false); if (audioRef.current) audioRef.current.pause(); setPlaying(null);
+  }
 
   if (selected) {
     return (
@@ -39,7 +47,12 @@ export default function TrackPicker({ selected, onSelect, labels }) {
       {open && (
         <div className="track-panel">
           <div className="track-panel-head"><b>{labels.title}</b><button type="button" onClick={() => setOpen(false)}>✕</button></div>
-          {loaded && tracks.length === 0 && <p className="track-empty">{labels.empty}</p>}
+          <form className="track-search" onSubmit={e => { e.preventDefault(); search(q); }}>
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder={labels.searchPh} />
+            <button type="submit">{loading ? '…' : '🔍'}</button>
+          </form>
+          {!configured && <p className="track-empty">{labels.keyNeeded}</p>}
+          {configured && loaded && tracks.length === 0 && !loading && <p className="track-empty">{labels.empty}</p>}
           <div className="track-list">
             {tracks.map(tk => (
               <div className="track-row" key={tk.id}>
@@ -50,6 +63,7 @@ export default function TrackPicker({ selected, onSelect, labels }) {
             ))}
           </div>
           <audio ref={audioRef} onEnded={() => setPlaying(null)} />
+          <p className="track-credit">Jamendo · Creative Commons</p>
         </div>
       )}
     </div>

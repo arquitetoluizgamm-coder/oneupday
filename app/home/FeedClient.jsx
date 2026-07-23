@@ -97,7 +97,7 @@ export default function FeedClient({ mutedCats, labels }) {
             {f.text && f.text !== '\u{1F4F7}' && f.text !== '\u{1F3A5}' && <p>{f.text}</p>}
             {f.track && <TrackTag track={f.track} />}
             <div className="mcard-actions">
-              <EncourageBar updateId={f.id} labelIdle={labels.supportIdle} labelActive={labels.supportActive} />
+              <EncourageBar updateId={f.id} initialActive={f.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} />
               <FeedShare slug={f.journey.slug} title={f.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
               <MuteTopic category={f.journey.category} current={mutedCats} label={labels.muteTopic} />
             </div>
