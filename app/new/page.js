@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 import { createClient } from '../../lib/supabase/server';
 import { getLocale } from '../../lib/locale';
 import { getDict } from '../../lib/i18n';
-import LangSwitcher from '../../components/LangSwitcher';
 import Logo from '../../components/Logo';
 import NewJourneyForm from './NewJourneyForm';
 
@@ -20,7 +19,6 @@ export default async function NewJourney() {
       <header className="top">
         <Logo />
         <div className="top-right">
-          <LangSwitcher locale={locale} />
           <a className="ghost-btn" href="/home">{t.back}</a>
         </div>
       </header>

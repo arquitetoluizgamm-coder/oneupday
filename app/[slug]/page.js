@@ -1,7 +1,6 @@
 import { getSupabase } from '../../lib/supabase';
 import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
-import LangSwitcher from '../../components/LangSwitcher';
 import Logo from '../../components/Logo';
 import ShareButton from './ShareButton';
 import EncourageBar from './EncourageBar';
@@ -53,7 +52,6 @@ export default async function JourneyPage({ params }) {
       <header className="top">
         <Logo />
         <div className="top-right">
-          <LangSwitcher locale={locale} />
           <a className="cta" href="/login">{t.startYourJourney}</a>
         </div>
       </header>

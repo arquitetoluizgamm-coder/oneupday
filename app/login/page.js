@@ -1,6 +1,5 @@
 import { getLocale } from '../../lib/locale';
 import { getDict } from '../../lib/i18n';
-import LangSwitcher from '../../components/LangSwitcher';
 import Logo, { Symbol } from '../../components/Logo';
 import GoogleButton from './GoogleButton';
 
@@ -11,7 +10,6 @@ export default function Login() {
     <>
       <header className="top">
         <Logo />
-        <LangSwitcher locale={locale} />
       </header>
       <main className="auth-wrap">
         <div className="auth-card">

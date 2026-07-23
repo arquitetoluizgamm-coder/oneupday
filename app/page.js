@@ -1,7 +1,6 @@
 import { getSupabase } from '../lib/supabase';
 import { getLocale } from '../lib/locale';
 import { getDict } from '../lib/i18n';
-import LangSwitcher from '../components/LangSwitcher';
 import Logo from '../components/Logo';
 
 export const revalidate = 60;
@@ -22,7 +21,6 @@ export default async function Home() {
       <header className="top">
         <Logo href={false} />
         <div className="top-right">
-          <LangSwitcher locale={locale} />
           <a className="cta" href="/login">{t.start}</a>
         </div>
       </header>
