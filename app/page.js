@@ -73,7 +73,7 @@ export default async function Home() {
           const initial = (demo.owner.name || '?')[0];
           return (
             <section className="land-demo">
-              <span className="land-demo-label">{t.demoLabel}</span>
+              <span className="land-demo-label">{demo.fallback ? t.demoLabelDemo : t.demoLabel}</span>
               <a className="demo-card" href={demo.fallback ? '/login' : `/${demo.journey.slug}`}>
                 <div className="demo-cover" style={demo.photo
                   ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.05), rgba(9,12,42,.55)), url(${demo.photo})`, backgroundSize: 'cover', backgroundPosition: 'center' }
@@ -113,7 +113,7 @@ export default async function Home() {
         </section>
 
         <section className="examples">
-          <b>{t.examplesTitle}</b>
+          <b><a href="/dia1" style={{color:'inherit'}}>{t.examplesTitle}</a></b>
           <div className="example-pills">
             {[t.ex1, t.ex2, t.ex3, t.ex4, t.ex5].map((ex, i) => (
               <a key={i} href="/login" className="example-pill">{ex}</a>

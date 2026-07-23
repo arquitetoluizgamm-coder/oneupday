@@ -69,6 +69,18 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     if (photoRef.current) photoRef.current.value = '';
   }
 
+  async function aiSoftWrite() { await aiWrite(); }
+  async function aiSmallStep() {
+    if (saving || uploading) return;
+    setSaving(true);
+    try {
+      const r = await fetch('/api/assist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'nextstep', journeyId, draft: text }) });
+      const j = await r.json();
+      if (j.text) setText(j.text);
+    } catch { }
+    setSaving(false);
+  }
+
   async function aiWrite() {
     if (saving || uploading) return;
     setSaving(true);
@@ -156,6 +168,15 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
         </button>
       </div>
       {kind === 'setback' && <p className="setback-note">{t.setbackNote}</p>}
+      {aiOn && kind === 'setback' && (
+        <div className="ai-context">
+          <span className="ai-context-q">{t.aiCareQ}</span>
+          <div className="ai-context-btns">
+            <button type="button" onClick={aiSoftWrite} disabled={saving || uploading}>{t.aiCareLight}</button>
+            <button type="button" onClick={aiSmallStep} disabled={saving || uploading}>{t.aiCareStep}</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

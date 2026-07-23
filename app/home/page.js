@@ -33,6 +33,7 @@ export default async function Home() {
   const profile = await ensureProfile(supabase, user);
   const t = getDict(getLocale());
   const { count: unread } = await supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('recipient_id', user.id).eq('read', false);
+  const { count: myJourneys } = await supabase.from('journeys').select('*', { count: 'exact', head: true }).eq('owner_id', user.id);
 
   const labels = {
     dayShort: t.dayShort, tagSetback: t.tagSetback, tagWin: t.tagWin,
@@ -59,6 +60,15 @@ export default async function Home() {
       </header>
 
       <main className="wrap feed-page">
+        {(!myJourneys || myJourneys === 0) && (
+          <section className="first-journey">
+            <span className="fj-eyebrow">{t.fjEyebrow}</span>
+            <h1>{t.fjTitle.replace('{name}', (profile.name || '').split(' ')[0])}</h1>
+            <p>{t.fjSub}</p>
+            <a className="cta grow" href="/new">{t.fjCta}</a>
+            <p className="fj-hint">{t.fjHint}</p>
+          </section>
+        )}
         <FeedClient mutedCats={profile.muted_cats || ''} labels={labels} />
       </main>
       <BottomNav active="home" t={t} />

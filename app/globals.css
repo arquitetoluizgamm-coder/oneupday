@@ -857,3 +857,76 @@ main.wrap > section{margin-bottom:16px}
   .composer-toolbar .post-btn{width:100%;order:3}
   .tool,.composer-toolbar .track-picker .kind.music{flex:1;max-width:64px}
 }
+/* Card Dia 1 + Desafiar amigo */
+.dia1-card-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:14px;padding:14px 20px;font-weight:800;font-size:15px;cursor:pointer;color:#fff;background:linear-gradient(90deg,#f02f87,#ff7a45 60%,#ffd33d);transition:filter .15s,transform .15s}
+.dia1-card-btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.dia1-card-btn:disabled{opacity:.6}
+.challenge-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%;border:1.5px solid var(--night,#0b1030);background:#fff;color:var(--night,#0b1030);border-radius:14px;padding:12px 20px;font-weight:800;font-size:15px;cursor:pointer;transition:background .15s}
+.challenge-btn:hover{background:var(--soft,#f7f6fb)}
+.movement-actions{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+@media(min-width:560px){.movement-actions{flex-direction:row}.movement-actions>*{flex:1}}
+/* Onboarding 1º fluxo */
+.first-journey{background:linear-gradient(135deg,#0b1030,#26134d);color:#fff;border-radius:22px;padding:28px 24px;margin:6px 0 18px;text-align:center}
+.first-journey .fj-eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;color:#ffd33d}
+.first-journey h1{font-size:26px;letter-spacing:-.03em;margin:8px 0 6px}
+.first-journey p{color:rgba(255,255,255,.8);margin:0 0 16px;font-size:15px;line-height:1.5}
+.first-journey .cta{display:inline-flex}
+.first-journey .fj-hint{font-size:12.5px;color:rgba(255,255,255,.55);margin:12px 0 0}
+
+/* Privacidade no wizard */
+.vis-pick{display:flex;flex-direction:column;gap:8px}
+.vis-opt{text-align:left;border:1.5px solid var(--line,#eceaf3);background:#fff;border-radius:14px;padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s}
+.vis-opt:hover{background:var(--soft,#f7f6fb)}
+.vis-opt.on{border-color:var(--night,#0b1030);background:rgba(9,12,42,.04)}
+.vis-opt b{display:block;font-size:15px}
+.vis-opt span{font-size:13px;color:var(--muted)}
+
+/* IA contextual (após recaída) */
+.ai-context{margin-top:10px;background:linear-gradient(135deg,rgba(240,47,135,.06),rgba(168,85,247,.06));border:1px solid rgba(168,85,247,.2);border-radius:14px;padding:12px 14px}
+.ai-context-q{display:block;font-size:14px;font-weight:600;color:var(--night,#0b1030);margin-bottom:10px}
+.ai-context-btns{display:flex;flex-wrap:wrap;gap:8px}
+.ai-context-btns button{border:0;background:#fff;border:1px solid rgba(168,85,247,.3);color:#a21caf;font-weight:700;font-size:13px;padding:8px 14px;border-radius:999px;cursor:pointer}
+.ai-context-btns button:hover{background:rgba(168,85,247,.08)}
+/* Landing: primeira tela compacta no celular */
+@media(max-width:640px){
+  .land-hero{min-height:calc(100svh - 90px);display:flex;flex-direction:column;justify-content:center;padding-top:8px;padding-bottom:24px}
+  .land-hero h1{font-size:30px;line-height:1.12}
+  .land-sub{font-size:16px}
+  .land-explain{font-size:14px}
+  .land-demo{margin-top:8px}
+}
+/* Painel de métricas */
+.metric-top{display:flex;align-items:baseline;gap:10px;margin:6px 0 18px}
+.metric-top b{font-size:40px;font-weight:900;letter-spacing:-.03em;color:var(--night,#0b1030)}
+.metric-top span{color:var(--muted);font-weight:600}
+.metric-funnel{display:flex;flex-direction:column;gap:12px}
+.metric-row{display:grid;grid-template-columns:1fr 2fr auto;align-items:center;gap:14px}
+.metric-label{font-weight:700;font-size:14px}
+.metric-bar{height:14px;border-radius:999px;background:var(--soft,#f2f0f9);overflow:hidden}
+.metric-bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#f02f87,#ff7a45 60%,#ffd33d);min-width:4px}
+.metric-num{text-align:right;min-width:64px}
+.metric-num b{font-size:18px;font-weight:800}
+.metric-num small{display:block;color:var(--muted);font-size:12px}
+.metric-note{color:var(--muted);font-size:13px;line-height:1.6;margin-top:20px}
+@media(max-width:560px){.metric-row{grid-template-columns:1fr auto;grid-template-areas:'label num' 'bar bar'}.metric-label{grid-area:label}.metric-num{grid-area:num}.metric-bar{grid-area:bar}}
+.tema-hero{padding:20px 0 10px}
+.tema-hero h1{font-size:34px;letter-spacing:-.04em;margin:6px 0 8px}
+.tema-hero p{color:var(--muted);font-size:16px;line-height:1.5;margin:0 0 16px;max-width:560px}
+/* Página-movimento Dia 1 */
+.dia1-hero{text-align:center;padding:30px 0 14px}
+.dia1-badge{display:inline-block;background:linear-gradient(90deg,#f02f87,#ff7a45);color:#fff;font-weight:900;font-size:13px;letter-spacing:.12em;padding:6px 14px;border-radius:999px}
+.dia1-hero h1{font-size:40px;letter-spacing:-.045em;margin:14px 0 8px;line-height:1.05}
+.dia1-hero p{color:var(--muted);font-size:17px;max-width:520px;margin:0 auto 18px;line-height:1.5}
+.dia1-campaigns{margin:8px 0 6px}
+.campaign-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.campaign-pill{border:1px solid var(--line,#eceaf3);background:#fff;border-radius:999px;padding:9px 15px;font-weight:700;font-size:14px;color:var(--night,#0b1030);text-decoration:none;transition:background .15s}
+.campaign-pill:hover{background:var(--soft,#f7f6fb)}
+.dia1-wall{margin-top:20px}
+.wall-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:10px}
+.wall-card{text-decoration:none;color:inherit}
+.wall-cover{position:relative;aspect-ratio:3/4;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:12px}
+.wall-day{align-self:flex-start;background:rgba(255,255,255,.9);color:#0b1030;font-weight:800;font-size:11px;padding:3px 9px;border-radius:999px}
+.wall-title{color:#fff;font-size:15px;line-height:1.2;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+.wall-who{display:flex;align-items:center;gap:7px;margin-top:8px;font-size:13px;font-weight:600}
+.wall-ava{width:24px;height:24px;border-radius:50%;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex:0 0 auto}
+.wall-ava img{width:100%;height:100%;object-fit:cover}

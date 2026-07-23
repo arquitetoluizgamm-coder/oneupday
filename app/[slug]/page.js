@@ -3,6 +3,8 @@ import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
 import Logo from '../../components/Logo';
 import ShareButton from './ShareButton';
+import Dia1Card from './Dia1Card';
+import ChallengeButton from './ChallengeButton';
 import EncourageBar from './EncourageBar';
 import FollowButton from './FollowButton';
 import BlockButton from './BlockButton';
@@ -237,6 +239,13 @@ export default async function JourneyPage({ params }) {
           <ShareButton journey={journey} owner={owner} stats={stats} latest={latest}
             label={t.shareCard} downloading={t.shareDownloading}
             card={{ day: t.cardDay, of: t.cardOf, streak: t.cardStreak, setback: t.cardSetback }} />
+          <div className="movement-actions">
+            <Dia1Card journey={journey} owner={owner} theme={journey.title}
+              label={t.dia1CardBtn} downloading={t.shareDownloading}
+              texts={{ eyebrow: t.dia1Eyebrow, big: t.dia1Big, invite: t.dia1Invite, by: t.dia1By }} />
+            <ChallengeButton slug={journey.slug} theme={journey.title}
+              label={t.challengeBtn} copiedLabel={t.linkCopied} message={t.challengeMsg} />
+          </div>
         </section>
 
         <section className="encourage">

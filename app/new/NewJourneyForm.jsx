@@ -24,6 +24,7 @@ export default function NewJourneyForm({ userId, t }) {
   const [goal, setGoal] = useState('');
   const [cat, setCat] = useState('art');
   const [moment, setMoment] = useState('');
+  const [visibility, setVisibility] = useState('public');
   const [photoUrl, setPhotoUrl] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -85,7 +86,7 @@ export default function NewJourneyForm({ userId, t }) {
     const slug = slugify(title);
     const { data: journey, error } = await supabase.from('journeys').insert({
       owner_id: userId, slug, title: title.trim(), category, goal: goal.trim(), total_days,
-      cover_color: COLORS[category] || '#ff7a45', is_public: true, visibility: 'public', moment: moment || null,
+      cover_color: COLORS[category] || '#ff7a45', is_public: visibility === 'public', visibility, moment: moment || null,
     }).select().single();
     if (error || !journey) { setSaving(false); alert(t.createError); return; }
 
@@ -142,6 +143,14 @@ export default function NewJourneyForm({ userId, t }) {
         <div className="cat-pick">
           {MOMENTS.map(([v, l]) => (
             <button key={v} type="button" className={`chip moment${moment === v ? ' on' : ''}`} onClick={() => setMoment(moment === v ? '' : v)}>{l}</button>
+          ))}
+        </div>
+        <div className="field-label" style={{ marginTop: 16 }}>{t.privacyQ}</div>
+        <div className="vis-pick">
+          {[['public', t.pubPublic, t.pubPublicSub], ['followers', t.pubFollowers, t.pubFollowersSub], ['private', t.pubPrivate, t.pubPrivateSub]].map(([v, l, sub]) => (
+            <button key={v} type="button" className={`vis-opt${visibility === v ? ' on' : ''}`} onClick={() => setVisibility(v)}>
+              <b>{l}</b><span>{sub}</span>
+            </button>
           ))}
         </div>
       </div>

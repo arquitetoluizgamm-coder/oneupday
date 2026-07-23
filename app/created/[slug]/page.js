@@ -4,6 +4,8 @@ import { getLocale } from '../../../lib/locale';
 import { getDict } from '../../../lib/i18n';
 import Logo, { Symbol } from '../../../components/Logo';
 import ShareButton from '../../[slug]/ShareButton';
+import Dia1Card from '../../[slug]/Dia1Card';
+import ChallengeButton from '../../[slug]/ChallengeButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,12 +39,12 @@ export default async function Created({ params }) {
             <span>{t.cardDay} 1 · {journey.total_days} {t.cardOf}</span>
           </div>
           <div className="success-actions">
-            <ShareButton journey={journey} owner={owner} stats={stats || {}} latest={latest}
-              label={t.successShare} downloading={t.shareDownloading}
-              card={{ day: t.cardDay, of: t.cardOf, streak: t.cardStreak, setback: t.cardSetback }} />
-            <a className="cta" href={`/${journey.slug}`}>{t.successView}</a>
-            <a className="ghost-btn wide" href="/home">{t.successMore}</a>
-            <a className="ghost-btn wide" href="/explore">{t.successExplore}</a>
+            <Dia1Card journey={journey} owner={owner} theme={journey.title}
+              label={t.dia1CardBtn} downloading={t.shareDownloading}
+              texts={{ eyebrow: t.dia1Eyebrow, big: t.dia1Big, invite: t.dia1Invite, by: t.dia1By }} />
+            <ChallengeButton slug={journey.slug} theme={journey.title}
+              label={t.challengeBtn} copiedLabel={t.linkCopied} message={t.challengeMsg} />
+            <a className="ghost-btn wide" href={`/${journey.slug}`}>{t.successContinue}</a>
           </div>
         </section>
       </main>
