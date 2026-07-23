@@ -786,3 +786,27 @@ a.moment-tag:hover{background:rgba(255,255,255,.28)}
 .wiz-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:26px}
 .wiz-nav .cta{min-width:150px}
 .wiz-nav .cta:disabled{opacity:.45}
+/* Música */
+.kind.music{background:linear-gradient(90deg,#f02f87,#a855f7);color:#fff;border:0}
+.track-picker{position:relative;display:inline-flex}
+.track-panel{position:absolute;bottom:100%;left:0;margin-bottom:8px;width:300px;max-width:80vw;background:#fff;border:1px solid var(--line,#eceaf3);border-radius:14px;box-shadow:0 10px 30px rgba(9,12,42,.16);padding:10px;z-index:30}
+.track-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.track-panel-head b{font-size:14px}
+.track-panel-head button{border:0;background:transparent;font-size:15px;cursor:pointer;color:var(--muted)}
+.track-empty{color:var(--muted);font-size:13px;padding:6px}
+.track-list{max-height:240px;overflow:auto;display:flex;flex-direction:column;gap:2px}
+.track-row{display:flex;align-items:center;gap:10px;padding:7px 6px;border-radius:10px}
+.track-row:hover{background:var(--soft,#f7f6fb)}
+.track-play{width:30px;height:30px;border-radius:50%;border:0;background:var(--night,#0b1030);color:#fff;cursor:pointer;flex:0 0 auto;font-size:11px}
+.track-meta{flex:1;min-width:0}
+.track-meta b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-meta small{color:var(--muted);font-size:12px}
+.track-use{border:0;background:var(--soft,#f2f0f9);color:var(--night,#0b1030);font-weight:700;font-size:13px;padding:6px 12px;border-radius:999px;cursor:pointer}
+.track-chip{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,rgba(240,47,135,.12),rgba(168,85,247,.12));border:1px solid rgba(168,85,247,.3);border-radius:999px;padding:6px 8px 6px 12px;font-size:13px;font-weight:600;color:#a21caf}
+.track-chip button{border:0;background:transparent;cursor:pointer;color:inherit;font-size:13px}
+.feed-track{display:inline-flex;align-items:center;gap:8px;margin:6px 0 2px;background:var(--soft,#f7f6fb);border-radius:999px;padding:5px 12px 5px 5px;width:max-content;max-width:100%}
+.feed-track-btn{width:26px;height:26px;border-radius:50%;border:0;background:linear-gradient(90deg,#f02f87,#a855f7);color:#fff;cursor:pointer;font-size:10px;flex:0 0 auto}
+.feed-track-name{font-size:13px;font-weight:600;color:var(--night,#0b1030);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcard-actions .feed-share{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line,#eceaf3);background:#fff;color:var(--night,#0b1030);font-weight:600;font-size:13px;padding:6px 13px;border-radius:999px;cursor:pointer;transition:background .15s}
+.mcard-actions .feed-share:hover{background:var(--soft,#f7f6fb)}
+.mcard-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}

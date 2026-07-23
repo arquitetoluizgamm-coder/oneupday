@@ -39,6 +39,7 @@ export default async function Home() {
     viewPublic: t.viewPublic, muteTopic: t.muteTopic,
     inviteTitle: t.feedInviteTitle, inviteSub: t.feedInviteSub, inviteCta: t.feedInviteCta, loading: '',
     tabAll: t.tabAll, tabFollowing: t.tabFollowing, followingEmptyTitle: t.followingEmptyTitle, followingEmptySub: t.followingEmptySub,
+    supportIdle: t.withYouIdle, supportActive: t.withYouActive, share: t.shareShort, linkCopied: t.linkCopied,
   };
 
   return (

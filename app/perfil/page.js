@@ -172,6 +172,7 @@ export default async function Perfil() {
                 crisisTitle: t.crisisTitle, crisisText: t.crisisText,
                 ritualQ: t.ritualQ, rDid: t.rDid, rTried: t.rTried, rPaused: t.rPaused,
                 rDidText: t.rDidText, rTriedText: t.rTriedText, rPausedText: t.rPausedText, aiWrite: t.aiWrite,
+                musicAdd: t.musicAdd, musicTitle: t.musicTitle, musicUse: t.musicUse, musicRemove: t.musicRemove, musicEmpty: t.musicEmpty,
               }} />
               {aiOn && <NextStep journeyId={j.id} label={t.aiNextStep} thinking={t.aiThinking} />}
             </section>

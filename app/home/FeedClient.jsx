@@ -1,6 +1,25 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import MuteTopic from './MuteTopic';
+import EncourageBar from '../[slug]/EncourageBar';
+import FeedShare from './FeedShare';
+
+function TrackTag({ track }) {
+  const [playing, setPlaying] = useState(false);
+  const a = useRef(null);
+  function toggle() {
+    if (!a.current) return;
+    if (playing) { a.current.pause(); setPlaying(false); }
+    else { a.current.play().catch(() => {}); setPlaying(true); }
+  }
+  return (
+    <div className="feed-track">
+      <button type="button" className="feed-track-btn" onClick={toggle}>{playing ? '❚❚' : '▶'}</button>
+      <span className="feed-track-name">♪ {track.title}{track.artist ? ' · ' + track.artist : ''}</span>
+      <audio ref={a} src={track.audio_url} onEnded={() => setPlaying(false)} />
+    </div>
+  );
+}
 
 export default function FeedClient({ mutedCats, labels }) {
   const [items, setItems] = useState([]);
@@ -76,8 +95,10 @@ export default function FeedClient({ mutedCats, labels }) {
             {f.kind === 'setback' && <span className="post-tag setback">{labels.tagSetback}</span>}
             {f.kind === 'win' && <span className="post-tag win">{labels.tagWin}</span>}
             {f.text && f.text !== '\u{1F4F7}' && f.text !== '\u{1F3A5}' && <p>{f.text}</p>}
+            {f.track && <TrackTag track={f.track} />}
             <div className="mcard-actions">
-              <a className="feed-open" href={`/${f.journey.slug}`}>{labels.viewPublic}</a>
+              <EncourageBar updateId={f.id} labelIdle={labels.supportIdle} labelActive={labels.supportActive} />
+              <FeedShare slug={f.journey.slug} title={f.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
               <MuteTopic category={f.journey.category} current={mutedCats} label={labels.muteTopic} />
             </div>
           </div>

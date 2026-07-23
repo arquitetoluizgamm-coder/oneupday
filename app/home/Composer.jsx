@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
+import TrackPicker from './TrackPicker';
 
 const ORDER = ['step', 'win', 'setback', 'learned'];
 
@@ -25,6 +26,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [photoUrl, setPhotoUrl] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [track, setTrack] = useState(null);
   const photoRef = useRef(null);
   const videoRef = useRef(null);
   const router = useRouter();
@@ -91,10 +93,11 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     const { error } = await supabase.from('updates').insert({
       journey_id: journeyId, day_number: dayNumber, kind,
       text: value || fallback, photo_url: photoUrl, video_url: videoUrl,
+      track_id: track?.id || null, track_start: 0,
     });
     setSaving(false);
     if (error) { alert(t.error); return; }
-    setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null);
+    setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null);
     if (photoRef.current) photoRef.current.value = '';
     if (videoRef.current) videoRef.current.value = '';
     router.refresh();
@@ -140,6 +143,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           </button>
           <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPickPhoto} />
           <input ref={videoRef} type="file" accept="video/*" hidden onChange={onPickVideo} />
+          <TrackPicker selected={track} onSelect={setTrack} labels={{ add: t.musicAdd, title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty }} />
         </div>
         <button className="post-btn" onClick={post} disabled={saving || (!text.trim() && !photoUrl && !videoUrl)}>
           {saving ? t.posting : t.post}
