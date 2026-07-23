@@ -1120,17 +1120,17 @@ body{background:var(--bg);color:var(--ink)}
 .auth-card::before{display:none}
 
 /* Accent final: laranja do logo no lugar do rosa espalhado. */
-:root{--pink:#d97832;--orange:#e98a3a;--like:#c95745}
-.tiny-link{display:inline-flex;align-items:center;gap:5px;opacity:1;color:var(--orange);background:#fff;border:1px solid #dedbd4;border-radius:9px;padding:6px 10px;font-size:12px;font-weight:750;line-height:1;white-space:nowrap}
-.tiny-link:hover{color:#bd6428;border-color:#cfc9be;background:#faf9f6;text-decoration:none}
+:root{--pink:#c85d55;--orange:#e98a3a;--link:#27304a;--support:#c85d55;--support-soft:#fbebe9}
+.tiny-link{display:inline-flex;align-items:center;gap:5px;opacity:1;color:var(--link);background:#fff;border:1px solid #dedbd4;border-radius:9px;padding:6px 10px;font-size:12px;font-weight:750;line-height:1;white-space:nowrap}
+.tiny-link:hover{color:var(--ink);border-color:#cfc9be;background:#faf9f6;text-decoration:none}
 .tj-top .tiny-link{font-size:12px}
 .feed-lead .eyebrow{color:var(--muted)}
-.support-pill.on{color:var(--orange);border-color:var(--orange);background:rgba(233,138,58,.08)}
+.support-pill.on{color:var(--support);border-color:var(--support);background:var(--support-soft)}
 .nextstep{margin-top:10px}
 .nextstep-text{margin:8px 0 0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fafaf8;color:var(--ink);font-size:14px;line-height:1.5}
 .nextstep .tiny-link{font-size:12px}
-.privacy-toggle.vis-public,.privacy-toggle.vis-followers{color:var(--orange);border-color:rgba(233,138,58,.35)}
-.link-btn{color:var(--orange,#e98a3a)}
+.privacy-toggle.vis-public,.privacy-toggle.vis-followers{color:var(--link);border-color:rgba(39,48,74,.25)}
+.link-btn{color:var(--link)}
 
 /* Ações do compositor: contorno neutro, uma única ação preenchida. */
 .ritual-btn{min-height:56px}
