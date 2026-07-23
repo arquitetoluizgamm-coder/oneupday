@@ -14,7 +14,7 @@ export async function POST(req) {
     await sb.from('events').insert({
       user_id: user?.id || null,
       anon_id: body.anonId ? String(body.anonId).slice(0, 60) : null,
-      type: String(type).slice(0, 40),
+      name: String(type).slice(0, 40),
       meta: body.meta || null,
     });
   } catch { }

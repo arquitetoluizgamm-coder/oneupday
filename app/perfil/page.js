@@ -34,7 +34,7 @@ async function ensureProfile(supabase, user) {
   if (taken) handle = '@' + base + Math.floor(1000 + Math.random() * 9000);
   const profile = { id: user.id, name: meta.full_name || meta.name || base, handle, avatar_color: COLORS[Math.floor(Math.random() * COLORS.length)], avatar_url: googleAvatar };
   await supabase.from('profiles').insert(profile);
-  try { await supabase.from('events').insert({ user_id: user.id, type: 'signup' }); } catch { }
+  try { await supabase.from('events').insert({ user_id: user.id, name: 'signup' }); } catch { }
   return profile;
 }
 

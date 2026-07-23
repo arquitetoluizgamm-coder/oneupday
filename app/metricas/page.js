@@ -19,7 +19,7 @@ export default async function Metricas() {
     supabase.from('encouragements').select('*', { count: 'exact', head: true }),
   ]);
   let events = [];
-  try { const { data } = await supabase.from('events').select('type, user_id, anon_id, created_at').order('created_at', { ascending: false }).limit(20000); events = data || []; } catch { }
+  try { const { data } = await supabase.from('events').select('name, user_id, anon_id, created_at').order('created_at', { ascending: false }).limit(20000); events = data || []; } catch { }
 
   const profs = profiles || [], js = journeys || [], ups = updates || [];
   const now = Date.now();
@@ -41,8 +41,8 @@ export default async function Metricas() {
   ups.forEach(u => addAct(ownerBy[u.journey_id], u.created_at));
 
   // contadores de eventos
-  const evCount = t => events.filter(e => e.type === t).length;
-  const uniqVisitors = new Set(events.filter(e => e.type === 'landing_view').map(e => e.user_id || e.anon_id)).size;
+  const evCount = t => events.filter(e => e.name === t).length;
+  const uniqVisitors = new Set(events.filter(e => e.name === 'landing_view').map(e => e.user_id || e.anon_id)).size;
   const cardGen = evCount('card_generated'), cardShared = evCount('card_shared'), cardClick = evCount('card_clicked');
 
   // funil de entrada
