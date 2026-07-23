@@ -54,7 +54,7 @@ export default async function Home() {
   let feed = [];
   if (targetIds.length) {
     const { data: feedUpdates } = await supabase.from('updates')
-      .select('id, day_number, kind, text, photo_url, created_at, journey_id')
+      .select('id, day_number, kind, text, photo_url, video_url, created_at, journey_id')
       .in('journey_id', targetIds)
       .order('created_at', { ascending: false }).limit(20);
     const ups = feedUpdates || [];
@@ -133,7 +133,8 @@ export default async function Home() {
               <div className="bar"><span style={{ width: pct + '%' }} /></div>
               <Composer journeyId={j.id} nextDay={day + 1} labels={kindLabels} t={{
                 placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
-                addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded
+                addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded,
+                addVideo: t.addVideo, videoAdded: t.videoAdded, videoTooBig: t.videoTooBig, error: t.postError
               }} />
             </section>
           );
@@ -156,8 +157,9 @@ export default async function Home() {
                     <span>{fill(t.dayShort, { d: f.day_number })} · {f.journey.title}</span>
                   </div>
                   {kindTag[f.kind] && <span className={`post-tag ${f.kind}`}>{kindTag[f.kind]}</span>}
-                  {f.text && f.text !== '\u{1F4F7}' && <p>{f.text}</p>}
+                  {f.text && f.text !== '\u{1F4F7}' && f.text !== '\u{1F3A5}' && <p>{f.text}</p>}
                   {f.photo_url && <a href={`/${f.journey.slug}`} className="feed-photo"><img src={f.photo_url} alt="" /></a>}
+                  {f.video_url && <div className="feed-photo"><video src={f.video_url} controls playsInline preload="metadata" /></div>}
                   <div className="feed-actions">
                     <span className="feed-enc">♡ {f.enc}</span>
                     <a className="feed-open" href={`/${f.journey.slug}`}>{t.viewPublic}</a>

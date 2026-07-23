@@ -351,3 +351,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .feed-actions{display:flex;align-items:center;gap:14px;margin-top:10px}
 .feed-enc{color:var(--pink);font-weight:800;font-size:14px}
 .feed-open{color:var(--muted);font-weight:800;font-size:13px}
+
+/* ---------- Video ---------- */
+.photo-preview video,.update-photo video,.feed-photo video{
+  display:block;width:100%;max-height:360px;border-radius:14px;border:1px solid var(--line);background:#000}

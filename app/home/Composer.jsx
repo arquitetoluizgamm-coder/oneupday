@@ -4,43 +4,66 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 
 const ORDER = ['step', 'win', 'setback', 'learned'];
+const MAX_VIDEO = 60 * 1024 * 1024; // 60MB
 
 export default function Composer({ journeyId, nextDay, labels, t }) {
   const [text, setText] = useState('');
   const [kind, setKind] = useState('step');
   const [saving, setSaving] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(null);
+  const [videoUrl, setVideoUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const fileRef = useRef(null);
+  const photoRef = useRef(null);
+  const videoRef = useRef(null);
   const router = useRouter();
+
+  async function upload(file) {
+    const supabase = createClient();
+    const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
+    const path = `${journeyId}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from('photos').upload(path, file, { upsert: false });
+    if (error) return null;
+    return supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
+  }
 
   async function onPickPhoto(e) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const supabase = createClient();
-    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-    const path = `${journeyId}/${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from('photos').upload(path, file, { upsert: false });
-    if (error) { setUploading(false); alert(t.error); return; }
-    const { data } = supabase.storage.from('photos').getPublicUrl(path);
-    setPhotoUrl(data.publicUrl);
+    const url = await upload(file);
     setUploading(false);
+    if (!url) { alert(t.error); return; }
+    setPhotoUrl(url); setVideoUrl(null);
+    if (videoRef.current) videoRef.current.value = '';
+  }
+
+  async function onPickVideo(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > MAX_VIDEO) { alert(t.videoTooBig); e.target.value = ''; return; }
+    setUploading(true);
+    const url = await upload(file);
+    setUploading(false);
+    if (!url) { alert(t.error); return; }
+    setVideoUrl(url); setPhotoUrl(null);
+    if (photoRef.current) photoRef.current.value = '';
   }
 
   async function post() {
     const value = text.trim();
-    if ((!value && !photoUrl) || saving) return;
+    if ((!value && !photoUrl && !videoUrl) || saving) return;
     setSaving(true);
     const supabase = createClient();
+    const fallback = photoUrl ? '📷' : (videoUrl ? '🎥' : '');
     const { error } = await supabase.from('updates').insert({
       journey_id: journeyId, day_number: nextDay, kind,
-      text: value || (photoUrl ? '📷' : ''), photo_url: photoUrl,
+      text: value || fallback, photo_url: photoUrl, video_url: videoUrl,
     });
     setSaving(false);
     if (error) { alert(t.error); return; }
-    setText(''); setKind('step'); setPhotoUrl(null);
-    if (fileRef.current) fileRef.current.value = '';
+    setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null);
+    if (photoRef.current) photoRef.current.value = '';
+    if (videoRef.current) videoRef.current.value = '';
     router.refresh();
   }
 
@@ -51,6 +74,7 @@ export default function Composer({ journeyId, nextDay, labels, t }) {
       <input value={text} onChange={e => setText(e.target.value)} maxLength={180} placeholder={ph}
         onKeyDown={e => { if (e.key === 'Enter') post(); }} />
       {photoUrl && <div className="photo-preview"><img src={photoUrl} alt="" /></div>}
+      {videoUrl && <div className="photo-preview"><video src={videoUrl} controls playsInline /></div>}
       <div className="composer2-row">
         <div className="kinds">
           {ORDER.map(k => (
@@ -58,12 +82,16 @@ export default function Composer({ journeyId, nextDay, labels, t }) {
               className={`kind${kind === k ? ' active' : ''}${k === 'setback' ? ' setback' : ''}`}
               onClick={() => setKind(k)}>{labels[k]}</button>
           ))}
-          <button type="button" className="kind photo" onClick={() => fileRef.current?.click()} disabled={uploading}>
+          <button type="button" className="kind photo" onClick={() => photoRef.current?.click()} disabled={uploading}>
             {uploading ? t.uploading : (photoUrl ? t.photoAdded : t.addPhoto)}
           </button>
-          <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPickPhoto} />
+          <button type="button" className="kind photo" onClick={() => videoRef.current?.click()} disabled={uploading}>
+            {uploading ? t.uploading : (videoUrl ? t.videoAdded : t.addVideo)}
+          </button>
+          <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPickPhoto} />
+          <input ref={videoRef} type="file" accept="video/*" hidden onChange={onPickVideo} />
         </div>
-        <button className="post-btn" onClick={post} disabled={saving || (!text.trim() && !photoUrl)}>
+        <button className="post-btn" onClick={post} disabled={saving || (!text.trim() && !photoUrl && !videoUrl)}>
           {saving ? t.posting : t.post}
         </button>
       </div>

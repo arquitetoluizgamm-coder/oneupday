@@ -108,7 +108,8 @@ export default async function JourneyPage({ params }) {
                 <span className="day">{fill(t.dayShort, { d: u.day_number })}</span>
                 {tagFor(u.kind) && <span className={`tag ${u.kind}`}>{tagFor(u.kind)}</span>}
                 {u.photo_url && <div className="update-photo"><img src={u.photo_url} alt="" /></div>}
-                {u.text && u.text !== '📷' && <p>{u.text}</p>}
+                {u.video_url && <div className="update-photo"><video src={u.video_url} controls playsInline preload="metadata" /></div>}
+                {u.text && u.text !== '📷' && u.text !== '🎥' && <p>{u.text}</p>}
                 <EncourageBar updateId={u.id} initialCount={encById[u.id] || 0} />
               </div>
             </article>
