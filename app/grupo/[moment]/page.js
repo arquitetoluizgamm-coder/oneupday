@@ -35,12 +35,15 @@ export default async function Group({ params }) {
   const js = journeys || [];
   const statsById = {};
   const owners = {};
+  const photoBy = {};
   if (js.length) {
     const { data: stats } = await sb.from('journey_stats').select('*').in('journey_id', js.map(j => j.id));
     (stats || []).forEach(s => { statsById[s.journey_id] = s; });
     const oIds = [...new Set(js.map(j => j.owner_id))];
     const { data: profs } = await sb.from('profiles').select('id, name, avatar_color, avatar_url, handle').in('id', oIds);
     (profs || []).forEach(pr => { owners[pr.id] = pr; });
+    const { data: ph } = await sb.from('updates').select('journey_id, photo_url, day_number').in('journey_id', js.map(j => j.id)).not('photo_url', 'is', null).order('day_number', { ascending: false });
+    (ph || []).forEach(u => { if (!photoBy[u.journey_id]) photoBy[u.journey_id] = u.photo_url; });
   }
   const people = new Set(js.map(j => j.owner_id)).size;
 
@@ -62,7 +65,7 @@ export default async function Group({ params }) {
             const o = owners[j.owner_id] || {};
             return (
               <a className="pj-card" key={j.id} href={`/${j.slug}`}>
-                <div className="pj-thumb" style={{ background: `linear-gradient(135deg, var(--night), ${j.cover_color})` }}>
+                <div className="pj-thumb" style={photoBy[j.id] ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.1), rgba(9,12,42,.5)), url(${photoBy[j.id]})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: `linear-gradient(135deg, var(--night), ${j.cover_color})` }}>
                   <span>{fill(t.dayShort, { d: st.current_day || 0 })}</span>
                 </div>
                 <div className="pj-body">

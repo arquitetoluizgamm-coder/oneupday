@@ -24,9 +24,12 @@ export default async function Explore({ searchParams }) {
   const { data: journeys } = await query;
   const js = journeys || [];
   const statsById = {};
+  const photoBy = {};
   if (js.length) {
     const { data: stats } = await sb.from('journey_stats').select('*').in('journey_id', js.map(j => j.id));
     (stats || []).forEach(s => { statsById[s.journey_id] = s; });
+    const { data: ph } = await sb.from('updates').select('journey_id, photo_url, day_number').in('journey_id', js.map(j => j.id)).not('photo_url', 'is', null).order('day_number', { ascending: false });
+    (ph || []).forEach(u => { if (!photoBy[u.journey_id]) photoBy[u.journey_id] = u.photo_url; });
   }
 
   return (
@@ -77,7 +80,7 @@ export default async function Explore({ searchParams }) {
             const pct = Math.min(100, st.progress_pct || 0);
             return (
               <a className="pj-card" key={j.id} href={`/${j.slug}`}>
-                <div className="pj-thumb" style={{ background: `linear-gradient(135deg, var(--night), ${j.cover_color})` }}>
+                <div className="pj-thumb" style={photoBy[j.id] ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.1), rgba(9,12,42,.5)), url(${photoBy[j.id]})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: `linear-gradient(135deg, var(--night), ${j.cover_color})` }}>
                   <span>{fill(t.dayShort, { d: st.current_day || 0 })}</span>
                 </div>
                 <div className="pj-body">

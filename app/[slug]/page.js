@@ -42,18 +42,21 @@ async function loadProfile(handle) {
     .select('*').eq('owner_id', profile.id).order('created_at', { ascending: false });
   const js = journeys || [];
   const statsById = {};
+  const photoBy = {};
   if (js.length) {
     const { data: stats } = await sb.from('journey_stats').select('*').in('journey_id', js.map(j => j.id));
     (stats || []).forEach(s => { statsById[s.journey_id] = s; });
+    const { data: ph } = await sb.from('updates').select('journey_id, photo_url, day_number').in('journey_id', js.map(j => j.id)).not('photo_url', 'is', null).order('day_number', { ascending: false });
+    (ph || []).forEach(u => { if (!photoBy[u.journey_id]) photoBy[u.journey_id] = u.photo_url; });
   }
-  return { profile, journeys: js, statsById };
+  return { profile, journeys: js, statsById, photoBy };
   } catch (e) { return null; }
 }
 
 async function ProfilePage({ handle }) {
   const data = await loadProfile(handle);
   if (!data) notFound();
-  const { profile, journeys, statsById } = data;
+  const { profile, journeys, statsById, photoBy } = data;
   const t = getDict(getLocale());
   const initial = (profile.name || '?')[0];
   return (
@@ -86,7 +89,7 @@ async function ProfilePage({ handle }) {
             const pct = Math.min(100, st.progress_pct || 0);
             return (
               <a className="pj-card" key={j.id} href={`/${j.slug}`}>
-                <div className="pj-thumb" style={{ background: `linear-gradient(135deg, var(--night), ${j.cover_color})` }}>
+                <div className="pj-thumb" style={photoBy[j.id] ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.1), rgba(9,12,42,.5)), url(${photoBy[j.id]})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: `linear-gradient(135deg, var(--night), ${j.cover_color})` }}>
                   <span>{fill(t.dayShort, { d: st.current_day || 0 })}</span>
                 </div>
                 <div className="pj-body">

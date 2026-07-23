@@ -742,3 +742,5 @@ a.moment-tag:hover{background:rgba(255,255,255,.28)}
 .create-head{margin-bottom:16px}
 .create-head h1{font-size:28px}
 @media(max-width:520px){.create-form{padding:18px}}
+.pj-thumb{color:#fff}
+.feed-sentinel{text-align:center;color:var(--muted);font-size:13px;padding:20px}
