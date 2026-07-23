@@ -3,6 +3,7 @@ import { createClient } from '../../lib/supabase/server';
 import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
 import LangSwitcher from '../../components/LangSwitcher';
+import Logo from '../../components/Logo';
 import Composer from './Composer';
 
 export const dynamic = 'force-dynamic';
@@ -43,7 +44,7 @@ export default async function Home() {
   return (
     <>
       <header className="top">
-        <a className="wordmark" href="/">One <b>Up</b> Day</a>
+        <Logo />
         <div className="top-right">
           <LangSwitcher locale={locale} />
           <span className="hi">{profile.name}</span>

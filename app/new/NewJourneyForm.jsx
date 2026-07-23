@@ -67,7 +67,7 @@ export default function NewJourneyForm({ userId, t }) {
       <label>{t.fFirst}
         <textarea name="firstUpdate" required maxLength={180} placeholder={t.fFirstPh} />
       </label>
-      <button className="cta wide" type="submit" disabled={saving}>{saving ? t.creating : t.createBtn}</button>
+      <button className="cta wide grow" type="submit" disabled={saving}>{saving ? t.creating : t.createBtn}</button>
     </form>
   );
 }
