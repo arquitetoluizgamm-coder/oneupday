@@ -9,6 +9,7 @@ import EditBanner from '../../components/EditBanner';
 import BottomNav from '../../components/BottomNav';
 import PrivacyToggle from './PrivacyToggle';
 import MuteTopic from './MuteTopic';
+import EditAvatar from '../../components/EditAvatar';
 import ProgressBar from '../../components/ProgressBar';
 
 export const dynamic = 'force-dynamic';
@@ -147,6 +148,7 @@ export default async function Home() {
           <div className="pc-info">
             <div className="pc-avatar" style={{ background: profile.avatar_color || 'var(--orange)' }}>
               {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : profile.name[0]}
+              <EditAvatar userId={user.id} label={t.editPhoto} />
             </div>
             <div className="pc-meta">
               <h1>{profile.name}</h1>
@@ -177,14 +179,7 @@ export default async function Home() {
               <li><span>2</span>{t.obStep2}</li>
               <li><span>3</span>{t.obStep3}</li>
             </ol>
-            <NewJourneyForm userId={user.id} t={{
-              fName: t.fName, fNamePh: t.fNamePh, fCategory: t.fCategory, fDuration: t.fDuration,
-              fWhy: t.fWhy, fWhyPh: t.fWhyPh, fFirst: t.fFirst, fFirstPh: t.fFirstPh,
-              createBtn: t.createBtn, creating: t.creating, error: t.createError,
-              catArt: t.catArt, catLife: t.catLife, catBody: t.catBody, catHome: t.catHome, catWork: t.catWork,
-              dur7: t.dur7, dur30: t.dur30, dur60: t.dur60, dur100: t.dur100,
-                sugTitle: t.sugTitle, suggestions: [t.ex1, t.ex2, t.ex3, t.ex4, t.ex5],
-            }} />
+            <NewJourneyForm userId={user.id} t={t} />
           </section>
         )}
 
@@ -205,7 +200,7 @@ export default async function Home() {
                 </div>
               </div>
               <ProgressBar day={day} total={j.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
-              <Composer journeyId={j.id} nextDay={day + 1} labels={kindLabels} t={{
+              <Composer journeyId={j.id} startDate={j.created_at} labels={kindLabels} t={{
                 placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
                 addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded,
                 addVideo: t.addVideo, videoAdded: t.videoAdded, videoTooBig: t.videoTooBig, error: t.postError,

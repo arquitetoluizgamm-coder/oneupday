@@ -611,3 +611,17 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .tiny-link.danger:hover{color:var(--pink)}
 .who-tools{display:flex;justify-content:flex-end;margin:-6px 4px 8px}
 .ghost-btn.on{background:var(--night);color:#fff;border-color:var(--night)}
+
+/* ---------- Editar avatar ---------- */
+.pc-avatar{position:relative}
+.edit-avatar{position:absolute;right:-2px;bottom:-2px;width:30px;height:30px;border-radius:50%;
+  background:var(--night);color:#fff;border:3px solid var(--surface);display:grid;place-items:center;cursor:pointer;padding:0}
+.edit-avatar:hover{background:var(--night-2)}
+.edit-avatar:disabled{opacity:.6}
+
+/* ---------- Criação: categorias + mídia ---------- */
+.field-label{font-weight:800;font-size:14px;margin:2px 0 -4px}
+.cat-pick{display:flex;flex-wrap:wrap;gap:8px}
+.custom-cat{border:1px solid var(--line);border-radius:14px;padding:11px 14px;font:inherit;background:#fbfbfa}
+.media-row{display:flex;gap:8px;flex-wrap:wrap}
+.chip.photo{border-style:dashed}

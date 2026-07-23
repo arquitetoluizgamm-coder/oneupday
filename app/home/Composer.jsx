@@ -18,7 +18,7 @@ function looksRisky(t) {
 }
 const MAX_VIDEO = 60 * 1024 * 1024; // 60MB
 
-export default function Composer({ journeyId, nextDay, labels, t }) {
+export default function Composer({ journeyId, startDate, labels, t }) {
   const [text, setText] = useState('');
   const [kind, setKind] = useState('step');
   const [saving, setSaving] = useState(false);
@@ -68,7 +68,7 @@ export default function Composer({ journeyId, nextDay, labels, t }) {
     const supabase = createClient();
     const fallback = photoUrl ? '📷' : (videoUrl ? '🎥' : '');
     const { error } = await supabase.from('updates').insert({
-      journey_id: journeyId, day_number: nextDay, kind,
+      journey_id: journeyId, day_number: dayNumber, kind,
       text: value || fallback, photo_url: photoUrl, video_url: videoUrl,
     });
     setSaving(false);
@@ -80,7 +80,8 @@ export default function Composer({ journeyId, nextDay, labels, t }) {
   }
 
   const showCare = looksRisky(text);
-  const ph = t.placeholder.replace('{n}', nextDay);
+  const dayNumber = Math.max(1, Math.floor((Date.now() - new Date(startDate).getTime()) / 86400000) + 1);
+  const ph = t.placeholder.replace('{n}', dayNumber);
 
   return (
     <div className="composer2">

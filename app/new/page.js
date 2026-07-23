@@ -29,14 +29,7 @@ export default async function NewJourney() {
           <h1>{t.createTitle}</h1>
           <p className="sub">{t.createSub}</p>
         </div>
-        <NewJourneyForm userId={user.id} t={{
-          fName: t.fName, fNamePh: t.fNamePh, fCategory: t.fCategory, fDuration: t.fDuration,
-          fWhy: t.fWhy, fWhyPh: t.fWhyPh, fFirst: t.fFirst, fFirstPh: t.fFirstPh,
-          createBtn: t.createBtn, creating: t.creating, error: t.createError,
-          catArt: t.catArt, catLife: t.catLife, catBody: t.catBody, catHome: t.catHome, catWork: t.catWork,
-          dur7: t.dur7, dur30: t.dur30, dur60: t.dur60, dur100: t.dur100,
-          sugTitle: t.sugTitle, suggestions: [t.ex1, t.ex2, t.ex3, t.ex4, t.ex5],
-        }} />
+        <NewJourneyForm userId={user.id} t={t} />
       </main>
       <BottomNav active="create" t={t} />
     </>

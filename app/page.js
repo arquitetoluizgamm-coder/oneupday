@@ -2,6 +2,8 @@ import { getSupabase } from '../lib/supabase';
 import { getLocale } from '../lib/locale';
 import { getDict, fill } from '../lib/i18n';
 import Logo from '../components/Logo';
+import { createClient } from '../lib/supabase/server';
+import { redirect } from 'next/navigation';
 import ProgressBar from '../components/ProgressBar';
 
 export const dynamic = 'force-dynamic';
@@ -33,6 +35,9 @@ async function loadDemo() {
 }
 
 export default async function Home() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) redirect('/home');
   const t = getDict(getLocale());
   const real = await loadDemo();
   const demo = (real && real.photo) ? real : {
