@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { createClient } from '../../lib/supabase/client';
 import { track } from '../../lib/track';
 
-export default function EncourageBar({ updateId, labelIdle, labelActive, initialActive = false }) {
+export default function EncourageBar({ updateId, labelIdle, labelActive, supportersLabel = 'See who is with you', supportersLoading = 'Loading…', supportersEmpty = 'You are the first to show up here.', initialActive = false }) {
   const [active, setActive] = useState(initialActive);
   const [busy, setBusy] = useState(false);
+  const [people, setPeople] = useState(null);
+  const [loadingPeople, setLoadingPeople] = useState(false);
 
   async function toggle() {
     if (busy) return;
@@ -26,10 +28,25 @@ export default function EncourageBar({ updateId, labelIdle, labelActive, initial
     setBusy(false);
   }
 
+  async function showPeople() {
+    if (loadingPeople) return;
+    setLoadingPeople(true);
+    const response = await fetch(`/api/supporters/${updateId}`);
+    const data = await response.json().catch(() => ({}));
+    setPeople(data.people || []);
+    setLoadingPeople(false);
+  }
+
   // Apoio silencioso: envia incentivo, mas nunca mostra número público.
   return (
-    <button className={`support-pill${active ? ' on' : ''}`} onClick={toggle} disabled={busy}>
-      <span aria-hidden="true">{active ? '♥' : '♡'}</span>{active ? labelActive : labelIdle}
-    </button>
+    <div className="support-wrap">
+      <button className={`support-pill${active ? ' on' : ''}`} onClick={toggle} disabled={busy}>
+        <span aria-hidden="true">{active ? '♥' : '♡'}</span>{active ? labelActive : labelIdle}
+      </button>
+      <button type="button" className="supporters-link" onClick={showPeople}>
+        {loadingPeople ? supportersLoading : supportersLabel}
+      </button>
+      {people && <div className="supporters-popover">{people.length ? people.map(p => <span key={p.id}>{p.name}</span>) : <span>{supportersEmpty}</span>}</div>}
+    </div>
   );
 }

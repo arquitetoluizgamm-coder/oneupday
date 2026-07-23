@@ -1135,3 +1135,22 @@ body{background:var(--bg);color:var(--ink)}
 /* Ações do compositor: contorno neutro, uma única ação preenchida. */
 .ritual-btn{min-height:56px}
 .post-btn{background:var(--night);color:#fff}
+
+/* Apoio e comentários: conexão visível, sem ranking ou contador. */
+.support-wrap{position:relative;display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+.supporters-link,.comment-toggle{border:0;background:transparent;color:var(--muted);padding:4px 0;font:inherit;font-size:12px;font-weight:650;cursor:pointer}
+.supporters-link:hover,.comment-toggle:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.supporters-popover{position:absolute;z-index:20;left:0;top:calc(100% + 6px);min-width:190px;max-width:280px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;box-shadow:0 12px 30px rgba(16,19,45,.1);display:flex;flex-wrap:wrap;gap:6px}
+.supporters-popover span{font-size:12px;color:var(--ink);background:#f7f7f4;border-radius:999px;padding:5px 9px}
+.comments{margin-top:8px}
+.comment-panel{margin-top:8px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fafaf8}
+.comment-empty{margin:0 0 10px;color:var(--muted);font-size:13px}
+.comment-item{padding:7px 0;border-bottom:1px solid #ecece7}
+.comment-item:last-of-type{border-bottom:0}
+.comment-item b{font-size:13px;color:var(--ink)}
+.comment-item p{margin:3px 0 0;color:#3f4654;font-size:14px;line-height:1.45}
+.comment-form{display:flex;gap:8px;margin-top:10px}
+.comment-form input{min-width:0;flex:1;border:1px solid var(--line);border-radius:9px;background:#fff;padding:9px 10px;font:inherit;font-size:13px}
+.comment-form button{border:0;border-radius:9px;background:var(--night);color:#fff;padding:0 13px;font-weight:750;cursor:pointer}
+.comment-form button:disabled{opacity:.45;cursor:default}
+.comment-message{margin:8px 0 0;color:var(--support);font-size:12px}

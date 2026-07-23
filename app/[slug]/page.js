@@ -12,6 +12,7 @@ import ProgressBar from '../../components/ProgressBar';
 import ReportButton from './ReportButton';
 import FollowUserButton from './FollowUserButton';
 import UpdateManage from './UpdateManage';
+import Comments from '../../components/Comments';
 import { notFound } from 'next/navigation';
 import Track from '../../components/Track';
 
@@ -224,7 +225,8 @@ export default async function JourneyPage({ params, searchParams }) {
                 {u.video_url && <div className="update-photo"><video src={u.video_url} controls playsInline preload="metadata" /></div>}
                 {u.text && u.text !== '📷' && u.text !== '🎥' && <p>{u.text}</p>}
                 <div className="update-foot">
-                  <EncourageBar updateId={u.id} initialActive={myEncSet.has(u.id)} labelIdle={t.withYouIdle} labelActive={t.withYouActive} />
+                  <EncourageBar updateId={u.id} initialActive={myEncSet.has(u.id)} labelIdle={t.withYouIdle} labelActive={t.withYouActive} supportersLabel={t.supporters} supportersLoading={t.supportersLoading} supportersEmpty={t.supportersEmpty} />
+                  <Comments updateId={u.id} labels={{ comment: t.comment, close: t.commentClose, empty: t.commentEmpty, placeholder: t.commentPlaceholder, send: t.commentSend, sending: t.commentSending, unsafe: t.commentUnsafe, error: t.commentError, someone: t.commentSomeone }} />
                   {isOwner
                     ? <UpdateManage updateId={u.id} hasMedia={!!(u.photo_url || u.video_url)} labels={{ manage: t.managePost, replace: t.mediaReplace, remove: t.mediaRemove, delete: t.postDelete, deleteConfirm: t.postDeleteConfirm, uploading: t.uploading, error: t.postError }} />
                     : <ReportButton updateId={u.id} label={t.report} doneLabel={t.reported} />}

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import EncourageBar from '../[slug]/EncourageBar';
 import FeedShare from './FeedShare';
+import Comments from '../../components/Comments';
 
 function TrackTag({ track }) {
   const [playing, setPlaying] = useState(false);
@@ -98,9 +99,10 @@ export default function FeedClient({ mutedCats, labels }) {
           {f.video_url && !f.photo_url && <div className="entry-media"><video src={f.video_url} controls playsInline preload="metadata" /></div>}
           {f.track && <TrackTag track={f.track} />}
           <div className="entry-actions">
-            <EncourageBar updateId={f.id} initialActive={f.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} />
-            <FeedShare slug={f.journey.slug} title={f.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
-          </div>
+              <EncourageBar updateId={f.id} initialActive={f.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
+              <FeedShare slug={f.journey.slug} title={f.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
+            </div>
+            <Comments updateId={f.id} labels={labels.comments} />
         </article>
       ))}
       {!done && <div ref={sentinel} className="feed-sentinel">{loading ? labels.loading : ''}</div>}
