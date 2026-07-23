@@ -768,3 +768,21 @@ a.moment-tag:hover{background:rgba(255,255,255,.28)}
 .upd-menu button:hover{background:var(--soft,#f7f6fb)}
 .upd-menu button.danger{color:#e11d48}
 .upd-busy{font-size:12px;color:var(--muted);margin-left:6px}
+.wizard{display:flex;flex-direction:column;gap:0}
+.wiz-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.wiz-dots{display:flex;gap:8px}
+.wiz-dot{width:26px;height:6px;border-radius:999px;background:var(--line,#eceaf3);transition:background .2s}
+.wiz-dot.on{background:linear-gradient(90deg,#f02f87,#ff7a45)}
+.wiz-dot.done{background:#ffbf9b}
+.wiz-count{font-size:13px;color:var(--muted);font-weight:600}
+.wiz-head{margin-bottom:18px}
+.wiz-head h2{font-size:24px;font-weight:800;color:var(--night,#0b1030);margin:0 0 4px;letter-spacing:-.5px}
+.wiz-head p{color:var(--muted);font-size:15px;margin:0}
+.wiz-step{animation:wizIn .25s ease}
+@keyframes wizIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.wiz-title{width:100%;font-size:20px;font-weight:700;padding:14px 16px;border:1.5px solid var(--line,#eceaf3);border-radius:14px;margin-bottom:14px}
+.wiz-title:focus{outline:none;border-color:var(--orange,#ff7a45)}
+.wiz-step .sug-pills{display:flex;flex-wrap:wrap;gap:8px}
+.wiz-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:26px}
+.wiz-nav .cta{min-width:150px}
+.wiz-nav .cta:disabled{opacity:.45}
