@@ -92,7 +92,6 @@ async function ProfilePage({ handle }) {
             </div>
             <div className="pc-follow">
               <FollowUserButton profileId={profile.id} labelFollow={t.follow} labelFollowing={t.following} labelBack={t.followBack} />
-              <a className="ghost-btn message-profile" href={`/mensagens?para=${encodeURIComponent(profile.handle)}`}>{t.messages}</a>
             </div>
           </div>
         </section>

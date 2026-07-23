@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import EncourageBar from '../[slug]/EncourageBar';
 import FeedShare from './FeedShare';
 import Comments from '../../components/Comments';
+import FollowUserButton from '../[slug]/FollowUserButton';
 
 function TrackTag({ track }) {
   const [playing, setPlaying] = useState(false);
@@ -19,6 +20,12 @@ function TrackTag({ track }) {
       <audio ref={a} src={track.audio_url} onEnded={() => setPlaying(false)} />
     </div>
   );
+}
+
+function EntryText({ text, labels }) {
+  const [expanded, setExpanded] = useState(false);
+  const compact = text.length > 180;
+  return <>{<p className={`entry-text${expanded ? ' expanded' : ''}`}>{text}</p>}{compact && <button type="button" className="entry-expand" onClick={() => setExpanded(value => !value)}>{expanded ? labels.lessText : labels.moreText}</button>}</>;
 }
 
 export default function FeedClient({ mutedCats, labels }) {
@@ -99,10 +106,11 @@ export default function FeedClient({ mutedCats, labels }) {
               <b>{f.owner.name}</b>
               <small>{dayLabel(f.day_number)} · {f.journey.title}</small>
             </span>
+            {f.owner.id && <FollowUserButton profileId={f.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
             {f.kind === 'setback' && <span className="entry-tag setback">{labels.tagSetback}</span>}
             {f.kind === 'win' && <span className="entry-tag win">{labels.tagWin}</span>}
           </a>
-          {f.text && f.text !== '\u{1F4F7}' && f.text !== '\u{1F3A5}' && <p className="entry-text">{f.text}</p>}
+          {f.text && f.text !== '\u{1F4F7}' && f.text !== '\u{1F3A5}' && <EntryText text={f.text} labels={labels} />}
           {f.photo_url && <a href={`/${f.journey.slug}`} className="entry-media"><img src={f.photo_url} alt="" /></a>}
           {f.video_url && !f.photo_url && <div className="entry-media"><video src={f.video_url} controls playsInline preload="metadata" /></div>}
           {f.track && <TrackTag track={f.track} />}
