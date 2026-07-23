@@ -27,6 +27,7 @@ export default function FeedClient({ mutedCats, labels }) {
   const [done, setDone] = useState(false);
   const [started, setStarted] = useState(false);
   const [scope, setScope] = useState('all');
+  const [kind, setKind] = useState('');
   const sentinel = useRef(null);
   const offsetRef = useRef(0);
   const doneRef = useRef(false);
@@ -37,7 +38,7 @@ export default function FeedClient({ mutedCats, labels }) {
     if (busy.current || doneRef.current) return;
     busy.current = true; setLoading(true);
     try {
-      const r = await fetch(`/api/feed?offset=${offsetRef.current}&scope=${scopeRef.current}`);
+      const r = await fetch(`/api/feed?offset=${offsetRef.current}&scope=${scopeRef.current}&kind=${encodeURIComponent(kind)}`);
       const j = await r.json();
       const batch = j.items || [];
       setItems(prev => { const seen = new Set(prev.map(x => x.id)); return [...prev, ...batch.filter(x => !seen.has(x.id))]; });
@@ -54,8 +55,12 @@ export default function FeedClient({ mutedCats, labels }) {
     setItems([]); setDone(false); setStarted(false);
     load();
   }
+  function switchKind(next) {
+    if (next === kind) return;
+    setKind(next); offsetRef.current = 0; doneRef.current = false; setItems([]); setDone(false); setStarted(false); busy.current = false;
+  }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [kind]);
   useEffect(() => {
     const el = sentinel.current; if (!el) return;
     const io = new IntersectionObserver(es => { if (es[0].isIntersecting) load(); }, { rootMargin: '120px' });
@@ -72,6 +77,8 @@ export default function FeedClient({ mutedCats, labels }) {
       <div className="feed-tabs">
         <button className={scope === 'all' ? 'on' : ''} onClick={() => switchScope('all')}>{labels.tabAll}</button>
         <button className={scope === 'following' ? 'on' : ''} onClick={() => switchScope('following')}>{labels.tabFollowing}</button>
+        <span className="feed-filter-label">{labels.filterLabel}</span>
+        {['', 'step', 'win', 'setback', 'learned'].map(value => <button key={value} className={kind === value ? 'on' : ''} onClick={() => switchKind(value)}>{value === '' ? labels.filterAll : labels.kinds[value]}</button>)}
       </div>
 
       {started && items.length === 0 && (

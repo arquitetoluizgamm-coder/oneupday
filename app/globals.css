@@ -1186,6 +1186,39 @@ body{background:var(--bg);color:var(--ink)}
 .feed-lead{margin-top:24px}
 .feed-lead .eyebrow{font-size:11px;letter-spacing:.14em}
 .support-pill,.feed-share{transition:color .15s ease,background .15s ease,border-color .15s ease}
+.message-nav{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;color:var(--ink);background:var(--surface)}
+.message-nav:hover{background:#ecebe6}
+.pc-follow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.message-profile{font-size:12px;padding:7px 11px}
+.feed-filter-label{align-self:center;margin-left:8px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.messages-shell{max-width:760px;margin:10px auto 80px}
+.messages-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:18px}
+.messages-head h1{margin:4px 0 0;font-size:32px;letter-spacing:-.04em}
+.message-search{position:relative;margin-bottom:14px}
+.message-search>input{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;background:#fff}
+.message-results{position:absolute;z-index:15;left:0;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:var(--shadow-md)}
+.message-results button,.conversation-list button{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:0;background:transparent;padding:9px;border-radius:10px;color:var(--ink);cursor:pointer}
+.message-results button:hover,.conversation-list button:hover,.conversation-list button.selected{background:#f1f0eb}
+.message-avatar{width:34px;height:34px;display:grid;place-items:center;flex:none;overflow:hidden;border-radius:50%;color:#fff;font-weight:800;font-size:14px}
+.message-avatar img{width:100%;height:100%;object-fit:cover}
+.message-results button>span:last-child,.conversation-list button>span:last-child{display:grid;min-width:0}
+.message-results small,.conversation-list small{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.messages-grid{display:grid;grid-template-columns:250px 1fr;min-height:430px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.conversation-list{padding:10px;border-right:1px solid var(--line)}
+.message-thread{display:flex;flex-direction:column;min-width:0}
+.thread-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:16px;border-bottom:1px solid var(--line)}
+.thread-head a{font-size:12px;color:var(--link)}
+.thread-body{flex:1;padding:16px;display:flex;flex-direction:column;gap:8px;overflow:auto}
+.thread-body p{max-width:78%;margin:0;padding:9px 12px;border-radius:14px;font-size:14px;line-height:1.45}
+.thread-body p.received{align-self:flex-start;background:#f1f0eb;color:var(--ink);border-bottom-left-radius:4px}
+.thread-body p.sent{align-self:flex-end;background:var(--night);color:#fff;border-bottom-right-radius:4px}
+.message-form{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+.message-form input{min-width:0;flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit}
+.message-form button{border:0;border-radius:10px;padding:0 16px;background:var(--night);color:#fff;font-weight:750;cursor:pointer}
+.message-form button:disabled{opacity:.45;cursor:default}
+.message-muted{padding:16px;color:var(--muted);font-size:13px}
+.message-notice{margin:0;padding:0 16px 12px;color:var(--support);font-size:12px}
+@media(max-width:640px){.messages-grid{grid-template-columns:1fr}.conversation-list{border-right:0;border-bottom:1px solid var(--line);max-height:220px;overflow:auto}.messages-head h1{font-size:28px}.feed-filter-label{flex-basis:100%;margin:3px 0 0}.feed-tabs{flex-wrap:wrap}}
 
 /* Design system 2026: interface editorial, uma ação de destaque por tela. */
 :root{

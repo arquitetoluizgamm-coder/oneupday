@@ -17,6 +17,7 @@ export async function GET(req) {
   const blocked = new Set((blk || []).map(b => b.blocked_id));
 
   const scope = new URL(req.url).searchParams.get('scope') || 'all';
+  const kind = new URL(req.url).searchParams.get('kind') || '';
   let targetIds = [];
   if (scope === 'following') {
     const { data: fl } = await supabase.from('follows').select('journey_id').eq('user_id', user.id);
@@ -39,9 +40,11 @@ export async function GET(req) {
   }
   if (!targetIds.length) return NextResponse.json({ items: [] });
 
-  const { data: ups } = await supabase.from('updates')
+  let updatesQuery = supabase.from('updates')
     .select('id, day_number, kind, text, photo_url, video_url, journey_id')
-    .in('journey_id', targetIds).order('created_at', { ascending: false }).order('id', { ascending: false })
+    .in('journey_id', targetIds);
+  if (['step', 'win', 'setback', 'learned'].includes(kind)) updatesQuery = updatesQuery.eq('kind', kind);
+  const { data: ups } = await updatesQuery.order('created_at', { ascending: false }).order('id', { ascending: false })
     .range(offset, offset + PAGE - 1);
   const list = ups || [];
   const jIds = [...new Set(list.map(u => u.journey_id))];

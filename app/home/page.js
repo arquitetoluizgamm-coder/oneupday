@@ -67,6 +67,7 @@ export default async function Home() {
     supportIdle: t.withYouIdle, supportActive: t.withYouActive, supporters: t.supporters, supportersLoading: t.supportersLoading, supportersEmpty: t.supportersEmpty,
     share: t.shareShort, linkCopied: t.linkCopied,
     comments: { comment: t.comment, close: t.commentClose, empty: t.commentEmpty, placeholder: t.commentPlaceholder, send: t.commentSend, sending: t.commentSending, unsafe: t.commentUnsafe, error: t.commentError, someone: t.commentSomeone, reply: t.commentReply, more: t.commentMore, less: t.commentLess, replying: t.commentReplying, cancel: t.commentCancel },
+    filterLabel: t.filterLabel, filterAll: t.filterAll, kinds: { step: t.kindStep, win: t.kindWin, setback: t.kindSetback, learned: t.kindLearned },
   };
 
   return (
@@ -79,6 +80,9 @@ export default async function Home() {
             {unread > 0 && !profile.notif_paused && <b>{unread > 9 ? '9+' : unread}</b>}
           </a>
           <a className="ghost-btn" href="/explore">{t.explore}</a>
+          <a className="message-nav" href="/mensagens" aria-label={t.messages} title={t.messages}>
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-5 4v-4.2A2.5 2.5 0 0 1 4 13.5z"/></svg>
+          </a>
           <a className="header-ava" href="/perfil" aria-label={profile.name} style={{ background: profile.avatar_color || 'var(--orange)' }}>
             {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : profile.name[0]}
           </a>
