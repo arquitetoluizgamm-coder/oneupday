@@ -2,6 +2,8 @@ import { getSupabase } from '../../lib/supabase';
 import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
 import LangSwitcher from '../../components/LangSwitcher';
+import ShareButton from './ShareButton';
+import EncourageBar from './EncourageBar';
 import { notFound } from 'next/navigation';
 
 export const revalidate = 60;
@@ -15,7 +17,13 @@ async function loadJourney(slug) {
     sb.from('updates').select('*').eq('journey_id', journey.id).order('day_number', { ascending: true }),
     sb.from('journey_stats').select('*').eq('journey_id', journey.id).maybeSingle(),
   ]);
-  return { journey, owner, updates: updates || [], stats: stats || {} };
+  const ups = updates || [];
+  const encById = {};
+  if (ups.length) {
+    const { data: encs } = await sb.from('encouragements').select('update_id').in('update_id', ups.map(u => u.id));
+    (encs || []).forEach(e => { encById[e.update_id] = (encById[e.update_id] || 0) + 1; });
+  }
+  return { journey, owner, updates: ups, stats: stats || {}, encById };
 }
 
 export async function generateMetadata({ params }) {
@@ -31,11 +39,12 @@ export async function generateMetadata({ params }) {
 export default async function JourneyPage({ params }) {
   const data = await loadJourney(params.slug);
   if (!data) notFound();
-  const { journey, owner, updates, stats } = data;
+  const { journey, owner, updates, stats, encById } = data;
   const locale = getLocale();
   const t = getDict(locale);
   const pct = Math.min(100, stats.progress_pct || 0);
   const initial = (owner?.name || '?')[0];
+  const latest = updates.length ? updates[updates.length - 1] : null;
   const tagFor = k => k === 'setback' ? t.tagSetback : k === 'win' ? t.tagWin : null;
 
   return (
@@ -80,10 +89,22 @@ export default async function JourneyPage({ params }) {
               <div className="body">
                 <span className="day">{fill(t.dayShort, { d: u.day_number })}</span>
                 {tagFor(u.kind) && <span className={`tag ${u.kind}`}>{tagFor(u.kind)}</span>}
-                <p>{u.text}</p>
+                {u.photo_url && <div className="update-photo"><img src={u.photo_url} alt="" /></div>}
+                {u.text && u.text !== '📷' && <p>{u.text}</p>}
+                <EncourageBar updateId={u.id} initialCount={encById[u.id] || 0} />
               </div>
             </article>
           ))}
+        </section>
+
+        <section className="share-card-section">
+          <div className="share-copy">
+            <p className="eyebrow">{t.publicJourney}</p>
+            <h3>{t.shareTitle}</h3>
+            <p>{t.shareSub}</p>
+          </div>
+          <ShareButton journey={journey} owner={owner} stats={stats} latest={latest}
+            label={t.shareCard} downloading={t.shareDownloading} />
         </section>
 
         <section className="encourage">

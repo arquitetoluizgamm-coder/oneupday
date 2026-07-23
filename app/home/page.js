@@ -83,7 +83,8 @@ export default async function Home() {
               </div>
               <div className="bar"><span style={{ width: pct + '%' }} /></div>
               <Composer journeyId={j.id} nextDay={day + 1} labels={kindLabels} t={{
-                placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote
+                placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
+                addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded
               }} />
             </section>
           );
