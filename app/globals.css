@@ -1168,6 +1168,25 @@ body{background:var(--bg);color:var(--ink)}
 .comment-form button:disabled{opacity:.45;cursor:default}
 .comment-message{margin:8px 0 0;color:var(--support);font-size:12px}
 
+/* Refinamento de hierarquia: cada elemento tem uma função visual única. */
+.entry{position:relative}
+.entry.setback{border-left:3px solid #68748a}
+.entry.win{border-left:3px solid #6b9a78}
+.entry .entry-id b{font-weight:800}
+.entry .entry-id small{font-size:12px;letter-spacing:.01em}
+.entry-text{font-size:17px;line-height:1.58;letter-spacing:-.006em}
+.entry-tag{background:#f0f1ef;border:1px solid #e2e5e0;color:#536171}
+.entry-tag.win{background:#eef5ef;border-color:#dce9df;color:#356044}
+.entry-tag.setback{background:#eef0f3;border-color:#dfe3e9;color:#536171}
+.entry-ava{box-shadow:0 0 0 3px #f1f0eb}
+.entry-actions .feed-share,.entry-actions .support-pill{font-size:12px;letter-spacing:.01em}
+.feed-page .entry{border-radius:14px}
+.today,.auth-card,.jcard,.share-card-section,.profile-card{border-radius:14px}
+.today h1,.home-head h1,.create-head h1,.land-hero h1{font-weight:800}
+.feed-lead{margin-top:24px}
+.feed-lead .eyebrow{font-size:11px;letter-spacing:.14em}
+.support-pill,.feed-share{transition:color .15s ease,background .15s ease,border-color .15s ease}
+
 /* Design system 2026: interface editorial, uma ação de destaque por tela. */
 :root{
   --bg:#f7f6f2;

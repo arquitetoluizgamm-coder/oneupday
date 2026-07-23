@@ -82,7 +82,7 @@ export default function FeedClient({ mutedCats, labels }) {
         </div>
       )}
       {items.map(f => (
-        <article className="entry" key={f.id}>
+        <article className={`entry ${f.kind || 'step'}`} key={f.id}>
           <a className="entry-head" href={`/${f.owner.handle || f.journey.slug}`}>
             <span className="entry-ava" style={{ background: f.owner.avatar_color || 'var(--orange)' }}>
               {f.owner.avatar_url ? <img src={f.owner.avatar_url} alt="" /> : (f.owner.name || '?')[0]}
