@@ -1,10 +1,11 @@
-import { getSupabase } from '../../lib/supabase';
+import { createClient } from '../../lib/supabase/server';
 import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
 import Logo from '../../components/Logo';
 import ShareButton from './ShareButton';
 import EncourageBar from './EncourageBar';
 import FollowButton from './FollowButton';
+import BlockButton from './BlockButton';
 import ProgressBar from '../../components/ProgressBar';
 import ReportButton from './ReportButton';
 import { notFound } from 'next/navigation';
@@ -13,8 +14,8 @@ export const revalidate = 60;
 
 async function loadJourney(slug) {
   try {
-  const sb = getSupabase();
-  const { data: journey } = await sb.from('journeys').select('*').eq('slug', slug).eq('is_public', true).maybeSingle();
+  const sb = createClient();
+  const { data: journey } = await sb.from('journeys').select('*').eq('slug', slug).maybeSingle();
   if (!journey) return null;
   const [{ data: owner }, { data: updates }, { data: stats }] = await Promise.all([
     sb.from('profiles').select('name, handle, avatar_color, avatar_url, banner_url').eq('id', journey.owner_id).maybeSingle(),
@@ -33,12 +34,12 @@ async function loadJourney(slug) {
 
 async function loadProfile(handle) {
   try {
-  const sb = getSupabase();
+  const sb = createClient();
   const { data: profile } = await sb.from('profiles')
     .select('id, name, handle, avatar_url, avatar_color, banner_url').eq('handle', handle).maybeSingle();
   if (!profile) return null;
   const { data: journeys } = await sb.from('journeys')
-    .select('*').eq('owner_id', profile.id).eq('is_public', true).order('created_at', { ascending: false });
+    .select('*').eq('owner_id', profile.id).order('created_at', { ascending: false });
   const js = journeys || [];
   const statsById = {};
   if (js.length) {
@@ -162,6 +163,7 @@ export default async function JourneyPage({ params }) {
           </a>
           <FollowButton journeyId={journey.id} labelFollow={t.follow} labelFollowing={t.following} />
         </div>
+        <div className="who-tools"><BlockButton ownerId={journey.owner_id} label={t.blockUser} /></div>
 
         <div className="stats">
           <article><b>{stats.days_posted || 0}</b><span>{t.daysPosted}</span></article>

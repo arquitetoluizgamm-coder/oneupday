@@ -11,7 +11,7 @@ async function loadDemo() {
     const sb = getSupabase();
     const { data: journeys } = await sb.from('journeys')
       .select('id, slug, title, cover_color, total_days, owner_id')
-      .eq('is_public', true).order('created_at', { ascending: false }).limit(12);
+      .eq('visibility', 'public').order('created_at', { ascending: false }).limit(12);
     let best = null, photoCount = 0;
     for (const j of (journeys || [])) {
       const { data: st } = await sb.from('journey_stats').select('*').eq('journey_id', j.id).maybeSingle();

@@ -35,7 +35,7 @@ export default function NewJourneyForm({ userId, t, onCreated }) {
     const slug = slugify(title);
     const { data: journey, error } = await supabase.from('journeys').insert({
       owner_id: userId, slug, title, category, goal, total_days,
-      cover_color: COLORS[category] || '#ff7a45', is_public: true,
+      cover_color: COLORS[category] || '#ff7a45', is_public: true, visibility: 'public',
     }).select().single();
 
     if (error || !journey) { setSaving(false); alert(t.error); return; }

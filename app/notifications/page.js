@@ -3,6 +3,7 @@ import { createClient } from '../../lib/supabase/server';
 import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
 import Logo from '../../components/Logo';
+import PauseNotif from './PauseNotif';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,7 @@ export default async function Notifications() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
   const t = getDict(getLocale());
+  const { data: me } = await supabase.from('profiles').select('notif_paused').eq('id', user.id).maybeSingle();
 
   const { data: notifs } = await supabase.from('notifications')
     .select('*').eq('recipient_id', user.id).order('created_at', { ascending: false }).limit(50);
@@ -35,7 +37,7 @@ export default async function Notifications() {
         <div className="top-right"><a className="ghost-btn" href="/home">{t.navHome}</a></div>
       </header>
       <main className="wrap">
-        <div className="create-head"><p className="eyebrow">{t.notifications}</p><h1>{t.notifications}</h1></div>
+        <div className="create-head"><p className="eyebrow">{t.notifications}</p><h1>{t.notifications}</h1><div style={{marginTop:12}}><PauseNotif userId={user.id} paused={me?.notif_paused} labelPause={t.pauseNotif} labelPaused={t.notifPaused} /></div></div>
         {list.length === 0 && <div className="empty"><b>{t.notifEmpty}</b></div>}
         <div className="notif-list">
           {list.map(n => {

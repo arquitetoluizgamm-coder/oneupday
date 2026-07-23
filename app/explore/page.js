@@ -15,7 +15,7 @@ export default async function Explore({ searchParams }) {
   const catLabel = { art: t.catArt, body: t.catBody, work: t.catWork, home: t.catHome, life: t.catLife };
 
   const sb = getSupabase();
-  let query = sb.from('journeys').select('*').eq('is_public', true).order('created_at', { ascending: false }).limit(40);
+  let query = sb.from('journeys').select('*').eq('visibility', 'public').order('created_at', { ascending: false }).limit(40);
   if (cat) query = query.eq('category', cat);
   if (q) query = query.ilike('title', `%${q}%`);
   const { data: journeys } = await query;

@@ -8,6 +8,7 @@ import NewJourneyForm from '../new/NewJourneyForm';
 import EditBanner from '../../components/EditBanner';
 import BottomNav from '../../components/BottomNav';
 import PrivacyToggle from './PrivacyToggle';
+import MuteTopic from './MuteTopic';
 import ProgressBar from '../../components/ProgressBar';
 
 export const dynamic = 'force-dynamic';
@@ -17,7 +18,7 @@ const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'
 async function ensureProfile(supabase, user) {
   const meta = user.user_metadata || {};
   const googleAvatar = meta.avatar_url || meta.picture || null;
-  const { data: existing } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color, banner_url').eq('id', user.id).maybeSingle();
+  const { data: existing } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color, banner_url, muted_cats, notif_paused').eq('id', user.id).maybeSingle();
   if (existing) {
     if (!existing.avatar_url && googleAvatar) {
       await supabase.from('profiles').update({ avatar_url: googleAvatar }).eq('id', user.id);
@@ -68,10 +69,13 @@ export default async function Home() {
     .select('*', { count: 'exact', head: true }).eq('user_id', user.id);
   const points = updatesCount * 10 + setbackCount * 15 + (encGiven || 0) * 5 + maxStreak * 2;
 
+  const { data: blk } = await supabase.from('blocks').select('blocked_id').eq('blocker_id', user.id);
+  const blocked = new Set((blk || []).map(b => b.blocked_id));
+  const mutedCats = new Set((profile.muted_cats || '').split(',').filter(Boolean));
   const { data: pub } = await supabase.from('journeys')
-    .select('id').eq('is_public', true).neq('owner_id', user.id)
+    .select('id, owner_id, category').eq('visibility', 'public').neq('owner_id', user.id)
     .order('created_at', { ascending: false }).limit(20);
-  const targetIds = (pub || []).map(j => j.id);
+  const targetIds = (pub || []).filter(j => !blocked.has(j.owner_id) && !mutedCats.has(j.category)).map(j => j.id).slice(0, 20);
 
   let feed = [];
   if (targetIds.length) {
@@ -81,7 +85,7 @@ export default async function Home() {
       .order('created_at', { ascending: false }).limit(20);
     const ups = feedUpdates || [];
     const jIds = [...new Set(ups.map(u => u.journey_id))];
-    const { data: js } = await supabase.from('journeys').select('id, slug, title, cover_color, total_days, owner_id').in('id', jIds);
+    const { data: js } = await supabase.from('journeys').select('id, slug, title, cover_color, total_days, owner_id, category').in('id', jIds);
     const jMap = {}; (js || []).forEach(j => { jMap[j.id] = j; });
     const oIds = [...new Set((js || []).map(j => j.owner_id))];
     const { data: profs } = await supabase.from('profiles').select('id, name, avatar_color, avatar_url, handle').in('id', oIds);
@@ -102,7 +106,7 @@ export default async function Home() {
         <div className="top-right">
           <a className="bell" href="/notifications" aria-label={t.notifications}>
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" /></svg>
-            {unread > 0 && <b>{unread > 9 ? '9+' : unread}</b>}
+            {unread > 0 && !profile.notif_paused && <b>{unread > 9 ? '9+' : unread}</b>}
           </a>
           <a className="ghost-btn" href="/explore">{t.explore}</a>
           <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
@@ -128,6 +132,7 @@ export default async function Home() {
                   {f.video_url && <div className="feed-photo"><video src={f.video_url} controls playsInline preload="metadata" /></div>}
                   <div className="feed-actions">
                     <a className="feed-open" href={`/${f.journey.slug}`}>{t.viewPublic}</a>
+                    <MuteTopic category={f.journey.category} current={profile.muted_cats} label={t.muteTopic} />
                   </div>
                 </div>
               </article>
@@ -195,7 +200,7 @@ export default async function Home() {
                   <span>{fill(t.dayOf, { d: day, t: j.total_days, s: s.streak || 0 })}</span>
                 </div>
                 <div className="jcard-tools">
-                  <PrivacyToggle journeyId={j.id} initialPublic={j.is_public} labelPublic={t.pubPublic} labelPrivate={t.pubPrivate} />
+                  <PrivacyToggle journeyId={j.id} initial={j.visibility || (j.is_public ? 'public' : 'private')} labels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} />
                   <a className="view-link" href={`/${j.slug}`}>{t.viewPublic}</a>
                 </div>
               </div>
