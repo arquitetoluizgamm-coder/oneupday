@@ -15,7 +15,10 @@ export default function FeedShare({ slug, title, label, copiedLabel }) {
   const [copied, setCopied] = useState(false);
   async function share() {
     const url = `${window.location.origin}/${slug}`;
-    if (navigator.share) {
+    const isTouch = (navigator.maxTouchPoints || 0) > 0
+      || (typeof window.matchMedia === 'function' && window.matchMedia('(pointer:coarse)').matches);
+    // Compartilhamento nativo só no celular; no desktop é instável, então copiamos o link.
+    if (isTouch && navigator.share) {
       try { await navigator.share({ title: title || 'One Up Day', url }); return; }
       catch (e) { if (e && e.name === 'AbortError') return; }
     }

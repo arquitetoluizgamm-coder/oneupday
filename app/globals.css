@@ -832,3 +832,28 @@ main.wrap > section{margin-bottom:16px}
   .composer2-row .kinds{width:100%}
   .composer2-row .post-btn{width:100%}
 }
+/* Composer premium — seletor de tipo + barra de ferramentas */
+.kind-seg{display:flex;gap:4px;background:var(--soft,#f4f2fa);border:1px solid var(--line,#eceaf3);border-radius:14px;padding:4px;margin-top:12px;overflow-x:auto;scrollbar-width:none}
+.kind-seg::-webkit-scrollbar{display:none}
+.kseg{flex:1 0 auto;border:0;background:transparent;padding:9px 14px;border-radius:10px;font-weight:700;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap;transition:background .15s,color .15s,box-shadow .15s}
+.kseg:hover{color:var(--night,#0b1030)}
+.kseg.on{background:#fff;color:var(--night,#0b1030);box-shadow:0 1px 5px rgba(9,12,42,.10)}
+.kseg.on.k-win{color:#16a34a}
+.kseg.on.k-setback{color:#e11d48}
+
+.composer-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+.composer-toolbar .tools{display:flex;align-items:center;gap:8px}
+.tool{width:44px;height:44px;border-radius:13px;border:1px solid var(--line,#eceaf3);background:#fff;font-size:19px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;transition:transform .14s,background .14s,border-color .14s}
+.tool:hover{background:var(--soft,#f7f6fb);transform:translateY(-1px)}
+.tool:active{transform:translateY(0)}
+.tool:disabled{opacity:.45;cursor:default;transform:none}
+.tool.set{border-color:#16a34a;background:rgba(22,163,74,.10)}
+.tool.ai{border-color:rgba(240,47,135,.35);background:linear-gradient(135deg,rgba(240,47,135,.10),rgba(168,85,247,.10))}
+.composer-toolbar .track-picker .kind.music{width:44px;height:44px;border-radius:13px;border:0;background:linear-gradient(135deg,#f02f87,#a855f7);color:#fff;font-size:18px;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.composer-toolbar .post-btn{min-width:120px}
+@media(max-width:640px){
+  .composer-toolbar{flex-wrap:wrap}
+  .composer-toolbar .tools{width:100%;justify-content:space-between}
+  .composer-toolbar .post-btn{width:100%;order:3}
+  .tool,.composer-toolbar .track-picker .kind.music{flex:1;max-width:64px}
+}

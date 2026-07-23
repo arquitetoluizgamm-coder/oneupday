@@ -133,27 +133,25 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       <textarea ref={inputRef} className="composer2-input" value={text} onChange={e => setText(e.target.value)}
         maxLength={500} placeholder={ph} rows={1}
         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); post(); } }} />
-      {aiOn && <button type="button" className="ai-write" onClick={aiWrite} disabled={saving || uploading}>{t.aiWrite}</button>}
       {photoUrl && <div className="photo-preview"><img src={photoUrl} alt="" /></div>}
       {videoUrl && <div className="photo-preview"><video src={videoUrl} controls playsInline /></div>}
-      <div className="composer2-row">
-        <div className="kinds">
-          {ORDER.map(k => (
-            <button key={k} type="button"
-              className={`kind${kind === k ? ' active' : ''}${k === 'setback' ? ' setback' : ''}`}
-              onClick={() => setKind(k)}>{labels[k]}</button>
-          ))}
-          <button type="button" className="kind photo" onClick={() => photoRef.current?.click()} disabled={uploading}>
-            {uploading ? t.uploading : (photoUrl ? t.photoAdded : t.addPhoto)}
-          </button>
-          <button type="button" className="kind photo" onClick={() => videoRef.current?.click()} disabled={uploading}>
-            {uploading ? t.uploading : (videoUrl ? t.videoAdded : t.addVideo)}
-          </button>
+
+      <div className="kind-seg">
+        {ORDER.map(k => (
+          <button key={k} type="button" className={`kseg${kind === k ? ' on' : ''} k-${k}`} onClick={() => setKind(k)}>{labels[k]}</button>
+        ))}
+      </div>
+
+      <div className="composer-toolbar">
+        <div className="tools">
+          <button type="button" className={`tool${photoUrl ? ' set' : ''}`} title={t.addPhoto} aria-label={t.addPhoto} onClick={() => photoRef.current?.click()} disabled={uploading}>📷</button>
+          <button type="button" className={`tool${videoUrl ? ' set' : ''}`} title={t.addVideo} aria-label={t.addVideo} onClick={() => videoRef.current?.click()} disabled={uploading}>🎬</button>
           <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPickPhoto} />
           <input ref={videoRef} type="file" accept="video/*" hidden onChange={onPickVideo} />
-          <TrackPicker selected={track} onSelect={setTrack} labels={{ add: t.musicAdd, title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded }} />
+          <TrackPicker selected={track} onSelect={setTrack} labels={{ add: '🎵', title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded }} />
+          {aiOn && <button type="button" className="tool ai" title={t.aiWrite} aria-label={t.aiWrite} onClick={aiWrite} disabled={saving || uploading}>✨</button>}
         </div>
-        <button className="post-btn" onClick={post} disabled={saving || (!text.trim() && !photoUrl && !videoUrl)}>
+        <button className="post-btn" onClick={post} disabled={saving || uploading || (!text.trim() && !photoUrl && !videoUrl)}>
           {saving ? t.posting : t.post}
         </button>
       </div>
