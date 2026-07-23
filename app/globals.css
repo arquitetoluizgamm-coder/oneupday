@@ -358,3 +358,27 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .ava img,.feed-ava img,.me-ava img{width:100%;height:100%;object-fit:cover}
 .ava,.feed-ava,.me-ava{overflow:hidden}
 .me-ava{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:13px}
+
+/* ---------- Profile card (premium) ---------- */
+.profile-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+  overflow:hidden;box-shadow:var(--shadow-md);margin:4px 0 22px}
+.pc-banner{position:relative;height:160px;background:var(--up-gradient);background-size:cover;background-position:center}
+.pc-info{display:flex;align-items:flex-end;gap:16px;padding:0 24px 20px;margin-top:-44px}
+.pc-avatar{flex:0 0 auto;width:92px;height:92px;border-radius:26px;border:4px solid var(--surface);
+  display:grid;place-items:center;color:#fff;font-weight:900;font-size:36px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.pc-avatar img{width:100%;height:100%;object-fit:cover}
+.pc-meta{padding-bottom:8px;min-width:0}
+.pc-meta h1{font-size:24px;letter-spacing:-.035em;margin:0;line-height:1.1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-meta span{color:var(--muted);font-size:14px;font-weight:600}
+.edit-banner{position:absolute;top:14px;right:14px;background:rgba(9,12,42,.5);color:#fff;border:0;
+  border-radius:999px;padding:8px 15px;font-weight:800;font-size:13px;cursor:pointer;backdrop-filter:blur(8px);
+  transition:background .14s}
+.edit-banner:hover{background:rgba(9,12,42,.7)}
+.edit-banner:disabled{opacity:.7}
+@media(max-width:520px){
+  .pc-banner{height:120px}
+  .pc-info{padding:0 16px 16px;gap:12px}
+  .pc-avatar{width:76px;height:76px;border-radius:22px;font-size:30px}
+  .pc-meta h1{font-size:21px}
+}

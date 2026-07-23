@@ -5,6 +5,7 @@ import { getDict, fill } from '../../lib/i18n';
 import Logo from '../../components/Logo';
 import Composer from './Composer';
 import NewJourneyForm from '../new/NewJourneyForm';
+import EditBanner from '../../components/EditBanner';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +14,7 @@ const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'
 async function ensureProfile(supabase, user) {
   const meta = user.user_metadata || {};
   const googleAvatar = meta.avatar_url || meta.picture || null;
-  const { data: existing } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').eq('id', user.id).maybeSingle();
+  const { data: existing } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color, banner_url').eq('id', user.id).maybeSingle();
   if (existing) {
     if (!existing.avatar_url && googleAvatar) {
       await supabase.from('profiles').update({ avatar_url: googleAvatar }).eq('id', user.id);
@@ -88,14 +89,24 @@ export default async function Home() {
     <>
       <header className="top">
         <Logo />
-        <div className="top-right">
-          <span className="me-ava" style={{ background: profile.avatar_color || 'var(--orange)' }}>{profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : profile.name[0]}</span>
-          <span className="hi">{profile.name}</span>
-          <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
-        </div>
+        <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
       </header>
 
       <main className="wrap">
+        <section className="profile-card">
+          <div className="pc-banner" style={profile.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : undefined}>
+            <EditBanner userId={user.id} label={t.editBanner} uploadingLabel={t.uploading} />
+          </div>
+          <div className="pc-info">
+            <div className="pc-avatar" style={{ background: profile.avatar_color || 'var(--orange)' }}>
+              {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : profile.name[0]}
+            </div>
+            <div className="pc-meta">
+              <h1>{profile.name}</h1>
+              <span>{profile.handle}</span>
+            </div>
+          </div>
+        </section>
         <section className="home-head">
           <div>
             <p className="eyebrow">{t.yourJourneys}</p>
