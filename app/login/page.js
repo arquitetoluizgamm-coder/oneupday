@@ -8,9 +8,6 @@ export default function Login() {
   const t = getDict(locale);
   return (
     <>
-      <header className="top">
-        <Logo />
-      </header>
       <main className="auth-wrap">
         <div className="auth-card">
           <div className="auth-mark"><Symbol size={72} /></div>

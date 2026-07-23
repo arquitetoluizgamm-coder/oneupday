@@ -1,8 +1,15 @@
 :root{
-  --bg:#f6f4ef; --surface:#fff; --ink:#151515; --night:#090c2a; --night-2:#15194b;
-  --muted:#6b7280; --line:#e6e3dd; --pink:#f02f87; --orange:#ff7a45; --yellow:#ffd33d;
-  --up:linear-gradient(135deg,var(--pink),var(--orange) 52%,var(--yellow));
-  --shadow:0 16px 42px rgba(25,25,25,.08);
+  --bg:#F8F8F6; --surface:#FFFFFF; --ink:#10132D;
+  --night:#10132D; --night-2:#1b1f45;
+  --muted:#69707D; --line:#EAEAE5;
+  --pink:#f02f87; --orange:#ff7a45; --yellow:#ffd33d; --violet:#5b53c6;
+  --up:linear-gradient(135deg,var(--pink),var(--orange) 55%,var(--yellow));
+  --radius:16px; --radius-lg:16px; --r-card:16px; --r-field:12px;
+  --shadow:0 10px 30px rgba(16,19,45,.05);
+  --shadow-sm:0 1px 4px rgba(16,19,45,.05);
+  --shadow-md:0 10px 30px rgba(16,19,45,.06);
+  --shadow-lg:0 20px 50px rgba(16,19,45,.10);
+  --ring:0 0 0 1px rgba(16,19,45,.06);
 }
 *{box-sizing:border-box}
 body{
@@ -200,14 +207,6 @@ a{color:inherit;text-decoration:none}
    PREMIUM LAYER — identidade One Up Day
    luz · cartões brancos · navy premium · gradiente = crescimento
    ============================================================ */
-:root{
-  --radius:20px;
-  --radius-lg:28px;
-  --shadow-sm:0 2px 8px rgba(9,12,42,.05);
-  --shadow-md:0 10px 30px rgba(9,12,42,.07);
-  --shadow-lg:0 26px 60px rgba(9,12,42,.12);
-  --ring:0 0 0 1px rgba(9,12,42,.06);
-}
 body{
   font-family:'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   -webkit-font-smoothing:antialiased;
@@ -717,21 +716,6 @@ a.moment-tag:hover{background:rgba(255,255,255,.28)}
 
 /* ---------- Feed media-cards (home) ---------- */
 .feed-page{padding-top:8px}
-.mcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
-  overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:16px;transition:box-shadow .16s}
-.mcard:hover{box-shadow:var(--shadow-md)}
-.mcard-media{display:block}
-.mcard-media img,.mcard-media video{display:block;width:100%;max-height:70vh;object-fit:cover;background:#000}
-.mcard-body{padding:14px 16px 16px}
-.mcard-who{display:flex;align-items:center;gap:10px;color:inherit}
-.mcard-ava{width:38px;height:38px;border-radius:50%;overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:900;font-size:16px;flex:0 0 auto}
-.mcard-ava img{width:100%;height:100%;object-fit:cover;object-position:center top}
-.mcard-id b{display:block;font-size:15px;letter-spacing:-.01em}
-.mcard-id small{color:var(--muted);font-size:13px}
-.mcard-who:hover b{text-decoration:underline}
-.mcard-body p{margin:10px 0 0;color:#2b2f38;line-height:1.55}
-.mcard-body .post-tag{margin-top:10px}
-.mcard-actions{display:flex;align-items:center;gap:14px;margin-top:12px}
 
 /* ---------- Criar jornada: card organizado ---------- */
 .create-form{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
@@ -968,12 +952,6 @@ main.wrap > section{margin-bottom:16px}
 /* ==========================================================
    EDITORIAL SYSTEM — retune calmo (sobrescreve o acumulado)
    ========================================================== */
-:root{
-  --bg:#F8F8F6; --surface:#FFFFFF; --ink:#10132D; --night:#10132D; --night-2:#1b1f45;
-  --muted:#69707D; --line:#EAEAE5; --violet:#5b53c6;
-  --shadow:0 10px 30px rgba(16,19,45,.05);
-  --r-field:12px; --r-card:16px;
-}
 body{ background:var(--bg); color:var(--ink); }
 
 /* raios coerentes: 12 campos, 16 cards */
@@ -1035,3 +1013,13 @@ input,textarea,select,.composer2 input,.composer2 textarea,.wiz-title,.custom-ca
 
 /* tipografia editorial da landing */
 .land-hero h1{font-weight:800;letter-spacing:-.03em;line-height:1.1}
+
+/* ---- Botões: 3 padrões + gradiente reservado ---- */
+.follow-btn{background:var(--night);color:#fff;border:0}
+.follow-btn.on{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.dia1-card-btn{background:var(--night)}
+.dia1-badge{background:var(--night);color:#fff}
+.cover{background:var(--night)}
+.success-mark{background:var(--night)}
+.feed-track-btn,.composer-toolbar .track-picker .kind.music{background:var(--night)}
+.track-chip{background:rgba(16,19,45,.05);border-color:var(--line);color:var(--ink)}
