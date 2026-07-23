@@ -1,4 +1,4 @@
-import { getSupabase } from '@/lib/supabase';
+import { getSupabase } from '../../lib/supabase';
 import { notFound } from 'next/navigation';
 
 export const revalidate = 60; // revalida a cada 60s
