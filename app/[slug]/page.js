@@ -9,6 +9,7 @@ import BlockButton from './BlockButton';
 import ProgressBar from '../../components/ProgressBar';
 import ReportButton from './ReportButton';
 import FollowUserButton from './FollowUserButton';
+import UpdateManage from './UpdateManage';
 import { notFound } from 'next/navigation';
 
 export const revalidate = 60;
@@ -16,6 +17,7 @@ export const revalidate = 60;
 async function loadJourney(slug) {
   try {
   const sb = createClient();
+  const { data: { user } } = await sb.auth.getUser();
   const { data: journey } = await sb.from('journeys').select('*').eq('slug', slug).maybeSingle();
   if (!journey) return null;
   const [{ data: owner }, { data: updates }, { data: stats }] = await Promise.all([
@@ -29,7 +31,7 @@ async function loadJourney(slug) {
     const { data: encs } = await sb.from('encouragements').select('update_id').in('update_id', ups.map(u => u.id));
     (encs || []).forEach(e => { encById[e.update_id] = (encById[e.update_id] || 0) + 1; });
   }
-  return { journey, owner, updates: ups, stats: stats || {}, encById };
+  return { journey, owner, updates: ups, stats: stats || {}, encById, viewerId: user?.id || null };
   } catch (e) { return null; }
 }
 
@@ -132,7 +134,8 @@ export default async function JourneyPage({ params }) {
   if (slug.startsWith('@')) return <ProfilePage handle={slug} />;
   const data = await loadJourney(slug);
   if (!data) notFound();
-  const { journey, owner, updates, stats, encById } = data;
+  const { journey, owner, updates, stats, encById, viewerId } = data;
+  const isOwner = viewerId && viewerId === journey.owner_id;
   const locale = getLocale();
   const t = getDict(locale);
   const pct = Math.min(100, stats.progress_pct || 0);
@@ -210,7 +213,9 @@ export default async function JourneyPage({ params }) {
                 {u.text && u.text !== '📷' && u.text !== '🎥' && <p>{u.text}</p>}
                 <div className="update-foot">
                   <EncourageBar updateId={u.id} labelIdle={t.withYouIdle} labelActive={t.withYouActive} />
-                  <ReportButton updateId={u.id} label={t.report} doneLabel={t.reported} />
+                  {isOwner
+                    ? <UpdateManage updateId={u.id} hasMedia={!!(u.photo_url || u.video_url)} labels={{ manage: t.managePost, replace: t.mediaReplace, remove: t.mediaRemove, delete: t.postDelete, deleteConfirm: t.postDeleteConfirm, uploading: t.uploading, error: t.postError }} />
+                    : <ReportButton updateId={u.id} label={t.report} doneLabel={t.reported} />}
                 </div>
               </div>
             </article>
