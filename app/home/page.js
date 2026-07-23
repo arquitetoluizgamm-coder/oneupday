@@ -51,17 +51,11 @@ export default async function Home() {
     (stats || []).forEach(s => { statsById[s.journey_id] = s; });
   }
 
-  // ---- Feed (seguidas; se não segue ninguém, descoberta) ----
-  const { data: follows } = await supabase.from('follows').select('journey_id').eq('user_id', user.id);
-  const followedIds = (follows || []).map(f => f.journey_id);
-  let targetIds = followedIds;
-  const discovery = followedIds.length === 0;
-  if (discovery) {
-    const { data: pub } = await supabase.from('journeys')
-      .select('id').eq('is_public', true).neq('owner_id', user.id)
-      .order('created_at', { ascending: false }).limit(20);
-    targetIds = (pub || []).map(j => j.id);
-  }
+  // ---- Feed "Em alta agora" (jornadas públicas recentes) ----
+  const { data: pub } = await supabase.from('journeys')
+    .select('id').eq('is_public', true).neq('owner_id', user.id)
+    .order('created_at', { ascending: false }).limit(20);
+  const targetIds = (pub || []).map(j => j.id);
 
   let feed = [];
   if (targetIds.length) {
@@ -104,6 +98,33 @@ export default async function Home() {
       </header>
 
       <main className="wrap">
+        {feed.length > 0 && (
+          <section className="feed feed-lead">
+            <div className="feed-head"><h2>{t.trendingTitle}</h2></div>
+            {feed.map(f => (
+              <article className="feed-card" key={f.id}>
+                <a className="feed-ava" href={`/${f.owner.handle || f.journey.slug}`} style={{ background: f.owner.avatar_color || 'var(--orange)' }}>
+                  {f.owner.avatar_url ? <img src={f.owner.avatar_url} alt="" /> : (f.owner.name || '?')[0]}
+                </a>
+                <div className="feed-body">
+                  <div className="feed-top">
+                    <a href={`/${f.owner.handle || f.journey.slug}`}><b>{f.owner.name}</b></a>
+                    <span>{fill(t.dayShort, { d: f.day_number })} · {f.journey.title}</span>
+                  </div>
+                  {kindTag[f.kind] && <span className={`post-tag ${f.kind}`}>{kindTag[f.kind]}</span>}
+                  {f.text && f.text !== '\u{1F4F7}' && f.text !== '\u{1F3A5}' && <p>{f.text}</p>}
+                  {f.photo_url && <a href={`/${f.journey.slug}`} className="feed-photo"><img src={f.photo_url} alt="" /></a>}
+                  {f.video_url && <div className="feed-photo"><video src={f.video_url} controls playsInline preload="metadata" /></div>}
+                  <div className="feed-actions">
+                    <span className="feed-enc">♡ {f.enc}</span>
+                    <a className="feed-open" href={`/${f.journey.slug}`}>{t.viewPublic}</a>
+                  </div>
+                </div>
+              </article>
+            ))}
+            <a className="feed-more" href="/explore">{t.explore} →</a>
+          </section>
+        )}
         <section className="profile-card">
           <div className="pc-banner" style={profile.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : undefined}>
             <EditBanner userId={user.id} label={t.editBanner} uploadingLabel={t.uploading} />
@@ -174,42 +195,6 @@ export default async function Home() {
           );
         })}
 
-        {list.length > 0 && feed.length === 0 && (
-          <section className="feed-invite">
-            <b>{t.feedInviteTitle}</b>
-            <p>{t.feedInviteSub}</p>
-            <a className="cta grow" href="/explore">{t.feedInviteCta}</a>
-          </section>
-        )}
-        {feed.length > 0 && (
-          <section className="feed">
-            <div className="feed-head">
-              <h2>{t.feedTitle}</h2>
-              {discovery && <span className="feed-badge">{t.discover}</span>}
-            </div>
-            {feed.map(f => (
-              <article className="feed-card" key={f.id}>
-                <a className="feed-ava" href={`/${f.owner.handle || f.journey.slug}`} style={{ background: f.owner.avatar_color || 'var(--orange)' }}>
-                  {f.owner.avatar_url ? <img src={f.owner.avatar_url} alt="" /> : (f.owner.name || '?')[0]}
-                </a>
-                <div className="feed-body">
-                  <div className="feed-top">
-                    <a href={`/${f.owner.handle || f.journey.slug}`}><b>{f.owner.name}</b></a>
-                    <span>{fill(t.dayShort, { d: f.day_number })} · {f.journey.title}</span>
-                  </div>
-                  {kindTag[f.kind] && <span className={`post-tag ${f.kind}`}>{kindTag[f.kind]}</span>}
-                  {f.text && f.text !== '\u{1F4F7}' && f.text !== '\u{1F3A5}' && <p>{f.text}</p>}
-                  {f.photo_url && <a href={`/${f.journey.slug}`} className="feed-photo"><img src={f.photo_url} alt="" /></a>}
-                  {f.video_url && <div className="feed-photo"><video src={f.video_url} controls playsInline preload="metadata" /></div>}
-                  <div className="feed-actions">
-                    <span className="feed-enc">♡ {f.enc}</span>
-                    <a className="feed-open" href={`/${f.journey.slug}`}>{t.viewPublic}</a>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </section>
-        )}
       </main>
       <BottomNav active="home" t={t} />
     </>

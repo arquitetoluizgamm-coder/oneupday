@@ -11,7 +11,7 @@ async function loadDemo() {
     const { data: journeys } = await sb.from('journeys')
       .select('id, slug, title, cover_color, total_days, owner_id')
       .eq('is_public', true).order('created_at', { ascending: false }).limit(12);
-    let photoOnly = null, fallback = null;
+    let best = null, photoCount = 0;
     for (const j of (journeys || [])) {
       const { data: st } = await sb.from('journey_stats').select('*').eq('journey_id', j.id).maybeSingle();
       if (!st || (st.current_day || 0) < 1) continue;
@@ -19,13 +19,14 @@ async function loadDemo() {
         .select('photo_url, day_number').eq('journey_id', j.id)
         .not('photo_url', 'is', null).order('day_number', { ascending: false }).limit(1);
       const photo = ups && ups[0] ? ups[0].photo_url : null;
-      const { data: owner } = await sb.from('profiles').select('name, avatar_color, avatar_url').eq('id', j.owner_id).maybeSingle();
-      const item = { journey: j, stats: st, owner: owner || {}, photo };
-      if (photo && owner && owner.avatar_url) return item;  // melhor: foto real + rosto real
-      if (photo && !photoOnly) photoOnly = item;            // 2ª opção: só foto
-      if (!fallback) fallback = item;                       // 3ª: válida sem foto
+      if (photo) photoCount++;
+      if (photo && !best) {
+        const { data: owner } = await sb.from('profiles').select('name, avatar_color, avatar_url').eq('id', j.owner_id).maybeSingle();
+        best = { journey: j, stats: st, owner: owner || {}, photo };
+      }
     }
-    return photoOnly || fallback;
+    // só mostra jornada real quando já há volume (3+ com foto); até lá, usa a demo
+    return photoCount >= 3 ? best : null;
   } catch (e) {}
   return null;
 }

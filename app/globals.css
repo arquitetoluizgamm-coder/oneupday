@@ -545,3 +545,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   .land-ideas > div{display:flex;align-items:center;gap:14px;text-align:left;padding:0}
   .idea-ico{margin-bottom:0}
 }
+
+/* ---------- Feed-first (Em alta agora) ---------- */
+.feed-lead{margin:6px 0 26px}
+.feed-lead .feed-head h2{font-size:22px;letter-spacing:-.03em}
+.feed-more{display:inline-block;margin-top:4px;font-weight:800;font-size:14px;color:var(--night)}
+.feed-more:hover{color:var(--orange)}
