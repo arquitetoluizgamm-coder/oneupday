@@ -429,7 +429,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .bottom-nav{display:none}
 @media(max-width:860px){
   body{padding-bottom:74px}
-  .bottom-nav{display:grid;grid-template-columns:repeat(3,1fr);position:fixed;left:0;right:0;bottom:0;z-index:30;
+  .bottom-nav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:30;
     background:rgba(255,255,255,.95);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
   .bottom-nav a{display:grid;place-items:center;gap:3px;padding:10px 6px 12px;color:var(--muted);font-weight:800;font-size:11px}
   .bottom-nav a.on{color:var(--ink)}
@@ -714,3 +714,31 @@ a.moment-tag:hover{background:rgba(255,255,255,.28)}
 .ai-write:disabled{opacity:.6}
 .nextstep{margin-top:6px}
 .nextstep-text{margin:8px 0 0;background:#fbfbfa;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.5}
+
+/* ---------- Feed media-cards (home) ---------- */
+.feed-page{padding-top:8px}
+.mcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+  overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:16px;transition:box-shadow .16s}
+.mcard:hover{box-shadow:var(--shadow-md)}
+.mcard-media{display:block}
+.mcard-media img,.mcard-media video{display:block;width:100%;max-height:70vh;object-fit:cover;background:#000}
+.mcard-body{padding:14px 16px 16px}
+.mcard-who{display:flex;align-items:center;gap:10px;color:inherit}
+.mcard-ava{width:38px;height:38px;border-radius:50%;overflow:hidden;display:grid;place-items:center;color:#fff;font-weight:900;font-size:16px;flex:0 0 auto}
+.mcard-ava img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.mcard-id b{display:block;font-size:15px;letter-spacing:-.01em}
+.mcard-id small{color:var(--muted);font-size:13px}
+.mcard-who:hover b{text-decoration:underline}
+.mcard-body p{margin:10px 0 0;color:#2b2f38;line-height:1.55}
+.mcard-body .post-tag{margin-top:10px}
+.mcard-actions{display:flex;align-items:center;gap:14px;margin-top:12px}
+
+/* ---------- Criar jornada: card organizado ---------- */
+.create-form{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+  padding:24px;box-shadow:var(--shadow-md)}
+.create-form > label,.create-form > .field-label,.create-form > .form-grid,.create-form > .cat-pick,
+.create-form > .custom-cat,.create-form > .media-row,.create-form > .photo-preview{margin-top:4px}
+.create-form .cat-pick{padding:2px 0}
+.create-head{margin-bottom:16px}
+.create-head h1{font-size:28px}
+@media(max-width:520px){.create-form{padding:18px}}
