@@ -20,7 +20,7 @@ export default function NextStep({ journeyId, label, thinking, errLabel, rateLab
   return (
     <div className="nextstep">
       <button className="tiny-link" onClick={go} disabled={busy}>{busy ? thinking : label}</button>
-      {text && <p className="nextstep-text">💡 {text}</p>}
+      {text && <p className="nextstep-text">{text}</p>}
       {err && <p className="nextstep-text" style={{ color: '#e11d48' }}>{err}</p>}
     </div>
   );
