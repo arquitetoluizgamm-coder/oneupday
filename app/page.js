@@ -10,21 +10,36 @@ async function loadDemo() {
     const sb = getSupabase();
     const { data: journeys } = await sb.from('journeys')
       .select('id, slug, title, cover_color, total_days, owner_id')
-      .eq('is_public', true).order('created_at', { ascending: false }).limit(8);
+      .eq('is_public', true).order('created_at', { ascending: false }).limit(12);
+    let photoOnly = null, fallback = null;
     for (const j of (journeys || [])) {
       const { data: st } = await sb.from('journey_stats').select('*').eq('journey_id', j.id).maybeSingle();
-      if (st && (st.current_day || 0) >= 1) {
-        const { data: owner } = await sb.from('profiles').select('name, avatar_color, avatar_url').eq('id', j.owner_id).maybeSingle();
-        return { journey: j, stats: st, owner: owner || {} };
-      }
+      if (!st || (st.current_day || 0) < 1) continue;
+      const { data: ups } = await sb.from('updates')
+        .select('photo_url, day_number').eq('journey_id', j.id)
+        .not('photo_url', 'is', null).order('day_number', { ascending: false }).limit(1);
+      const photo = ups && ups[0] ? ups[0].photo_url : null;
+      const { data: owner } = await sb.from('profiles').select('name, avatar_color, avatar_url').eq('id', j.owner_id).maybeSingle();
+      const item = { journey: j, stats: st, owner: owner || {}, photo };
+      if (photo && owner && owner.avatar_url) return item;  // melhor: foto real + rosto real
+      if (photo && !photoOnly) photoOnly = item;            // 2ª opção: só foto
+      if (!fallback) fallback = item;                       // 3ª: válida sem foto
     }
+    return photoOnly || fallback;
   } catch (e) {}
   return null;
 }
 
 export default async function Home() {
   const t = getDict(getLocale());
-  const demo = await loadDemo();
+  const real = await loadDemo();
+  const demo = (real && real.photo) ? real : {
+    journey: { slug: '__demo', title: t.demoFbTitle, cover_color: '#0ea5e9', total_days: 60 },
+    stats: { current_day: 21, progress_pct: 35, streak: 21 },
+    owner: { name: 'Marina', avatar_url: '/demo-avatar.jpg', avatar_color: '#0ea5e9' },
+    photo: '/demo-cover.jpg',
+    fallback: true,
+  };
 
   const ideas = [
     { k: 'start', b: t.ideaStart, l: t.ideaStartL, d: 'M12 5v14M5 12h14' },
@@ -52,8 +67,10 @@ export default async function Home() {
           return (
             <section className="land-demo">
               <span className="land-demo-label">{t.demoLabel}</span>
-              <a className="demo-card" href={`/${demo.journey.slug}`}>
-                <div className="demo-cover" style={{ background: `linear-gradient(135deg, var(--night), ${demo.journey.cover_color})` }}>
+              <a className="demo-card" href={demo.fallback ? '/login' : `/${demo.journey.slug}`}>
+                <div className="demo-cover" style={demo.photo
+                  ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.05), rgba(9,12,42,.55)), url(${demo.photo})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+                  : { background: `linear-gradient(135deg, var(--night), ${demo.journey.cover_color})` }}>
                   <span className="demo-day">{t.cardDay} {day}</span>
                 </div>
                 <div className="demo-body">
