@@ -20,6 +20,15 @@ function looksRisky(t) {
 }
 const MAX_VIDEO = 60 * 1024 * 1024; // 60MB
 
+function ToolIcon({ type }) {
+  const paths = {
+    photo: <><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="8" cy="9" r="1.4" /><path d="m4 17 4.5-4 3 2.5 2.2-2 6.3 5.5" /></>,
+    video: <><rect x="3" y="6" width="13" height="12" rx="2" /><path d="m16 10 5-3v10l-5-3z" /></>,
+    ai: <><path d="m12 3 1.4 5.6L19 10l-5.6 1.4L12 17l-1.4-5.6L5 10l5.6-1.4z" /><path d="m19 16 .6 2.4L22 19l-2.4.6L19 22l-.6-2.4L16 19l2.4-.6z" /></>,
+  };
+  return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{paths[type]}</svg>;
+}
+
 export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [text, setText] = useState('');
   const [kind, setKind] = useState('step');
@@ -165,12 +174,12 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
 
       <div className="composer-toolbar">
         <div className="tools">
-          <button type="button" className={`tool${photoUrl ? ' set' : ''}`} title={t.addPhoto} aria-label={t.addPhoto} onClick={() => photoRef.current?.click()} disabled={uploading}>📷</button>
-          <button type="button" className={`tool${videoUrl ? ' set' : ''}`} title={t.addVideo} aria-label={t.addVideo} onClick={() => videoRef.current?.click()} disabled={uploading}>🎬</button>
+          <button type="button" className={`tool${photoUrl ? ' set' : ''}`} title={t.addPhoto} aria-label={t.addPhoto} onClick={() => photoRef.current?.click()} disabled={uploading}><ToolIcon type="photo" /></button>
+          <button type="button" className={`tool${videoUrl ? ' set' : ''}`} title={t.addVideo} aria-label={t.addVideo} onClick={() => videoRef.current?.click()} disabled={uploading}><ToolIcon type="video" /></button>
           <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPickPhoto} />
           <input ref={videoRef} type="file" accept="video/*" hidden onChange={onPickVideo} />
           <TrackPicker selected={track} onSelect={setTrack} labels={{ add: '🎵', title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded }} />
-          {aiOn && <button type="button" className="tool ai" title={t.aiWrite} aria-label={t.aiWrite} onClick={aiWrite} disabled={saving || uploading}>✨</button>}
+          {aiOn && <button type="button" className="tool ai" title={t.aiWrite} aria-label={t.aiWrite} onClick={aiWrite} disabled={saving || uploading}><ToolIcon type="ai" /></button>}
         </div>
         <button className="post-btn" onClick={post} disabled={saving || uploading || (!text.trim() && !photoUrl && !videoUrl)}>
           {saving ? t.posting : t.post}

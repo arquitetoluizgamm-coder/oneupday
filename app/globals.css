@@ -1095,3 +1095,26 @@ body{background:var(--bg);color:var(--ink)}
   .land-ideas{gap:20px}
   .auth-card{padding:32px 22px}
 }
+
+/* Composer: uma paleta neutra e ícones consistentes. */
+.ritual-btn,.ritual-btn.did,.ritual-btn.tried,.ritual-btn.paused{
+  color:var(--ink);border-color:var(--line);background:var(--surface);
+}
+.ritual-btn:hover,.ritual-btn.did:hover,.ritual-btn.tried:hover,.ritual-btn.paused:hover{
+  background:#f4f4f1;border-color:#d9d9d3;transform:none;
+}
+.kind-seg{background:#f3f3f0;border-color:#e5e5df}
+.kseg.on,.kseg.on.k-win,.kseg.on.k-setback{color:var(--ink);background:#fff;box-shadow:0 1px 4px rgba(16,19,45,.08)}
+.tool,.composer-toolbar .track-picker .kind.music{color:var(--ink);background:#fff;border:1px solid var(--line);box-shadow:none}
+.tool svg,.composer-toolbar .track-picker .kind.music svg{width:19px;height:19px}
+.tool.set{color:var(--ink);border-color:#c8c8c0;background:#f3f3f0}
+.tool.ai{color:var(--ink);border-color:var(--line);background:#fff}
+.composer-toolbar .track-picker .kind.music:hover,.tool:hover{background:#f4f4f1;transform:none}
+.post-btn{background:var(--night);color:#fff;box-shadow:none;border-radius:12px;padding:11px 22px}
+.post-btn:not(:disabled):hover{background:var(--night-2);transform:none}
+.track-chip{border-radius:10px;padding:8px 10px}
+
+/* Login: o símbolo fica no card, o topo permanece limpo. */
+.auth-wrap{padding-top:36px}
+.auth-mark{width:82px;height:82px;margin:0 auto 22px;border-radius:20px;background:#fff;border:1px solid var(--line);box-shadow:none}
+.auth-card::before{display:none}
