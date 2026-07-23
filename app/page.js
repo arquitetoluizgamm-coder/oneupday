@@ -20,13 +20,13 @@ export default async function Home() {
     <>
       <header className="top">
         <span className="wordmark">One <b>Up</b> Day</span>
-        <a className="cta" href="#">Start</a>
+        <a className="cta" href="/login">Start</a>
       </header>
 
       <main className="hero">
         <h1>Start small.<br />Keep going.</h1>
         <p>Follow real journeys, post one honest step a day, and help people continue when it gets hard.</p>
-        <a className="cta" href="#">Start a journey</a>
+        <a className="cta" href="/login">Start a journey</a>
 
         {journeys.length > 0 && (
           <div className="demo">
