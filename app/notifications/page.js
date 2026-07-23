@@ -31,7 +31,7 @@ export default async function Notifications() {
   return (
     <>
       <header className="top">
-        <Logo />
+        <Logo href="/home" />
         <div className="top-right"><a className="ghost-btn" href="/home">{t.navHome}</a></div>
       </header>
       <main className="wrap">

@@ -26,7 +26,7 @@ export default async function Created({ params }) {
 
   return (
     <>
-      <header className="top"><Logo /></header>
+      <header className="top"><Logo href="/home" /></header>
       <main className="wrap">
         <section className="success">
           <div className="success-mark"><Symbol size={64} /></div>

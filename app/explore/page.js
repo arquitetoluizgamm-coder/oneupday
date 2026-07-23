@@ -29,7 +29,7 @@ export default async function Explore({ searchParams }) {
   return (
     <>
       <header className="top">
-        <Logo />
+        <Logo href="/home" />
         <div className="top-right">
           <a className="ghost-btn" href="/home">One Up Day</a>
         </div>

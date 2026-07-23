@@ -12,6 +12,7 @@ import { notFound } from 'next/navigation';
 export const revalidate = 60;
 
 async function loadJourney(slug) {
+  try {
   const sb = getSupabase();
   const { data: journey } = await sb.from('journeys').select('*').eq('slug', slug).eq('is_public', true).maybeSingle();
   if (!journey) return null;
@@ -27,9 +28,11 @@ async function loadJourney(slug) {
     (encs || []).forEach(e => { encById[e.update_id] = (encById[e.update_id] || 0) + 1; });
   }
   return { journey, owner, updates: ups, stats: stats || {}, encById };
+  } catch (e) { return null; }
 }
 
 async function loadProfile(handle) {
+  try {
   const sb = getSupabase();
   const { data: profile } = await sb.from('profiles')
     .select('id, name, handle, avatar_url, avatar_color, banner_url').eq('handle', handle).maybeSingle();
@@ -43,6 +46,7 @@ async function loadProfile(handle) {
     (stats || []).forEach(s => { statsById[s.journey_id] = s; });
   }
   return { profile, journeys: js, statsById };
+  } catch (e) { return null; }
 }
 
 async function ProfilePage({ handle }) {
@@ -100,7 +104,7 @@ async function ProfilePage({ handle }) {
 }
 
 export async function generateMetadata({ params }) {
-  const slug = decodeURIComponent(params.slug);
+  let slug; try { slug = decodeURIComponent(params.slug); } catch { slug = params.slug; }
   if (slug.startsWith('@')) {
     const p = await loadProfile(slug);
     return { title: p ? `${p.profile.name} · One Up Day` : 'One Up Day' };
@@ -116,7 +120,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function JourneyPage({ params }) {
-  const slug = decodeURIComponent(params.slug);
+  let slug; try { slug = decodeURIComponent(params.slug); } catch { slug = params.slug; }
   if (slug.startsWith('@')) return <ProfilePage handle={slug} />;
   const data = await loadJourney(slug);
   if (!data) notFound();

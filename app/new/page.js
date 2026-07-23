@@ -18,7 +18,7 @@ export default async function NewJourney() {
   return (
     <>
       <header className="top">
-        <Logo />
+        <Logo href="/home" />
         <div className="top-right">
           <a className="ghost-btn" href="/home">{t.back}</a>
         </div>
