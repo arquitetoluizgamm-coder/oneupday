@@ -28,6 +28,7 @@ export default function FeedClient({ mutedCats, labels }) {
   const [started, setStarted] = useState(false);
   const [scope, setScope] = useState('all');
   const [kind, setKind] = useState('');
+  const [filterOpen, setFilterOpen] = useState(false);
   const sentinel = useRef(null);
   const offsetRef = useRef(0);
   const doneRef = useRef(false);
@@ -57,7 +58,7 @@ export default function FeedClient({ mutedCats, labels }) {
   }
   function switchKind(next) {
     if (next === kind) return;
-    setKind(next); offsetRef.current = 0; doneRef.current = false; setItems([]); setDone(false); setStarted(false); busy.current = false;
+    setKind(next); setFilterOpen(false); offsetRef.current = 0; doneRef.current = false; setItems([]); setDone(false); setStarted(false); busy.current = false;
   }
 
   useEffect(() => { load(); }, [kind]);
@@ -77,9 +78,9 @@ export default function FeedClient({ mutedCats, labels }) {
       <div className="feed-tabs">
         <button className={scope === 'all' ? 'on' : ''} onClick={() => switchScope('all')}>{labels.tabAll}</button>
         <button className={scope === 'following' ? 'on' : ''} onClick={() => switchScope('following')}>{labels.tabFollowing}</button>
-        <span className="feed-filter-label">{labels.filterLabel}</span>
-        {['', 'step', 'win', 'setback', 'learned'].map(value => <button key={value} className={kind === value ? 'on' : ''} onClick={() => switchKind(value)}>{value === '' ? labels.filterAll : labels.kinds[value]}</button>)}
+        <button type="button" className={`feed-filter-trigger${kind ? ' active' : ''}`} onClick={() => setFilterOpen(value => !value)}>{labels.filterLabel}{kind ? ` · ${labels.kinds[kind]}` : ''}</button>
       </div>
+      {filterOpen && <div className="feed-filter-menu"><span>{labels.filterLabel}</span>{['', 'step', 'win', 'setback', 'learned'].map(value => <button key={value} className={kind === value ? 'on' : ''} onClick={() => switchKind(value)}>{value === '' ? labels.filterAll : labels.kinds[value]}</button>)}</div>}
 
       {started && items.length === 0 && (
         <div className="feed-invite">

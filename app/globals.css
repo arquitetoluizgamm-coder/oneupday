@@ -1218,6 +1218,17 @@ body{background:var(--bg);color:var(--ink)}
 .message-form button:disabled{opacity:.45;cursor:default}
 .message-muted{padding:16px;color:var(--muted);font-size:13px}
 .message-notice{margin:0;padding:0 16px 12px;color:var(--support);font-size:12px}
+.feed-filter-trigger{margin-left:auto!important;border:1px solid transparent!important;background:transparent!important;color:var(--link)!important;padding:7px 11px!important;border-radius:9px!important;font-size:12px!important}
+.feed-filter-trigger:hover,.feed-filter-trigger.active{background:#fff!important;border-color:var(--line)!important;box-shadow:0 1px 4px rgba(24,36,59,.08)!important}
+.feed-filter-menu{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:-8px 0 14px;padding:8px 10px;background:#f8f7f3;border:1px solid var(--line);border-radius:11px}
+.feed-filter-menu>span{margin-right:4px;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.feed-filter-menu button{border:0;background:transparent;color:var(--muted);padding:6px 9px;border-radius:8px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.feed-filter-menu button:hover,.feed-filter-menu button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(24,36,59,.08)}
+.message-bubble{display:flex;flex-direction:column;max-width:78%;gap:2px}
+.message-bubble.sent{align-self:flex-end;align-items:flex-end}
+.message-bubble.received{align-self:flex-start;align-items:flex-start}
+.message-bubble p{max-width:100%!important}
+.message-status{padding:0 5px;color:var(--muted);font-size:10px}
 @media(max-width:640px){.messages-grid{grid-template-columns:1fr}.conversation-list{border-right:0;border-bottom:1px solid var(--line);max-height:220px;overflow:auto}.messages-head h1{font-size:28px}.feed-filter-label{flex-basis:100%;margin:3px 0 0}.feed-tabs{flex-wrap:wrap}}
 
 /* Design system 2026: interface editorial, uma ação de destaque por tela. */
