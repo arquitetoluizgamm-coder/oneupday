@@ -27,8 +27,83 @@ async function loadJourney(slug) {
   return { journey, owner, updates: ups, stats: stats || {}, encById };
 }
 
+async function loadProfile(handle) {
+  const sb = getSupabase();
+  const { data: profile } = await sb.from('profiles')
+    .select('id, name, handle, avatar_url, avatar_color, banner_url').eq('handle', handle).maybeSingle();
+  if (!profile) return null;
+  const { data: journeys } = await sb.from('journeys')
+    .select('*').eq('owner_id', profile.id).eq('is_public', true).order('created_at', { ascending: false });
+  const js = journeys || [];
+  const statsById = {};
+  if (js.length) {
+    const { data: stats } = await sb.from('journey_stats').select('*').in('journey_id', js.map(j => j.id));
+    (stats || []).forEach(s => { statsById[s.journey_id] = s; });
+  }
+  return { profile, journeys: js, statsById };
+}
+
+async function ProfilePage({ handle }) {
+  const data = await loadProfile(handle);
+  if (!data) notFound();
+  const { profile, journeys, statsById } = data;
+  const t = getDict(getLocale());
+  const initial = (profile.name || '?')[0];
+  return (
+    <>
+      <header className="top">
+        <Logo />
+        <div className="top-right">
+          <a className="cta" href="/login">{t.startYourJourney}</a>
+        </div>
+      </header>
+      <main className="wrap">
+        <section className="profile-card">
+          <div className="pc-banner" style={profile.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : undefined}></div>
+          <div className="pc-info">
+            <div className="pc-avatar" style={{ background: profile.avatar_color || 'var(--orange)' }}>
+              {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : initial}
+            </div>
+            <div className="pc-meta">
+              <h1>{profile.name}</h1>
+              <span>{profile.handle}</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="home-head"><div><p className="eyebrow">{t.profileJourneys}</p></div></section>
+        {journeys.length === 0 && <div className="empty"><b>{t.noPublicJourneys}</b></div>}
+        <div className="pj-grid">
+          {journeys.map(j => {
+            const st = statsById[j.id] || {};
+            const pct = Math.min(100, st.progress_pct || 0);
+            return (
+              <a className="pj-card" key={j.id} href={`/${j.slug}`}>
+                <div className="pj-thumb" style={{ background: `linear-gradient(135deg, var(--night), ${j.cover_color})` }}>
+                  <span>{fill(t.dayShort, { d: st.current_day || 0 })}</span>
+                </div>
+                <div className="pj-body">
+                  <b>{j.title}</b>
+                  <div className="bar"><span style={{ width: pct + '%' }} /></div>
+                  <small>{fill(t.dayOf, { d: st.current_day || 0, t: j.total_days, s: st.streak || 0 })}</small>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </main>
+      <footer className="foot">One <b>Up</b> Day · {t.tagline} · oneupday.app/{profile.handle}</footer>
+    </>
+  );
+}
+
 export async function generateMetadata({ params }) {
-  const data = await loadJourney(params.slug);
+  const slug = decodeURIComponent(params.slug);
+  if (slug.startsWith('@')) {
+    const p = await loadProfile(slug);
+    return { title: p ? `${p.profile.name} · One Up Day` : 'One Up Day' };
+  }
+  const data = await loadJourney(slug);
   if (!data) return { title: 'One Up Day' };
   const { journey, stats } = data;
   return {
@@ -38,7 +113,9 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function JourneyPage({ params }) {
-  const data = await loadJourney(params.slug);
+  const slug = decodeURIComponent(params.slug);
+  if (slug.startsWith('@')) return <ProfilePage handle={slug} />;
+  const data = await loadJourney(slug);
   if (!data) notFound();
   const { journey, owner, updates, stats, encById } = data;
   const locale = getLocale();
