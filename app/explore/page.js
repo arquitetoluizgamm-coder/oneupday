@@ -48,6 +48,15 @@ export default async function Explore({ searchParams }) {
           <input name="q" defaultValue={q} placeholder={t.searchPh} />
         </form>
 
+        <section className="communities">
+          <h2>{t.groups}</h2>
+          <div className="comm-grid">
+            {MOMENTS.map(([v, l]) => (
+              <a key={v} className="comm-card" href={`/grupo/${v}`}>{l}</a>
+            ))}
+          </div>
+        </section>
+
         <div className="cat-chips">
           <a className={`chip${!cat ? ' on' : ''}`} href="/explore">{t.allCats}</a>
           {CATS.map(c => (

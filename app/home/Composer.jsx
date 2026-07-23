@@ -18,7 +18,7 @@ function looksRisky(t) {
 }
 const MAX_VIDEO = 60 * 1024 * 1024; // 60MB
 
-export default function Composer({ journeyId, startDate, labels, t }) {
+export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [text, setText] = useState('');
   const [kind, setKind] = useState('step');
   const [saving, setSaving] = useState(false);
@@ -59,6 +59,17 @@ export default function Composer({ journeyId, startDate, labels, t }) {
     if (!url) { alert(t.error); return; }
     setVideoUrl(url); setPhotoUrl(null);
     if (photoRef.current) photoRef.current.value = '';
+  }
+
+  async function aiWrite() {
+    if (saving || uploading) return;
+    setSaving(true);
+    try {
+      const r = await fetch('/api/assist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: 'write', journeyId, draft: text }) });
+      const j = await r.json();
+      if (j.text) setText(j.text);
+    } catch { }
+    setSaving(false);
   }
 
   async function quick(kind, defaultText) {
@@ -109,8 +120,9 @@ export default function Composer({ journeyId, startDate, labels, t }) {
           <p>{t.crisisText}</p>
         </div>
       )}
-      <input value={text} onChange={e => setText(e.target.value)} maxLength={180} placeholder={ph}
+      <input value={text} onChange={e => setText(e.target.value)} maxLength={500} placeholder={ph}
         onKeyDown={e => { if (e.key === 'Enter') post(); }} />
+      {aiOn && <button type="button" className="ai-write" onClick={aiWrite} disabled={saving || uploading}>{t.aiWrite}</button>}
       {photoUrl && <div className="photo-preview"><img src={photoUrl} alt="" /></div>}
       {videoUrl && <div className="photo-preview"><video src={videoUrl} controls playsInline /></div>}
       <div className="composer2-row">

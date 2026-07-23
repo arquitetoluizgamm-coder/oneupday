@@ -102,7 +102,7 @@ export default function NewJourneyForm({ userId, t }) {
       </div>
 
       <label>{t.fName}
-        <input ref={titleRef} name="title" required maxLength={60} placeholder={t.fNamePh} />
+        <input ref={titleRef} name="title" required maxLength={80} placeholder={t.fNamePh} />
       </label>
 
       <div className="field-label">{t.fCategory}</div>
@@ -116,7 +116,7 @@ export default function NewJourneyForm({ userId, t }) {
         <input ref={customRef} className="custom-cat" maxLength={24} placeholder={t.customCatPh} />
       )}
 
-      <div className="field-label">{t.momentQ}</div>
+      <div className="field-label">{t.momentQ} <span className="opt">({t.optional})</span></div>
       <div className="cat-pick">
         {MOMENTS.map(([v, l]) => (
           <button key={v} type="button" className={`chip moment${moment === v ? ' on' : ''}`} onClick={() => setMoment(moment === v ? '' : v)}>{l}</button>
@@ -133,11 +133,11 @@ export default function NewJourneyForm({ userId, t }) {
       </label>
 
       <label>{t.fWhy}
-        <textarea name="goal" required maxLength={180} placeholder={t.fWhyPh} />
+        <textarea name="goal" required maxLength={300} placeholder={t.fWhyPh} />
       </label>
 
       <label>{t.fFirst}
-        <textarea name="firstUpdate" maxLength={180} placeholder={t.fFirstPh} />
+        <textarea name="firstUpdate" maxLength={500} placeholder={t.fFirstPh} />
       </label>
 
       {photoUrl && <div className="photo-preview"><img src={photoUrl} alt="" /></div>}
