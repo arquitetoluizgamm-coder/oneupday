@@ -2,6 +2,7 @@ import { getSupabase } from '../lib/supabase';
 import { getLocale } from '../lib/locale';
 import { getDict, fill } from '../lib/i18n';
 import Logo from '../components/Logo';
+import ProgressBar from '../components/ProgressBar';
 
 export const dynamic = 'force-dynamic';
 
@@ -81,8 +82,7 @@ export default async function Home() {
                     </span>
                     <b>{demo.journey.title}</b>
                   </div>
-                  <div className="bar"><span style={{ width: (pct > 0 ? Math.max(pct, 6) : 0) + '%' }} /></div>
-                  <small>{demo.owner.name} · {fill(t.dayXofY, { d: day, t: demo.journey.total_days })}</small>
+                  <ProgressBar day={day} total={demo.journey.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
                 </div>
               </a>
             </section>
