@@ -16,10 +16,20 @@ export async function GET(req) {
   const { data: blk } = await supabase.from('blocks').select('blocked_id').eq('blocker_id', user.id);
   const blocked = new Set((blk || []).map(b => b.blocked_id));
 
-  const { data: pub } = await supabase.from('journeys')
-    .select('id, owner_id, category').eq('visibility', 'public').neq('owner_id', user.id)
-    .order('created_at', { ascending: false }).limit(300);
-  const targetIds = (pub || []).filter(j => !blocked.has(j.owner_id) && !mutedCats.has(j.category)).map(j => j.id);
+  const scope = new URL(req.url).searchParams.get('scope') || 'all';
+  let targetIds = [];
+  if (scope === 'following') {
+    const { data: fl } = await supabase.from('follows').select('journey_id').eq('user_id', user.id);
+    const fids = [...new Set((fl || []).map(f => f.journey_id))];
+    if (!fids.length) return NextResponse.json({ items: [] });
+    const { data: fj } = await supabase.from('journeys').select('id, owner_id, category').in('id', fids);
+    targetIds = (fj || []).filter(j => !blocked.has(j.owner_id) && !mutedCats.has(j.category)).map(j => j.id);
+  } else {
+    const { data: pub } = await supabase.from('journeys')
+      .select('id, owner_id, category').eq('visibility', 'public').neq('owner_id', user.id)
+      .order('created_at', { ascending: false }).limit(300);
+    targetIds = (pub || []).filter(j => !blocked.has(j.owner_id) && !mutedCats.has(j.category)).map(j => j.id);
+  }
   if (!targetIds.length) return NextResponse.json({ items: [] });
 
   const { data: ups } = await supabase.from('updates')

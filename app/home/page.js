@@ -38,6 +38,7 @@ export default async function Home() {
     dayShort: t.dayShort, tagSetback: t.tagSetback, tagWin: t.tagWin,
     viewPublic: t.viewPublic, muteTopic: t.muteTopic,
     inviteTitle: t.feedInviteTitle, inviteSub: t.feedInviteSub, inviteCta: t.feedInviteCta, loading: '',
+    tabAll: t.tabAll, tabFollowing: t.tabFollowing, followingEmptyTitle: t.followingEmptyTitle, followingEmptySub: t.followingEmptySub,
   };
 
   return (

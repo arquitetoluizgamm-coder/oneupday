@@ -4,25 +4,36 @@ import MuteTopic from './MuteTopic';
 
 export default function FeedClient({ mutedCats, labels }) {
   const [items, setItems] = useState([]);
-  const [offset, setOffset] = useState(0);
-  const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
   const [started, setStarted] = useState(false);
+  const [scope, setScope] = useState('all');
   const sentinel = useRef(null);
+  const offsetRef = useRef(0);
+  const doneRef = useRef(false);
+  const scopeRef = useRef('all');
   const busy = useRef(false);
 
   async function load() {
-    if (busy.current || done) return;
+    if (busy.current || doneRef.current) return;
     busy.current = true; setLoading(true);
     try {
-      const r = await fetch(`/api/feed?offset=${offset}`);
+      const r = await fetch(`/api/feed?offset=${offsetRef.current}&scope=${scopeRef.current}`);
       const j = await r.json();
       const batch = j.items || [];
       setItems(prev => { const seen = new Set(prev.map(x => x.id)); return [...prev, ...batch.filter(x => !seen.has(x.id))]; });
-      setOffset(o => o + batch.length);
-      if (batch.length < 8) setDone(true);
+      offsetRef.current += batch.length;
+      if (batch.length < 8) { doneRef.current = true; setDone(true); }
     } catch { }
     setLoading(false); setStarted(true); busy.current = false;
+  }
+
+  function switchScope(s) {
+    if (s === scopeRef.current) return;
+    scopeRef.current = s; setScope(s);
+    offsetRef.current = 0; doneRef.current = false;
+    setItems([]); setDone(false); setStarted(false);
+    load();
   }
 
   useEffect(() => { load(); }, []);
@@ -31,16 +42,23 @@ export default function FeedClient({ mutedCats, labels }) {
     const io = new IntersectionObserver(es => { if (es[0].isIntersecting) load(); }, { rootMargin: '600px' });
     io.observe(el);
     return () => io.disconnect();
-  }, [offset, done, loading]);
+  }, [done, scope]);
 
   const dayLabel = d => labels.dayShort.replace('{d}', d);
+  const emptyTitle = scope === 'following' ? labels.followingEmptyTitle : labels.inviteTitle;
+  const emptySub = scope === 'following' ? labels.followingEmptySub : labels.inviteSub;
 
   return (
     <>
+      <div className="feed-tabs">
+        <button className={scope === 'all' ? 'on' : ''} onClick={() => switchScope('all')}>{labels.tabAll}</button>
+        <button className={scope === 'following' ? 'on' : ''} onClick={() => switchScope('following')}>{labels.tabFollowing}</button>
+      </div>
+
       {started && items.length === 0 && (
         <div className="feed-invite">
-          <b>{labels.inviteTitle}</b>
-          <p>{labels.inviteSub}</p>
+          <b>{emptyTitle}</b>
+          <p>{emptySub}</p>
           <a className="cta grow" href="/explore">{labels.inviteCta}</a>
         </div>
       )}
