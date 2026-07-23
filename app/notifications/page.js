@@ -47,7 +47,7 @@ export default async function Notifications() {
               ? fill(t.notifFollow, { name: a.name || '' })
               : fill(t.notifEncourage, { name: a.name || '' });
             return (
-              <a className={`notif-item${n.read ? '' : ' unread'}`} key={n.id} href={j.slug ? `/${j.slug}` : '/home'}>
+              <a className={`notif-item${n.read ? '' : ' unread'}`} key={n.id} href={j.slug ? `/${j.slug}` : (a.handle ? `/${a.handle}` : '/home')}>
                 <span className="notif-ava" style={{ background: a.avatar_color || 'var(--orange)' }}>
                   {a.avatar_url ? <img src={a.avatar_url} alt="" /> : (a.name || '?')[0]}
                 </span>
