@@ -1205,3 +1205,17 @@ body{background:var(--bg);color:var(--ink)}
 .tag.win,.entry-tag.win,.post-tag.win{background:#eef4ee;color:#356044}
 .bell b{background:var(--support)}
 .bottom-nav a.on svg{color:var(--orange)}
+
+/* Visible premium pass: separate content from the canvas instead of white-on-white. */
+body{background:#f1f0eb}
+.top{background:rgba(241,240,235,.94);border-bottom:1px solid #dedbd3}
+.feed-page .entry{background:#fff;border:1px solid #e1ded6;border-radius:18px;box-shadow:0 7px 22px rgba(24,36,59,.055);padding:20px;margin:0 0 14px}
+.feed-page .entry:hover{border-color:#d5d0c6;box-shadow:0 10px 26px rgba(24,36,59,.08)}
+.entry-actions{border-top:1px solid #efede8;padding-top:10px;margin-top:14px}
+.today{background:#fffdf9;border-color:#ddd8ce;box-shadow:0 8px 24px rgba(24,36,59,.07)}
+.feed-tabs{margin:0 0 16px;padding:3px;background:#e9e7e1;border-radius:12px;gap:2px}
+.feed-tabs button{padding:7px 13px;border-radius:9px}
+.feed-tabs button.on{background:#fff;box-shadow:0 1px 4px rgba(24,36,59,.1);border:0}
+.support-pill.on{box-shadow:0 0 0 3px rgba(189,91,82,.1)}
+.comment-panel{background:#f7f6f2;border-color:#e1ded6}
+.comment-form input{background:#fff}
