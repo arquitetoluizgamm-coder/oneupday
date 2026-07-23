@@ -207,13 +207,14 @@ export default async function JourneyPage({ params }) {
             <p>{t.shareSub}</p>
           </div>
           <ShareButton journey={journey} owner={owner} stats={stats} latest={latest}
-            label={t.shareCard} downloading={t.shareDownloading} />
+            label={t.shareCard} downloading={t.shareDownloading}
+            card={{ day: t.cardDay, of: t.cardOf, streak: t.cardStreak, setback: t.cardSetback }} />
         </section>
 
         <section className="encourage">
-          <h3>{fill(t.followingQ, { name: owner?.name || '' })}</h3>
-          <p>{t.encourageSub}</p>
-          <a className="cta" href="/login">{t.encourageJoin}</a>
+          <h3>{t.joinTitle}</h3>
+          <p>{t.joinSub}</p>
+          <a className="cta grow" href="/login">{t.encourageJoin}</a>
         </section>
       </main>
 

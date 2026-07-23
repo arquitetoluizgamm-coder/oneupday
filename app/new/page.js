@@ -35,6 +35,7 @@ export default async function NewJourney() {
           createBtn: t.createBtn, creating: t.creating, error: t.createError,
           catArt: t.catArt, catLife: t.catLife, catBody: t.catBody, catHome: t.catHome, catWork: t.catWork,
           dur7: t.dur7, dur30: t.dur30, dur60: t.dur60, dur100: t.dur100,
+          sugTitle: t.sugTitle, suggestions: [t.ex1, t.ex2, t.ex3, t.ex4, t.ex5],
         }} />
       </main>
       <BottomNav active="create" t={t} />

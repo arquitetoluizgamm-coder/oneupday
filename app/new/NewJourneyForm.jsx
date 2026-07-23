@@ -1,19 +1,24 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 
 const COLORS = { art: '#6c5ce7', body: '#0ea5e9', home: '#ff7a45', work: '#111827', life: '#16a34a' };
 
 function slugify(title) {
-  const base = title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  const base = title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'journey';
   return `${base}-${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
-export default function NewJourneyForm({ userId, t }) {
+export default function NewJourneyForm({ userId, t, onCreated }) {
   const [saving, setSaving] = useState(false);
+  const titleRef = useRef(null);
   const router = useRouter();
+
+  function pick(text) {
+    if (titleRef.current) { titleRef.current.value = text; titleRef.current.focus(); }
+  }
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -27,20 +32,34 @@ export default function NewJourneyForm({ userId, t }) {
     const first = form.firstUpdate.value.trim();
 
     const supabase = createClient();
+    const slug = slugify(title);
     const { data: journey, error } = await supabase.from('journeys').insert({
-      owner_id: userId, slug: slugify(title), title, category, goal, total_days,
+      owner_id: userId, slug, title, category, goal, total_days,
       cover_color: COLORS[category] || '#ff7a45', is_public: true,
     }).select().single();
 
     if (error || !journey) { setSaving(false); alert(t.error); return; }
     await supabase.from('updates').insert({ journey_id: journey.id, day_number: 1, kind: 'step', text: first });
-    router.push('/home'); router.refresh();
+    router.push(`/created/${slug}`);
+    router.refresh();
   }
+
+  const suggestions = t.suggestions || [];
 
   return (
     <form className="create-form" onSubmit={onSubmit}>
+      {suggestions.length > 0 && (
+        <div className="sug-block">
+          <span className="sug-title">{t.sugTitle}</span>
+          <div className="sug-pills">
+            {suggestions.map((sg, i) => (
+              <button key={i} type="button" className="sug-pill" onClick={() => pick(sg)}>{sg}</button>
+            ))}
+          </div>
+        </div>
+      )}
       <label>{t.fName}
-        <input name="title" required maxLength={60} placeholder={t.fNamePh} />
+        <input ref={titleRef} name="title" required maxLength={60} placeholder={t.fNamePh} />
       </label>
       <div className="form-grid">
         <label>{t.fCategory}

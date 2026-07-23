@@ -143,6 +143,7 @@ export default async function Home() {
               createBtn: t.createBtn, creating: t.creating, error: t.createError,
               catArt: t.catArt, catLife: t.catLife, catBody: t.catBody, catHome: t.catHome, catWork: t.catWork,
               dur7: t.dur7, dur30: t.dur30, dur60: t.dur60, dur100: t.dur100,
+                sugTitle: t.sugTitle, suggestions: [t.ex1, t.ex2, t.ex3, t.ex4, t.ex5],
             }} />
           </section>
         )}
@@ -173,6 +174,13 @@ export default async function Home() {
           );
         })}
 
+        {list.length > 0 && feed.length === 0 && (
+          <section className="feed-invite">
+            <b>{t.feedInviteTitle}</b>
+            <p>{t.feedInviteSub}</p>
+            <a className="cta grow" href="/explore">{t.feedInviteCta}</a>
+          </section>
+        )}
         {feed.length > 0 && (
           <section className="feed">
             <div className="feed-head">

@@ -24,7 +24,7 @@ function loadImg(src) {
   });
 }
 
-export default function ShareButton({ journey, owner, stats, latest, label, downloading }) {
+export default function ShareButton({ journey, owner, stats, latest, label, downloading, card }) {
   const [busy, setBusy] = useState(false);
 
   async function make() {
@@ -72,13 +72,13 @@ export default function ShareButton({ journey, owner, stats, latest, label, down
     let y = topY + 70;
     if (latest && latest.kind === 'setback') {
       ctx.font = '700 32px Inter, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,.7)';
-      ctx.fillText('SETBACK · STILL IN THE JOURNEY', 90, y); y += 40;
+      ctx.fillText(card.setback, 90, y); y += 40;
     }
 
     ctx.font = '900 170px Inter, sans-serif'; ctx.fillStyle = grad;
-    ctx.fillText(`Day ${stats.current_day || 0}`, 90, y + 150);
+    ctx.fillText(`${card.day} ${stats.current_day || 0}`, 90, y + 150);
     ctx.font = '700 56px Inter, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,.85)';
-    ctx.fillText(`of ${journey.total_days}`, 100, y + 220);
+    ctx.fillText(`${card.of} ${journey.total_days}`, 100, y + 220);
 
     ctx.font = '800 68px Inter, sans-serif'; ctx.fillStyle = '#fff';
     y = wrap(ctx, journey.title, 90, y + 320, W - 180, 82, 2);
@@ -93,7 +93,7 @@ export default function ShareButton({ journey, owner, stats, latest, label, down
     ctx.fillStyle = grad; ctx.beginPath(); ctx.roundRect(90, barY, Math.max(28, barW * pct), 24, 12); ctx.fill();
 
     ctx.font = '700 40px Inter, sans-serif'; ctx.fillStyle = '#fff';
-    ctx.fillText(`${stats.streak || 0} day streak`, 90, barY + 95);
+    ctx.fillText(card.streak.replace('{n}', stats.streak || 0), 90, barY + 95);
     ctx.font = '600 38px Inter, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,.6)';
     const link = `oneupday.app/${journey.slug}`;
     ctx.fillText(link, W - 90 - ctx.measureText(link).width, barY + 95);

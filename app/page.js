@@ -30,6 +30,15 @@ export default async function Home() {
         <p>{t.heroSub}</p>
         <a className="cta grow" href="/login">{t.heroCta}</a>
 
+        <div className="examples">
+          <b>{t.examplesTitle}</b>
+          <div className="example-pills">
+            {[t.ex1, t.ex2, t.ex3, t.ex4, t.ex5].map((ex, i) => (
+              <a key={i} href="/login" className="example-pill">{ex}</a>
+            ))}
+          </div>
+        </div>
+
         {journeys.length > 0 && (
           <div className="demo">
             <b>{t.seeReal}</b>
