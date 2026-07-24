@@ -12,6 +12,7 @@ import EditAvatar from '../../components/EditAvatar';
 import CompanionCard from '../home/CompanionCard';
 import NextStep from '../home/NextStep';
 import ProgressBar from '../../components/ProgressBar';
+import MediaGallery from '../../components/MediaGallery';
 import Track from '../../components/Track';
 
 export const dynamic = 'force-dynamic';
@@ -193,14 +194,7 @@ export default async function Perfil() {
         {myMedia.length > 0 && (
           <section className="album">
             <p className="eyebrow">{t.albumTitle}</p>
-            <div className="album-grid">
-              {myMedia.map(m => (
-                <a className="album-item" key={m.id} href={m.url} target="_blank" rel="noreferrer">
-                  {m.kind === 'video' ? <video src={m.url} muted playsInline /> : <img src={m.url} alt="" />}
-                  <span className={`album-vis vis-${m.visibility}`}>{m.visibility === 'public' ? t.pubPublic : m.visibility === 'followers' ? t.pubFollowers : t.pubPrivate}</span>
-                </a>
-              ))}
-            </div>
+            <MediaGallery items={myMedia} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} />
           </section>
         )}
       </main>

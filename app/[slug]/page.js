@@ -11,6 +11,7 @@ import FollowButton from './FollowButton';
 import BlockButton from './BlockButton';
 import ProgressBar from '../../components/ProgressBar';
 import ReportButton from './ReportButton';
+import MediaGallery from '../../components/MediaGallery';
 import FollowUserButton from './FollowUserButton';
 import UpdateManage from './UpdateManage';
 import Comments from '../../components/Comments';
@@ -122,13 +123,7 @@ async function ProfilePage({ handle }) {
         {media && media.length > 0 && (
           <section className="album">
             <p className="eyebrow">{t.albumTitle}</p>
-            <div className="album-grid">
-              {media.map(m => (
-                <a className="album-item" key={m.id} href={m.url} target="_blank" rel="noreferrer">
-                  {m.kind === 'video' ? <video src={m.url} muted playsInline /> : <img src={m.url} alt="" />}
-                </a>
-              ))}
-            </div>
+            <MediaGallery items={media} />
           </section>
         )}
       </main>
