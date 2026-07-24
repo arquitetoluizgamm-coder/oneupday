@@ -1531,3 +1531,27 @@ img,video{max-width:100%}
 
 /* Divisória entre posts mais sutil e intencional */
 .feed-page .entry{border-bottom:1px solid rgba(16,19,45,.07)}
+/* ==========================================================
+   Post de texto = página de papel (neutro, centralizado)
+   ========================================================== */
+.entry-textcard{
+  background:#F4F1E9;
+  border:1px solid rgba(16,19,45,.08);
+  color:#1a2033;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  gap:14px;min-height:320px;padding:44px 30px;border-radius:var(--r-card,16px);
+}
+.entry-textcard::after{display:none}
+.entry-textcard .etc-day{
+  font-family:var(--serif);font-weight:500;font-size:12px;letter-spacing:.16em;
+  text-transform:uppercase;opacity:.45;color:#1a2033;
+}
+.entry-textcard p{
+  font-family:var(--serif);font-weight:500;font-size:23px;line-height:1.42;letter-spacing:-.008em;
+  color:#1a2033;max-width:24ch;margin:0;-webkit-line-clamp:9;
+}
+.entry-textcard.long p{font-size:19px;line-height:1.52;font-weight:400;max-width:30ch}
+@media(max-width:640px){
+  .entry-textcard{border-left:0;border-right:0;border-radius:0;min-height:340px;padding:48px 26px}
+  .entry-textcard p{font-size:22px}
+}

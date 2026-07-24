@@ -177,8 +177,7 @@ export default function FeedClient({ labels }) {
               const cleanText = item.text && item.text !== '📷' && item.text !== '🎥' ? item.text : '';
               if (!hasMedia && cleanText) {
                 return (
-                  <a href={`/${item.journey.slug}`} className={`entry-textcard${cleanText.length > 130 ? ' long' : ''}`}
-                    style={{ background: `linear-gradient(150deg, ${item.journey.cover_color || '#1b1f45'}, #10132D 90%)` }}>
+                  <a href={`/${item.journey.slug}`} className={`entry-textcard${cleanText.length > 130 ? ' long' : ''}`}>
                     <span className="etc-day">{dayLabel(item.day_number)}</span>
                     <p>{cleanText}</p>
                   </a>
