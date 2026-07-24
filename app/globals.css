@@ -1306,3 +1306,12 @@ body{background:#f1f0eb}
 .support-pill.on{box-shadow:0 0 0 3px rgba(189,91,82,.1)}
 .comment-panel{background:#f7f6f2;border-color:#e1ded6}
 .comment-form input{background:#fff}
+.supporters-icon{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:0;border-radius:50%;background:transparent;color:var(--muted);cursor:pointer;padding:0}
+.supporters-icon:hover{background:#f1f0eb;color:var(--ink)}
+.entry-actions .comments{margin-top:0}
+
+/* Feed social: no cards, only a quiet divider between posts. */
+.feed-page .entry{background:transparent;border:0;border-bottom:1px solid #deddd8;border-radius:0;box-shadow:none;padding:22px 2px;margin:0}
+.feed-page .entry:hover{background:transparent;border-color:#deddd8;box-shadow:none}
+.entry-actions{border-top:0;padding-top:0;margin-top:13px}
+.comment-panel{margin-top:8px}
