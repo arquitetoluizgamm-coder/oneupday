@@ -2001,3 +2001,14 @@ html.chrome-scrolling .top{box-shadow:none!important}
 /* ---- Próximo Capítulo: fechar (só na home) ---- */
 .nc-close{position:absolute;top:10px;right:12px;z-index:2;width:30px;height:30px;border-radius:50%;border:0;cursor:pointer;background:rgba(255,255,255,.12);color:#fff;font-size:13px;line-height:1}
 .nc-close:hover{background:rgba(255,255,255,.22)}
+
+/* ---- Perfil em abas (premium, sem página longa) ---- */
+.ptabs-wrap{margin-top:6px}
+.ptabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:rgba(16,19,45,.05);border-radius:999px;padding:4px;margin:6px 0 18px}
+.ptab{border:0;background:transparent;cursor:pointer;font:inherit;font-size:13.5px;font-weight:750;letter-spacing:-.01em;color:var(--muted);padding:9px 6px;border-radius:999px;transition:background .15s,color .15s}
+.ptab.on{background:var(--night);color:#fff;box-shadow:0 4px 12px rgba(16,19,45,.2)}
+.ptab-panel{animation:fadeIn .18s ease}
+.ptab-actions{display:flex;gap:10px;justify-content:flex-end;margin:0 0 14px}
+.tab-empty{text-align:center;padding:36px 16px;color:var(--muted)}
+.tab-empty p{margin:0 0 16px;font-size:15px}
+.pc-consistency{margin:6px 0 0}

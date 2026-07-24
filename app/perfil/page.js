@@ -16,6 +16,7 @@ import Track from '../../components/Track';
 import AppTop from '../../components/AppTop';
 import NextChapter from '../../components/NextChapter';
 import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
+import ProfileTabs from '../../components/ProfileTabs';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -134,6 +135,7 @@ export default async function Perfil() {
                 <span>{profile.handle}</span>
                 <div className="points-chip" title={t.pointsExplain}><b>{points}</b> {t.pointsWord}</div>
               </div>
+              {maxStreak > 0 && <p className="consistency pc-consistency">{t.consistencyLine.replace('{n}', maxStreak)}</p>}
             </div>
           </div>
         </section>
@@ -144,60 +146,6 @@ export default async function Perfil() {
         </div>
 
         {nc.mode && <NextChapter mode={nc.mode} line={nc.line} env={nc.env} labels={ncLabels(t, nc)} />}
-
-        <section className="followers-block">
-          <div className="fb-head">
-            <p className="eyebrow">{t.followersTitle}</p>
-            <b className="fb-count">{followers.length}</b>
-          </div>
-          {followers.length === 0
-            ? <p className="fb-empty">{t.followersNone}</p>
-            : (<>
-              <p className="fb-who">{t.followersWho}</p>
-              <div className="followers-list">
-                {followers.map(f => (
-                  <a className="follower-chip" key={f.id} href={`/${f.handle}`}>
-                    <span className="fc-ava" style={{ background: f.avatar_color || 'var(--orange)' }}>
-                      {f.avatar_url ? <img src={f.avatar_url} alt="" /> : (f.name || '?')[0]}
-                    </span>
-                    <span className="fc-name">{f.name}</span>
-                  </a>
-                ))}
-              </div>
-            </>)}
-        </section>
-
-        {supporters.length > 0 && (
-          <section className="followers-block supporters-block">
-            <div className="fb-head">
-              <p className="eyebrow">{t.supportersMineTitle}</p>
-              <b className="fb-count">{supporters.length}</b>
-            </div>
-            <p className="fb-who">{t.supportersMineWho}</p>
-            <div className="followers-list">
-              {supporters.map((s) => (
-                <a className="follower-chip" key={s.id} href={`/${s.handle}`}>
-                  <span className="fc-ava" style={{ background: s.avatar_color || 'var(--orange)' }}>
-                    {s.avatar_url ? <img src={s.avatar_url} alt="" /> : (s.name || '?')[0]}
-                  </span>
-                  <span className="fc-name">{s.name}</span>
-                  {s.count > 1 && <span className="fc-count">{s.count}×</span>}
-                </a>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {aiConfigured && <CompanionCard userId={user.id} title={t.companionTitle} btn={t.companionBtn} loading={t.companionLoading} initialOff={aiPrefOff} labels={{ consent: t.aiConsent, off: t.aiOff, offState: t.aiOffState, reactivate: t.aiReactivate, err: t.aiErr, rateErr: t.aiRateErr }} />}
-
-        <section className="home-head">
-          <div>
-            <p className="eyebrow">{t.yourJourneys}</p>
-            <h1>{t.homeTitle}</h1>
-            {maxStreak > 0 && <p className="consistency">{t.consistencyLine.replace('{n}', maxStreak)}</p>}
-          </div>
-          <div className="head-actions"><a className="ghost-btn" href="/midia">{t.mediaAdd}</a><a className="cta" href="/new">{t.newJourney}</a></div>
-        </section>
 
         {list.length === 0 && (
           <section className="onboarding-block">
@@ -210,43 +158,99 @@ export default async function Perfil() {
           </section>
         )}
 
-        {list.map(j => {
-          const s = statsById[j.id] || {};
-          const day = s.current_day || 0;
-          return (
-            <section className="jcard" key={j.id}>
-              <div className="jcard-head">
-                <div><h2>{j.title}</h2><span>{fill(t.dayOf, { d: day, t: j.total_days, s: s.streak || 0 })}</span></div>
-                <div className="jcard-tools">
-                  <PrivacyToggle journeyId={j.id} initial={j.visibility || (j.is_public ? 'public' : 'private')} labels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} />
-                  <a className="view-link" href={`/retro/${j.slug}`}>{t.retroLink}</a>
-                  <a className="view-link" href={`/${j.slug}`}>{t.viewPublic}</a>
-                </div>
+        {list.length > 0 && (
+          <ProfileTabs
+            labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, people: t.profTabPeople }}
+            journeys={(
+              <>
+                <div className="head-actions ptab-actions"><a className="ghost-btn" href="/midia">{t.mediaAdd}</a><a className="cta" href="/new">{t.newJourney}</a></div>
+                {list.map(j => {
+                  const s = statsById[j.id] || {};
+                  const day = s.current_day || 0;
+                  return (
+                    <section className="jcard" key={j.id}>
+                      <div className="jcard-head">
+                        <div><h2>{j.title}</h2><span>{fill(t.dayOf, { d: day, t: j.total_days, s: s.streak || 0 })}</span></div>
+                        <div className="jcard-tools">
+                          <PrivacyToggle journeyId={j.id} initial={j.visibility || (j.is_public ? 'public' : 'private')} labels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} />
+                          <a className="view-link" href={`/retro/${j.slug}`}>{t.retroLink}</a>
+                          <a className="view-link" href={`/${j.slug}`}>{t.viewPublic}</a>
+                        </div>
+                      </div>
+                      <ProgressBar day={day} total={j.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+                      <Composer journeyId={j.id} startDate={j.created_at} aiOn={aiOn} labels={kindLabels} t={{
+                        placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
+                        addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded,
+                        addVideo: t.addVideo, videoAdded: t.videoAdded, videoTooBig: t.videoTooBig,
+                        crisisTitle: t.crisisTitle, crisisText: t.crisisText,
+                        ritualQ: t.ritualQ, rDid: t.rDid, rTried: t.rTried, rPaused: t.rPaused,
+                        rDidText: t.rDidText, rTriedText: t.rTriedText, rPausedText: t.rPausedText, aiWrite: t.aiWrite,
+                        musicAdd: t.musicAdd, musicTitle: t.musicTitle, musicUse: t.musicUse, musicRemove: t.musicRemove, musicEmpty: t.musicEmpty, musicSearchPh: t.musicSearchPh, musicKeyNeeded: t.musicKeyNeeded,
+                        aiErr: t.aiErr, aiRateErr: t.aiRateErr,
+                        moodQ: t.moodQ, prompts: t.prompts, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful },
+                        env: { q: t.envQ, ph: t.envPh, save: t.envSave, skip: t.envSkip },
+                      }} />
+                      {aiOn && <NextStep journeyId={j.id} label={t.aiNextStep} thinking={t.aiThinking} errLabel={t.aiErr} rateLabel={t.aiRateErr} />}
+                    </section>
+                  );
+                })}
+                {aiConfigured && <CompanionCard userId={user.id} title={t.companionTitle} btn={t.companionBtn} loading={t.companionLoading} initialOff={aiPrefOff} labels={{ consent: t.aiConsent, off: t.aiOff, offState: t.aiOffState, reactivate: t.aiReactivate, err: t.aiErr, rateErr: t.aiRateErr }} />}
+              </>
+            )}
+            album={myMedia.length > 0 ? (
+              <MediaGallery items={myMedia} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} own deleteLabel={t.mediaDelete} deleteConfirm={t.mediaDeleteConfirm} />
+            ) : (
+              <div className="tab-empty">
+                <p>{t.albumEmpty}</p>
+                <a className="cta" href="/midia">{t.albumEmptyCta}</a>
               </div>
-              <ProgressBar day={day} total={j.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
-              <Composer journeyId={j.id} startDate={j.created_at} aiOn={aiOn} labels={kindLabels} t={{
-                placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
-                addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded,
-                addVideo: t.addVideo, videoAdded: t.videoAdded, videoTooBig: t.videoTooBig,
-                crisisTitle: t.crisisTitle, crisisText: t.crisisText,
-                ritualQ: t.ritualQ, rDid: t.rDid, rTried: t.rTried, rPaused: t.rPaused,
-                rDidText: t.rDidText, rTriedText: t.rTriedText, rPausedText: t.rPausedText, aiWrite: t.aiWrite,
-                musicAdd: t.musicAdd, musicTitle: t.musicTitle, musicUse: t.musicUse, musicRemove: t.musicRemove, musicEmpty: t.musicEmpty, musicSearchPh: t.musicSearchPh, musicKeyNeeded: t.musicKeyNeeded,
-                aiErr: t.aiErr, aiRateErr: t.aiRateErr,
-                moodQ: t.moodQ, prompts: t.prompts, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful },
-                env: { q: t.envQ, ph: t.envPh, save: t.envSave, skip: t.envSkip },
-
-              }} />
-              {aiOn && <NextStep journeyId={j.id} label={t.aiNextStep} thinking={t.aiThinking} errLabel={t.aiErr} rateLabel={t.aiRateErr} />}
-            </section>
-          );
-        })}
-
-        {myMedia.length > 0 && (
-          <section className="album">
-            <p className="eyebrow">{t.albumTitle}</p>
-            <MediaGallery items={myMedia} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} own deleteLabel={t.mediaDelete} deleteConfirm={t.mediaDeleteConfirm} />
-          </section>
+            )}
+            people={(
+              <>
+                {supporters.length > 0 && (
+                  <section className="followers-block supporters-block">
+                    <div className="fb-head">
+                      <p className="eyebrow">{t.supportersMineTitle}</p>
+                      <b className="fb-count">{supporters.length}</b>
+                    </div>
+                    <p className="fb-who">{t.supportersMineWho}</p>
+                    <div className="followers-list">
+                      {supporters.map((s) => (
+                        <a className="follower-chip" key={s.id} href={`/${s.handle}`}>
+                          <span className="fc-ava" style={{ background: s.avatar_color || 'var(--orange)' }}>
+                            {s.avatar_url ? <img src={s.avatar_url} alt="" /> : (s.name || '?')[0]}
+                          </span>
+                          <span className="fc-name">{s.name}</span>
+                          {s.count > 1 && <span className="fc-count">{s.count}×</span>}
+                        </a>
+                      ))}
+                    </div>
+                  </section>
+                )}
+                <section className="followers-block">
+                  <div className="fb-head">
+                    <p className="eyebrow">{t.followersTitle}</p>
+                    <b className="fb-count">{followers.length}</b>
+                  </div>
+                  {followers.length === 0
+                    ? <p className="fb-empty">{t.followersNone}</p>
+                    : (<>
+                      <p className="fb-who">{t.followersWho}</p>
+                      <div className="followers-list">
+                        {followers.map(f => (
+                          <a className="follower-chip" key={f.id} href={`/${f.handle}`}>
+                            <span className="fc-ava" style={{ background: f.avatar_color || 'var(--orange)' }}>
+                              {f.avatar_url ? <img src={f.avatar_url} alt="" /> : (f.name || '?')[0]}
+                            </span>
+                            <span className="fc-name">{f.name}</span>
+                          </a>
+                        ))}
+                      </div>
+                    </>)}
+                </section>
+              </>
+            )}
+          />
         )}
       </main>
       <BottomNav active="profile" t={t} />
