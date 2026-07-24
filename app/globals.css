@@ -165,10 +165,9 @@ a{color:inherit;text-decoration:none}
 
 /* ---------- Photos ---------- */
 .kind.photo{border-style:dashed}
-.photo-preview{margin-top:10px}
-.photo-preview img{width:100%;max-height:220px;object-fit:cover;border-radius:14px;border:1px solid var(--line)}
+.photo-preview,.update-photo,.feed-photo{margin-top:10px;width:min(100%,420px);aspect-ratio:9 / 16;overflow:hidden;border-radius:16px;background:#ebe9e3}
+.photo-preview img,.update-photo img,.feed-photo img{width:100%;height:100%;object-fit:cover;border-radius:16px;border:1px solid var(--line)}
 .update-photo{margin:8px 0}
-.update-photo img{width:100%;max-height:360px;object-fit:cover;border-radius:16px;border:1px solid var(--line)}
 
 /* ---------- Encourage ---------- */
 .encourage-pill{display:inline-flex;align-items:center;gap:6px;margin-top:8px;
@@ -345,15 +344,14 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .feed-top b{font-size:15px}
 .feed-top span{color:var(--muted);font-size:13px}
 .feed-body p{margin:6px 0 0;color:#2b2f38}
-.feed-photo{display:block;margin-top:10px}
-.feed-photo img{width:100%;max-height:320px;object-fit:cover;border-radius:14px;border:1px solid var(--line)}
+.feed-photo{display:block}
 .feed-actions{display:flex;align-items:center;gap:14px;margin-top:10px}
 .feed-enc{color:var(--pink);font-weight:800;font-size:14px}
 .feed-open{color:var(--muted);font-weight:800;font-size:13px}
 
 /* ---------- Video ---------- */
 .photo-preview video,.update-photo video,.feed-photo video{
-  display:block;width:100%;height:auto;max-height:70vh;border-radius:14px;border:1px solid var(--line);background:#000}
+  display:block;width:100%;height:100%;object-fit:cover;border-radius:16px;border:1px solid var(--line);background:#000}
 .ava img,.feed-ava img,.me-ava img{width:100%;height:100%;object-fit:cover;object-position:center top}
 .ava,.feed-ava,.me-ava{overflow:hidden}
 .me-ava{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:900;font-size:13px}
@@ -1371,10 +1369,10 @@ body{background:#f1f0eb}
 }
 
 /* Mídia padronizada do feed: proporção única e enquadramento consistente. */
-.feed-page .entry-media{width:100%;aspect-ratio:4 / 3;margin:14px 0 0;overflow:hidden;border-radius:0;background:#ebe9e3}
+.feed-page .entry-media{width:100%;aspect-ratio:9 / 16;margin:14px 0 0;overflow:hidden;border-radius:0;background:#ebe9e3}
 .feed-page .entry-media img,.feed-page .entry-media video{width:100%;height:100%;display:block;object-fit:cover;border-radius:0}
 @media(max-width:640px){
-  .feed-page .entry-media{width:calc(100% + 32px);margin-left:-16px;margin-right:-16px;border-radius:0;aspect-ratio:4 / 3}
+  .feed-page .entry-media{width:calc(100% + 32px);margin-left:-16px;margin-right:-16px;border-radius:0;aspect-ratio:9 / 16}
 }
 
 /* Biblioteca inicial de jornadas de exemplo. */

@@ -28,6 +28,16 @@ function EntryText({ text, labels }) {
   return <>{<p className={`entry-text${expanded ? ' expanded' : ''}`}>{text}</p>}{compact && <button type="button" className="entry-expand" onClick={() => setExpanded(value => !value)}>{expanded ? labels.lessText : labels.moreText}</button>}</>;
 }
 
+function DemoActions({ item, labels }) {
+  return (
+    <div className="entry-actions">
+      <a className="support-pill" href={`/${item.journey.slug}`}><span>♡</span><span>{labels.supportIdle}</span></a>
+      <a className="comment-toggle demo-action-link" href={`/${item.journey.slug}`}><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-5 4v-4.2A2.5 2.5 0 0 1 4 13.5z"/></svg><span className="action-label">{labels.comments.comment}</span></a>
+      <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
+    </div>
+  );
+}
+
 export default function FeedClient({ mutedCats, labels }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -116,11 +126,11 @@ export default function FeedClient({ mutedCats, labels }) {
           {f.photo_url && <a href={`/${f.journey.slug}`} className="entry-media"><img src={f.photo_url} alt="" /></a>}
           {f.video_url && !f.photo_url && <div className="entry-media"><video src={f.video_url} controls playsInline preload="metadata" /></div>}
           {f.track && <TrackTag track={f.track} />}
-          <div className="entry-actions">
+          {f.demo ? <DemoActions item={f} labels={labels} /> : <div className="entry-actions">
               <EncourageBar updateId={f.id} initialActive={f.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
               <FeedShare slug={f.journey.slug} title={f.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
               <Comments updateId={f.id} labels={labels.comments} />
-            </div>
+            </div>}
         </article>
       ))}
       {!done && <div ref={sentinel} className="feed-sentinel">{loading ? labels.loading : ''}</div>}

@@ -1,7 +1,6 @@
 import { getSupabase } from '../../lib/supabase';
 import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
-import { buildDemoStories } from '../../lib/demoStories';
 import Logo from '../../components/Logo';
 import BottomNav from '../../components/BottomNav';
 
@@ -17,36 +16,31 @@ export default async function Explore({ searchParams }) {
   const moment = searchParams?.moment || '';
   const catLabel = { art: t.catArt, body: t.catBody, work: t.catWork, home: t.catHome, life: t.catLife };
   const MOMENTS = [['starting', t.mStarting], ['notgiveup', t.mNotgiveup], ['rebuilding', t.mRebuilding], ['health', t.mHealth], ['courage', t.mCourage], ['hardphase', t.mHardphase], ['building', t.mBuilding]];
-  const demoIntro = locale === 'pt'
-    ? 'Exemplos criados para mostrar como uma jornada pode aparecer no app.'
-    : 'Examples created to show how a journey can look inside the app.';
-  const demoOutro = locale === 'pt'
-    ? 'Quando a comunidade crescer, esse espaço divide atenção com pessoas reais.'
-    : 'As the community grows, this space shares attention with real people.';
 
   const sb = getSupabase();
   let query = sb.from('journeys').select('*').eq('visibility', 'public').order('created_at', { ascending: false }).limit(40);
   if (cat) query = query.eq('category', cat);
   if (moment) query = query.eq('moment', moment);
   if (q) query = query.ilike('title', `%${q}%`);
+
   const { data: journeys } = await query;
   const js = journeys || [];
   const statsById = {};
   const photoBy = {};
-  if (js.length) {
-    const { data: stats } = await sb.from('journey_stats').select('*').in('journey_id', js.map(j => j.id));
-    (stats || []).forEach(s => { statsById[s.journey_id] = s; });
-    const { data: ph } = await sb.from('updates').select('journey_id, photo_url, day_number').in('journey_id', js.map(j => j.id)).not('photo_url', 'is', null).order('day_number', { ascending: false });
-    (ph || []).forEach(u => { if (!photoBy[u.journey_id]) photoBy[u.journey_id] = u.photo_url; });
-  }
 
-  const demos = buildDemoStories(locale).filter((story) => {
-    if (cat && story.category !== cat) return false;
-    if (moment && story.moment !== moment) return false;
-    if (!q) return true;
-    const haystack = `${story.title} ${story.goal} ${story.owner.name} ${story.owner.handle}`.toLowerCase();
-    return haystack.includes(q.toLowerCase());
-  });
+  if (js.length) {
+    const { data: stats } = await sb.from('journey_stats').select('*').in('journey_id', js.map((journey) => journey.id));
+    (stats || []).forEach((stat) => { statsById[stat.journey_id] = stat; });
+
+    const { data: photos } = await sb.from('updates')
+      .select('journey_id, photo_url, day_number')
+      .in('journey_id', js.map((journey) => journey.id))
+      .not('photo_url', 'is', null)
+      .order('day_number', { ascending: false });
+    (photos || []).forEach((item) => {
+      if (!photoBy[item.journey_id]) photoBy[item.journey_id] = item.photo_url;
+    });
+  }
 
   return (
     <>
@@ -70,77 +64,41 @@ export default async function Explore({ searchParams }) {
         <section className="communities">
           <h2>{t.groups}</h2>
           <div className="comm-grid">
-            {MOMENTS.map(([v, l]) => (
-              <a key={v} className="comm-card" href={`/grupo/${v}`}>{l}</a>
+            {MOMENTS.map(([value, label]) => (
+              <a key={value} className="comm-card" href={`/grupo/${value}`}>{label}</a>
             ))}
           </div>
         </section>
 
         <div className="cat-chips">
           <a className={`chip${!cat ? ' on' : ''}`} href="/explore">{t.allCats}</a>
-          {CATS.map(c => (
-            <a key={c} className={`chip${cat === c ? ' on' : ''}`} href={`/explore?cat=${c}`}>{catLabel[c]}</a>
+          {CATS.map((value) => (
+            <a key={value} className={`chip${cat === value ? ' on' : ''}`} href={`/explore?cat=${value}`}>{catLabel[value]}</a>
           ))}
         </div>
         <div className="cat-chips moments">
           <a className={`chip${!moment ? ' on' : ''}`} href="/explore">{t.momentAll}</a>
-          {MOMENTS.map(([v, l]) => (
-            <a key={v} className={`chip moment${moment === v ? ' on' : ''}`} href={`/grupo/${v}`}>{l}</a>
+          {MOMENTS.map(([value, label]) => (
+            <a key={value} className={`chip moment${moment === value ? ' on' : ''}`} href={`/grupo/${value}`}>{label}</a>
           ))}
         </div>
 
-        {demos.length > 0 && (
-          <section className="demo-showcase">
-            <div className="demo-showcase-head">
-              <div>
-                <p className="eyebrow">{t.demoLabelDemo}</p>
-                <h2>{t.examplesTitle}</h2>
-                <p>{demoIntro}</p>
-              </div>
-              <span>{demoOutro}</span>
-            </div>
-            <div className="demo-story-grid">
-              {demos.map((story) => (
-                <a className="demo-story-card" key={story.slug} href={`/${story.slug}`}>
-                  <div className="demo-story-top">
-                    <span className="demo-story-avatar" style={{ background: story.owner.avatarColor }}>
-                      <img src={story.owner.avatarUrl} alt="" />
-                    </span>
-                    <div className="demo-story-meta">
-                      <b>{story.owner.name}</b>
-                      <small>{story.owner.handle}</small>
-                    </div>
-                    <span className="demo-story-badge">{t.demoExample}</span>
-                  </div>
-                  <div className="demo-story-copy">
-                    <h3>{story.title}</h3>
-                    <p>{story.preview}</p>
-                  </div>
-                  <div className="demo-story-foot">
-                    <span>{catLabel[story.category] || ''}</span>
-                    <span>{fill(t.dayOf, { d: story.stats.current_day || 0, t: story.total_days, s: story.stats.streak || 0 })}</span>
-                  </div>
-                  <div className="bar"><span style={{ width: `${Math.max(story.stats.progress_pct || 0, 6)}%` }} /></div>
-                </a>
-              ))}
-            </div>
-          </section>
-        )}
-
         {js.length === 0 && <div className="empty"><b>{t.noPublicJourneys}</b></div>}
         <div className="pj-grid">
-          {js.map(j => {
-            const st = statsById[j.id] || {};
-            const pct = Math.min(100, st.progress_pct || 0);
+          {js.map((journey) => {
+            const stats = statsById[journey.id] || {};
+            const pct = Math.min(100, stats.progress_pct || 0);
             return (
-              <a className="pj-card" key={j.id} href={`/${j.slug}`}>
-                <div className="pj-thumb" style={photoBy[j.id] ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.1), rgba(9,12,42,.5)), url(${photoBy[j.id]})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: `linear-gradient(135deg, var(--night), ${j.cover_color})` }}>
-                  <span>{fill(t.dayShort, { d: st.current_day || 0 })}</span>
+              <a className="pj-card" key={journey.id} href={`/${journey.slug}`}>
+                <div className="pj-thumb" style={photoBy[journey.id]
+                  ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.1), rgba(9,12,42,.5)), url(${photoBy[journey.id]})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+                  : { background: `linear-gradient(135deg, var(--night), ${journey.cover_color})` }}>
+                  <span>{fill(t.dayShort, { d: stats.current_day || 0 })}</span>
                 </div>
                 <div className="pj-body">
-                  <b>{j.title}</b>
+                  <b>{journey.title}</b>
                   <div className="bar"><span style={{ width: (pct > 0 ? Math.max(pct, 6) : 0) + '%' }} /></div>
-                  <small>{catLabel[j.category] || ''} · {fill(t.dayOf, { d: st.current_day || 0, t: j.total_days, s: st.streak || 0 })}</small>
+                  <small>{catLabel[journey.category] || ''} · {fill(t.dayOf, { d: stats.current_day || 0, t: journey.total_days, s: stats.streak || 0 })}</small>
                 </div>
               </a>
             );
