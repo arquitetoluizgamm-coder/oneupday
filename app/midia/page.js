@@ -26,6 +26,7 @@ export default async function Midia() {
           whichJourney: t.mediaWhichJourney, whichDay: t.mediaWhichDay, whoSees: t.mediaWhoSees,
           pubPublic: t.pubPublic, pubFollowers: t.pubFollowers, pubPrivate: t.pubPrivate,
           save: t.mediaSave, saving: t.creating, captionLabel: t.mediaCaption, captionPh: t.mediaCaptionPh,
+          crop: { original: t.cropOriginal, square: t.cropSquare, portrait: t.cropPortrait, landscape: t.cropLandscape, use: t.cropUse, cancel: t.cropCancel, hint: t.cropHint, hintOriginal: t.cropHintOriginal, zoom: t.cropZoom },
         }} />
       </main>
       <BottomNav active="profile" t={t} />

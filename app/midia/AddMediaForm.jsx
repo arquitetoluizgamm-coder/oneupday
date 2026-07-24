@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
+import ImageCropper from '../../components/ImageCropper';
 
 const MAX_VIDEO = 60 * 1024 * 1024;
 
@@ -18,6 +19,8 @@ export default function AddMediaForm({ userId, journeys, t }) {
   const [kind, setKind] = useState('photo');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [rawFile, setRawFile] = useState(null);
+  const [rawUrl, setRawUrl] = useState('');
   const fileRef = useRef(null);
   const router = useRouter();
 
@@ -26,19 +29,49 @@ export default function AddMediaForm({ userId, journeys, t }) {
     const j = list.find((x) => x.id === id);
     if (j) setDay(String(dayFor(j)));
   }
+
+  async function store(fileOrBlob, ext) {
+    const supabase = createClient();
+    const path = `${userId}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from('photos').upload(path, fileOrBlob, { upsert: false });
+    if (error) return null;
+    return supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
+  }
+
   async function onFile(e) {
     const file = e.target.files?.[0]; if (!file) return;
     const isVideo = file.type.startsWith('video');
-    if (isVideo && file.size > MAX_VIDEO) { alert(L.videoTooBig); e.target.value = ''; return; }
+    if (isVideo) {
+      if (file.size > MAX_VIDEO) { alert(L.videoTooBig); e.target.value = ''; return; }
+      setUploading(true);
+      const u = await store(file, (file.name.split('.').pop() || 'mp4').toLowerCase());
+      setUploading(false);
+      if (!u) { alert(L.error); return; }
+      setUrl(u); setKind('video'); return;
+    }
+    // foto → abre o enquadrador antes de subir
+    if (rawUrl) URL.revokeObjectURL(rawUrl);
+    setRawFile(file);
+    setRawUrl(URL.createObjectURL(file));
+  }
+
+  async function onCropDone(result) {
+    let toUpload, ext;
+    if (result === 'original' || !result) { toUpload = rawFile; ext = (rawFile?.name.split('.').pop() || 'jpg').toLowerCase(); }
+    else { toUpload = result; ext = 'jpg'; }
+    if (rawUrl) URL.revokeObjectURL(rawUrl);
+    setRawUrl(''); setRawFile(null);
+    if (!toUpload) return;
     setUploading(true);
-    const supabase = createClient();
-    const ext = (file.name.split('.').pop() || (isVideo ? 'mp4' : 'jpg')).toLowerCase();
-    const path = `${userId}/${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from('photos').upload(path, file, { upsert: false });
+    const u = await store(toUpload, ext);
     setUploading(false);
-    if (error) { alert(L.error); return; }
-    setUrl(supabase.storage.from('photos').getPublicUrl(path).data.publicUrl);
-    setKind(isVideo ? 'video' : 'photo');
+    if (!u) { alert(L.error); return; }
+    setUrl(u); setKind('photo');
+  }
+  function onCropCancel() {
+    if (rawUrl) URL.revokeObjectURL(rawUrl);
+    setRawUrl(''); setRawFile(null);
+    if (fileRef.current) fileRef.current.value = '';
   }
   async function submit() {
     if (!url || saving) return;
@@ -67,7 +100,9 @@ export default function AddMediaForm({ userId, journeys, t }) {
 
   return (
     <div className="media-form">
-      {!url ? (
+      {rawUrl ? (
+        <ImageCropper src={rawUrl} labels={L.crop || {}} onDone={onCropDone} onCancel={onCropCancel} />
+      ) : !url ? (
         <button type="button" className="media-drop" onClick={() => fileRef.current?.click()} disabled={uploading}>
           {uploading ? L.uploading : L.pick}
         </button>
