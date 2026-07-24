@@ -95,7 +95,7 @@ export default async function Home() {
           <HeaderHeart likes={heartLikes} follows={heartFollows} labels={{ title: t.heartTitle, likes: t.heartLikes, follows: t.heartFollows, empty: t.heartEmpty, seeAll: t.heartSeeAll }} />
         </div>
         <a className="top-brand" href="/home" aria-label="One Up Day">
-          <img src="/logo-wordmark.png" alt="One Up Day" />
+          <img src="/logo-name.png" alt="One Up Day" />
         </a>
         <div className="top-right">
           <a className="header-ava" href="/perfil" aria-label={profile.name} style={{ background: profile.avatar_color || 'var(--orange)' }}>

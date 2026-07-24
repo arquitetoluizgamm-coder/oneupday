@@ -1636,8 +1636,8 @@ html.chrome-scrolling .top{ box-shadow:0 1px 0 rgba(16,19,45,.05) }
 .header-heart{position:relative;display:inline-flex}
 .heart-btn{color:var(--ink)}
 .heart-btn .heart-dot{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:#e0245e}
-.heart-pop{position:absolute;top:calc(100% + 8px);right:-6px;z-index:60;width:246px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 34px rgba(16,19,45,.14);padding:14px 15px;animation:fadeIn .16s ease}
-.heart-pop::before{content:'';position:absolute;top:-6px;right:16px;width:12px;height:12px;background:#fff;border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
+.heart-pop{position:absolute;top:calc(100% + 8px);left:-6px;right:auto;z-index:60;width:250px;background:rgba(255,255,255,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0;border-radius:16px;box-shadow:0 10px 30px rgba(16,19,45,.10);padding:14px 15px;animation:fadeIn .16s ease}
+.heart-pop::before{content:'';position:absolute;top:-5px;left:16px;right:auto;width:11px;height:11px;background:rgba(255,255,255,.72);backdrop-filter:blur(10px);border:0;transform:rotate(45deg)}
 .hp-title{display:block;font-size:12px;font-weight:800;letter-spacing:.02em;color:var(--muted);margin-bottom:8px}
 .hp-lines p{margin:4px 0;font-size:15px;color:var(--ink)}
 .hp-lines p b{color:#e0245e;font-weight:800}
