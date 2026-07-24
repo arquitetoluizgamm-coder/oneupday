@@ -81,6 +81,8 @@ export default async function Perfil() {
   try { const { data: pref } = await supabase.from('profiles').select('ai_opt_out').eq('id', user.id).maybeSingle(); aiPrefOff = !!pref?.ai_opt_out; } catch { }
   const aiConfigured = !!process.env.OPENAI_API_KEY && list.length > 0;
   const aiOn = aiConfigured && !aiPrefOff;
+  let myMedia = [];
+  try { const { data: md } = await supabase.from('media').select('id, url, kind, visibility').eq('user_id', user.id).order('created_at', { ascending: false }); myMedia = md || []; } catch {}
 
   return (
     <>
@@ -143,7 +145,7 @@ export default async function Perfil() {
             <h1>{t.homeTitle}</h1>
             {maxStreak > 0 && <p className="consistency">{t.consistencyLine.replace('{n}', maxStreak)}</p>}
           </div>
-          <a className="cta" href="/new">{t.newJourney}</a>
+          <div className="head-actions"><a className="ghost-btn" href="/midia">{t.mediaAdd}</a><a className="cta" href="/new">{t.newJourney}</a></div>
         </section>
 
         {list.length === 0 && (
@@ -187,6 +189,20 @@ export default async function Perfil() {
             </section>
           );
         })}
+
+        {myMedia.length > 0 && (
+          <section className="album">
+            <p className="eyebrow">{t.albumTitle}</p>
+            <div className="album-grid">
+              {myMedia.map(m => (
+                <a className="album-item" key={m.id} href={m.url} target="_blank" rel="noreferrer">
+                  {m.kind === 'video' ? <video src={m.url} muted playsInline /> : <img src={m.url} alt="" />}
+                  <span className={`album-vis vis-${m.visibility}`}>{m.visibility === 'public' ? t.pubPublic : m.visibility === 'followers' ? t.pubFollowers : t.pubPrivate}</span>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
       <BottomNav active="profile" t={t} />
     </>

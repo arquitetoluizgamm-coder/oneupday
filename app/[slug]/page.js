@@ -62,14 +62,16 @@ async function loadProfile(handle) {
     const { data: ph } = await sb.from('updates').select('journey_id, photo_url, day_number').in('journey_id', js.map(j => j.id)).not('photo_url', 'is', null).order('day_number', { ascending: false });
     (ph || []).forEach(u => { if (!photoBy[u.journey_id]) photoBy[u.journey_id] = u.photo_url; });
   }
-  return { profile, journeys: js, statsById, photoBy };
+  let media = [];
+  try { const { data: md } = await sb.from('media').select('id, url, kind').eq('user_id', profile.id).order('created_at', { ascending: false }).limit(30); media = md || []; } catch {}
+  return { profile, journeys: js, statsById, photoBy, media };
   } catch (e) { return null; }
 }
 
 async function ProfilePage({ handle }) {
   const data = await loadProfile(handle);
   if (!data) notFound();
-  const { profile, journeys, statsById, photoBy } = data;
+  const { profile, journeys, statsById, photoBy, media } = data;
   const t = getDict(getLocale());
   const initial = (profile.name || '?')[0];
   return (
@@ -117,6 +119,18 @@ async function ProfilePage({ handle }) {
             );
           })}
         </div>
+        {media && media.length > 0 && (
+          <section className="album">
+            <p className="eyebrow">{t.albumTitle}</p>
+            <div className="album-grid">
+              {media.map(m => (
+                <a className="album-item" key={m.id} href={m.url} target="_blank" rel="noreferrer">
+                  {m.kind === 'video' ? <video src={m.url} muted playsInline /> : <img src={m.url} alt="" />}
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
       <footer className="foot">One <b>Up</b> Day · {t.tagline} · oneupday.app/{profile.handle}</footer>
     </>
