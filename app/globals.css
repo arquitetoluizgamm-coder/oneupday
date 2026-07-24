@@ -1636,7 +1636,7 @@ html.chrome-scrolling .top{ box-shadow:0 1px 0 rgba(16,19,45,.05) }
 .header-heart{position:relative;display:inline-flex}
 .heart-btn{color:var(--ink)}
 .heart-btn .heart-dot{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:#e0245e}
-.heart-pop{position:absolute;top:calc(100% + 8px);left:-6px;right:auto;z-index:60;width:250px;background:rgba(255,255,255,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0;border-radius:16px;box-shadow:0 10px 30px rgba(16,19,45,.10);padding:14px 15px;animation:fadeIn .16s ease}
+.heart-pop{position:absolute;top:calc(100% + 8px);left:-6px;right:auto;z-index:60;width:auto;display:flex;align-items:center;gap:16px;background:rgba(255,255,255,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0;border-radius:16px;box-shadow:0 10px 30px rgba(16,19,45,.10);padding:14px 15px;animation:fadeIn .16s ease}
 .heart-pop::before{content:'';position:absolute;top:-5px;left:16px;right:auto;width:11px;height:11px;background:rgba(255,255,255,.72);backdrop-filter:blur(10px);border:0;transform:rotate(45deg)}
 .hp-title{display:block;font-size:12px;font-weight:800;letter-spacing:.02em;color:var(--muted);margin-bottom:8px}
 .hp-lines p{margin:4px 0;font-size:15px;color:var(--ink)}
@@ -1667,3 +1667,8 @@ html.chrome-scrolling .top{ box-shadow:0 1px 0 rgba(16,19,45,.05) }
 .media-progress .mp-bar span{display:block;height:100%;border-radius:999px;background:var(--up)}
 .media-progress .mp-label{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.4)}
 .entry-textcard .media-progress .mp-label{color:var(--ink);text-shadow:none}
+
+/* balão do coração: só ícone + número */
+.heart-pop .hp-stat{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-size:15px;color:var(--ink);line-height:1}
+.heart-pop .hp-stat.likes svg{color:#e0245e}
+.heart-pop .hp-stat.follows svg{color:var(--ink)}
