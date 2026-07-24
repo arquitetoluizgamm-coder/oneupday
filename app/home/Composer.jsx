@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 import TrackPicker from './TrackPicker';
+import ImageCropper from '../../components/ImageCropper';
 import { track } from '../../lib/track';
 
 const ORDER = ['step', 'win', 'setback', 'learned'];
@@ -38,6 +39,8 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [uploading, setUploading] = useState(false);
   const [track, setTrack] = useState(null);
   const [aiErr, setAiErr] = useState('');
+  const [rawFile, setRawFile] = useState(null);
+  const [rawUrl, setRawUrl] = useState('');
   const photoRef = useRef(null);
   const videoRef = useRef(null);
   const inputRef = useRef(null);
@@ -49,25 +52,42 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   }, [text]);
 
 
-  async function upload(file) {
+  async function upload(file, extOverride) {
     const supabase = createClient();
-    const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
+    const ext = (extOverride || file.name?.split('.').pop() || 'bin').toLowerCase();
     const path = `${journeyId}/${crypto.randomUUID()}.${ext}`;
     const { error } = await supabase.storage.from('photos').upload(path, file, { upsert: false });
     if (error) return null;
     return supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
   }
 
-  async function onPickPhoto(e) {
+  function onPickPhoto(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (rawUrl) URL.revokeObjectURL(rawUrl);
+    setRawFile(file);
+    setRawUrl(URL.createObjectURL(file));
+  }
+  async function onCropDone(result) {
+    let toUpload, ext;
+    if (result === 'original' || !result) { toUpload = rawFile; ext = (rawFile?.name.split('.').pop() || 'jpg').toLowerCase(); }
+    else { toUpload = result; ext = 'jpg'; }
+    if (rawUrl) URL.revokeObjectURL(rawUrl);
+    setRawUrl('');
+    if (!toUpload) return;
     setUploading(true);
-    const url = await upload(file);
+    const url = await upload(toUpload, ext);
     setUploading(false);
     if (!url) { alert(t.error); return; }
     setPhotoUrl(url); setVideoUrl(null);
     if (videoRef.current) videoRef.current.value = '';
   }
+  function onCropCancel() {
+    if (rawUrl) URL.revokeObjectURL(rawUrl);
+    setRawUrl('');
+    if (!photoUrl) { setRawFile(null); if (photoRef.current) photoRef.current.value = ''; }
+  }
+  function reframe() { if (rawFile) setRawUrl(URL.createObjectURL(rawFile)); }
 
   async function onPickVideo(e) {
     const file = e.target.files?.[0];
@@ -170,8 +190,20 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           ))}
         </div>
       )}
-      {photoUrl && <div className="photo-preview"><img src={photoUrl} alt="" /></div>}
+      {photoUrl && (
+        <div className="photo-preview">
+          <img src={photoUrl} alt="" />
+          {rawFile && <button type="button" className="tiny-link" onClick={reframe}>{(t.crop || {}).edit || 'Editar enquadramento'}</button>}
+        </div>
+      )}
       {videoUrl && <div className="photo-preview"><video src={videoUrl} controls playsInline /></div>}
+      {rawUrl && (
+        <div className="crop-modal" role="dialog" aria-modal="true">
+          <div className="crop-modal-card">
+            <ImageCropper src={rawUrl} labels={t.crop || {}} onDone={onCropDone} onCancel={onCropCancel} />
+          </div>
+        </div>
+      )}
 
       <div className="kind-seg">
         {ORDER.map(k => (
