@@ -45,7 +45,7 @@ export default function EncourageBar({ updateId, labelIdle, labelActive, support
   return (
     <div className="support-wrap">
       <button className={`support-pill${active ? ' on' : ''}`} onClick={toggle} disabled={busy} aria-label={active ? labelActive : labelIdle}>
-        <svg className="sp-heart" viewBox="0 0 24 24" width="22" height="22" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20.5C12 20.5 3.5 15.5 3.5 9.2 3.5 6.4 5.6 4.5 8 4.5c1.7 0 3.1 1 4 2.4.9-1.4 2.3-2.4 4-2.4 2.4 0 4.5 1.9 4.5 4.7 0 6.3-8.5 11.3-8.5 11.3z"/></svg>
+        <svg className="sp-heart" viewBox="0 0 24 24" width="22" height="22" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1 7.8 7.8 7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
         <span className="action-label">{active ? labelActive : labelIdle}</span>
       </button>
       <button type="button" className="supporters-icon" onClick={showPeople} aria-expanded={supportersOpen} aria-label={loadingPeople ? supportersLoading : supportersLabel} title={supportersLabel}>
