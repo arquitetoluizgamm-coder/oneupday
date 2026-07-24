@@ -1465,3 +1465,6 @@ html.chrome-scrolling .top{box-shadow:none}
 .auth-mark{background:transparent;border:0;box-shadow:none;margin:0 auto 20px}
 .auth-card h1{margin-bottom:8px}
 .auth-card p{margin-bottom:26px}
+/* ---- Abas do feed: fixas no topo, somem na rolagem como o cabeçalho ---- */
+.feed-tabs{position:sticky;top:0;z-index:9;background:linear-gradient(var(--bg) 78%,transparent);width:100%;justify-content:center;padding:10px 0 8px;margin:0 0 8px;transition:transform .28s ease,opacity .25s ease}
+html.chrome-hide .feed-tabs{transform:translateY(-140%);opacity:0}

@@ -144,21 +144,7 @@ export default function FeedClient({ labels }) {
       <div className="feed-tabs">
         <button className={scope === 'all' ? 'on' : ''} onClick={() => switchScope('all')}>{labels.tabAll}</button>
         <button className={scope === 'following' ? 'on' : ''} onClick={() => switchScope('following')}>{labels.tabFollowing}</button>
-        <button type="button" className={`feed-filter-trigger${kind ? ' active' : ''}`} onClick={() => setFilterOpen((value) => !value)}>
-          {labels.filterLabel}{kind ? ` · ${labels.kinds[kind]}` : ''}
-        </button>
       </div>
-
-      {filterOpen && (
-        <div className="feed-filter-menu">
-          <span>{labels.filterLabel}</span>
-          {['', 'step', 'win', 'setback', 'learned'].map((value) => (
-            <button key={value} className={kind === value ? 'on' : ''} onClick={() => switchKind(value)}>
-              {value === '' ? labels.filterAll : labels.kinds[value]}
-            </button>
-          ))}
-        </div>
-      )}
 
       <section className="feed-stream">
         {started && items.length === 0 && (
