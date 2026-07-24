@@ -117,8 +117,8 @@ export default function FeedClient({ mutedCats, labels }) {
           <div className="entry-actions">
               <EncourageBar updateId={f.id} initialActive={f.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
               <FeedShare slug={f.journey.slug} title={f.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
+              <Comments updateId={f.id} labels={labels.comments} />
             </div>
-            <Comments updateId={f.id} labels={labels.comments} />
         </article>
       ))}
       {!done && <div ref={sentinel} className="feed-sentinel">{loading ? labels.loading : ''}</div>}

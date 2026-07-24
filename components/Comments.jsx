@@ -34,7 +34,7 @@ export default function Comments({ updateId, labels }) {
   }
   return (
     <div className="comments">
-      <button type="button" className="comment-toggle" onClick={toggle}>{open ? labels.close : labels.comment}</button>
+      <button type="button" className="comment-toggle" onClick={toggle}><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-5 4v-4.2A2.5 2.5 0 0 1 4 13.5z"/></svg><span className="action-label">{open ? labels.close : labels.comment}</span></button>
       {open && <div className="comment-panel">
         {items.length === 0 ? <p className="comment-empty">{labels.empty}</p> : (() => {
           const roots = items.filter(c => !c.parent_id);
