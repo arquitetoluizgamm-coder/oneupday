@@ -1266,7 +1266,9 @@ body{background:var(--bg);color:var(--ink)}
   .bottom-nav{left:50%;right:auto;bottom:14px;width:min(350px,calc(100% - 28px));transform:translateX(-50%);border:1px solid rgba(229,227,221,.9);border-radius:20px;box-shadow:0 10px 28px rgba(24,36,59,.14);background:rgba(255,255,255,.88)}
   .bottom-nav.scrolled{opacity:.68;transform:translate(-50%,4px)}
   .bottom-nav a{padding:8px 6px 9px}
-  .feed-page .entry{width:calc(100% + 32px);margin-left:-16px;border-left:0;border-right:0;border-radius:0;padding:18px 16px}
+  .feed-stream{height:calc(100svh - 210px);overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior-y:contain;padding-bottom:88px;scrollbar-width:none}
+  .feed-stream::-webkit-scrollbar{display:none}
+  .feed-page .entry{width:calc(100% + 32px);min-height:calc(100svh - 250px);margin-left:-16px;border-left:0;border-right:0;border-radius:0;padding:18px 16px;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;justify-content:flex-start}
   .entry-text{font-size:15px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
   .entry-actions{gap:22px}
   .entry-actions .support-pill,.entry-actions .feed-share,.comments .comment-toggle{font-size:0;display:inline-flex;align-items:center;gap:5px}
@@ -1279,6 +1281,8 @@ body{background:var(--bg);color:var(--ink)}
   .entry-actions .comments{display:contents}
   .entry-actions .comment-toggle:before{content:'◌';font-size:23px;line-height:1}
   .entry-actions .comment-panel{flex-basis:100%;width:100%}
+  .feed-invite{min-height:calc(100svh - 250px);display:flex;flex-direction:column;justify-content:center;scroll-snap-align:start}
+  .feed-sentinel{height:18px}
 }
 
 /* Design system 2026: interface editorial, uma ação de destaque por tela. */
