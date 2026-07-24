@@ -518,7 +518,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .demo-card{display:block;max-width:420px;margin:0 auto;background:var(--surface);border:1px solid var(--line);
   border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);transition:transform .16s,box-shadow .16s}
 .demo-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
-.demo-cover{height:120px;display:flex;align-items:flex-end;padding:14px}
+.demo-cover{position:relative;height:120px;display:flex;align-items:flex-end;padding:14px}
 .demo-day{background:rgba(255,255,255,.16);color:#fff;font-weight:900;font-size:14px;padding:4px 12px;border-radius:999px;backdrop-filter:blur(4px)}
 .demo-body{padding:16px 18px}
 .demo-who{display:flex;align-items:center;gap:10px;margin-bottom:10px}
