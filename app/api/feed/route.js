@@ -103,7 +103,7 @@ export async function GET(req) {
     journeyIds.length ? guard(supabase.from('journey_stats').select('journey_id, current_day, progress_pct').in('journey_id', journeyIds)) : { data: [] },
     ownerIds.length ? guard(supabase.from('profiles').select('id, mood, mood_at').in('id', ownerIds).not('mood', 'is', null)) : { data: [] },
     journeyIds.length ? guard(supabase.from('updates').select('id, journey_id, day_number').in('journey_id', journeyIds)) : { data: [] },
-    scope === 'all' ? guard(supabase.from('media').select('id, url, kind, caption, user_id, created_at').eq('visibility', 'public').order('created_at', { ascending: false }).limit(60)) : { data: [] },
+    scope === 'all' ? guard(supabase.from('media').select('*').eq('visibility', 'public').order('created_at', { ascending: false }).limit(60)) : { data: [] },
   ]);
 
   const myEnc = new Set((encR.data || []).map((e) => e.update_id));
