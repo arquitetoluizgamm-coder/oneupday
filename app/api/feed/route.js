@@ -59,9 +59,8 @@ export async function GET(req) {
       .map((journey) => journey.id);
   }
 
-  const demoItems = scope === 'all'
-    ? buildDemoFeedItems(locale).filter((item) => !mutedCats.has(item.journey.category) && (!kind || item.kind === kind))
-    : [];
+  let demoItems = [];
+  try { if (scope === 'all') demoItems = buildDemoFeedItems(locale).filter((item) => !mutedCats.has(item.journey.category) && (!kind || item.kind === kind)); } catch {}
   let realTotal = 0;
   if (targetIds.length) {
     let cq = supabase.from('updates').select('*', { count: 'exact', head: true }).in('journey_id', targetIds);
@@ -102,79 +101,66 @@ export async function GET(req) {
   const profileMap = {};
   (profiles || []).forEach((profile) => { profileMap[profile.id] = profile; });
 
-  const myEnc = new Set();
-  if (updates.length) {
-    try {
-      const { data: encouragements } = await supabase
-        .from('encouragements')
-        .select('update_id')
-        .eq('user_id', user.id)
-        .in('update_id', updates.map((item) => item.id));
-      (encouragements || []).forEach((item) => myEnc.add(item.update_id));
-    } catch {}
-  }
+  const uids = updates.map((item) => item.id);
+  const guard = (pr) => Promise.resolve(pr).then((r) => r).catch(() => ({ data: [] }));
 
+  const [encR, tracksR, supEncR, statsR, moodR, allUpsR, mediaR] = await Promise.all([
+    updates.length ? guard(supabase.from('encouragements').select('update_id').eq('user_id', user.id).in('update_id', uids)) : { data: [] },
+    updates.length ? guard(supabase.from('updates').select('id, track_title, track_artist, track_audio_url').in('id', uids).not('track_audio_url', 'is', null)) : { data: [] },
+    updates.length ? guard(supabase.from('encouragements').select('update_id, user_id').in('update_id', uids)) : { data: [] },
+    journeyIds.length ? guard(supabase.from('journey_stats').select('journey_id, current_day, progress_pct').in('journey_id', journeyIds)) : { data: [] },
+    ownerIds.length ? guard(supabase.from('profiles').select('id, mood, mood_at').in('id', ownerIds).not('mood', 'is', null)) : { data: [] },
+    journeyIds.length ? guard(supabase.from('updates').select('id, journey_id, day_number').in('journey_id', journeyIds)) : { data: [] },
+    scope === 'all' ? guard(supabase.from('media').select('id, url, kind, caption, user_id, created_at').eq('visibility', 'public').order('created_at', { ascending: false }).limit(60)) : { data: [] },
+  ]);
+
+  const myEnc = new Set((encR.data || []).map((e) => e.update_id));
   const trackByUpdate = {};
-  if (updates.length) {
-    try {
-      const { data: tracks } = await supabase
-        .from('updates')
-        .select('id, track_title, track_artist, track_audio_url')
-        .in('id', updates.map((item) => item.id))
-        .not('track_audio_url', 'is', null);
-      (tracks || []).forEach((item) => {
-        trackByUpdate[item.id] = { title: item.track_title, artist: item.track_artist, audio_url: item.track_audio_url };
-      });
-    } catch {}
-  }
-
-  const supportersByUpdate = {};
-  if (updates.length) {
-    try {
-      const { data: encs } = await supabase.from('encouragements').select('update_id, user_id').in('update_id', updates.map((item) => item.id));
-      const supIds = [...new Set((encs || []).map((e) => e.user_id))];
-      const supProfiles = {};
-      if (supIds.length) {
-        const { data: sp } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', supIds);
-        (sp || []).forEach((pr) => { supProfiles[pr.id] = pr; });
-      }
-      (encs || []).forEach((e) => {
-        (supportersByUpdate[e.update_id] ||= []);
-        const pr = supProfiles[e.user_id];
-        if (pr && supportersByUpdate[e.update_id].length < 12) supportersByUpdate[e.update_id].push({ name: pr.name, handle: pr.handle, avatar_url: pr.avatar_url, avatar_color: pr.avatar_color });
-      });
-    } catch {}
-  }
-
+  (tracksR.data || []).forEach((item) => { trackByUpdate[item.id] = { title: item.track_title, artist: item.track_artist, audio_url: item.track_audio_url }; });
   const statsByJourney = {};
-  if (journeyIds.length) {
-    try {
-      const { data: js } = await supabase.from('journey_stats').select('journey_id, current_day, progress_pct').in('journey_id', journeyIds);
-      (js || []).forEach((st) => { statsByJourney[st.journey_id] = st; });
-    } catch {}
-  }
-
+  (statsR.data || []).forEach((st) => { statsByJourney[st.journey_id] = st; });
   const ownerMoodById = {};
-  try {
-    const { data: mps } = await supabase.from('profiles').select('id, mood, mood_at').in('id', ownerIds).not('mood', 'is', null);
-    (mps || []).forEach((mp) => { if (mp.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) ownerMoodById[mp.id] = mp.mood; });
-  } catch {}
+  (moodR.data || []).forEach((mp) => { if (mp.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) ownerMoodById[mp.id] = mp.mood; });
 
   const comebackByUpdate = {};
-  if (journeyIds.length) {
-    try {
-      const { data: allUps } = await supabase.from('updates').select('id, journey_id, day_number').in('journey_id', journeyIds);
-      const daysByJourney = {};
-      (allUps || []).forEach((u) => { (daysByJourney[u.journey_id] ||= []).push(u.day_number || 0); });
-      Object.values(daysByJourney).forEach((arr) => arr.sort((a, b) => a - b));
-      updates.forEach((u) => {
-        const arr = daysByJourney[u.journey_id] || [];
-        let prev = null;
-        for (const d of arr) { if (d < (u.day_number || 0)) prev = d; else break; }
-        if (prev !== null) { const gap = (u.day_number || 0) - prev; if (gap >= 3) comebackByUpdate[u.id] = gap; }
-      });
-    } catch {}
+  {
+    const daysByJourney = {};
+    (allUpsR.data || []).forEach((u) => { (daysByJourney[u.journey_id] ||= []).push(u.day_number || 0); });
+    Object.values(daysByJourney).forEach((arr) => arr.sort((a, b) => a - b));
+    updates.forEach((u) => {
+      const arr = daysByJourney[u.journey_id] || [];
+      let prev = null;
+      for (const d of arr) { if (d < (u.day_number || 0)) prev = d; else break; }
+      if (prev !== null) { const gap = (u.day_number || 0) - prev; if (gap >= 3) comebackByUpdate[u.id] = gap; }
+    });
   }
+
+  const supEnc = supEncR.data || [];
+  const supIds = [...new Set(supEnc.map((e) => e.user_id))];
+  const mediaRows = (mediaR.data || []).filter((m) => !blocked.has(m.user_id) && m.user_id !== user.id);
+  const mediaOwnerIds = [...new Set(mediaRows.map((m) => m.user_id))];
+  const mediaIds = mediaRows.map((m) => m.id);
+
+  const [supProfR, mediaProfR, mediaEncR] = await Promise.all([
+    supIds.length ? guard(supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', supIds)) : { data: [] },
+    mediaOwnerIds.length ? guard(supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', mediaOwnerIds)) : { data: [] },
+    mediaIds.length ? guard(supabase.from('encouragements').select('media_id').eq('user_id', user.id).in('media_id', mediaIds)) : { data: [] },
+  ]);
+
+  const supProfiles = {};
+  (supProfR.data || []).forEach((pr) => { supProfiles[pr.id] = pr; });
+  const supportersByUpdate = {};
+  supEnc.forEach((e) => {
+    (supportersByUpdate[e.update_id] ||= []);
+    const pr = supProfiles[e.user_id];
+    if (pr && supportersByUpdate[e.update_id].length < 12) supportersByUpdate[e.update_id].push({ name: pr.name, handle: pr.handle, avatar_url: pr.avatar_url, avatar_color: pr.avatar_color });
+  });
+
+  const mediaProf = {};
+  (mediaProfR.data || []).forEach((pr) => { mediaProf[pr.id] = pr; });
+  const mediaEncSet = new Set((mediaEncR.data || []).map((e) => e.media_id));
+  const mediaFeed = mediaRows.map((m) => ({ id: 'media-' + m.id, media: true, mediaId: m.id, url: m.url, kind: m.kind, caption: m.caption || '', created_at: m.created_at, owner: mediaProf[m.user_id] || {}, encouraged: mediaEncSet.has(m.id) }));
+  const mediaTotal = mediaFeed.length;
 
   const realItems = updates.map((item) => {
     const journey = journeyMap[item.journey_id];
@@ -189,25 +175,6 @@ export async function GET(req) {
       comeback: comebackByUpdate[item.id] || null,
     };
   }).filter(Boolean);
-
-  // fotos/vídeos do álbum (públicos) entram no feed, depois dos posts reais
-  let mediaFeed = [];
-  if (scope === 'all') {
-    try {
-      const { data: mrows } = await supabase.from('media').select('id, url, kind, caption, user_id, created_at').eq('visibility', 'public').order('created_at', { ascending: false }).limit(60);
-      const rows = (mrows || []).filter((m) => !blocked.has(m.user_id) && m.user_id !== user.id);
-      const mIds = [...new Set(rows.map((m) => m.user_id))];
-      const mp = {};
-      if (mIds.length) { const { data: profs } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', mIds); (profs || []).forEach((pr) => { mp[pr.id] = pr; }); }
-      mediaFeed = rows.map((m) => ({ id: 'media-' + m.id, media: true, mediaId: m.id, url: m.url, kind: m.kind, caption: m.caption || '', created_at: m.created_at, owner: mp[m.user_id] || {}, encouraged: false }));
-      try {
-        const { data: myE } = await supabase.from('encouragements').select('media_id').eq('user_id', user.id).in('media_id', mediaFeed.map((x) => x.mediaId));
-        const eset = new Set((myE || []).map((e) => e.media_id));
-        mediaFeed.forEach((it) => { it.encouraged = eset.has(it.mediaId); });
-      } catch {}
-    } catch {}
-  }
-  const mediaTotal = mediaFeed.length;
 
   const afterReal = Math.max(0, PAGE - realItems.length);
   const mediaStart = Math.max(0, offset - realTotal);
