@@ -37,14 +37,12 @@ export default function BottomNav({ active, t }) {
       )}
       <nav className={`bottom-nav${scrolling ? ' scrolling' : ''}`} aria-label="Navigation">
         {items.map(it => it.create ? (
-          <button key={it.key} type="button" className="bn-create" onClick={() => setMenu(true)} aria-label={it.label}>
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={it.d} /></svg>
-            <span>{it.label}</span>
+          <button key={it.key} type="button" className="bn-create" onClick={() => setMenu(true)} aria-label={it.label} title={it.label}>
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={it.d} /></svg>
           </button>
         ) : (
-          <a key={it.key} href={it.href} className={active === it.key ? 'on' : ''}>
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={it.d} /></svg>
-            <span>{it.label}</span>
+          <a key={it.key} href={it.href} className={active === it.key ? 'on' : ''} aria-label={it.label} title={it.label}>
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={it.d} /></svg>
           </a>
         ))}
       </nav>

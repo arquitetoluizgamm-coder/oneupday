@@ -1936,3 +1936,12 @@ html.chrome-scrolling .top{box-shadow:none!important}
 
 /* ---- Ferramentas do perfil (Ver público / Sair) ---- */
 .profile-tools{display:flex;gap:10px;justify-content:flex-end;margin:10px 0 4px}
+
+/* ---- Bottom nav só com ícones ---- */
+.bottom-nav a,.bottom-nav .bn-create{padding:13px 6px 14px;gap:0}
+.bottom-nav a span,.bottom-nav .bn-create span{display:none}
+.bottom-nav a.on{color:var(--ink)}
+.bottom-nav a.on svg{stroke-width:2.5}
+@media(min-width:861px){
+  .bottom-nav a,.bottom-nav .bn-create{padding:14px 6px}
+}
