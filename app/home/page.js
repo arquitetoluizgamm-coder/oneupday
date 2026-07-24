@@ -9,6 +9,7 @@ import Composer from './Composer';
 import NextStep from './NextStep';
 import ProgressBar from '../../components/ProgressBar';
 import Track from '../../components/Track';
+import ScrollChrome from '../../components/ScrollChrome';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -87,6 +88,7 @@ export default async function Home() {
       </header>
 
       <Track type="visit" meta={{ page: "home" }} />
+      <ScrollChrome />
       <main className="wrap feed-page">
         {!primary && (
           <section className="first-journey">
