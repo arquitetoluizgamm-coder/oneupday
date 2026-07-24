@@ -2,12 +2,13 @@
 import FollowUserButton from '../app/[slug]/FollowUserButton';
 
 export default function SuggestionCard({ people, labels }) {
+  const L = labels || {};
   if (!people || !people.length) return null;
   return (
     <section className="suggest-card">
       <div className="sg-head">
-        <b>{labels.title}</b>
-        <span>{labels.sub}</span>
+        <b>{L.title}</b>
+        <span>{L.sub}</span>
       </div>
       <div className="sg-list">
         {people.map((p) => (
@@ -18,7 +19,7 @@ export default function SuggestionCard({ people, labels }) {
               </span>
               <span className="sg-meta"><b>{p.name}</b><small>{p.journeyTitle}</small></span>
             </a>
-            <FollowUserButton profileId={p.ownerId} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />
+            <FollowUserButton profileId={p.ownerId} labelFollow={L.follow} labelFollowing={L.following} labelBack={L.followBack} />
           </div>
         ))}
       </div>

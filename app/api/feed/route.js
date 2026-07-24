@@ -190,8 +190,27 @@ export async function GET(req) {
     };
   }).filter(Boolean);
 
-  const demoNeeded = Math.max(0, PAGE - realItems.length);
-  const demoStart = Math.max(0, offset - realTotal);
-  const demoSlice = demoNeeded > 0 ? demoItems.slice(demoStart, demoStart + demoNeeded) : [];
-  return NextResponse.json({ items: [...realItems, ...demoSlice] });
+  // fotos/vídeos do álbum (públicos) entram no feed, depois dos posts reais
+  let mediaFeed = [];
+  if (scope === 'all') {
+    try {
+      const { data: mrows } = await supabase.from('media').select('id, url, kind, caption, user_id, created_at').eq('visibility', 'public').order('created_at', { ascending: false }).limit(60);
+      const rows = (mrows || []).filter((m) => !blocked.has(m.user_id) && m.user_id !== user.id);
+      const mIds = [...new Set(rows.map((m) => m.user_id))];
+      const mp = {};
+      if (mIds.length) { const { data: profs } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', mIds); (profs || []).forEach((pr) => { mp[pr.id] = pr; }); }
+      mediaFeed = rows.map((m) => ({ id: 'media-' + m.id, media: true, url: m.url, kind: m.kind, caption: m.caption || '', created_at: m.created_at, owner: mp[m.user_id] || {} }));
+    } catch {}
+  }
+  const mediaTotal = mediaFeed.length;
+
+  const afterReal = Math.max(0, PAGE - realItems.length);
+  const mediaStart = Math.max(0, offset - realTotal);
+  const mediaSlice = afterReal > 0 ? mediaFeed.slice(mediaStart, mediaStart + afterReal) : [];
+
+  const afterMedia = Math.max(0, PAGE - realItems.length - mediaSlice.length);
+  const demoStart = Math.max(0, offset - realTotal - mediaTotal);
+  const demoSlice = afterMedia > 0 ? demoItems.slice(demoStart, demoStart + afterMedia) : [];
+
+  return NextResponse.json({ items: [...realItems, ...mediaSlice, ...demoSlice] });
 }

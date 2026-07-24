@@ -187,6 +187,23 @@ export default function FeedClient({ labels }) {
 
         {items.map((item, idx) => (
           <Fragment key={item.id}>
+          {item.media ? (
+          <article className="entry entry-photo">
+            <a className="entry-head" href={`/${item.owner.handle || ''}`}>
+              <span className="entry-ava" style={{ background: item.owner.avatar_color || 'var(--orange)' }}>
+                {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}
+              </span>
+              <span className="entry-id"><b>{item.owner.name}</b></span>
+            </a>
+            {item.caption && <p className="entry-text">{item.caption}</p>}
+            <div className="entry-media">
+              {item.kind === 'video' ? <video src={item.url} controls playsInline preload="metadata" /> : <img src={item.url} alt="" />}
+            </div>
+            <div className="entry-actions">
+              <FeedShare slug={item.owner.handle || ''} title={item.owner.name} label={labels.share} copiedLabel={labels.linkCopied} />
+            </div>
+          </article>
+          ) : (
           <article className={`entry ${item.kind || 'step'}${item.demo ? ' is-demo' : ''}`}>
             <div className="entry-head">
               <a className="entry-person" href={`/${item.owner.handle || item.journey.slug}`}>
@@ -250,6 +267,7 @@ export default function FeedClient({ labels }) {
               </div>
             )}
           </article>
+          )}
           {(idx === 5 || idx === 15) && suggestions.length > 0 && (
             <SuggestionCard people={idx === 5 ? suggestions.slice(0, 5) : suggestions.slice(5, 10)} labels={labels.suggest} />
           )}

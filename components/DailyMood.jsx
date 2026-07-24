@@ -4,6 +4,7 @@ import { createClient } from '../lib/supabase/client';
 import { MOOD_ORDER, MOODS } from '../lib/moods';
 
 export default function DailyMood({ userId, answeredToday, labels }) {
+  const L = labels || {};
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const today = new Date().toISOString().slice(0, 10);
@@ -32,18 +33,18 @@ export default function DailyMood({ userId, answeredToday, labels }) {
   if (!open) return null;
   return (
     <div className="dm-backdrop" onClick={dismiss}>
-      <div className="dm-card" role="dialog" aria-label={labels.title} onClick={(e) => e.stopPropagation()}>
-        <b className="dm-title">{labels.title}</b>
-        <p className="dm-sub">{labels.sub}</p>
+      <div className="dm-card" role="dialog" aria-label={L.title} onClick={(e) => e.stopPropagation()}>
+        <b className="dm-title">{L.title}</b>
+        <p className="dm-sub">{L.sub}</p>
         <div className="dm-grid">
           {MOOD_ORDER.map((k) => (
             <button type="button" key={k} className="dm-mood" onClick={() => pick(k)} disabled={busy}>
               <span className="dm-dot" style={{ background: MOODS[k], boxShadow: `0 0 0 3px rgba(0,0,0,0), 0 0 14px ${MOODS[k]}88` }} />
-              {(labels.moods || {})[k]}
+              {(L.moods || {})[k]}
             </button>
           ))}
         </div>
-        <button type="button" className="dm-skip" onClick={dismiss}>{labels.skip}</button>
+        <button type="button" className="dm-skip" onClick={dismiss}>{L.skip}</button>
       </div>
     </div>
   );
