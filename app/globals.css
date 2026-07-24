@@ -1352,7 +1352,7 @@ body{background:#f1f0eb}
 .ritual{display:grid;gap:8px}
 .ritual-q{font-size:13px;font-weight:750;color:var(--ink)}
 .ritual-btns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-.ritual-btn,.ritual-btn.did,.ritual-btn.tried,.ritual-btn.paused{min-width:0;min-height:0;padding:9px 7px;border-radius:10px;font-size:12px;line-height:1.2;font-weight:750;white-space:nowrap;transform:none}
+.ritual-btn,.ritual-btn.did,.ritual-btn.tried,.ritual-btn.paused{min-width:0;min-height:40px;padding:7px 6px;border-radius:10px;font-size:12px;line-height:1.15;font-weight:750;white-space:normal;overflow-wrap:anywhere;display:flex;align-items:center;justify-content:center;text-align:center;transform:none}
 .ritual-btn:hover,.ritual-btn.did:hover,.ritual-btn.tried:hover,.ritual-btn.paused:hover{transform:none}
 .composer2-input{min-height:42px;margin-top:10px;padding:10px 12px;font-size:14px;border-radius:10px}
 .kind-seg{margin-top:9px;border-radius:10px;padding:3px}
@@ -1365,7 +1365,7 @@ body{background:#f1f0eb}
 @media(max-width:520px){
   .today{padding:14px 12px 12px}
   .ritual-btns{gap:5px}
-  .ritual-btn,.ritual-btn.did,.ritual-btn.tried,.ritual-btn.paused{flex-basis:auto;min-width:0;padding:9px 5px;font-size:11px}
+  .ritual-btn,.ritual-btn.did,.ritual-btn.tried,.ritual-btn.paused{flex-basis:auto;min-width:0;min-height:40px;padding:7px 4px;font-size:11px}
   .composer-toolbar .tools{width:auto;justify-content:flex-start}
   .composer-toolbar .post-btn{width:auto;order:initial}
 }
