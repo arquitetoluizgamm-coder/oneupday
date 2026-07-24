@@ -60,18 +60,22 @@ export default function AddMediaForm({ userId, journeys, t }) {
     if (result === 'original' || !result) { toUpload = rawFile; ext = (rawFile?.name.split('.').pop() || 'jpg').toLowerCase(); }
     else { toUpload = result; ext = 'jpg'; }
     if (rawUrl) URL.revokeObjectURL(rawUrl);
-    setRawUrl(''); setRawFile(null);
+    setRawUrl('');
     if (!toUpload) return;
     setUploading(true);
     const u = await store(toUpload, ext);
     setUploading(false);
     if (!u) { alert(L.error); return; }
-    setUrl(u); setKind('photo');
+    setUrl(u); setKind('photo'); // mantém rawFile p/ reeditar enquadramento
   }
   function onCropCancel() {
     if (rawUrl) URL.revokeObjectURL(rawUrl);
-    setRawUrl(''); setRawFile(null);
-    if (fileRef.current) fileRef.current.value = '';
+    setRawUrl('');
+    if (!url) { setRawFile(null); if (fileRef.current) fileRef.current.value = ''; }
+  }
+  function reframe() {
+    if (!rawFile) return;
+    setRawUrl(URL.createObjectURL(rawFile));
   }
   async function submit() {
     if (!url || saving) return;
@@ -109,7 +113,10 @@ export default function AddMediaForm({ userId, journeys, t }) {
       ) : (
         <div className="media-preview">
           {kind === 'video' ? <video src={url} controls playsInline /> : <img src={url} alt="" />}
-          <button type="button" className="tiny-link" onClick={() => setUrl('')}>{L.replace}</button>
+          <div className="media-preview-actions">
+            {rawFile && kind === 'photo' && <button type="button" className="tiny-link" onClick={reframe}>{(L.crop || {}).edit || 'Editar enquadramento'}</button>}
+            <button type="button" className="tiny-link" onClick={() => { setUrl(''); setRawFile(null); }}>{L.replace}</button>
+          </div>
         </div>
       )}
       <input ref={fileRef} type="file" accept="image/*,video/*" hidden onChange={onFile} />

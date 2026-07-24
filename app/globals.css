@@ -1859,3 +1859,6 @@ html.chrome-scrolling .top{box-shadow:none!important}
   .feed-page{max-width:600px}
   .first-journey{max-width:600px;margin-left:auto;margin-right:auto}
 }
+
+/* ---- Ações da prévia de mídia (trocar / editar enquadramento) ---- */
+.media-preview-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:8px}
