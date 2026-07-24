@@ -156,6 +156,22 @@ export async function GET(req) {
     (mps || []).forEach((mp) => { if (mp.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) ownerMoodById[mp.id] = mp.mood; });
   } catch {}
 
+  const comebackByUpdate = {};
+  if (journeyIds.length) {
+    try {
+      const { data: allUps } = await supabase.from('updates').select('id, journey_id, day_number').in('journey_id', journeyIds);
+      const daysByJourney = {};
+      (allUps || []).forEach((u) => { (daysByJourney[u.journey_id] ||= []).push(u.day_number || 0); });
+      Object.values(daysByJourney).forEach((arr) => arr.sort((a, b) => a - b));
+      updates.forEach((u) => {
+        const arr = daysByJourney[u.journey_id] || [];
+        let prev = null;
+        for (const d of arr) { if (d < (u.day_number || 0)) prev = d; else break; }
+        if (prev !== null) { const gap = (u.day_number || 0) - prev; if (gap >= 3) comebackByUpdate[u.id] = gap; }
+      });
+    } catch {}
+  }
+
   const realItems = updates.map((item) => {
     const journey = journeyMap[item.journey_id];
     if (!journey) return null;
@@ -166,6 +182,7 @@ export async function GET(req) {
       track: trackByUpdate[item.id] || null,
       encouraged: myEnc.has(item.id),
       supporters: supportersByUpdate[item.id] || [],
+      comeback: comebackByUpdate[item.id] || null,
     };
   }).filter(Boolean);
 

@@ -200,6 +200,7 @@ export default function FeedClient({ labels }) {
               </a>
               {item.owner.id && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
             </div>
+            {item.comeback && <div className="entry-comeback">{(labels.comebackFmt || '').replace('{d}', item.comeback)}</div>}
             {item.kind === 'setback' && <div className="entry-kindline setback">{labels.tagSetback}</div>}
             {item.kind === 'win' && <div className="entry-kindline win">{labels.tagWin}</div>}
             {[7, 30, 60, 100].includes(item.day_number) && <div className="entry-milestone">{(labels.milestoneFmt || '').replace('{d}', item.day_number)}</div>}

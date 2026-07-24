@@ -47,6 +47,10 @@ export default async function Notifications() {
               ? fill(t.notifFollow, { name: a.name || '' })
               : n.type === 'hug'
               ? fill(t.notifHug, { name: a.name || '' })
+              : n.type === 'mood_low'
+              ? fill(t.notifMoodLow, { name: a.name || '' })
+              : n.type === 'comeback'
+              ? fill(t.notifComeback, { name: a.name || '' })
               : fill(t.notifEncourage, { name: a.name || '' });
             return (
               <a className={`notif-item${n.read ? '' : ' unread'}`} key={n.id} href={j.slug ? `/${j.slug}` : (a.handle ? `/${a.handle}` : '/home')}>
