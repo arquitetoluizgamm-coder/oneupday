@@ -150,7 +150,7 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="foot"><p>One <b>Up</b> Day · {t.tagline}</p><p className="foot-care">{t.notTherapy}</p></footer>
+      <footer className="foot"><p>One <b>Up</b> Day · {t.tagline} · <a href="/regras" style={{color:"inherit"}}>{t.rulesTitle}</a></p><p className="foot-care">{t.notTherapy}</p></footer>
     </>
   );
 }

@@ -189,6 +189,7 @@ export default function NewJourneyForm({ userId, t }) {
             <span>{t.durDaysWord}</span>
           </div>
         )}
+        <p className="dur-hint">{t.durHint}</p>
         <div className="field-label" style={{ marginTop: 22 }}>{t.fWhy}</div>
         <div className="why-field">
           <textarea value={goal} onChange={e => setGoal(e.target.value)} maxLength={300} placeholder={t.fWhyPh} rows={4} />
