@@ -1458,3 +1458,10 @@ html.chrome-scrolling .top{box-shadow:none}
   .sheet-backdrop{align-items:center}
   .sheet{border-radius:20px;max-height:82svh}
 }
+/* ---- Login aberto: sem card, itens direto no fundo, centralizado ---- */
+.auth-wrap{min-height:100svh;padding:24px 20px;display:grid;place-items:center;max-width:none}
+.auth-card{background:transparent;border:0;box-shadow:none;border-radius:0;padding:0;max-width:400px;margin:0 auto;text-align:center}
+.auth-card::before{display:none}
+.auth-mark{background:transparent;border:0;box-shadow:none;margin:0 auto 20px}
+.auth-card h1{margin-bottom:8px}
+.auth-card p{margin-bottom:26px}
