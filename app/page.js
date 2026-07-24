@@ -64,6 +64,7 @@ export default async function Home() {
   const ideas = [
     { k: 'start', b: t.ideaStart, l: t.ideaStartL, d: 'M12 5v14M5 12h14' },
     { k: 'share', b: t.ideaShare, l: t.ideaShareL, d: 'M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13' },
+    { k: 'support', b: t.ideaSupport, l: t.ideaSupportL, d: 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1 7.8 7.8 7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z' },
     { k: 'continue', b: t.ideaContinue, l: t.ideaContinueL, d: 'M5 12h14M13 6l6 6-6 6' },
   ];
 
@@ -76,9 +77,14 @@ export default async function Home() {
         <section className="land-hero">
           <h1>{t.landHeadline}</h1>
           <p className="land-sub">{t.landSub}</p>
-          <p className="land-explain">{t.landExplain}</p>
+          <p className="land-identity"><span>{t.landIdentity1}</span><b>{t.landIdentity2}</b></p>
           <a className="cta grow land-cta" href="/login">{t.landCta}</a>
-          <p className="land-safety">{t.landSafety}</p>
+          <p className="land-safety">{t.landExplain}</p>
+        </section>
+
+        <section className="land-see">
+          <p className="see-1">{t.landSeeTitle1}</p>
+          <p className="see-2">{t.landSeeTitle2}</p>
         </section>
 
         {demo && (() => {
@@ -109,13 +115,7 @@ export default async function Home() {
           );
         })()}
 
-        <section className="manifesto">
-          <p className="manifesto-1">{t.thesis1}</p>
-          <p className="manifesto-2">{t.thesis2}</p>
-          <p className="manifesto-sub">{t.thesisSub}</p>
-        </section>
-
-        <section className="land-ideas">
+        <section className="land-ideas ideas-4">
           {ideas.map(i => (
             <div key={i.k}>
               <span className="idea-ico">
@@ -134,6 +134,12 @@ export default async function Home() {
               <a key={i} href="/login" className="example-pill">{ex}</a>
             ))}
           </div>
+        </section>
+
+        <section className="land-close">
+          <p className="close-1">{t.landClose1}</p>
+          <p className="close-2">{t.landClose2}</p>
+          <a className="cta grow land-cta" href="/login">{t.landCloseCta}</a>
         </section>
       </main>
 

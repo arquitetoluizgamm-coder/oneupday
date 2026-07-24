@@ -1878,3 +1878,33 @@ html.chrome-scrolling .top{box-shadow:none!important}
 /* Quem te apoia: contador por pessoa */
 .supporters-block{margin-top:2px}
 .fc-count{font-size:10.5px;font-weight:800;color:var(--pink);margin-left:2px}
+
+/* ---- Landing: linha de identidade no herói ---- */
+.land-identity{margin:18px auto 26px;max-width:30rem;font-size:17px;line-height:1.55}
+.land-identity span{display:block;color:#6b7280}
+.land-identity b{display:block;color:var(--ink);font-weight:800;letter-spacing:-.015em}
+
+/* ---- Landing: "resultado vs jornada" ---- */
+.land-see{margin:60px auto 6px;text-align:center}
+.land-see .see-1{margin:0;font-size:22px;color:#6b7280;letter-spacing:-.02em}
+.land-see .see-2{margin:4px 0 0;font-size:26px;font-weight:850;letter-spacing:-.03em}
+
+/* ---- Landing: 4 blocos ---- */
+.land-ideas.ideas-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:640px){ .land-ideas.ideas-4{grid-template-columns:repeat(2,1fr)} }
+
+/* ---- Landing: fechamento ---- */
+.land-close{margin:70px auto 20px;text-align:center;max-width:34rem}
+.land-close .close-1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.03em;line-height:1.25}
+.land-close .close-2{margin:8px 0 24px;font-size:20px;color:#6b7280}
+@media(max-width:600px){ .land-close .close-1{font-size:22px} }
+
+/* ---- /invite ---- */
+.invite{display:flex;align-items:center;min-height:70vh}
+.invite-card{max-width:34rem;margin:0 auto;text-align:center;padding:20px}
+.invite-card h1{font-size:34px;letter-spacing:-.04em;line-height:1.12;margin:8px 0 18px}
+.invite-p{color:#4b5563;font-size:17px;line-height:1.6;margin:0 0 12px}
+.invite-p.strong{color:var(--ink);font-weight:700}
+.invite-card .land-cta{margin-top:14px}
+.invite-creed{margin-top:22px;font-size:13.5px;font-weight:700;color:var(--muted);letter-spacing:.02em}
+@media(max-width:600px){ .invite-card h1{font-size:27px} }
