@@ -1422,3 +1422,17 @@ html.chrome-scrolling .top{box-shadow:0 1px 0 var(--line)}
 @media(max-width:640px){
   .entry-textcard{width:calc(100% + 32px);margin-left:-16px;border-radius:0;min-height:340px;padding:32px 22px}
 }
+
+/* ---- Feed compacto: sem sobra abaixo da mídia ---- */
+.entry-media{margin-top:10px}
+.entry-actions{margin-top:10px}
+.entry-textcard{margin-top:10px}
+.comments .comment-toggle{padding:4px 0}
+@media(max-width:640px){
+  .feed-page .entry{padding:14px 16px 12px}
+  /* mídia full-bleed como no Instagram (post já é full-bleed) */
+  .entry-media{width:calc(100% + 32px);margin-left:-16px;border-radius:0}
+  .entry-media img,.entry-media video{max-height:calc(100svh - 200px)}
+  .entry-actions{margin-top:10px;gap:20px}
+  .entry-head{margin-bottom:0}
+}
