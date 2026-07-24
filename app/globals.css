@@ -417,7 +417,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* ---------- Desktop pass ---------- */
 @media(min-width:1000px){
-  .wrap,.top{max-width:768px}
+  .wrap,.top{max-width:604px}
   .hero{max-width:768px;padding-top:64px}
   .hero h1{font-size:66px}
   .pj-grid{grid-template-columns:repeat(auto-fill,minmax(232px,1fr))}
@@ -1856,8 +1856,13 @@ html.chrome-scrolling .top{box-shadow:none!important}
     width:min(460px,92vw);background:rgba(255,255,255,.97);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:999px;
     box-shadow:0 14px 38px rgba(16,19,45,.18)}
   .bottom-nav a,.bottom-nav .bn-create{padding:12px 6px}
+  /* coluna única do app (todas as páginas): largura confortável e centralizada */
+  .wrap,.top{max-width:604px}
   .feed-page{max-width:600px}
   .first-journey{max-width:600px;margin-left:auto;margin-right:auto}
+  /* grades e cabeçalhos não esticam demais */
+  .explore-screen .pj-grid,.pj-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .create-head h1{font-size:32px}
 }
 
 /* ---- Ações da prévia de mídia (trocar / editar enquadramento) ---- */
