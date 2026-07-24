@@ -205,6 +205,18 @@ export default function FeedClient({ labels }) {
                 <Comments updateId={item.id} labels={labels.comments} />
               </div>
             )}
+            {item.journey.total_days > 0 && (() => {
+              const day = item.journey.current_day || 0;
+              const total = item.journey.total_days;
+              const pct = Math.min(100, Math.max(3, item.journey.progress_pct || Math.round((day / total) * 100)));
+              const left = Math.max(0, total - day);
+              return (
+                <div className="entry-progress" aria-hidden="true">
+                  <div className="ep-bar"><span style={{ width: pct + '%' }} /></div>
+                  <span className="ep-label">{(labels.progressFmt || '').replace('{d}', day).replace('{r}', left)}</span>
+                </div>
+              );
+            })()}
           </article>
         ))}
 

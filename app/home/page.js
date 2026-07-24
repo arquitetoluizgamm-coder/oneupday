@@ -10,6 +10,7 @@ import NextStep from './NextStep';
 import ProgressBar from '../../components/ProgressBar';
 import Track from '../../components/Track';
 import ScrollChrome from '../../components/ScrollChrome';
+import HeaderHeart from '../../components/HeaderHeart';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -46,6 +47,22 @@ export default async function Home() {
   let pstats = {};
   if (primary) { const { data: st } = await supabase.from('journey_stats').select('*').eq('journey_id', primary.id).maybeSingle(); pstats = st || {}; }
 
+  let heartLikes = 0; const heartFollowers = new Set();
+  if (list.length) {
+    const jIds = list.map((j) => j.id);
+    const { data: myUps } = await supabase.from('updates').select('id').in('journey_id', jIds);
+    const uIds = (myUps || []).map((u) => u.id);
+    if (uIds.length) {
+      const { count: lc } = await supabase.from('encouragements').select('*', { count: 'exact', head: true }).in('update_id', uIds).neq('user_id', user.id);
+      heartLikes = lc || 0;
+    }
+    const { data: jf } = await supabase.from('follows').select('user_id').in('journey_id', jIds);
+    (jf || []).forEach((f) => heartFollowers.add(f.user_id));
+  }
+  try { const { data: pf } = await supabase.from('profile_follows').select('follower_id').eq('following_id', user.id); (pf || []).forEach((f) => heartFollowers.add(f.follower_id)); } catch {}
+  heartFollowers.delete(user.id);
+  const heartFollows = heartFollowers.size;
+
   let aiPrefOff = false;
   try { const { data: pref } = await supabase.from('profiles').select('ai_opt_out').eq('id', user.id).maybeSingle(); aiPrefOff = !!pref?.ai_opt_out; } catch { }
   const aiOn = !!process.env.OPENAI_API_KEY && !aiPrefOff && !!primary;
@@ -76,10 +93,7 @@ export default async function Home() {
       <header className="top">
         <Logo href="/home" />
         <div className="top-right">
-          <a className="bell" href="/notifications" aria-label={t.notifications}>
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" /></svg>
-            {unread > 0 && !profile.notif_paused && <b>{unread > 9 ? '9+' : unread}</b>}
-          </a>
+          <HeaderHeart likes={heartLikes} follows={heartFollows} labels={{ title: t.heartTitle, likes: t.heartLikes, follows: t.heartFollows, empty: t.heartEmpty, seeAll: t.heartSeeAll }} />
           <a className="icon-btn" href="/explore" aria-label={t.explore}>
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="m15 9-2 5-5 2 2-5z" /></svg>
           </a>

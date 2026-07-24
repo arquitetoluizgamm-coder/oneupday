@@ -86,7 +86,7 @@ export async function GET(req) {
 
   const journeyIds = [...new Set(updates.map((item) => item.journey_id))];
   const { data: journeys } = journeyIds.length
-    ? await supabase.from('journeys').select('id, slug, title, category, owner_id, cover_color').in('id', journeyIds)
+    ? await supabase.from('journeys').select('id, slug, title, category, owner_id, cover_color, total_days').in('id', journeyIds)
     : { data: [] };
   const journeyMap = {};
   (journeys || []).forEach((journey) => { journeyMap[journey.id] = journey; });
@@ -142,12 +142,20 @@ export async function GET(req) {
     } catch {}
   }
 
+  const statsByJourney = {};
+  if (journeyIds.length) {
+    try {
+      const { data: js } = await supabase.from('journey_stats').select('journey_id, current_day, progress_pct').in('journey_id', journeyIds);
+      (js || []).forEach((st) => { statsByJourney[st.journey_id] = st; });
+    } catch {}
+  }
+
   const realItems = updates.map((item) => {
     const journey = journeyMap[item.journey_id];
     if (!journey) return null;
     return {
       ...item,
-      journey: { slug: journey.slug, title: journey.title, category: journey.category },
+      journey: { slug: journey.slug, title: journey.title, category: journey.category, total_days: journey.total_days, current_day: (statsByJourney[journey.id] || {}).current_day || 0, progress_pct: (statsByJourney[journey.id] || {}).progress_pct || 0 },
       owner: profileMap[journey.owner_id] || {},
       track: trackByUpdate[item.id] || null,
       encouraged: myEnc.has(item.id),

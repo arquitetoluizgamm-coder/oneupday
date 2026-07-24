@@ -1626,3 +1626,27 @@ body{ background:#ffffff }
 html.chrome-scrolling .top{ box-shadow:0 1px 0 rgba(16,19,45,.05) }
 .feed-tabs{ background:linear-gradient(#ffffff 78%,transparent) }
 .support-strip{ background:transparent }
+/* ==========================================================
+   Coração vermelho, coração do topo (balão) e progresso no post
+   ========================================================== */
+/* apoio ativo = vermelho */
+.entry-actions .support-pill.on,.entry-actions .support-pill.on:before,.support-pill.on{color:#e0245e!important}
+
+/* coração do topo (contorno transparente) + balão */
+.header-heart{position:relative;display:inline-flex}
+.heart-btn{color:var(--ink)}
+.heart-btn .heart-dot{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:#e0245e}
+.heart-pop{position:absolute;top:calc(100% + 8px);right:-6px;z-index:60;width:246px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 34px rgba(16,19,45,.14);padding:14px 15px;animation:fadeIn .16s ease}
+.heart-pop::before{content:'';position:absolute;top:-6px;right:16px;width:12px;height:12px;background:#fff;border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg)}
+.hp-title{display:block;font-size:12px;font-weight:800;letter-spacing:.02em;color:var(--muted);margin-bottom:8px}
+.hp-lines p{margin:4px 0;font-size:15px;color:var(--ink)}
+.hp-lines p b{color:#e0245e;font-weight:800}
+.hp-empty{margin:2px 0;font-size:14px;color:var(--muted)}
+.hp-all{display:inline-block;margin-top:10px;font-size:13px;font-weight:700;color:var(--pink)}
+
+/* barra de progresso discreta no rodapé do post */
+.entry-progress{display:flex;align-items:center;gap:10px;margin:14px 2px 0}
+.entry-progress .ep-bar{flex:1;height:3px;border-radius:999px;background:rgba(16,19,45,.08);overflow:hidden}
+.entry-progress .ep-bar span{display:block;height:100%;border-radius:999px;background:rgba(16,19,45,.28)}
+.entry-progress .ep-label{font-size:11px;color:var(--muted);white-space:nowrap;letter-spacing:.01em}
+@media(max-width:640px){ .entry-progress{margin-left:16px;margin-right:16px} }
