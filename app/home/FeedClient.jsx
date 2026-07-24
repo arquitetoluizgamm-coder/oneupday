@@ -1,9 +1,10 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, Fragment } from 'react';
 import EncourageBar from '../[slug]/EncourageBar';
 import FeedShare from './FeedShare';
 import Comments from '../../components/Comments';
 import SupportStrip from '../../components/SupportStrip';
+import SuggestionCard from '../../components/SuggestionCard';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
 function TrackTag({ track }) {
@@ -74,6 +75,8 @@ export default function FeedClient({ labels }) {
   const doneRef = useRef(false);
   const scopeRef = useRef('all');
   const busy = useRef(false);
+  const [suggestions, setSuggestions] = useState([]);
+  useEffect(() => { fetch('/api/suggestions').then((r) => r.json()).then((j) => setSuggestions(j.people || [])).catch(() => {}); }, []);
 
   async function load() {
     if (busy.current || doneRef.current) return;
@@ -156,8 +159,9 @@ export default function FeedClient({ labels }) {
           </div>
         )}
 
-        {items.map((item) => (
-          <article className={`entry ${item.kind || 'step'}${item.demo ? ' is-demo' : ''}`} key={item.id}>
+        {items.map((item, idx) => (
+          <Fragment key={item.id}>
+          <article className={`entry ${item.kind || 'step'}${item.demo ? ' is-demo' : ''}`}>
             <div className="entry-head">
               <a className="entry-person" href={`/${item.owner.handle || item.journey.slug}`}>
                 <span className="entry-ava" style={{ background: item.owner.avatar_color || 'var(--orange)' }}>
@@ -217,6 +221,10 @@ export default function FeedClient({ labels }) {
               </div>
             )}
           </article>
+          {(idx === 5 || idx === 15) && suggestions.length > 0 && (
+            <SuggestionCard people={idx === 5 ? suggestions.slice(0, 5) : suggestions.slice(5, 10)} labels={labels.suggest} />
+          )}
+          </Fragment>
         ))}
 
         {!done && <div ref={sentinel} className="feed-sentinel">{loading ? labels.loading : ''}</div>}
