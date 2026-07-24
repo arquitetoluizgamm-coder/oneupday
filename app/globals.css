@@ -1486,7 +1486,7 @@ html.chrome-hide .feed-tabs{transform:translateY(-140%);opacity:0}
 
 
 /* ---- Fixar layout na tela (sem rolagem lateral / solto) ---- */
-html,body{max-width:100%;overflow-x:hidden}
+html,body{max-width:100%;overflow-x:clip}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{position:relative;width:100%;overscroll-behavior-x:none}
 .wrap,.feed-page,.top{max-width:100%}
@@ -1494,3 +1494,16 @@ img,video{max-width:100%}
 
 /* ---- Full-bleed simétrico e estável ---- */
 .feed-page{overflow-x:clip}
+
+/* ---- Feed: mídia edge-to-edge, texto com respiro ---- */
+@media(max-width:640px){
+  .wrap.feed-page{padding-left:0;padding-right:0}
+  .feed-page .entry{width:auto;margin:0;padding:16px 0;border-left:0;border-right:0;border-radius:0}
+  .feed-page .entry .entry-head,
+  .feed-page .entry > .entry-text,
+  .feed-page .entry > .entry-kindline,
+  .feed-page .entry .entry-actions{padding-left:16px;padding-right:16px}
+  .feed-page .entry-media,.feed-page .entry-textcard{width:100%;margin-left:0;margin-right:0;margin-top:10px;border-radius:0}
+  .feed-tabs{padding-left:16px;padding-right:16px}
+  .feed-invite{padding-left:16px;padding-right:16px}
+}
