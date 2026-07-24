@@ -1269,7 +1269,7 @@ body{background:var(--bg);color:var(--ink)}
   .bottom-nav{opacity:.97}
   .bottom-nav a{padding:8px 6px 9px}
   .feed-stream{padding-bottom:88px}
-  .feed-page .entry{width:calc(100% + 32px);margin-left:-16px;border-left:0;border-right:0;border-radius:0;padding:18px 16px}
+  .feed-page .entry{width:auto;margin-inline:-16px;border-left:0;border-right:0;border-radius:0;padding:18px 16px}
   .entry-text{font-size:15px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
   .entry-actions{gap:22px}
   .entry-actions .support-pill,.entry-actions .feed-share,.comments .comment-toggle{font-size:0;display:inline-flex;align-items:center;gap:5px}
@@ -1377,7 +1377,7 @@ body{background:#f1f0eb}
 .feed-page .entry-media{width:100%;margin:10px 0 0;overflow:hidden;border-radius:0;background:#0b0d18}
 .feed-page .entry-media img,.feed-page .entry-media video{width:100%;height:auto;display:block;aspect-ratio:4/5;object-fit:cover;max-height:calc(100svh - 230px);border-radius:0}
 @media(max-width:640px){
-  .feed-page .entry-media{width:calc(100% + 32px);margin-left:-16px;margin-right:-16px;border-radius:0}
+  .feed-page .entry-media{width:auto;margin-inline:-16px;border-radius:0}
 }
 
 /* Biblioteca inicial de jornadas de exemplo. */
@@ -1421,7 +1421,7 @@ html.chrome-scrolling .top{box-shadow:0 1px 0 var(--line)}
 .entry-textcard p{margin:0;font-size:26px;line-height:1.35;font-weight:700;letter-spacing:-.02em;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:8;-webkit-box-orient:vertical;overflow:hidden}
 .entry-textcard.long p{font-size:19px;line-height:1.5;font-weight:600}
 @media(max-width:640px){
-  .entry-textcard{width:calc(100% + 32px);margin-left:-16px;border-radius:0;min-height:340px;padding:32px 22px}
+  .entry-textcard{width:auto;margin-inline:-16px;border-radius:0;min-height:340px;padding:32px 22px}
 }
 
 /* ---- Feed compacto: sem sobra abaixo da mídia ---- */
@@ -1432,7 +1432,7 @@ html.chrome-scrolling .top{box-shadow:0 1px 0 var(--line)}
 @media(max-width:640px){
   .feed-page .entry{padding:14px 16px 12px}
   /* mídia full-bleed como no Instagram (post já é full-bleed) */
-  .entry-media{width:calc(100% + 32px);margin-left:-16px;border-radius:0}
+  .entry-media{width:auto;margin-inline:-16px;border-radius:0}
   .entry-media img,.entry-media video{max-height:calc(100svh - 200px)}
   .entry-actions{margin-top:10px;gap:20px}
   .entry-head{margin-bottom:0}
@@ -1491,3 +1491,6 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{position:relative;width:100%;overscroll-behavior-x:none}
 .wrap,.feed-page,.top{max-width:100%}
 img,video{max-width:100%}
+
+/* ---- Full-bleed simétrico e estável ---- */
+.feed-page{overflow-x:clip}
