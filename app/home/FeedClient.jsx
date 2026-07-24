@@ -98,7 +98,8 @@ export default function FeedClient({ mutedCats, labels }) {
       )}
       {items.map(f => (
         <article className={`entry ${f.kind || 'step'}`} key={f.id}>
-          <a className="entry-head" href={`/${f.owner.handle || f.journey.slug}`}>
+          <div className="entry-head">
+            <a className="entry-person" href={`/${f.owner.handle || f.journey.slug}`}>
             <span className="entry-ava" style={{ background: f.owner.avatar_color || 'var(--orange)' }}>
               {f.owner.avatar_url ? <img src={f.owner.avatar_url} alt="" /> : (f.owner.name || '?')[0]}
             </span>
@@ -106,10 +107,11 @@ export default function FeedClient({ mutedCats, labels }) {
               <b>{f.owner.name}</b>
               <small>{dayLabel(f.day_number)} · {f.journey.title}</small>
             </span>
+            </a>
             {f.owner.id && <FollowUserButton profileId={f.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
             {f.kind === 'setback' && <span className="entry-tag setback">{labels.tagSetback}</span>}
             {f.kind === 'win' && <span className="entry-tag win">{labels.tagWin}</span>}
-          </a>
+          </div>
           {f.text && f.text !== '\u{1F4F7}' && f.text !== '\u{1F3A5}' && <EntryText text={f.text} labels={labels} />}
           {f.photo_url && <a href={`/${f.journey.slug}`} className="entry-media"><img src={f.photo_url} alt="" /></a>}
           {f.video_url && !f.photo_url && <div className="entry-media"><video src={f.video_url} controls playsInline preload="metadata" /></div>}
