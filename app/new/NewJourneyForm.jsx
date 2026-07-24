@@ -31,6 +31,8 @@ export default function NewJourneyForm({ userId, t }) {
   const [uploading, setUploading] = useState(false);
   const customRef = useRef(null);
   const durRef = useRef(null);
+  const [dur, setDur] = useState('30');
+  const [customDur, setCustomDur] = useState('');
   const firstRef = useRef(null);
   const photoRef = useRef(null);
   const videoRef = useRef(null);
@@ -85,7 +87,7 @@ export default function NewJourneyForm({ userId, t }) {
     e.preventDefault(); if (saving) return; setSaving(true);
     let category = cat;
     if (cat === 'other') category = (customRef.current?.value.trim().toLowerCase() || 'other').slice(0, 24);
-    const total_days = parseInt(durRef.current?.value || '30', 10);
+    const total_days = dur === 'other' ? Math.min(730, Math.max(1, parseInt(customDur || '30', 10) || 30)) : parseInt(dur, 10);
     const first = (firstRef.current?.value || '').trim();
 
     const supabase = createClient();
@@ -176,13 +178,19 @@ export default function NewJourneyForm({ userId, t }) {
       {/* Step 4 — Duração + porquê */}
       <div className="wiz-step" style={{ display: step === 4 ? 'block' : 'none' }}>
         <label>{t.fDuration}
-          <select ref={durRef} defaultValue="30">
+          <select value={dur} onChange={e => setDur(e.target.value)}>
             <option value="7">{t.dur7}</option>
             <option value="30">{t.dur30}</option>
             <option value="60">{t.dur60}</option>
             <option value="100">{t.dur100}</option>
+            <option value="other">{t.durCustom}</option>
           </select>
         </label>
+        {dur === 'other' && (
+          <label>{t.durCustomLabel}
+            <input type="number" min="1" max="730" value={customDur} onChange={e => setCustomDur(e.target.value)} placeholder={t.durCustomPh} />
+          </label>
+        )}
         <label>{t.fWhy}
           <textarea value={goal} onChange={e => setGoal(e.target.value)} maxLength={300} placeholder={t.fWhyPh} />
         </label>

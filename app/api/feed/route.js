@@ -62,14 +62,18 @@ export async function GET(req) {
   const demoItems = scope === 'all'
     ? buildDemoFeedItems(locale).filter((item) => !mutedCats.has(item.journey.category) && (!kind || item.kind === kind))
     : [];
-  const demoSlice = demoItems.slice(offset, offset + PAGE);
-  const realOffset = Math.max(0, offset - demoItems.length);
-  const realLimit = Math.max(0, PAGE - demoSlice.length);
+  let realTotal = 0;
+  if (targetIds.length) {
+    let cq = supabase.from('updates').select('*', { count: 'exact', head: true }).in('journey_id', targetIds);
+    if (VALID_KINDS.has(kind)) cq = cq.eq('kind', kind);
+    const { count } = await cq;
+    realTotal = count || 0;
+  }
 
-  if (!targetIds.length && !demoSlice.length) return NextResponse.json({ items: [] });
+  if (!targetIds.length && !demoItems.length) return NextResponse.json({ items: [] });
 
   let updates = [];
-  if (targetIds.length && realLimit > 0) {
+  if (targetIds.length && offset < realTotal) {
     let updatesQuery = supabase.from('updates')
       .select('id, day_number, kind, text, photo_url, video_url, journey_id')
       .in('journey_id', targetIds);
@@ -79,7 +83,7 @@ export async function GET(req) {
     const { data: rows } = await updatesQuery
       .order('created_at', { ascending: false })
       .order('id', { ascending: false })
-      .range(realOffset, realOffset + realLimit - 1);
+      .range(offset, offset + PAGE - 1);
 
     updates = rows || [];
   }
@@ -186,5 +190,8 @@ export async function GET(req) {
     };
   }).filter(Boolean);
 
-  return NextResponse.json({ items: [...demoSlice, ...realItems] });
+  const demoNeeded = Math.max(0, PAGE - realItems.length);
+  const demoStart = Math.max(0, offset - realTotal);
+  const demoSlice = demoNeeded > 0 ? demoItems.slice(demoStart, demoStart + demoNeeded) : [];
+  return NextResponse.json({ items: [...realItems, ...demoSlice] });
 }
