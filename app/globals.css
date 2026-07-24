@@ -1908,3 +1908,8 @@ html.chrome-scrolling .top{box-shadow:none!important}
 .invite-card .land-cta{margin-top:14px}
 .invite-creed{margin-top:22px;font-size:13.5px;font-weight:700;color:var(--muted);letter-spacing:.02em}
 @media(max-width:600px){ .invite-card h1{font-size:27px} }
+
+/* ---- Landing: legenda do card + "toda jornada começa de algum lugar" ---- */
+.land-demo-caption{margin:12px 0 0;text-align:center;color:var(--muted);font-size:14px}
+.land-somewhere .somewhere-note{margin:18px auto 0;max-width:26rem;text-align:center;color:#6b7280;font-size:15px;line-height:1.55}
+.land-somewhere .somewhere-note b{display:block;color:var(--ink);font-weight:800;margin-top:2px}

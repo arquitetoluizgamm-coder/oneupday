@@ -111,6 +111,7 @@ export default async function Home() {
                   <ProgressBar day={day} total={demo.journey.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
                 </div>
               </a>
+              <p className="land-demo-caption">{t.landDemoCaption}</p>
             </section>
           );
         })()}
@@ -127,13 +128,14 @@ export default async function Home() {
           ))}
         </section>
 
-        <section className="examples">
-          <b><a href="/dia1" style={{color:'inherit'}}>{t.examplesTitle}</a></b>
+        <section className="examples land-somewhere">
+          <b>{t.landExTitle}</b>
           <div className="example-pills">
-            {[t.ex1, t.ex2, t.ex3, t.ex4, t.ex5].map((ex, i) => (
+            {[t.landEx1, t.landEx2, t.landEx3, t.landEx4, t.landEx5, t.landEx6].map((ex, i) => (
               <a key={i} href="/login" className="example-pill">{ex}</a>
             ))}
           </div>
+          <p className="somewhere-note">{t.landExNote1}<b> {t.landExNote2}</b></p>
         </section>
 
         <section className="land-close">
