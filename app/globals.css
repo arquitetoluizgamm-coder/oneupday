@@ -1507,3 +1507,27 @@ img,video{max-width:100%}
   .feed-tabs{padding-left:16px;padding-right:16px}
   .feed-invite{padding-left:16px;padding-right:16px}
 }
+/* ==========================================================
+   Apresentação editorial do post (menos "app", mais diário)
+   ========================================================== */
+:root{ --serif:'Fraunces', Georgia, 'Times New Roman', serif; }
+
+/* A reflexão (voz humana) em serifada editorial */
+.entry-text{font-family:var(--serif);font-size:19px;line-height:1.55;letter-spacing:-.003em;color:#1a2033;font-weight:400}
+.feed-page .entry > .entry-text{margin-top:12px}
+@media(max-width:640px){ .entry-text{font-size:18px;line-height:1.56} }
+
+/* Card de texto: página de diário, não banner */
+.entry-textcard{gap:18px;justify-content:flex-end;min-height:360px;padding:34px 30px}
+.entry-textcard .etc-day{font-family:var(--serif);font-weight:500;font-size:14px;letter-spacing:.06em;text-transform:none;opacity:.85}
+.entry-textcard p{font-family:var(--serif);font-weight:500;font-size:27px;line-height:1.34;letter-spacing:-.01em;-webkit-line-clamp:9}
+.entry-textcard.long p{font-size:21px;line-height:1.45;font-weight:400}
+.entry-textcard::after{content:'';position:absolute;left:30px;top:30px;width:26px;height:2px;background:rgba(255,255,255,.55)}
+
+/* Cabeçalho: dia como assinatura discreta */
+.entry-id small{letter-spacing:.005em}
+.entry-id small .entry-journey{font-weight:650}
+.entry-kindline{font-family:inherit;text-transform:none;font-weight:700;font-size:12.5px;opacity:.95}
+
+/* Divisória entre posts mais sutil e intencional */
+.feed-page .entry{border-bottom:1px solid rgba(16,19,45,.07)}
