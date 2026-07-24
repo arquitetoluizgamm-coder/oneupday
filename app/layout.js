@@ -2,6 +2,15 @@ import './globals.css';
 import { getLocale } from '../lib/locale';
 import { getDict } from '../lib/i18n';
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#F8F8F6',
+};
+
 export async function generateMetadata() {
   const t = getDict(getLocale());
   return {
@@ -13,7 +22,6 @@ export async function generateMetadata() {
       icon: [{ url: '/favicon-32.png', sizes: '32x32' }, { url: '/favicon-16.png', sizes: '16x16' }],
       apple: '/apple-touch-icon.png',
     },
-    themeColor: '#090c2a',
     openGraph: { title: 'One Up Day', description: t.heroSub, type: 'website' },
   };
 }

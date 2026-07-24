@@ -1484,3 +1484,10 @@ html.chrome-hide .feed-tabs{transform:translateY(-140%);opacity:0}
 .entry-kindline.setback{color:var(--violet)}
 .entry-kindline.win{color:#356044}
 
+
+/* ---- Fixar layout na tela (sem rolagem lateral / solto) ---- */
+html,body{max-width:100%;overflow-x:hidden}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{position:relative;width:100%;overscroll-behavior-x:none}
+.wrap,.feed-page,.top{max-width:100%}
+img,video{max-width:100%}
