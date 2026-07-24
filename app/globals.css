@@ -1756,3 +1756,7 @@ html.chrome-scrolling .top{box-shadow:none!important}
 /* ---- Realce de recomeço ---- */
 .entry-comeback{display:inline-block;margin:9px 2px 0;font-size:12.5px;font-weight:800;letter-spacing:.01em;color:#2f8f6b;background:rgba(47,143,107,.10);padding:4px 11px;border-radius:999px}
 @media(max-width:640px){ .entry-comeback{margin-left:16px} }
+/* ---- Prompts de escrita no compositor ---- */
+.composer-prompts{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.prompt-chip{border:1px dashed var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s}
+.prompt-chip:hover{border-style:solid;color:var(--ink);background:var(--soft,#f7f6fb)}

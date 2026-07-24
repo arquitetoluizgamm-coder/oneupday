@@ -51,11 +51,13 @@ export default async function Notifications() {
               ? fill(t.notifMoodLow, { name: a.name || '' })
               : n.type === 'comeback'
               ? fill(t.notifComeback, { name: a.name || '' })
+              : n.type === 'welcome'
+              ? t.notifWelcome
               : fill(t.notifEncourage, { name: a.name || '' });
             return (
               <a className={`notif-item${n.read ? '' : ' unread'}`} key={n.id} href={j.slug ? `/${j.slug}` : (a.handle ? `/${a.handle}` : '/home')}>
-                <span className="notif-ava" style={{ background: a.avatar_color || 'var(--orange)' }}>
-                  {a.avatar_url ? <img src={a.avatar_url} alt="" /> : (a.name || '?')[0]}
+                <span className="notif-ava" style={{ background: n.type === 'welcome' ? 'var(--night)' : (a.avatar_color || 'var(--orange)') }}>
+                  {n.type === 'welcome' ? '💛' : (a.avatar_url ? <img src={a.avatar_url} alt="" /> : (a.name || '?')[0])}
                 </span>
                 <div><p>{text}</p>{j.title && <small>{j.title}</small>}</div>
               </a>

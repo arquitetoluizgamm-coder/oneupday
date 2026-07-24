@@ -163,6 +163,13 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       <textarea ref={inputRef} className="composer2-input" value={text} onChange={e => setText(e.target.value)}
         maxLength={500} placeholder={ph} rows={1}
         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); post(); } }} />
+      {!text.trim() && Array.isArray(t.prompts) && t.prompts.length > 0 && (
+        <div className="composer-prompts">
+          {t.prompts.map((pr, i) => (
+            <button type="button" key={i} className="prompt-chip" onClick={() => { setText(pr + ' '); inputRef.current?.focus(); }}>{pr}</button>
+          ))}
+        </div>
+      )}
       {photoUrl && <div className="photo-preview"><img src={photoUrl} alt="" /></div>}
       {videoUrl && <div className="photo-preview"><video src={videoUrl} controls playsInline /></div>}
 
