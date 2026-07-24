@@ -1555,3 +1555,32 @@ img,video{max-width:100%}
   .entry-textcard{border-left:0;border-right:0;border-radius:0;min-height:340px;padding:48px 26px}
   .entry-textcard p{font-size:22px}
 }
+/* ==========================================================
+   PASSE PREMIUM/NEUTRO: um acento, moldura 4:5, ação mínima
+   ========================================================== */
+:root{ --accent:#2b3242; --graphite:#3a4152; }
+
+/* 1) UM ACENTO SÓ — cor sai; diferença por peso/texto (Seguir permanece) */
+.entry-kindline{color:var(--graphite)!important;opacity:.7}
+.entry-kindline::before{content:'—';font-size:12px;margin-right:7px;opacity:.6}
+.entry-head .follow-btn{color:var(--graphite)!important;font-weight:700}
+.entry-head .follow-btn.on{color:var(--muted)!important;font-weight:600}
+.entry-actions .support-pill.on{color:var(--accent)!important}
+.entry-actions .support-pill.on:before{color:var(--accent)}
+
+/* 2) MOLDURA ÚNICA 4:5 — card de texto na mesma proporção da foto */
+.entry-textcard{aspect-ratio:4/5;min-height:0;justify-content:center}
+@media(max-width:640px){ .entry-textcard{aspect-ratio:4/5;min-height:0} }
+
+/* 3) BARRA DE AÇÃO MÍNIMA — ícones apagados, mais ar; coração é o calor */
+.entry-actions{gap:24px;margin-top:12px;color:var(--muted)}
+.entry-actions .support-pill,.entry-actions .feed-share,.entry-actions .comment-toggle{color:var(--muted)}
+.entry-actions .support-pill:hover,.entry-actions .feed-share:hover,.entry-actions .comment-toggle:hover{color:var(--ink)}
+@media(min-width:641px){
+  .entry-actions .feed-share,.entry-actions .support-pill{font-size:0}
+  .entry-actions .feed-share span,.entry-actions .support-pill span{display:none}
+  .entry-actions .support-pill:before{content:'♡';font-size:21px;line-height:1}
+  .entry-actions .support-pill.on:before{content:'♥'}
+  .entry-actions .feed-share svg,.entry-actions .comment-toggle svg{width:21px;height:21px}
+  .entry-actions .comment-toggle .action-label{display:none}
+}
