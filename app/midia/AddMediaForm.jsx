@@ -13,6 +13,7 @@ export default function AddMediaForm({ userId, journeys, t }) {
   const [journeyId, setJourneyId] = useState(list[0]?.id || '');
   const [day, setDay] = useState(list[0] ? String(dayFor(list[0])) : '1');
   const [visibility, setVisibility] = useState('public');
+  const [desc, setDesc] = useState('');
   const [url, setUrl] = useState('');
   const [kind, setKind] = useState('photo');
   const [uploading, setUploading] = useState(false);
@@ -48,11 +49,11 @@ export default function AddMediaForm({ userId, journeys, t }) {
       const d = Math.max(1, parseInt(day || '1', 10) || 1);
       ({ error } = await supabase.from('updates').insert({
         journey_id: journeyId, day_number: d, kind: 'step',
-        text: kind === 'video' ? '🎥' : '📷',
+        text: desc.trim() || (kind === 'video' ? '🎥' : '📷'),
         photo_url: kind === 'photo' ? url : null, video_url: kind === 'video' ? url : null,
       }));
     } else {
-      ({ error } = await supabase.from('media').insert({ user_id: userId, url, kind, visibility }));
+      ({ error } = await supabase.from('media').insert({ user_id: userId, url, kind, visibility, caption: desc.trim() || null }));
     }
     setSaving(false);
     if (error) { alert(L.error); return; }
@@ -112,7 +113,9 @@ export default function AddMediaForm({ userId, journeys, t }) {
             </div>
           )}
 
-          <button className="cta wide grow" onClick={submit} disabled={saving || uploading}>{saving ? L.saving : L.save}</button>
+          <div className="field-label" style={{ marginTop: 16 }}>{L.captionLabel}</div>
+          <textarea className="media-caption" value={desc} onChange={e => setDesc(e.target.value)} maxLength={300} placeholder={L.captionPh} rows={3} />
+          <button className="cta wide grow" onClick={submit} disabled={saving || uploading} style={{ marginTop: 14 }}>{saving ? L.saving : L.save}</button>
         </>
       )}
     </div>

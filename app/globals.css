@@ -1775,3 +1775,39 @@ html.chrome-scrolling .top{box-shadow:none!important}
 .album-item{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#eceae4;display:block}
 .album-item img,.album-item video{width:100%;height:100%;object-fit:cover;display:block}
 .album-vis{position:absolute;bottom:6px;left:6px;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:rgba(16,19,45,.6);color:#fff}
+/* ---- Wizard "Meta" premium ---- */
+.wiz-step .field-label{font-size:13px;font-weight:750;color:var(--ink);margin-bottom:10px;letter-spacing:-.01em}
+.dur-chips{display:flex;flex-wrap:wrap;gap:8px}
+.dur-chip{border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:12px 16px;font-size:14px;font-weight:700;color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s}
+.dur-chip:hover{background:var(--soft,#f7f6fb)}
+.dur-chip.on{border-color:var(--night);background:rgba(16,19,45,.04)}
+.dur-custom{display:flex;align-items:center;gap:10px;margin-top:12px}
+.dur-custom input{width:120px;border:1.5px solid var(--night);border-radius:12px;padding:12px 14px;font:inherit;font-size:16px;font-weight:700}
+.dur-custom input:focus{outline:0;box-shadow:0 0 0 4px rgba(16,19,45,.06)}
+.dur-custom span{color:var(--muted);font-weight:600}
+.why-field{position:relative}
+.why-field textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14px 16px 26px;font:inherit;font-size:15px;line-height:1.55;resize:vertical;min-height:120px}
+.why-field textarea:focus{outline:0;border-color:var(--night);box-shadow:0 0 0 4px rgba(16,19,45,.05)}
+.why-count{position:absolute;bottom:12px;right:14px;font-size:11px;color:var(--muted);font-weight:600;pointer-events:none}
+/* ---- Menu do + (footer) ---- */
+.create-backdrop{position:fixed;inset:0;z-index:70;background:rgba(16,19,45,.35);display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .16s ease}
+.create-menu{background:#fff;width:100%;max-width:460px;border-radius:20px 20px 0 0;padding:10px;margin-bottom:74px;box-shadow:0 -8px 30px rgba(16,19,45,.12);animation:sheetUp .2s ease}
+.create-menu .cm-item{display:flex;align-items:center;gap:12px;padding:15px 14px;border-radius:14px;font-size:16px;font-weight:700;color:var(--ink);text-decoration:none}
+.create-menu .cm-item:hover{background:var(--soft,#f7f6fb)}
+.create-menu .cm-item + .cm-item{border-top:1px solid var(--line)}
+.bn-create{background:transparent;border:0;cursor:pointer;display:grid;place-items:center;gap:3px;color:var(--muted);font-weight:800;font-size:11px}
+@media(min-width:520px){ .create-backdrop{align-items:center} .create-menu{border-radius:20px;margin-bottom:0} }
+
+/* ---- Buscar pessoas ---- */
+.ps-field{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--muted)}
+.ps-field input{flex:1;border:0;outline:0;font:inherit;font-size:16px;background:transparent;color:var(--ink)}
+.ps-hint{color:var(--muted);font-size:14px;margin:16px 2px}
+.ps-list{display:flex;flex-direction:column;margin-top:8px}
+.ps-person{display:flex;align-items:center;gap:12px;padding:11px 2px;text-decoration:none;color:inherit}
+.ps-person + .ps-person{border-top:1px solid rgba(16,19,45,.05)}
+.ps-ava{width:46px;height:46px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;overflow:hidden;color:#fff;font-weight:800;font-size:17px}
+.ps-ava img{width:100%;height:100%;object-fit:cover}
+.ps-meta b{display:block;font-size:15px;letter-spacing:-.01em}
+.ps-meta small{color:var(--muted);font-size:13px}
+.media-caption{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font:inherit;font-size:15px;line-height:1.5;resize:vertical;min-height:76px}
+.media-caption:focus{outline:0;border-color:var(--night)}

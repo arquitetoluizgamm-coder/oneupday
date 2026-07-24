@@ -177,23 +177,23 @@ export default function NewJourneyForm({ userId, t }) {
 
       {/* Step 4 — Duração + porquê */}
       <div className="wiz-step" style={{ display: step === 4 ? 'block' : 'none' }}>
-        <label>{t.fDuration}
-          <select value={dur} onChange={e => setDur(e.target.value)}>
-            <option value="7">{t.dur7}</option>
-            <option value="30">{t.dur30}</option>
-            <option value="60">{t.dur60}</option>
-            <option value="100">{t.dur100}</option>
-            <option value="other">{t.durCustom}</option>
-          </select>
-        </label>
+        <div className="field-label">{t.fDuration}</div>
+        <div className="dur-chips">
+          {[['7', t.dur7], ['30', t.dur30], ['60', t.dur60], ['100', t.dur100], ['other', t.durCustom]].map(([v, l]) => (
+            <button type="button" key={v} className={`dur-chip${dur === v ? ' on' : ''}`} onClick={() => setDur(v)}>{l}</button>
+          ))}
+        </div>
         {dur === 'other' && (
-          <label>{t.durCustomLabel}
-            <input type="number" min="1" max="730" value={customDur} onChange={e => setCustomDur(e.target.value)} placeholder={t.durCustomPh} />
-          </label>
+          <div className="dur-custom">
+            <input type="number" min="1" max="730" value={customDur} onChange={e => setCustomDur(e.target.value)} placeholder={t.durCustomPh} autoFocus />
+            <span>{t.durDaysWord}</span>
+          </div>
         )}
-        <label>{t.fWhy}
-          <textarea value={goal} onChange={e => setGoal(e.target.value)} maxLength={300} placeholder={t.fWhyPh} />
-        </label>
+        <div className="field-label" style={{ marginTop: 22 }}>{t.fWhy}</div>
+        <div className="why-field">
+          <textarea value={goal} onChange={e => setGoal(e.target.value)} maxLength={300} placeholder={t.fWhyPh} rows={4} />
+          <span className="why-count">{goal.length}/300</span>
+        </div>
       </div>
 
       {/* Step 5 — Primeiro dia */}

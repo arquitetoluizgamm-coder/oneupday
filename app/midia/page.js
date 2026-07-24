@@ -25,7 +25,7 @@ export default async function Midia() {
           destTitle: t.mediaDest, destJourney: t.mediaDestJourney, destJourneySub: t.mediaDestJourneySub, destAlbum: t.mediaDestAlbum, destAlbumSub: t.mediaDestAlbumSub,
           whichJourney: t.mediaWhichJourney, whichDay: t.mediaWhichDay, whoSees: t.mediaWhoSees,
           pubPublic: t.pubPublic, pubFollowers: t.pubFollowers, pubPrivate: t.pubPrivate,
-          save: t.mediaSave, saving: t.creating,
+          save: t.mediaSave, saving: t.creating, captionLabel: t.mediaCaption, captionPh: t.mediaCaptionPh,
         }} />
       </main>
       <BottomNav active="profile" t={t} />
