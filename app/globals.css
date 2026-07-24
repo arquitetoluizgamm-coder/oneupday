@@ -1672,3 +1672,15 @@ html.chrome-scrolling .top{ box-shadow:0 1px 0 rgba(16,19,45,.05) }
 .heart-pop .hp-stat{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-size:15px;color:var(--ink);line-height:1}
 .heart-pop .hp-stat.likes svg{color:#e0245e}
 .heart-pop .hp-stat.follows svg{color:var(--ink)}
+/* ==========================================================
+   Barra de ações: só ícones SVG, alinhados (sobrescreve hacks)
+   ========================================================== */
+.entry-actions{display:flex!important;align-items:center;gap:22px}
+.entry-actions .support-wrap,.entry-actions .comments{display:inline-flex;align-items:center}
+.entry-actions .support-pill,.entry-actions .feed-share,.entry-actions .comment-toggle{display:inline-flex!important;align-items:center;justify-content:center;background:transparent;border:0;padding:0;color:var(--muted);font-size:inherit!important;line-height:1;cursor:pointer}
+.entry-actions .support-pill::before,.entry-actions .feed-share::before,.entry-actions .comment-toggle::before{content:none!important}
+.entry-actions svg{display:block!important;width:22px!important;height:22px!important}
+.entry-actions .action-label{display:none!important}
+.entry-actions .supporters-icon{display:none!important}
+.entry-actions .support-pill.on{color:#e0245e!important}
+.entry-actions .support-pill:hover,.entry-actions .feed-share:hover,.entry-actions .comment-toggle:hover{color:var(--ink)}

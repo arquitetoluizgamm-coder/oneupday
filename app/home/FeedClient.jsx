@@ -49,7 +49,7 @@ function EntryText({ text, labels }) {
 function DemoActions({ item, labels }) {
   return (
     <div className="entry-actions">
-      <a className="support-pill" href={`/${item.journey.slug}`}><span>♡</span><span>{labels.supportIdle}</span></a>
+      <a className="support-pill" href={`/${item.journey.slug}`}><svg className="sp-heart" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 20.5C12 20.5 3.5 15.5 3.5 9.2 3.5 6.4 5.6 4.5 8 4.5c1.7 0 3.1 1 4 2.4.9-1.4 2.3-2.4 4-2.4 2.4 0 4.5 1.9 4.5 4.7 0 6.3-8.5 11.3-8.5 11.3z"/></svg><span className="action-label">{labels.supportIdle}</span></a>
       <a className="comment-toggle demo-action-link" href={`/${item.journey.slug}`}>
         <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-5 4v-4.2A2.5 2.5 0 0 1 4 13.5z" />
