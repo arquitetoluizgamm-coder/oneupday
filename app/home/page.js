@@ -81,6 +81,7 @@ export default async function Home() {
     musicAdd: t.musicAdd, musicTitle: t.musicTitle, musicUse: t.musicUse, musicRemove: t.musicRemove, musicEmpty: t.musicEmpty, musicSearchPh: t.musicSearchPh, musicKeyNeeded: t.musicKeyNeeded,
     aiErr: t.aiErr, aiRateErr: t.aiRateErr,
     moodQ: t.moodQ, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful },
+    hug: { hug: t.hugLabel, toast: t.hugToast }, milestoneFmt: t.milestoneFmt, needs: { title: t.needsTitle, cta: t.needsCta },
   };
 
   const feedLabels = {

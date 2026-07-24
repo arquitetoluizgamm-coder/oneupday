@@ -5,6 +5,8 @@ import FeedShare from './FeedShare';
 import Comments from '../../components/Comments';
 import SupportStrip from '../../components/SupportStrip';
 import SuggestionCard from '../../components/SuggestionCard';
+import HugButton from '../../components/HugButton';
+import NeedsSupport from '../../components/NeedsSupport';
 import { MOODS, moodGlow } from '../../lib/moods';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
@@ -66,6 +68,7 @@ function DemoActions({ item, labels }) {
         <span className="action-label">{labels.comments.comment}</span>
       </button>
       <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
+      <HugButton demo name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
     </div>
     {showC && (
       <div className="comment-panel">
@@ -95,6 +98,8 @@ export default function FeedClient({ labels }) {
   const scopeRef = useRef('all');
   const busy = useRef(false);
   const [suggestions, setSuggestions] = useState([]);
+  const [needs, setNeeds] = useState([]);
+  useEffect(() => { fetch('/api/needs').then((r) => r.json()).then((j) => setNeeds(j.people || [])).catch(() => {}); }, []);
   useEffect(() => { fetch('/api/suggestions').then((r) => r.json()).then((j) => setSuggestions(j.people || [])).catch(() => {}); }, []);
 
   async function load() {
@@ -169,6 +174,8 @@ export default function FeedClient({ labels }) {
         <button className={scope === 'following' ? 'on' : ''} onClick={() => switchScope('following')}>{labels.tabFollowing}</button>
       </div>
 
+      <NeedsSupport people={needs} labels={labels.needs} />
+
       <section className="feed-stream">
         {started && items.length === 0 && (
           <div className="feed-invite">
@@ -195,6 +202,7 @@ export default function FeedClient({ labels }) {
             </div>
             {item.kind === 'setback' && <div className="entry-kindline setback">{labels.tagSetback}</div>}
             {item.kind === 'win' && <div className="entry-kindline win">{labels.tagWin}</div>}
+            {[7, 30, 60, 100].includes(item.day_number) && <div className="entry-milestone">{(labels.milestoneFmt || '').replace('{d}', item.day_number)}</div>}
 
             {(() => {
               const hasMedia = !!(item.photo_url || item.video_url);
@@ -237,6 +245,7 @@ export default function FeedClient({ labels }) {
                 <EncourageBar updateId={item.id} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
                 <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
                 <Comments updateId={item.id} labels={labels.comments} />
+                <HugButton toId={item.owner.id} updateId={item.id} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
               </div>
             )}
           </article>

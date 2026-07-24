@@ -45,6 +45,8 @@ export default async function Notifications() {
             const j = jMap[n.journey_id] || {};
             const text = n.type === 'follow'
               ? fill(t.notifFollow, { name: a.name || '' })
+              : n.type === 'hug'
+              ? fill(t.notifHug, { name: a.name || '' })
               : fill(t.notifEncourage, { name: a.name || '' });
             return (
               <a className={`notif-item${n.read ? '' : ' unread'}`} key={n.id} href={j.slug ? `/${j.slug}` : (a.handle ? `/${a.handle}` : '/home')}>
