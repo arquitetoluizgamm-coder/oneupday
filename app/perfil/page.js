@@ -85,6 +85,28 @@ export default async function Perfil() {
   let myMedia = [];
   try { const { data: md } = await supabase.from('media').select('id, url, kind, visibility').eq('user_id', user.id).order('created_at', { ascending: false }); myMedia = md || []; } catch {}
 
+  // ---- Quem te apoia: abraços recebidos + apoios nos seus posts ----
+  let supporters = [];
+  try {
+    let uids = [];
+    if (jIds.length) { const { data: ups } = await supabase.from('updates').select('id').in('journey_id', jIds); uids = (ups || []).map(u => u.id); }
+    const mids = myMedia.map(m => m.id);
+    const agg = {};
+    const bump = (id, ts) => { if (!id || id === user.id) return; const cur = agg[id] || { count: 0, last: 0 }; cur.count++; const tt = ts ? new Date(ts).getTime() : 0; if (tt > cur.last) cur.last = tt; agg[id] = cur; };
+    const guard = (pr) => Promise.resolve(pr).then((r) => r).catch(() => ({ data: [] }));
+    const queries = [];
+    if (uids.length) queries.push(guard(supabase.from('encouragements').select('user_id, created_at').in('update_id', uids).neq('user_id', user.id)));
+    if (mids.length) queries.push(guard(supabase.from('encouragements').select('user_id, created_at').in('media_id', mids).neq('user_id', user.id)));
+    queries.push(guard(supabase.from('hugs').select('from_id, created_at').eq('to_id', user.id).neq('from_id', user.id)));
+    const res = await Promise.all(queries);
+    res.forEach((r) => (r.data || []).forEach((row) => bump(row.user_id || row.from_id, row.created_at)));
+    const ids = Object.keys(agg);
+    if (ids.length) {
+      const { data: profs } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', ids);
+      supporters = (profs || []).map((p) => ({ ...p, count: agg[p.id].count, last: agg[p.id].last })).sort((a, b) => b.last - a.last).slice(0, 40);
+    }
+  } catch {}
+
   return (
     <>
       <header className="top">
@@ -137,6 +159,27 @@ export default async function Perfil() {
               </div>
             </>)}
         </section>
+
+        {supporters.length > 0 && (
+          <section className="followers-block supporters-block">
+            <div className="fb-head">
+              <p className="eyebrow">{t.supportersMineTitle}</p>
+              <b className="fb-count">{supporters.length}</b>
+            </div>
+            <p className="fb-who">{t.supportersMineWho}</p>
+            <div className="followers-list">
+              {supporters.map((s) => (
+                <a className="follower-chip" key={s.id} href={`/${s.handle}`}>
+                  <span className="fc-ava" style={{ background: s.avatar_color || 'var(--orange)' }}>
+                    {s.avatar_url ? <img src={s.avatar_url} alt="" /> : (s.name || '?')[0]}
+                  </span>
+                  <span className="fc-name">{s.name}</span>
+                  {s.count > 1 && <span className="fc-count">{s.count}×</span>}
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
 
         {aiConfigured && <CompanionCard userId={user.id} title={t.companionTitle} btn={t.companionBtn} loading={t.companionLoading} initialOff={aiPrefOff} labels={{ consent: t.aiConsent, off: t.aiOff, offState: t.aiOffState, reactivate: t.aiReactivate, err: t.aiErr, rateErr: t.aiRateErr }} />}
 

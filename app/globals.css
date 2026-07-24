@@ -1874,3 +1874,7 @@ html.chrome-scrolling .top{box-shadow:none!important}
 /* ---- Enquadrador em modal (Composer) ---- */
 .crop-modal{position:fixed;inset:0;z-index:90;background:rgba(16,19,45,.5);display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeIn .16s ease}
 .crop-modal-card{background:var(--surface);border-radius:20px;padding:16px 16px 18px;width:min(420px,94vw);max-height:92svh;overflow-y:auto;box-shadow:0 24px 60px rgba(16,19,45,.28)}
+
+/* Quem te apoia: contador por pessoa */
+.supporters-block{margin-top:2px}
+.fc-count{font-size:10.5px;font-weight:800;color:var(--pink);margin-left:2px}
