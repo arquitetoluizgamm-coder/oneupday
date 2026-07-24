@@ -1,6 +1,7 @@
 import { getSupabase } from '../lib/supabase';
 import { getLocale } from '../lib/locale';
 import { getDict, fill } from '../lib/i18n';
+import { buildDemoStories } from '../lib/demoStories';
 import Logo from '../components/Logo';
 import { createClient } from '../lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -50,12 +51,13 @@ export default async function Home() {
   const { data: { user } } = await supabase.auth.getUser();
   if (user) redirect('/home');
   const t = getDict(getLocale());
+  const demoSeed = buildDemoStories(getLocale())[0];
   const real = await loadDemo();
   const demo = (real && real.photo) ? real : {
-    journey: { slug: '__demo', title: t.demoFbTitle, cover_color: '#0ea5e9', total_days: 60 },
-    stats: { current_day: 21, progress_pct: 35, streak: 21 },
-    owner: { name: 'Marina', avatar_url: '/demo-avatar.jpg', avatar_color: '#0ea5e9' },
-    photo: '/demo-cover.jpg',
+    journey: { slug: demoSeed.slug, title: demoSeed.title, cover_color: demoSeed.cover_color, total_days: demoSeed.total_days },
+    stats: demoSeed.stats,
+    owner: { name: demoSeed.owner.name, avatar_url: demoSeed.owner.avatarUrl, avatar_color: demoSeed.owner.avatarColor },
+    photo: null,
     fallback: true,
   };
 

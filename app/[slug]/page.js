@@ -1,6 +1,7 @@
 import { createClient } from '../../lib/supabase/server';
 import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
+import { getDemoStory } from '../../lib/demoStories';
 import Logo from '../../components/Logo';
 import ShareButton from './ShareButton';
 import Dia1Card from './Dia1Card';
@@ -122,11 +123,94 @@ async function ProfilePage({ handle }) {
   );
 }
 
+function DemoJourneyPage({ story, t, locale }) {
+  const pct = Math.min(100, story.stats.progress_pct || 0);
+  const momentLabels = { starting: t.mStarting, notgiveup: t.mNotgiveup, rebuilding: t.mRebuilding, health: t.mHealth, courage: t.mCourage, hardphase: t.mHardphase, building: t.mBuilding };
+  const momentLabel = momentLabels[story.moment];
+  const tagFor = (kind) => kind === 'setback' ? t.tagSetback : kind === 'win' ? t.tagWin : null;
+  const demoNote = locale === 'pt'
+    ? 'Exemplo criado para mostrar como as jornadas podem aparecer no começo do app.'
+    : 'Sample journey created to show how stories can feel alive at the start of the app.';
+
+  return (
+    <>
+      <header className="top">
+        <Logo />
+        <div className="top-right">
+          <a className="cta" href="/login">{t.startYourJourney}</a>
+        </div>
+      </header>
+
+      <Track type="demo_journey_view" meta={{ slug: story.slug }} />
+      <main className="wrap">
+        <section className="cover" style={{ background: `linear-gradient(135deg, var(--night), ${story.cover_color})` }}>
+          <p className="eyebrow">{t.demoLabelDemo}</p>
+          {momentLabel && <a className="moment-tag" href={`/grupo/${story.moment}`}>{momentLabel}</a>}
+          <h1>{story.title}</h1>
+          <p>{story.goal}</p>
+        </section>
+
+        <div className="demo-note">{demoNote}</div>
+
+        <div className="who">
+          <span className="ava" style={{ background: story.owner.avatarColor || 'var(--orange)' }}>
+            <img src={story.owner.avatarUrl} alt="" />
+          </span>
+          <div className="who-name">
+            <b>{story.owner.name}</b>
+            <span>{story.owner.handle} · {fill(t.dayXofY, { d: story.stats.current_day || 0, t: story.total_days })}</span>
+          </div>
+          <a className="follow-btn" href="/login">{t.follow}</a>
+        </div>
+
+        <div className="stats">
+          <article><b>{story.stats.days_posted || 0}</b><span>{t.daysPosted}</span></article>
+          <article><b>{story.stats.streak || 0}</b><span>{t.dayStreakLabel}</span></article>
+          <article><b>{pct}%</b><span>{t.progress}</span></article>
+        </div>
+        <ProgressBar day={story.stats.current_day || 0} total={story.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+
+        <section className="timeline">
+          {story.updates.slice().reverse().map((u, i, arr) => (
+            <article key={u.id}>
+              <div className="rail">
+                <div className={`dot ${u.kind === 'setback' ? 'setback' : u.kind === 'win' ? 'win' : ''}`} />
+                {i < arr.length - 1 && <div className="line" />}
+              </div>
+              <div className="body">
+                <span className="day">{fill(t.dayShort, { d: u.day_number })}</span>
+                {tagFor(u.kind) && <span className={`tag ${u.kind}`}>{tagFor(u.kind)}</span>}
+                <p>{u.text}</p>
+              </div>
+            </article>
+          ))}
+        </section>
+
+        <section className="encourage">
+          <h3>{t.joinTitle}</h3>
+          <p>{t.joinSub}</p>
+          <a className="cta grow" href="/login">{t.encourageJoin}</a>
+        </section>
+      </main>
+
+      <footer className="foot">One <b>Up</b> Day · {t.tagline} · oneupday.app/{story.slug}</footer>
+    </>
+  );
+}
+
 export async function generateMetadata({ params }) {
   let slug; try { slug = decodeURIComponent(params.slug); } catch { slug = params.slug; }
   if (slug.startsWith('@')) {
     const p = await loadProfile(slug);
     return { title: p ? `${p.profile.name} · One Up Day` : 'One Up Day' };
+  }
+  const demo = getDemoStory(slug, getLocale());
+  if (demo) {
+    return {
+      title: `${demo.title} · One Up Day`,
+      description: demo.goal,
+      twitter: { card: 'summary_large_image' },
+    };
   }
   const data = await loadJourney(slug);
   if (!data) return { title: 'One Up Day' };
@@ -141,14 +225,16 @@ export async function generateMetadata({ params }) {
 export default async function JourneyPage({ params, searchParams }) {
   let slug; try { slug = decodeURIComponent(params.slug); } catch { slug = params.slug; }
   if (slug.startsWith('@')) return <ProfilePage handle={slug} />;
+  const locale = getLocale();
+  const t = getDict(locale);
+  const demo = getDemoStory(slug, locale);
+  if (demo) return <DemoJourneyPage story={demo} t={t} locale={locale} />;
   const data = await loadJourney(slug);
   if (!data) notFound();
   const { journey, owner, updates, stats, encById, viewerId, myEnc } = data;
   const isOwner = viewerId && viewerId === journey.owner_id;
   const myEncSet = new Set(myEnc || []);
   const fromShare = searchParams?.r === 's';
-  const locale = getLocale();
-  const t = getDict(locale);
   const pct = Math.min(100, stats.progress_pct || 0);
   const initial = (owner?.name || '?')[0];
   const latest = updates.length ? updates[updates.length - 1] : null;
