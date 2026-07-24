@@ -1913,3 +1913,8 @@ html.chrome-scrolling .top{box-shadow:none!important}
 .land-demo-caption{margin:12px 0 0;text-align:center;color:var(--muted);font-size:14px}
 .land-somewhere .somewhere-note{margin:18px auto 0;max-width:26rem;text-align:center;color:#6b7280;font-size:15px;line-height:1.55}
 .land-somewhere .somewhere-note b{display:block;color:var(--ink);font-weight:800;margin-top:2px}
+
+/* ---- Demo fixa da landing: selo Recomeço + atualização ---- */
+.demo-flag{margin-left:auto;background:#f3efe7;color:var(--link);font-weight:800;font-size:11px;letter-spacing:.03em;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.demo-update{margin:0 0 12px;color:#3d4656;font-size:14.5px;line-height:1.5}
+.ideas-intro{margin:52px 0 16px;text-align:center;font-size:17px;font-weight:750;letter-spacing:-.02em}

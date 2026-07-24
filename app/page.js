@@ -1,7 +1,5 @@
-import { getSupabase } from '../lib/supabase';
 import { getLocale } from '../lib/locale';
-import { getDict, fill } from '../lib/i18n';
-import { buildDemoStories } from '../lib/demoStories';
+import { getDict } from '../lib/i18n';
 import Logo from '../components/Logo';
 import { createClient } from '../lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -10,40 +8,27 @@ import Track from '../components/Track';
 
 export const dynamic = 'force-dynamic';
 
-let _demoCache = { at: 0, val: undefined };
-async function loadDemo() {
-  if (_demoCache.val !== undefined && Date.now() - _demoCache.at < 90000) return _demoCache.val;
+// Curadoria manual (futuro): defina LANDING_FEATURED_JOURNEY_SLUG na Vercel
+// para destacar UMA jornada real escolhida a dedo. Sem a variável, a landing
+// mostra sempre a demonstração fixa — nunca conteúdo automático sem curadoria.
+async function loadFeatured() {
+  const slug = process.env.LANDING_FEATURED_JOURNEY_SLUG;
+  if (!slug) return null;
   try {
+    const { getSupabase } = await import('../lib/supabase');
     const sb = getSupabase();
-    const { data: journeys } = await sb.from('journeys')
+    const { data: journey } = await sb.from('journeys')
       .select('id, slug, title, cover_color, total_days, owner_id')
-      .eq('visibility', 'public').order('created_at', { ascending: false }).limit(12);
-    const js = journeys || [];
-    if (!js.length) return null;
-    const ids = js.map(j => j.id);
-    // 3 consultas em lote (sem N+1)
-    const [{ data: stats }, { data: photos }, { data: profs }] = await Promise.all([
-      sb.from('journey_stats').select('*').in('journey_id', ids),
-      sb.from('updates').select('journey_id, photo_url, day_number').in('journey_id', ids).not('photo_url', 'is', null).order('day_number', { ascending: false }),
-      sb.from('profiles').select('id, name, avatar_color, avatar_url').in('id', js.map(j => j.owner_id)),
+      .eq('slug', slug).eq('visibility', 'public').maybeSingle();
+    if (!journey) return null;
+    const [{ data: stats }, { data: photo }, { data: owner }] = await Promise.all([
+      sb.from('journey_stats').select('*').eq('journey_id', journey.id).maybeSingle(),
+      sb.from('updates').select('photo_url').eq('journey_id', journey.id).not('photo_url', 'is', null).order('day_number', { ascending: false }).limit(1).maybeSingle(),
+      sb.from('profiles').select('name, avatar_color, avatar_url').eq('id', journey.owner_id).maybeSingle(),
     ]);
-    const stById = {}; (stats || []).forEach(s => { stById[s.journey_id] = s; });
-    const photoBy = {}; (photos || []).forEach(u => { if (!photoBy[u.journey_id]) photoBy[u.journey_id] = u.photo_url; });
-    const pById = {}; (profs || []).forEach(pr => { pById[pr.id] = pr; });
-    let best = null, photoCount = 0;
-    for (const j of js) {
-      const st = stById[j.id]; const photo = photoBy[j.id];
-      if (!st || (st.current_day || 0) < 1 || !photo) continue;
-      photoCount++;
-      if (!best) best = { journey: j, stats: st, owner: pById[j.owner_id] || {}, photo };
-    }
-    // só mostra jornada real quando já há volume (3+ com foto); até lá, usa a demo
-    const out = photoCount >= 3 ? best : null;
-    _demoCache = { at: Date.now(), val: out };
-    return out;
-  } catch (e) {}
-  _demoCache = { at: Date.now(), val: null };
-  return null;
+    if (!stats || (stats.current_day || 0) < 1) return null;
+    return { journey, stats, owner: owner || {}, photo: photo?.photo_url || null };
+  } catch (e) { return null; }
 }
 
 export default async function Home() {
@@ -51,14 +36,17 @@ export default async function Home() {
   const { data: { user } } = await supabase.auth.getUser();
   if (user) redirect('/home');
   const t = getDict(getLocale());
-  const demoSeed = buildDemoStories(getLocale())[0];
-  const real = await loadDemo();
-  const demo = (real && real.photo) ? real : {
-    journey: { slug: demoSeed.slug, title: demoSeed.title, cover_color: demoSeed.cover_color, total_days: demoSeed.total_days },
-    stats: demoSeed.stats,
-    owner: { name: demoSeed.owner.name, avatar_url: demoSeed.owner.avatarUrl, avatar_color: demoSeed.owner.avatarColor },
-    photo: null,
-    fallback: true,
+  const featured = await loadFeatured();
+
+  // Demonstração fixa e controlada — a primeira impressão da marca não
+  // depende das fotos dos primeiros usuários.
+  const demo = {
+    name: t.landDemoName,
+    title: t.landDemoTitle,
+    update: t.landDemoUpdate,
+    badge: t.landDemoBadge,
+    day: 12,
+    total: 30,
   };
 
   const ideas = [
@@ -87,51 +75,68 @@ export default async function Home() {
           <p className="see-2">{t.landSeeTitle2}</p>
         </section>
 
-        {demo && (() => {
-          const pct = Math.min(100, demo.stats.progress_pct || 0);
-          const day = demo.stats.current_day || 0;
-          const initial = (demo.owner.name || '?')[0];
-          return (
-            <section className="land-demo">
-              <span className="land-demo-label">{demo.fallback ? t.demoLabelDemo : t.demoLabel}</span>
-              <a className="demo-card" href={demo.fallback ? '/login' : `/${demo.journey.slug}`}>
-                <div className="demo-cover" style={demo.photo
-                  ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.05), rgba(9,12,42,.55)), url(${demo.photo})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-                  : { background: `linear-gradient(135deg, var(--night), ${demo.journey.cover_color})` }}>
-                  <span className="demo-day">{t.cardDay} {day}</span>
-                  {demo.fallback && <span className="demo-example">{t.demoExample}</span>}
+        {featured ? (
+          <section className="land-demo">
+            <span className="land-demo-label">{t.demoLabel}</span>
+            <a className="demo-card" href={`/${featured.journey.slug}`}>
+              <div className="demo-cover" style={featured.photo
+                ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.05), rgba(9,12,42,.55)), url(${featured.photo})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+                : { background: `linear-gradient(135deg, var(--night), ${featured.journey.cover_color})` }}>
+                <span className="demo-day">{t.cardDay} {featured.stats.current_day || 0}</span>
+              </div>
+              <div className="demo-body">
+                <div className="demo-who">
+                  <span className="demo-ava" style={{ background: featured.owner.avatar_color || 'var(--orange)' }}>
+                    {featured.owner.avatar_url ? <img src={featured.owner.avatar_url} alt="" /> : (featured.owner.name || '?')[0]}
+                  </span>
+                  <b>{featured.journey.title}</b>
                 </div>
-                <div className="demo-body">
-                  <div className="demo-who">
-                    <span className="demo-ava" style={{ background: demo.owner.avatar_color || 'var(--orange)' }}>
-                      {demo.owner.avatar_url ? <img src={demo.owner.avatar_url} alt="" /> : initial}
-                    </span>
-                    <b>{demo.journey.title}</b>
-                  </div>
-                  <ProgressBar day={day} total={demo.journey.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+                <ProgressBar day={featured.stats.current_day || 0} total={featured.journey.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+              </div>
+            </a>
+          </section>
+        ) : (
+          <section className="land-demo">
+            <span className="land-demo-label">{t.demoLabelDemo}</span>
+            <a className="demo-card" href="/login">
+              <div className="demo-cover" style={{ backgroundImage: 'linear-gradient(180deg, rgba(9,12,42,.05), rgba(9,12,42,.55)), url(/demo-cover.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                <span className="demo-day">{t.cardDay} {demo.day}</span>
+                <span className="demo-example">{t.demoExample}</span>
+              </div>
+              <div className="demo-body">
+                <div className="demo-who">
+                  <span className="demo-ava" style={{ background: 'var(--orange)' }}>
+                    <img src="/demo-avatar.jpg" alt="" />
+                  </span>
+                  <b>{demo.title}</b>
+                  <span className="demo-flag">{demo.badge}</span>
                 </div>
-              </a>
-              <p className="land-demo-caption">{t.landDemoCaption}</p>
-            </section>
-          );
-        })()}
+                <p className="demo-update">{demo.update}</p>
+                <ProgressBar day={demo.day} total={demo.total} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+              </div>
+            </a>
+          </section>
+        )}
 
-        <section className="land-ideas ideas-4">
-          {ideas.map(i => (
-            <div key={i.k}>
-              <span className="idea-ico">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={i.d} /></svg>
-              </span>
-              <b>{i.b}</b>
-              <span className="idea-l">{i.l}</span>
-            </div>
-          ))}
+        <section className="land-ideas-wrap">
+          <p className="ideas-intro">{t.landDemoCaption}</p>
+          <div className="land-ideas ideas-4">
+            {ideas.map(i => (
+              <div key={i.k}>
+                <span className="idea-ico">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={i.d} /></svg>
+                </span>
+                <b>{i.b}</b>
+                <span className="idea-l">{i.l}</span>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="examples land-somewhere">
-          <b>{t.landExTitle}</b>
+          <b>{t.examplesTitle}</b>
           <div className="example-pills">
-            {[t.landEx1, t.landEx2, t.landEx3, t.landEx4, t.landEx5, t.landEx6].map((ex, i) => (
+            {[t.landEx1, t.landEx2, t.landEx3, t.landEx4, t.landEx5].map((ex, i) => (
               <a key={i} href="/login" className="example-pill">{ex}</a>
             ))}
           </div>
