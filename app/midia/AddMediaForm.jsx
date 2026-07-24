@@ -53,10 +53,15 @@ export default function AddMediaForm({ userId, journeys, t }) {
         photo_url: kind === 'photo' ? url : null, video_url: kind === 'video' ? url : null,
       }));
     } else {
-      ({ error } = await supabase.from('media').insert({ user_id: userId, url, kind, visibility, caption: desc.trim() || null }));
+      const mediaRow = { user_id: userId, url, kind, visibility, caption: desc.trim() || null };
+      ({ error } = await supabase.from('media').insert(mediaRow));
+      if (error && /caption|column/i.test(error.message || '')) {
+        const { caption: _c, ...noCap } = mediaRow;
+        ({ error } = await supabase.from('media').insert(noCap));
+      }
     }
     setSaving(false);
-    if (error) { alert(L.error); return; }
+    if (error) { alert((L.error || 'Erro') + (error.message ? '\n\n' + error.message : '')); return; }
     router.push('/perfil'); router.refresh();
   }
 

@@ -427,7 +427,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .bottom-nav{display:none}
 @media(max-width:860px){
   body{padding-bottom:74px}
-  .bottom-nav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:30;
+  .bottom-nav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:30;
     background:rgba(255,255,255,.95);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
   .bottom-nav a{display:grid;place-items:center;gap:3px;padding:10px 6px 12px;color:var(--muted);font-weight:800;font-size:11px}
   .bottom-nav a.on{color:var(--ink)}
@@ -1264,7 +1264,7 @@ body{background:var(--bg);color:var(--ink)}
 .bottom-nav{transition:opacity .2s ease,transform .2s ease}
 @media(max-width:640px){.messages-grid{grid-template-columns:1fr}.conversation-list{border-right:0;border-bottom:1px solid var(--line);max-height:220px;overflow:auto}.messages-head h1{font-size:28px}.feed-filter-label{flex-basis:100%;margin:3px 0 0}.feed-tabs{flex-wrap:wrap}}
 @media(max-width:640px){
-  .bottom-nav{left:50%;right:auto;bottom:14px;width:min(350px,calc(100% - 28px));transform:translateX(-50%);border:1px solid rgba(229,227,221,.9);border-radius:20px;box-shadow:0 10px 28px rgba(24,36,59,.14);background:rgba(255,255,255,.88)}
+  .bottom-nav{left:50%;right:auto;bottom:14px;width:min(420px,calc(100% - 20px));flex-wrap:nowrap;transform:translateX(-50%);border:1px solid rgba(229,227,221,.9);border-radius:20px;box-shadow:0 10px 28px rgba(24,36,59,.14);background:rgba(255,255,255,.88)}
   .bottom-nav.scrolling{opacity:.5}
   .bottom-nav{opacity:.97}
   .bottom-nav a{padding:8px 6px 9px}
@@ -1811,3 +1811,8 @@ html.chrome-scrolling .top{box-shadow:none!important}
 .ps-meta small{color:var(--muted);font-size:13px}
 .media-caption{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;font:inherit;font-size:15px;line-height:1.5;resize:vertical;min-height:76px}
 .media-caption:focus{outline:0;border-color:var(--night)}
+
+/* footer 5 itens em uma linha */
+.bottom-nav{grid-template-columns:repeat(5,1fr)}
+.bottom-nav a,.bottom-nav .bn-create{min-width:0;padding:8px 2px 9px;font-size:10.5px}
+.bottom-nav a span,.bottom-nav .bn-create span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
