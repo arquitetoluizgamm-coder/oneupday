@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 import { createClient } from '../../lib/supabase/server';
 import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
-import Logo from '../../components/Logo';
 import Composer from '../home/Composer';
 import NewJourneyForm from '../new/NewJourneyForm';
 import EditBanner from '../../components/EditBanner';
@@ -14,6 +13,7 @@ import NextStep from '../home/NextStep';
 import ProgressBar from '../../components/ProgressBar';
 import MediaGallery from '../../components/MediaGallery';
 import Track from '../../components/Track';
+import AppTop from '../../components/AppTop';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -109,13 +109,7 @@ export default async function Perfil() {
 
   return (
     <>
-      <header className="top">
-        <Logo href="/home" />
-        <div className="top-right">
-          <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
-          <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
-        </div>
-      </header>
+      <AppTop backLabel={t.back} />
 
       <Track type="visit" meta={{ page: "perfil" }} />
       <main className="wrap">
@@ -137,6 +131,11 @@ export default async function Perfil() {
             </div>
           </div>
         </section>
+
+        <div className="profile-tools">
+          <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
+          <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
+        </div>
 
         <section className="followers-block">
           <div className="fb-head">

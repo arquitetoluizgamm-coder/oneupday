@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '../../lib/supabase/server';
 import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
-import Logo from '../../components/Logo';
+import AppTop from '../../components/AppTop';
 import PauseNotif from './PauseNotif';
 
 export const dynamic = 'force-dynamic';
@@ -32,10 +32,7 @@ export default async function Notifications() {
 
   return (
     <>
-      <header className="top">
-        <Logo href="/home" />
-        <div className="top-right"><a className="ghost-btn" href="/home">{t.navHome}</a></div>
-      </header>
+      <AppTop backLabel={t.back} />
       <main className="wrap">
         <div className="create-head"><p className="eyebrow">{t.notifications}</p><h1>{t.notifications}</h1><div style={{marginTop:12}}><PauseNotif userId={user.id} paused={me?.notif_paused} labelPause={t.pauseNotif} labelPaused={t.notifPaused} /></div></div>
         {list.length === 0 && <div className="empty"><b>{t.notifEmpty}</b></div>}

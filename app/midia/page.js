@@ -2,9 +2,9 @@ import { redirect } from 'next/navigation';
 import { createClient } from '../../lib/supabase/server';
 import { getLocale } from '../../lib/locale';
 import { getDict } from '../../lib/i18n';
-import Logo from '../../components/Logo';
 import BottomNav from '../../components/BottomNav';
 import AddMediaForm from './AddMediaForm';
+import AppTop from '../../components/AppTop';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +17,7 @@ export default async function Midia() {
 
   return (
     <>
-      <header className="top"><Logo href="/home" /><div className="top-right"><a className="ghost-btn" href="/perfil">{t.navProfile}</a></div></header>
+      <AppTop backLabel={t.back} />
       <main className="wrap">
         <div className="create-head"><p className="eyebrow">{t.mediaEyebrow}</p><h1>{t.mediaTitle}</h1></div>
         <AddMediaForm userId={user.id} journeys={journeys || []} t={{

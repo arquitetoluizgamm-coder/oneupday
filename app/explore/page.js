@@ -1,7 +1,7 @@
 import { getSupabase } from '../../lib/supabase';
 import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
-import Logo from '../../components/Logo';
+import AppTop from '../../components/AppTop';
 import BottomNav from '../../components/BottomNav';
 
 export const dynamic = 'force-dynamic';
@@ -44,12 +44,7 @@ export default async function Explore({ searchParams }) {
 
   return (
     <>
-      <header className="top">
-        <Logo href="/home" />
-        <div className="top-right">
-          <a className="ghost-btn" href="/home">One Up Day</a>
-        </div>
-      </header>
+      <AppTop backLabel={t.back} />
       <main className="wrap explore-screen">
         <div className="create-head">
           <p className="eyebrow">{t.explore}</p>

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '../../lib/supabase/server';
 import { getLocale } from '../../lib/locale';
 import { getDict } from '../../lib/i18n';
-import Logo from '../../components/Logo';
+import AppTop from '../../components/AppTop';
 import NewJourneyForm from './NewJourneyForm';
 import BottomNav from '../../components/BottomNav';
 
@@ -17,12 +17,7 @@ export default async function NewJourney() {
 
   return (
     <>
-      <header className="top">
-        <Logo href="/home" />
-        <div className="top-right">
-          <a className="ghost-btn" href="/home">{t.back}</a>
-        </div>
-      </header>
+      <AppTop backLabel={t.back} />
       <main className="wrap">
         <div className="create-head">
           <p className="eyebrow">{t.createEyebrow}</p>
