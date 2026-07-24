@@ -194,7 +194,7 @@ export default async function Perfil() {
         {myMedia.length > 0 && (
           <section className="album">
             <p className="eyebrow">{t.albumTitle}</p>
-            <MediaGallery items={myMedia} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} />
+            <MediaGallery items={myMedia} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} own deleteLabel={t.mediaDelete} deleteConfirm={t.mediaDeleteConfirm} />
           </section>
         )}
       </main>

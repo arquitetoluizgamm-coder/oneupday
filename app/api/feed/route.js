@@ -61,20 +61,12 @@ export async function GET(req) {
 
   let demoItems = [];
   try { if (scope === 'all') demoItems = buildDemoFeedItems(locale).filter((item) => !mutedCats.has(item.journey.category) && (!kind || item.kind === kind)); } catch {}
-  let realTotal = 0;
-  if (targetIds.length) {
-    let cq = supabase.from('updates').select('*', { count: 'exact', head: true }).in('journey_id', targetIds);
-    if (VALID_KINDS.has(kind)) cq = cq.eq('kind', kind);
-    const { count } = await cq;
-    realTotal = count || 0;
-  }
-
   if (!targetIds.length && !demoItems.length) return NextResponse.json({ items: [] });
 
   let updates = [];
-  if (targetIds.length && offset < realTotal) {
+  if (targetIds.length) {
     let updatesQuery = supabase.from('updates')
-      .select('id, day_number, kind, text, photo_url, video_url, journey_id')
+      .select('id, day_number, kind, text, photo_url, video_url, journey_id, created_at')
       .in('journey_id', targetIds);
 
     if (VALID_KINDS.has(kind)) updatesQuery = updatesQuery.eq('kind', kind);
@@ -82,7 +74,7 @@ export async function GET(req) {
     const { data: rows } = await updatesQuery
       .order('created_at', { ascending: false })
       .order('id', { ascending: false })
-      .range(offset, offset + PAGE - 1);
+      .range(0, Math.min(offset + PAGE, 300) - 1);
 
     updates = rows || [];
   }
@@ -137,7 +129,7 @@ export async function GET(req) {
 
   const supEnc = supEncR.data || [];
   const supIds = [...new Set(supEnc.map((e) => e.user_id))];
-  const mediaRows = (mediaR.data || []).filter((m) => !blocked.has(m.user_id) && m.user_id !== user.id);
+  const mediaRows = (mediaR.data || []).filter((m) => !blocked.has(m.user_id));
   const mediaOwnerIds = [...new Set(mediaRows.map((m) => m.user_id))];
   const mediaIds = mediaRows.map((m) => m.id);
 
@@ -176,13 +168,10 @@ export async function GET(req) {
     };
   }).filter(Boolean);
 
-  const afterReal = Math.max(0, PAGE - realItems.length);
-  const mediaStart = Math.max(0, offset - realTotal);
-  const mediaSlice = afterReal > 0 ? mediaFeed.slice(mediaStart, mediaStart + afterReal) : [];
-
-  const afterMedia = Math.max(0, PAGE - realItems.length - mediaSlice.length);
-  const demoStart = Math.max(0, offset - realTotal - mediaTotal);
-  const demoSlice = afterMedia > 0 ? demoItems.slice(demoStart, demoStart + afterMedia) : [];
-
-  return NextResponse.json({ items: [...realItems, ...mediaSlice, ...demoSlice] });
+  const merged = [...realItems, ...mediaFeed].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+  const pageItems = merged.slice(offset, offset + PAGE);
+  const demoNeeded = Math.max(0, PAGE - pageItems.length);
+  const demoStart = Math.max(0, offset - merged.length);
+  const demoSlice = demoNeeded > 0 ? demoItems.slice(demoStart, demoStart + demoNeeded) : [];
+  return NextResponse.json({ items: [...pageItems, ...demoSlice] });
 }
