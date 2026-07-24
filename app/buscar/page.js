@@ -18,7 +18,7 @@ export default async function Buscar() {
       <header className="top"><Logo href="/home" /><div className="top-right"><a className="ghost-btn" href="/home">{t.navHome}</a></div></header>
       <main className="wrap">
         <div className="create-head"><h1>{t.searchTitle}</h1></div>
-        <PeopleSearch labels={{ ph: t.searchPh, hint: t.searchHint, none: t.searchNone }} />
+        <PeopleSearch labels={{ ph: t.searchPeoplePh, hint: t.searchHint, none: t.searchNone }} />
       </main>
       <BottomNav active="search" t={t} />
     </>

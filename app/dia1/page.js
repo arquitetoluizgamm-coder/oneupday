@@ -7,8 +7,8 @@ import Logo from '../../components/Logo';
 export const revalidate = 300;
 
 const CAMPAIGNS = {
-  pt: ['Comece antes do próximo mês', '7 dias aparecendo por você', 'Meu primeiro passo do ano', '30 dias sem desistir de mim', 'O recomeço começa hoje'],
-  en: ['Start before next month', '7 days showing up for you', 'My first step of the year', '30 days of not giving up on me', 'The restart starts today'],
+  pt: ['Não precisa esperar segunda-feira', '7 dias aparecendo por você', 'Meu primeiro passo do ano', '30 dias sem desistir de mim', 'O recomeço começa hoje'],
+  en: ['No need to wait for Monday', '7 days showing up for you', 'My first step of the year', '30 days of not giving up on me', 'The restart starts today'],
 };
 
 async function loadWall() {

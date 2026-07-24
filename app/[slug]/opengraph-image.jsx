@@ -54,7 +54,7 @@ export default async function OG({ params }) {
   const { data: s } = await sb.from('journey_stats').select('*').eq('journey_id', j.id).maybeSingle();
   const day = s?.current_day || 0;
   return new ImageResponse(
-    <Card big={`Day ${day}`} title={j.title} sub={`${s?.streak || 0} day streak · ${day}/${j.total_days}`} foot={`oneupday.app/${j.slug}`} />,
+    <Card big={`Day ${day}`} title={j.title} sub={`Day ${day} of ${j.total_days}`} foot={`oneupday.app/${j.slug}`} />,
     { ...size }
   );
 }
