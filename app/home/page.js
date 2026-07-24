@@ -13,6 +13,7 @@ import ScrollChrome from '../../components/ScrollChrome';
 import HeaderHeart from '../../components/HeaderHeart';
 import DailyMood from '../../components/DailyMood';
 import NextChapter from '../../components/NextChapter';
+import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
 import { MOODS, moodGlow } from '../../lib/moods';
 
 export const dynamic = 'force-dynamic';
@@ -74,38 +75,7 @@ export default async function Home() {
   const aiOn = !!process.env.OPENAI_API_KEY && !aiPrefOff && !!primary;
 
   // ---- Próximo Capítulo: antecipação pelo amanhã, nunca ansiedade ----
-  let ncMode = null, ncLine = null, ncLead = '', ncIdentity = '';
-  let ncEnv = null, ncSealedEnv = false;
-  if (primary) {
-    try {
-      const { data: ups } = await supabase.from('updates').select('day_number, kind, created_at').eq('journey_id', primary.id).order('created_at', { ascending: false }).limit(120);
-      const rows = ups || [];
-      if (rows.length) {
-        const last = rows[0];
-        const now = Date.now();
-        const lastAt = new Date(last.created_at).getTime();
-        const dayKey = (ms) => new Date(ms - 3 * 3600 * 1000).toISOString().slice(0, 10); // dia local (BRT)
-        const postedToday = dayKey(now) === dayKey(lastAt);
-        const gapDays = Math.floor((now - lastAt) / 86400000);
-        ncMode = postedToday ? 'sealed' : (gapDays >= 2 ? 'return' : 'reveal');
-        const days = [...new Set(rows.map((u) => u.day_number || 0).filter(Boolean))].sort((a, b) => a - b);
-        const gold = [];
-        for (let i = 1; i < days.length; i++) { if (days[i] - days[i - 1] >= 3) gold.push(days[i]); }
-        ncLine = { total: primary.total_days || (days[days.length - 1] || 1), days, gold };
-        ncLead = last.kind === 'setback' ? t.ncLeadSetback : t.ncLead;
-        ncIdentity = [t.ncId1, t.ncId2, t.ncId3][days.length % 3];
-        // Envelope de Amanhã: o que a pessoa deixou pra si mesma
-        try {
-          const { data: env } = await supabase.from('envelopes').select('id, text, created_at, opened_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
-          if (env) {
-            const isToday = dayKey(new Date(env.created_at).getTime()) === dayKey(now);
-            if (ncMode === 'sealed' && isToday) ncSealedEnv = true;
-            else if ((ncMode === 'reveal' || ncMode === 'return') && !env.opened_at && !isToday) ncEnv = { id: env.id, text: env.text };
-          }
-        } catch {}
-      }
-    } catch {}
-  }
+  const nc = await computeNextChapter(supabase, user.id, primary, t);
 
   const kindLabels = { step: t.kindStep, win: t.kindWin, setback: t.kindSetback, learned: t.kindLearned };
   const composerT = {
@@ -152,15 +122,8 @@ export default async function Home() {
       <ScrollChrome />
       <DailyMood userId={user.id} answeredToday={moodToday} labels={{ title: t.dailyMoodTitle, sub: t.dailyMoodSub, skip: t.dailyMoodSkip, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful } }} />
       <main className="wrap feed-page">
-        {ncMode && (
-          <NextChapter mode={ncMode} line={ncLine} env={ncEnv} labels={{
-            title: t.ncTitle, sealed: ncSealedEnv ? t.ncSealedEnv : t.ncSealed, blur: t.ncBlur, open: t.ncOpen,
-            envLead: t.envLead, envLeadReturn: t.envLeadReturn,
-            ready: t.ncReady, returnTitle: t.ncReturnTitle,
-            lead: ncLead, returnLead: t.ncReturnLead,
-            stepLabel: t.ncStepLabel, step: t.ncStep, identity: ncIdentity,
-            lineLabel: t.ncLineLabel, cta: t.ncCta,
-          }} />
+        {nc.mode && (
+          <NextChapter mode={nc.mode} line={nc.line} env={nc.env} labels={ncLabels(t, nc)} dismissible />
         )}
         {!primary && (
           <section className="first-journey">

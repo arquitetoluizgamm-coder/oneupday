@@ -14,6 +14,8 @@ import ProgressBar from '../../components/ProgressBar';
 import MediaGallery from '../../components/MediaGallery';
 import Track from '../../components/Track';
 import AppTop from '../../components/AppTop';
+import NextChapter from '../../components/NextChapter';
+import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -85,6 +87,10 @@ export default async function Perfil() {
   let myMedia = [];
   try { const { data: md } = await supabase.from('media').select('id, url, kind, visibility').eq('user_id', user.id).order('created_at', { ascending: false }); myMedia = md || []; } catch {}
 
+  // ---- Próximo Capítulo (casa fixa: sempre disponível aqui) ----
+  const primary = list[0] || null;
+  const nc = await computeNextChapter(supabase, user.id, primary, t);
+
   // ---- Quem te apoia: abraços recebidos + apoios nos seus posts ----
   let supporters = [];
   try {
@@ -136,6 +142,8 @@ export default async function Perfil() {
           <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
           <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
         </div>
+
+        {nc.mode && <NextChapter mode={nc.mode} line={nc.line} env={nc.env} labels={ncLabels(t, nc)} />}
 
         <section className="followers-block">
           <div className="fb-head">

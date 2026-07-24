@@ -1,19 +1,34 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '../lib/supabase/client';
+
+const dayKey = () => new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10);
 
 // Próximo Capítulo — antecipação, nunca ansiedade.
 // mode: 'sealed'  (postou hoje: cartão fechado pra amanhã)
 //       'reveal'  (voltou no dia seguinte: capítulo pronto)
 //       'return'  (voltou depois de uma pausa: nada expirou)
-export default function NextChapter({ mode, line, env, labels }) {
+export default function NextChapter({ mode, line, env, labels, dismissible = false }) {
   const L = labels || {};
   const [open, setOpen] = useState(false);
-  if (!mode) return null;
+  const [hidden, setHidden] = useState(dismissible); // evita flash: só mostra após checar
+  useEffect(() => {
+    if (!dismissible) return;
+    try { setHidden(localStorage.getItem('oud-nc-dismissed') === dayKey()); } catch { setHidden(false); }
+  }, [dismissible]);
+  function dismiss() {
+    try { localStorage.setItem('oud-nc-dismissed', dayKey()); } catch {}
+    setHidden(true);
+  }
+  if (!mode || hidden) return null;
+  const closeBtn = dismissible ? (
+    <button type="button" className="nc-close" onClick={dismiss} aria-label={L.close} title={L.close}>✕</button>
+  ) : null;
 
   if (mode === 'sealed') {
     return (
       <section className="nc nc-sealed" aria-label={L.title}>
+        {closeBtn}
         <span className="nc-eyebrow">{L.title}</span>
         <p className="nc-sealed-text">{L.sealed}</p>
         <p className="nc-blur" aria-hidden="true">{L.blur}</p>
@@ -24,6 +39,7 @@ export default function NextChapter({ mode, line, env, labels }) {
   if (!open) {
     return (
       <section className="nc nc-closed" aria-label={L.title}>
+        {closeBtn}
         <span className="nc-eyebrow">{L.title}</span>
         <p className="nc-closed-text">{mode === 'return' ? L.returnTitle : L.ready}</p>
         <button type="button" className="nc-open-btn" onClick={() => {
@@ -36,6 +52,7 @@ export default function NextChapter({ mode, line, env, labels }) {
 
   return (
     <section className="nc nc-openned" aria-label={L.title}>
+      {closeBtn}
       <span className="nc-eyebrow">{L.title}</span>
       <p className="nc-lead">{mode === 'return' ? L.returnLead : L.lead}</p>
       {env && env.text && (
