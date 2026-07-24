@@ -1584,3 +1584,28 @@ img,video{max-width:100%}
   .entry-actions .feed-share svg,.entry-actions .comment-toggle svg{width:21px;height:21px}
   .entry-actions .comment-toggle .action-label{display:none}
 }
+/* ==========================================================
+   Faixa "quem está com você" (marquee) + alinhamento de ícones
+   ========================================================== */
+.support-strip{margin-top:14px}
+.ss-title{display:block;font-size:12px;color:var(--muted);margin-bottom:9px;letter-spacing:.01em}
+.ss-viewport{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 90%,transparent)}
+.ss-track{display:flex;gap:9px;width:max-content}
+.ss-track.anim{animation:ssSlide 24s linear infinite}
+.ss-viewport:hover .ss-track.anim{animation-play-state:paused}
+@keyframes ssSlide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ss-person{flex:0 0 auto;display:block}
+.ss-ava{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;overflow:hidden;color:#fff;font-weight:700;font-size:14px;border:2px solid var(--surface);box-shadow:0 0 0 1px rgba(16,19,45,.06);transition:transform .15s}
+.ss-ava img{width:100%;height:100%;object-fit:cover}
+.ss-person:hover .ss-ava{transform:scale(1.07)}
+
+/* Alinhamento consistente da barra de ações */
+.entry-actions{display:flex;align-items:center;gap:22px}
+.entry-actions > *{display:inline-flex;align-items:center;line-height:1}
+.entry-actions button,.entry-actions a.support-pill,.entry-actions a.comment-toggle{display:inline-flex;align-items:center;justify-content:center;line-height:1;padding:0}
+.entry-actions .support-pill::before,.entry-actions .comment-toggle::before{display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.entry-actions svg{display:block}
+
+@media(max-width:640px){
+  .support-strip{padding-left:16px;padding-right:16px}
+}

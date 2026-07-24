@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import EncourageBar from '../[slug]/EncourageBar';
 import FeedShare from './FeedShare';
 import Comments from '../../components/Comments';
+import SupportStrip from '../../components/SupportStrip';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
 function TrackTag({ track }) {
@@ -192,6 +193,8 @@ export default function FeedClient({ labels }) {
               );
             })()}
             {item.track && <TrackTag track={item.track} />}
+
+            <SupportStrip people={item.supporters} title={(labels.supportStrip || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
 
             {item.demo ? (
               <DemoActions item={item} labels={labels} />

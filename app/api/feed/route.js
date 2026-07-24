@@ -124,6 +124,24 @@ export async function GET(req) {
     } catch {}
   }
 
+  const supportersByUpdate = {};
+  if (updates.length) {
+    try {
+      const { data: encs } = await supabase.from('encouragements').select('update_id, user_id').in('update_id', updates.map((item) => item.id));
+      const supIds = [...new Set((encs || []).map((e) => e.user_id))];
+      const supProfiles = {};
+      if (supIds.length) {
+        const { data: sp } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', supIds);
+        (sp || []).forEach((pr) => { supProfiles[pr.id] = pr; });
+      }
+      (encs || []).forEach((e) => {
+        (supportersByUpdate[e.update_id] ||= []);
+        const pr = supProfiles[e.user_id];
+        if (pr && supportersByUpdate[e.update_id].length < 12) supportersByUpdate[e.update_id].push({ name: pr.name, handle: pr.handle, avatar_url: pr.avatar_url, avatar_color: pr.avatar_color });
+      });
+    } catch {}
+  }
+
   const realItems = updates.map((item) => {
     const journey = journeyMap[item.journey_id];
     if (!journey) return null;
@@ -133,6 +151,7 @@ export async function GET(req) {
       owner: profileMap[journey.owner_id] || {},
       track: trackByUpdate[item.id] || null,
       encouraged: myEnc.has(item.id),
+      supporters: supportersByUpdate[item.id] || [],
     };
   }).filter(Boolean);
 
