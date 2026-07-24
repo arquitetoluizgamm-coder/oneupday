@@ -49,8 +49,14 @@ async function loadJourney(slug) {
 async function loadProfile(handle) {
   try {
   const sb = createClient();
-  const { data: profile } = await sb.from('profiles')
-    .select('id, name, handle, avatar_url, avatar_color, banner_url').eq('handle', handle).maybeSingle();
+  const variants = [handle];
+  if (handle.startsWith('@')) variants.push(handle.slice(1)); else variants.push('@' + handle);
+  let profile = null;
+  for (const h of variants) {
+    const { data } = await sb.from('profiles')
+      .select('id, name, handle, avatar_url, avatar_color, banner_url').eq('handle', h).maybeSingle();
+    if (data) { profile = data; break; }
+  }
   if (!profile) return null;
   const { data: journeys } = await sb.from('journeys')
     .select('*').eq('owner_id', profile.id).order('created_at', { ascending: false });
@@ -222,7 +228,11 @@ export async function generateMetadata({ params }) {
     };
   }
   const data = await loadJourney(slug);
-  if (!data) return { title: 'One Up Day' };
+  if (!data) {
+    const prof = await loadProfile(slug);
+    if (prof) return { title: `${prof.profile.name} · One Up Day` };
+    return { title: 'One Up Day' };
+  }
   const { journey, stats } = data;
   return {
     title: `${journey.title} — Day ${stats.current_day || 0} of ${journey.total_days} · One Up Day`,
@@ -239,7 +249,11 @@ export default async function JourneyPage({ params, searchParams }) {
   const demo = getDemoStory(slug, locale);
   if (demo) return <DemoJourneyPage story={demo} t={t} locale={locale} />;
   const data = await loadJourney(slug);
-  if (!data) notFound();
+  if (!data) {
+    const prof = await loadProfile(slug);
+    if (prof) return <ProfilePage handle={prof.profile.handle} />;
+    notFound();
+  }
   const { journey, owner, updates, stats, encById, viewerId, myEnc } = data;
   const isOwner = viewerId && viewerId === journey.owner_id;
   const myEncSet = new Set(myEnc || []);
