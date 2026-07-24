@@ -40,7 +40,7 @@ export default async function Explore({ searchParams }) {
           <a className="ghost-btn" href="/home">One Up Day</a>
         </div>
       </header>
-      <main className="wrap">
+      <main className="wrap explore-screen">
         <div className="create-head">
           <p className="eyebrow">{t.explore}</p>
           <h1>{t.exploreTitle}</h1>
