@@ -1436,3 +1436,6 @@ html.chrome-scrolling .top{box-shadow:0 1px 0 var(--line)}
   .entry-actions{margin-top:10px;gap:20px}
   .entry-head{margin-bottom:0}
 }
+/* ---- Título da jornada em destaque no cabeçalho do post ---- */
+.entry-id small{color:var(--muted)}
+.entry-id small .entry-journey{color:var(--ink);font-weight:750;letter-spacing:-.01em}

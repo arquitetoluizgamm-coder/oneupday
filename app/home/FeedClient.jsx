@@ -178,7 +178,7 @@ export default function FeedClient({ labels }) {
                 </span>
                 <span className="entry-id">
                   <b>{item.owner.name}</b>
-                  <small>{dayLabel(item.day_number)} · {item.journey.title}</small>
+                  <small>{dayLabel(item.day_number)} · <b className="entry-journey">{item.journey.title}</b></small>
                 </span>
               </a>
               {item.owner.id && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
