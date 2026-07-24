@@ -2,10 +2,11 @@
 import { MOODS } from '../lib/moods';
 
 export default function NeedsSupport({ people, labels }) {
+  const L = labels || {};
   if (!people || !people.length) return null;
   return (
     <section className="needs">
-      <span className="needs-title">{labels.title}</span>
+      <span className="needs-title">{L.title}</span>
       <div className="needs-list">
         {people.map((p) => (
           <a key={p.id} className="needs-person" href={`/${p.handle || ''}`}>
@@ -13,7 +14,7 @@ export default function NeedsSupport({ people, labels }) {
               {p.avatar_url ? <img src={p.avatar_url} alt="" /> : (p.name || '?')[0]}
             </span>
             <b>{(p.name || '').split(' ')[0]}</b>
-            <small>{labels.cta}</small>
+            <small>{L.cta}</small>
           </a>
         ))}
       </div>
