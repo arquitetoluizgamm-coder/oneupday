@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { createClient } from '../../lib/supabase/client';
 import { track } from '../../lib/track';
 
-export default function EncourageBar({ updateId, labelIdle, labelActive, supportersLabel = 'See who is with you', supportersLoading = 'Loading…', supportersEmpty = 'You are the first to show up here.', initialActive = false }) {
+export default function EncourageBar({ updateId, mediaId, labelIdle, labelActive, supportersLabel = 'See who is with you', supportersLoading = 'Loading…', supportersEmpty = 'You are the first to show up here.', initialActive = false }) {
+  const col = mediaId ? 'media_id' : 'update_id';
+  const val = mediaId || updateId;
   const [active, setActive] = useState(initialActive);
   const [busy, setBusy] = useState(false);
   const [people, setPeople] = useState(null);
@@ -17,12 +19,12 @@ export default function EncourageBar({ updateId, labelIdle, labelActive, support
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { window.location.href = '/login'; return; }
     if (active) {
-      await supabase.from('encouragements').delete().eq('update_id', updateId).eq('user_id', user.id);
+      await supabase.from('encouragements').delete().eq(col, val).eq('user_id', user.id);
       setActive(false);
     } else {
-      const { error } = await supabase.from('encouragements').insert({ update_id: updateId, user_id: user.id });
+      const { error } = await supabase.from('encouragements').insert({ [col]: val, user_id: user.id });
       if (error) {
-        await supabase.from('encouragements').delete().eq('update_id', updateId).eq('user_id', user.id);
+        await supabase.from('encouragements').delete().eq(col, val).eq('user_id', user.id);
         setActive(false);
       } else { setActive(true); track('encourage_sent', { updateId }); }
     }

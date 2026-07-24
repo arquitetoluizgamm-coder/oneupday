@@ -1,8 +1,10 @@
 'use client';
 import { useState } from 'react';
 
-export default function Comments({ updateId, labels }) {
+export default function Comments({ updateId, mediaId, labels }) {
   const L = labels || {};
+  const qs = mediaId ? `mediaId=${encodeURIComponent(mediaId)}` : `updateId=${encodeURIComponent(updateId)}`;
+  const targetBody = mediaId ? { mediaId } : { updateId };
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [text, setText] = useState('');
@@ -12,7 +14,7 @@ export default function Comments({ updateId, labels }) {
   const [replyTo, setReplyTo] = useState(null);
 
   async function load() {
-    const response = await fetch(`/api/comments?updateId=${encodeURIComponent(updateId)}`);
+    const response = await fetch(`/api/comments?${qs}`);
     const data = await response.json().catch(() => ({}));
     setItems(data.comments || []);
   }
@@ -24,7 +26,7 @@ export default function Comments({ updateId, labels }) {
     e.preventDefault();
     if (!text.trim() || busy) return;
     setBusy(true); setMessage('');
-    const response = await fetch('/api/comments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ updateId, text, parentId: replyTo?.id || null }) });
+    const response = await fetch('/api/comments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...targetBody, text, parentId: replyTo?.id || null }) });
     const data = await response.json().catch(() => ({}));
     if (response.status === 401) { window.location.href = '/login'; return; }
     if (response.status === 422) setMessage(L.unsafe);

@@ -200,7 +200,10 @@ export default function FeedClient({ labels }) {
               {item.kind === 'video' ? <video src={item.url} controls playsInline preload="metadata" /> : <img src={item.url} alt="" />}
             </div>
             <div className="entry-actions">
+              <EncourageBar mediaId={item.mediaId} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
               <FeedShare slug={item.owner.handle || ''} title={item.owner.name} label={labels.share} copiedLabel={labels.linkCopied} />
+              <Comments mediaId={item.mediaId} labels={labels.comments} />
+              <HugButton toId={item.owner.id} mediaId={item.mediaId} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
             </div>
           </article>
           ) : (

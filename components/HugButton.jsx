@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { createClient } from '../lib/supabase/client';
 
-export default function HugButton({ toId, updateId, name, labels, demo }) {
+export default function HugButton({ toId, updateId, mediaId, name, labels, demo }) {
   const L = labels || {};
   const [hugged, setHugged] = useState(false);
   const [toast, setToast] = useState('');
@@ -16,7 +16,7 @@ export default function HugButton({ toId, updateId, name, labels, demo }) {
       const sb = createClient();
       const { data: { user } } = await sb.auth.getUser();
       if (!user) { window.location.href = '/login'; return; }
-      await sb.from('hugs').insert({ from_id: user.id, to_id: toId, update_id: updateId });
+      await sb.from('hugs').insert({ from_id: user.id, to_id: toId, update_id: mediaId ? null : updateId, media_id: mediaId || null });
     } catch {}
   }
   return (

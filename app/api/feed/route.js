@@ -199,7 +199,12 @@ export async function GET(req) {
       const mIds = [...new Set(rows.map((m) => m.user_id))];
       const mp = {};
       if (mIds.length) { const { data: profs } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', mIds); (profs || []).forEach((pr) => { mp[pr.id] = pr; }); }
-      mediaFeed = rows.map((m) => ({ id: 'media-' + m.id, media: true, url: m.url, kind: m.kind, caption: m.caption || '', created_at: m.created_at, owner: mp[m.user_id] || {} }));
+      mediaFeed = rows.map((m) => ({ id: 'media-' + m.id, media: true, mediaId: m.id, url: m.url, kind: m.kind, caption: m.caption || '', created_at: m.created_at, owner: mp[m.user_id] || {}, encouraged: false }));
+      try {
+        const { data: myE } = await supabase.from('encouragements').select('media_id').eq('user_id', user.id).in('media_id', mediaFeed.map((x) => x.mediaId));
+        const eset = new Set((myE || []).map((e) => e.media_id));
+        mediaFeed.forEach((it) => { it.encouraged = eset.has(it.mediaId); });
+      } catch {}
     } catch {}
   }
   const mediaTotal = mediaFeed.length;
