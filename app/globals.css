@@ -165,7 +165,8 @@ a{color:inherit;text-decoration:none}
 
 /* ---------- Photos ---------- */
 .kind.photo{border-style:dashed}
-.photo-preview,.update-photo,.feed-photo{margin-top:10px;width:min(100%,420px);aspect-ratio:9 / 16;overflow:hidden;border-radius:16px;background:#ebe9e3}
+.photo-preview,.update-photo,.feed-photo{margin-top:10px;width:min(100%,420px);overflow:hidden;border-radius:16px;background:#0b0d18}
+.photo-preview img,.photo-preview video,.update-photo img,.update-photo video,.feed-photo img{width:100%;height:auto;display:block;aspect-ratio:4/5;object-fit:cover;max-height:70vh}
 .photo-preview img,.update-photo img,.feed-photo img{width:100%;height:100%;object-fit:cover;border-radius:16px;border:1px solid var(--line)}
 .update-photo{margin:8px 0}
 
@@ -1373,10 +1374,10 @@ body{background:#f1f0eb}
 }
 
 /* Mídia padronizada do feed: proporção única e enquadramento consistente. */
-.feed-page .entry-media{width:100%;aspect-ratio:9 / 16;margin:14px 0 0;overflow:hidden;border-radius:0;background:#ebe9e3}
-.feed-page .entry-media img,.feed-page .entry-media video{width:100%;height:100%;display:block;object-fit:cover;border-radius:0}
+.feed-page .entry-media{width:100%;margin:10px 0 0;overflow:hidden;border-radius:0;background:#0b0d18}
+.feed-page .entry-media img,.feed-page .entry-media video{width:100%;height:auto;display:block;aspect-ratio:4/5;object-fit:cover;max-height:calc(100svh - 230px);border-radius:0}
 @media(max-width:640px){
-  .feed-page .entry-media{width:calc(100% + 32px);margin-left:-16px;margin-right:-16px;border-radius:0;aspect-ratio:9 / 16}
+  .feed-page .entry-media{width:calc(100% + 32px);margin-left:-16px;margin-right:-16px;border-radius:0}
 }
 
 /* Biblioteca inicial de jornadas de exemplo. */
