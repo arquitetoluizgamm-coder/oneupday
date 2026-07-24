@@ -90,13 +90,14 @@ export default async function Home() {
 
   return (
     <>
-      <header className="top">
-        <Logo href="/home" />
-        <div className="top-right">
+      <header className="top top-3">
+        <div className="top-left">
           <HeaderHeart likes={heartLikes} follows={heartFollows} labels={{ title: t.heartTitle, likes: t.heartLikes, follows: t.heartFollows, empty: t.heartEmpty, seeAll: t.heartSeeAll }} />
-          <a className="icon-btn" href="/explore" aria-label={t.explore}>
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><path d="m15 9-2 5-5 2 2-5z" /></svg>
-          </a>
+        </div>
+        <a className="top-brand" href="/home" aria-label="One Up Day">
+          <img src="/logo-wordmark.png" alt="One Up Day" />
+        </a>
+        <div className="top-right">
           <a className="header-ava" href="/perfil" aria-label={profile.name} style={{ background: profile.avatar_color || 'var(--orange)' }}>
             {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : profile.name[0]}
           </a>
