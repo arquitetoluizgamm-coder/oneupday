@@ -1609,3 +1609,20 @@ img,video{max-width:100%}
 @media(max-width:640px){
   .support-strip{padding-left:16px;padding-right:16px}
 }
+/* ==========================================================
+   Faixa arrastável (parada) + tema branco
+   ========================================================== */
+.ss-scroll{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px;cursor:grab;scroll-behavior:smooth}
+.ss-scroll::-webkit-scrollbar{display:none}
+.ss-scroll.grabbing{cursor:grabbing;scroll-behavior:auto}
+.ss-scroll .ss-ava{user-select:none}
+/* desativa o marquee antigo, se houver */
+.ss-track,.ss-track.anim{animation:none!important}
+
+/* Tema branco: fundo, topo, cabeçalho, ícones e faixa em branco */
+:root{ --bg:#ffffff; --surface:#ffffff; }
+body{ background:#ffffff }
+.top{ background:#ffffff; }
+html.chrome-scrolling .top{ box-shadow:0 1px 0 rgba(16,19,45,.05) }
+.feed-tabs{ background:linear-gradient(#ffffff 78%,transparent) }
+.support-strip{ background:transparent }
