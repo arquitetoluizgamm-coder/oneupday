@@ -7,6 +7,7 @@ import SupportStrip from '../../components/SupportStrip';
 import SuggestionCard from '../../components/SuggestionCard';
 import HugButton from '../../components/HugButton';
 import NeedsSupport from '../../components/NeedsSupport';
+import MeTooButton from '../../components/MeTooButton';
 import { MOODS, moodGlow } from '../../lib/moods';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
@@ -262,6 +263,7 @@ export default function FeedClient({ labels }) {
             ) : (
               <div className="entry-actions">
                 <EncourageBar updateId={item.id} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
+                {(item.kind === 'setback' || item.comeback) && !item.demo && <MeTooButton updateId={item.id} labels={labels.metoo} />}
                 <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
                 <Comments updateId={item.id} labels={labels.comments} />
                 <HugButton toId={item.owner.id} updateId={item.id} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />

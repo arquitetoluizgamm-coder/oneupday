@@ -42,7 +42,14 @@ async function loadJourney(slug) {
       (mine || []).forEach(e => myEnc.push(e.update_id));
     }
   }
-  return { journey, owner, updates: ups, stats: stats || {}, encById, viewerId: user?.id || null, myEnc };
+  const meTooByUpdate = {};
+  if (user && user.id === journey.owner_id && ups.length) {
+    try {
+      const { data: mts } = await sb.from('me_too').select('update_id, msg_key').in('update_id', ups.map(u => u.id));
+      (mts || []).forEach((m) => { (meTooByUpdate[m.update_id] ||= []).push(m.msg_key); });
+    } catch {}
+  }
+  return { journey, owner, updates: ups, stats: stats || {}, encById, viewerId: user?.id || null, myEnc, meTooByUpdate };
   } catch (e) { return null; }
 }
 
@@ -254,8 +261,9 @@ export default async function JourneyPage({ params, searchParams }) {
     if (prof) return <ProfilePage handle={prof.profile.handle} />;
     notFound();
   }
-  const { journey, owner, updates, stats, encById, viewerId, myEnc } = data;
+  const { journey, owner, updates, stats, encById, viewerId, myEnc, meTooByUpdate = {} } = data;
   const isOwner = viewerId && viewerId === journey.owner_id;
+  const meTooMsg = { back: t.meTooBack, trying: t.meTooTrying, hard: t.meTooHard };
   const myEncSet = new Set(myEnc || []);
   const fromShare = searchParams?.r === 's';
   const pct = Math.min(100, stats.progress_pct || 0);
@@ -333,6 +341,15 @@ export default async function JourneyPage({ params, searchParams }) {
                 {u.photo_url && <div className="update-photo"><img src={u.photo_url} alt="" /></div>}
                 {u.video_url && <div className="update-photo"><video src={u.video_url} controls playsInline preload="metadata" /></div>}
                 {u.text && u.text !== '📷' && u.text !== '🎥' && <p>{u.text}</p>}
+                {isOwner && (meTooByUpdate[u.id] || []).length > 0 && (
+                  <div className="metoo-author">
+                    <b>{t.meTooAuthor}</b>
+                    <span>{fill(t.meTooCountFmt, { n: meTooByUpdate[u.id].length })}</span>
+                    <ul>
+                      {meTooByUpdate[u.id].filter(k => k !== 'metoo').slice(0, 6).map((k, i) => <li key={i}>“{meTooMsg[k]}”</li>)}
+                    </ul>
+                  </div>
+                )}
                 <div className="update-foot">
                   <EncourageBar updateId={u.id} initialActive={myEncSet.has(u.id)} labelIdle={t.withYouIdle} labelActive={t.withYouActive} supportersLabel={t.supporters} supportersLoading={t.supportersLoading} supportersEmpty={t.supportersEmpty} />
                   <Comments updateId={u.id} labels={{ comment: t.comment, close: t.commentClose, empty: t.commentEmpty, placeholder: t.commentPlaceholder, send: t.commentSend, sending: t.commentSending, unsafe: t.commentUnsafe, error: t.commentError, someone: t.commentSomeone, reply: t.commentReply, more: t.commentMore, less: t.commentLess, replying: t.commentReplying, cancel: t.commentCancel }} />

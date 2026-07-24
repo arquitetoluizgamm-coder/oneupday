@@ -2012,3 +2012,19 @@ html.chrome-scrolling .top{box-shadow:none!important}
 .tab-empty{text-align:center;padding:36px 16px;color:var(--muted)}
 .tab-empty p{margin:0 0 16px;font-size:15px}
 .pc-consistency{margin:6px 0 0}
+
+/* ---- "Eu também" (identificação anônima) ---- */
+.metoo-wrap{position:relative}
+.metoo-btn{border:0;background:transparent;cursor:pointer;font:inherit;font-size:13px;font-weight:750;color:var(--muted);padding:6px 8px;border-radius:999px}
+.metoo-btn:hover{background:rgba(16,19,45,.06);color:var(--ink)}
+.metoo-btn.on{color:#8a6d1d;cursor:default}
+.metoo-pop{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:40;width:min(260px,80vw);background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 34px rgba(16,19,45,.16);padding:12px;display:grid;gap:6px}
+.metoo-pop b{font-size:13px;letter-spacing:-.01em;margin-bottom:2px}
+.metoo-pop button{border:1px solid var(--line);background:#fff;cursor:pointer;font:inherit;font-size:13px;padding:8px 10px;border-radius:10px;text-align:left}
+.metoo-pop button:hover{border-color:var(--night)}
+.metoo-pop .metoo-just{color:var(--muted);border-style:dashed}
+.metoo-author{margin:10px 0 4px;background:#fbf7ee;border:1px solid #ecdfc3;border-radius:12px;padding:10px 12px}
+.metoo-author b{display:block;font-size:13.5px;color:#6b5313}
+.metoo-author span{font-size:12px;color:var(--muted)}
+.metoo-author ul{margin:6px 0 0;padding:0;list-style:none;display:grid;gap:3px}
+.metoo-author li{font-size:12.5px;font-style:italic;color:#5a5f6e}
