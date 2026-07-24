@@ -1439,3 +1439,21 @@ html.chrome-scrolling .top{box-shadow:0 1px 0 var(--line)}
 /* ---- Título da jornada em destaque no cabeçalho do post ---- */
 .entry-id small{color:var(--muted)}
 .entry-id small .entry-journey{color:var(--ink);font-weight:750;letter-spacing:-.01em}
+/* ---- Topo transparente + ícones ---- */
+.top{background:transparent;border-bottom:0}
+html.chrome-scrolling .top{box-shadow:none}
+.icon-btn{width:38px;height:38px;border-radius:50%;display:inline-grid;place-items:center;background:transparent;border:0;color:var(--ink);cursor:pointer;padding:0}
+.icon-btn:hover{background:rgba(16,19,45,.07)}
+
+/* ---- Sheet "O que avançou hoje?" ---- */
+.sheet-backdrop{position:fixed;inset:0;background:rgba(16,19,45,.45);z-index:80;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .18s ease}
+.sheet{background:var(--surface);width:100%;max-width:720px;border-radius:20px 20px 0 0;padding:16px 18px 30px;max-height:88svh;overflow-y:auto;animation:sheetUp .22s ease}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sheet-head b{font-size:17px;letter-spacing:-.02em}
+.sheet-close{border:0;background:transparent;font-size:16px;color:var(--muted);cursor:pointer;padding:6px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes sheetUp{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
+@media(min-width:720px){
+  .sheet-backdrop{align-items:center}
+  .sheet{border-radius:20px;max-height:82svh}
+}
