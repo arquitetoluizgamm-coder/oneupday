@@ -11,6 +11,8 @@ import ProgressBar from '../../components/ProgressBar';
 import Track from '../../components/Track';
 import ScrollChrome from '../../components/ScrollChrome';
 import HeaderHeart from '../../components/HeaderHeart';
+import DailyMood from '../../components/DailyMood';
+import { MOODS, moodGlow } from '../../lib/moods';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -63,6 +65,9 @@ export default async function Home() {
   heartFollowers.delete(user.id);
   const heartFollows = heartFollowers.size;
 
+  let myMood = ''; let moodToday = false;
+  try { const { data: mp } = await supabase.from('profiles').select('mood, mood_at').eq('id', user.id).maybeSingle(); if (mp?.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) { myMood = mp.mood || ''; moodToday = !!myMood; } } catch {}
+
   let aiPrefOff = false;
   try { const { data: pref } = await supabase.from('profiles').select('ai_opt_out').eq('id', user.id).maybeSingle(); aiPrefOff = !!pref?.ai_opt_out; } catch { }
   const aiOn = !!process.env.OPENAI_API_KEY && !aiPrefOff && !!primary;
@@ -99,7 +104,7 @@ export default async function Home() {
           <img src="/logo-name.png" alt="One Up Day" />
         </a>
         <div className="top-right">
-          <a className="header-ava" href="/perfil" aria-label={profile.name} style={{ background: profile.avatar_color || 'var(--orange)' }}>
+          <a className="header-ava" href="/perfil" aria-label={profile.name} style={{ background: profile.avatar_color || 'var(--orange)', ...(myMood && MOODS[myMood] ? { boxShadow: moodGlow(MOODS[myMood]) } : {}) }}>
             {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : profile.name[0]}
           </a>
         </div>
@@ -107,6 +112,7 @@ export default async function Home() {
 
       <Track type="visit" meta={{ page: "home" }} />
       <ScrollChrome />
+      <DailyMood userId={user.id} answeredToday={moodToday} labels={{ title: t.dailyMoodTitle, sub: t.dailyMoodSub, skip: t.dailyMoodSkip, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful } }} />
       <main className="wrap feed-page">
         {!primary && (
           <section className="first-journey">

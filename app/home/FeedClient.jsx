@@ -5,10 +5,9 @@ import FeedShare from './FeedShare';
 import Comments from '../../components/Comments';
 import SupportStrip from '../../components/SupportStrip';
 import SuggestionCard from '../../components/SuggestionCard';
-import { MOODS } from '../../lib/moods';
+import { MOODS, moodGlow } from '../../lib/moods';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
-function moodGlow(hex) { const n = parseInt(hex.slice(1), 16); const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255; return `0 0 0 2px #fff, 0 0 0 4px rgba(${r},${g},${b},.6), 0 0 15px rgba(${r},${g},${b},.55)`; }
 
 function TrackTag({ track }) {
   const [playing, setPlaying] = useState(false);
@@ -169,11 +168,11 @@ export default function FeedClient({ labels }) {
           <article className={`entry ${item.kind || 'step'}${item.demo ? ' is-demo' : ''}`}>
             <div className="entry-head">
               <a className="entry-person" href={`/${item.owner.handle || item.journey.slug}`}>
-                <span className="entry-ava" style={{ background: item.owner.avatar_color || 'var(--orange)', ...(item.mood && MOODS[item.mood] ? { boxShadow: moodGlow(MOODS[item.mood]) } : {}) }}>
+                <span className="entry-ava" style={{ background: item.owner.avatar_color || 'var(--orange)', ...(item.owner.mood && MOODS[item.owner.mood] ? { boxShadow: moodGlow(MOODS[item.owner.mood]) } : {}) }}>
                   {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}
                 </span>
                 <span className="entry-id">
-                  <b>{item.owner.name}{item.mood && (labels.moods || {})[item.mood] && <span className="entry-mood" style={{ color: MOODS[item.mood] }}> · {labels.moods[item.mood]}</span>}</b>
+                  <b>{item.owner.name}{item.owner.mood && (labels.moods || {})[item.owner.mood] && <span className="entry-mood" style={{ color: MOODS[item.owner.mood] }}> · {labels.moods[item.owner.mood]}</span>}</b>
                   <small><span className="entry-journey">{item.journey.title}</span> · {dayLabel(item.day_number)}</small>
                 </span>
               </a>

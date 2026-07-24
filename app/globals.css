@@ -1710,3 +1710,14 @@ html.chrome-scrolling .top{ box-shadow:0 1px 0 rgba(16,19,45,.05) }
 .mood-chip.on{background:rgba(16,19,45,.03);font-weight:700}
 .entry-mood{font-size:12.5px;font-weight:700;letter-spacing:.01em}
 .entry-ava{transition:box-shadow .25s ease}
+/* ---- Pergunta diária de sentimento ---- */
+.dm-backdrop{position:fixed;inset:0;z-index:90;background:rgba(16,19,45,.42);display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .18s ease}
+.dm-card{background:#fff;width:100%;max-width:460px;border-radius:22px 22px 0 0;padding:22px 20px 26px;animation:sheetUp .22s ease}
+.dm-title{display:block;font-size:19px;letter-spacing:-.02em}
+.dm-sub{color:var(--muted);font-size:14px;margin:6px 0 16px;line-height:1.45}
+.dm-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.dm-mood{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:#fff;border-radius:14px;padding:13px 14px;font-size:15px;font-weight:650;color:var(--ink);cursor:pointer;text-align:left}
+.dm-mood:hover{background:var(--soft,#f7f6fb)}
+.dm-dot{width:13px;height:13px;border-radius:50%;flex:0 0 auto}
+.dm-skip{margin:16px auto 0;display:block;border:0;background:transparent;color:var(--muted);font-weight:700;font-size:14px;cursor:pointer}
+@media(min-width:520px){ .dm-backdrop{align-items:center} .dm-card{border-radius:22px} }

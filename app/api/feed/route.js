@@ -150,13 +150,11 @@ export async function GET(req) {
     } catch {}
   }
 
-  const moodByUpdate = {};
-  if (updates.length) {
-    try {
-      const { data: mrows } = await supabase.from('updates').select('id, mood').in('id', updates.map((item) => item.id)).not('mood', 'is', null);
-      (mrows || []).forEach((m) => { moodByUpdate[m.id] = m.mood; });
-    } catch {}
-  }
+  const ownerMoodById = {};
+  try {
+    const { data: mps } = await supabase.from('profiles').select('id, mood, mood_at').in('id', ownerIds).not('mood', 'is', null);
+    (mps || []).forEach((mp) => { if (mp.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) ownerMoodById[mp.id] = mp.mood; });
+  } catch {}
 
   const realItems = updates.map((item) => {
     const journey = journeyMap[item.journey_id];
@@ -164,11 +162,10 @@ export async function GET(req) {
     return {
       ...item,
       journey: { slug: journey.slug, title: journey.title, category: journey.category, total_days: journey.total_days, current_day: (statsByJourney[journey.id] || {}).current_day || 0, progress_pct: (statsByJourney[journey.id] || {}).progress_pct || 0 },
-      owner: profileMap[journey.owner_id] || {},
+      owner: { ...(profileMap[journey.owner_id] || {}), mood: ownerMoodById[journey.owner_id] || null },
       track: trackByUpdate[item.id] || null,
       encouraged: myEnc.has(item.id),
       supporters: supportersByUpdate[item.id] || [],
-      mood: moodByUpdate[item.id] || null,
     };
   }).filter(Boolean);
 
