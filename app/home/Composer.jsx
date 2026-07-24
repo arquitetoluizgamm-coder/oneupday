@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 import TrackPicker from './TrackPicker';
+import { MOOD_ORDER, MOODS } from '../../lib/moods';
 import { track } from '../../lib/track';
 
 const ORDER = ['step', 'win', 'setback', 'learned'];
@@ -37,6 +38,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [videoUrl, setVideoUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [track, setTrack] = useState(null);
+  const [mood, setMood] = useState('');
   const [aiErr, setAiErr] = useState('');
   const photoRef = useRef(null);
   const videoRef = useRef(null);
@@ -130,11 +132,12 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       text: value || fallback, photo_url: photoUrl, video_url: videoUrl,
     };
     if (track) { row.track_title = track.title; row.track_artist = track.artist; row.track_audio_url = track.audio_url; }
+    if (mood) row.mood = mood;
     const { error } = await supabase.from('updates').insert(row);
     setSaving(false);
     if (error) { alert(t.error); return; }
     track('update_posted', { journeyId, kind });
-    setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null);
+    setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null); setMood('');
     if (photoRef.current) photoRef.current.value = '';
     if (videoRef.current) videoRef.current.value = '';
     router.refresh();
@@ -166,6 +169,16 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       {photoUrl && <div className="photo-preview"><img src={photoUrl} alt="" /></div>}
       {videoUrl && <div className="photo-preview"><video src={videoUrl} controls playsInline /></div>}
 
+      <div className="mood-row">
+        <span className="mood-q">{t.moodQ}</span>
+        <div className="mood-chips">
+          {MOOD_ORDER.map(k => (
+            <button type="button" key={k} className={`mood-chip${mood === k ? ' on' : ''}`} style={mood === k ? { borderColor: MOODS[k], color: MOODS[k] } : undefined} onClick={() => setMood(mood === k ? '' : k)}>
+              <i style={{ background: MOODS[k] }} />{(t.moods || {})[k]}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="kind-seg">
         {ORDER.map(k => (
           <button key={k} type="button" className={`kseg${kind === k ? ' on' : ''} k-${k}`} onClick={() => setKind(k)}>{labels[k]}</button>

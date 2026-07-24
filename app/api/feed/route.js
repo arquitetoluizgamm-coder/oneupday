@@ -150,6 +150,14 @@ export async function GET(req) {
     } catch {}
   }
 
+  const moodByUpdate = {};
+  if (updates.length) {
+    try {
+      const { data: mrows } = await supabase.from('updates').select('id, mood').in('id', updates.map((item) => item.id)).not('mood', 'is', null);
+      (mrows || []).forEach((m) => { moodByUpdate[m.id] = m.mood; });
+    } catch {}
+  }
+
   const realItems = updates.map((item) => {
     const journey = journeyMap[item.journey_id];
     if (!journey) return null;
@@ -160,6 +168,7 @@ export async function GET(req) {
       track: trackByUpdate[item.id] || null,
       encouraged: myEnc.has(item.id),
       supporters: supportersByUpdate[item.id] || [],
+      mood: moodByUpdate[item.id] || null,
     };
   }).filter(Boolean);
 

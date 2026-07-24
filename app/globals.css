@@ -1701,3 +1701,12 @@ html.chrome-scrolling .top{ box-shadow:0 1px 0 rgba(16,19,45,.05) }
 .sg-item .follow-btn{flex:0 0 auto;background:var(--night);color:#fff;border:0;border-radius:999px;padding:7px 16px;font-weight:800;font-size:13px;cursor:pointer}
 .sg-item .follow-btn.on{background:transparent;color:var(--muted);border:1px solid var(--line)}
 @media(max-width:640px){ .suggest-card{margin-left:16px;margin-right:16px} }
+/* ---- Sentimento (opcional) no compositor + feed ---- */
+.mood-row{margin-top:12px}
+.mood-q{display:block;font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.mood-chips{display:flex;flex-wrap:wrap;gap:7px}
+.mood-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.mood-chip i{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.mood-chip.on{background:rgba(16,19,45,.03);font-weight:700}
+.entry-mood{font-size:12.5px;font-weight:700;letter-spacing:.01em}
+.entry-ava{transition:box-shadow .25s ease}
