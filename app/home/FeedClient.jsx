@@ -51,18 +51,33 @@ function EntryText({ text, labels }) {
 
 function DemoActions({ item, labels }) {
   const [liked, setLiked] = useState(false);
+  const [showC, setShowC] = useState(false);
+  const samples = labels.comments.samples || [];
+  const commenters = (item.supporters || []).slice(0, 3);
   return (
+    <>
     <div className="entry-actions">
       <button type="button" className={`support-pill${liked ? ' on' : ''}`} onClick={() => setLiked((v) => !v)} aria-label={labels.supportIdle}>
         <svg className="sp-heart" viewBox="0 0 24 24" width="22" height="22" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1 7.8 7.8 7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
         <span className="action-label">{labels.supportIdle}</span>
       </button>
-      <button type="button" className="comment-toggle" aria-label={labels.comments.comment}>
+      <button type="button" className="comment-toggle" aria-label={labels.comments.comment} onClick={() => setShowC((v) => !v)}>
         <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12 7.6L3 21l1.9-5.7A8.4 8.4 0 1 1 21 11.5z"/></svg>
         <span className="action-label">{labels.comments.comment}</span>
       </button>
       <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
     </div>
+    {showC && (
+      <div className="comment-panel">
+        {commenters.length ? commenters.map((p, i) => (
+          <div className="cmt" key={i}>
+            <span className="cmt-ava" style={{ background: p.avatar_color || 'var(--muted)' }}>{p.avatar_url ? <img src={p.avatar_url} alt="" /> : (p.name || '?')[0]}</span>
+            <div className="cmt-body"><b>{(p.name || '').split(' ')[0]}</b> {samples[i % (samples.length || 1)]}</div>
+          </div>
+        )) : <p className="comment-empty">{labels.comments.empty}</p>}
+      </div>
+    )}
+    </>
   );
 }
 
