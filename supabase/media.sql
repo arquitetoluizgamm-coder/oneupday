@@ -6,6 +6,7 @@ create table if not exists public.media (
   url        text not null,
   kind       text not null default 'photo',
   visibility text not null default 'public' check (visibility in ('public','followers','private')),
+  caption    text,
   created_at timestamptz default now()
 );
 create index if not exists idx_media_user on public.media(user_id, created_at desc);
