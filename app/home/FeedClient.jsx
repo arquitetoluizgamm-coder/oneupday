@@ -164,13 +164,13 @@ export default function FeedClient({ labels }) {
                 </span>
                 <span className="entry-id">
                   <b>{item.owner.name}</b>
-                  <small>{dayLabel(item.day_number)} · <b className="entry-journey">{item.journey.title}</b></small>
+                  <small><span className="entry-journey">{item.journey.title}</span> · {dayLabel(item.day_number)}</small>
                 </span>
               </a>
               {item.owner.id && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
-              {item.kind === 'setback' && <span className="entry-tag setback">{labels.tagSetback}</span>}
-              {item.kind === 'win' && <span className="entry-tag win">{labels.tagWin}</span>}
             </div>
+            {item.kind === 'setback' && <div className="entry-kindline setback">{labels.tagSetback}</div>}
+            {item.kind === 'win' && <div className="entry-kindline win">{labels.tagWin}</div>}
 
             {(() => {
               const hasMedia = !!(item.photo_url || item.video_url);
