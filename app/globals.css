@@ -1410,3 +1410,7 @@ body{background:#f1f0eb}
 .top{transition:transform .28s ease,box-shadow .2s ease}
 html.chrome-hide .top{transform:translateY(-110%)}
 html.chrome-scrolling .top{box-shadow:0 1px 0 var(--line)}
+
+/* ---- Padrão de mídia do feed: 4:5 (1080x1350), post inteiro na tela ---- */
+.entry-media{width:100%;overflow:hidden;background:#0b0d18}
+.entry-media img,.entry-media video{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;max-height:calc(100svh - 230px)}
