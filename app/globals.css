@@ -1657,3 +1657,13 @@ html.chrome-scrolling .top{ box-shadow:0 1px 0 rgba(16,19,45,.05) }
 .top-3 .top-brand img{height:26px;width:auto;display:block}
 .top-3 .top-right{justify-self:end;display:flex;align-items:center;gap:10px}
 @media(max-width:640px){ .top-3 .top-brand img{height:23px} }
+/* ---- Barra de progresso SOBRE a mídia (cor de evolução) ---- */
+.entry-media{position:relative}
+.entry-textcard{position:relative}
+.media-progress{position:absolute;left:0;right:0;bottom:0;padding:14px 14px 10px;display:flex;align-items:center;gap:9px;background:linear-gradient(to top,rgba(9,10,20,.55),transparent);pointer-events:none}
+.entry-textcard .media-progress{background:linear-gradient(to top,rgba(16,19,45,.10),transparent)}
+.media-progress .mp-bar{flex:1;height:4px;border-radius:999px;background:rgba(255,255,255,.28);overflow:hidden}
+.entry-textcard .media-progress .mp-bar{background:rgba(16,19,45,.12)}
+.media-progress .mp-bar span{display:block;height:100%;border-radius:999px;background:var(--up)}
+.media-progress .mp-label{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.entry-textcard .media-progress .mp-label{color:var(--ink);text-shadow:none}

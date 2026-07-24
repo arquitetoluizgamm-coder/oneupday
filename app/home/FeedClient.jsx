@@ -176,19 +176,30 @@ export default function FeedClient({ labels }) {
             {(() => {
               const hasMedia = !!(item.photo_url || item.video_url);
               const cleanText = item.text && item.text !== '📷' && item.text !== '🎥' ? item.text : '';
+              const total = item.journey.total_days || 0;
+              const day = item.journey.current_day || 0;
+              const pct = total ? Math.min(100, Math.max(3, item.journey.progress_pct || Math.round((day / total) * 100))) : 0;
+              const left = Math.max(0, total - day);
+              const progressEl = total > 0 ? (
+                <div className="media-progress" aria-hidden="true">
+                  <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
+                  <span className="mp-label">{(labels.progressFmt || '').replace('{d}', day).replace('{r}', left)}</span>
+                </div>
+              ) : null;
               if (!hasMedia && cleanText) {
                 return (
                   <a href={`/${item.journey.slug}`} className={`entry-textcard${cleanText.length > 130 ? ' long' : ''}`}>
                     <span className="etc-day">{dayLabel(item.day_number)}</span>
                     <p>{cleanText}</p>
+                    {progressEl}
                   </a>
                 );
               }
               return (
                 <>
                   {cleanText && <EntryText text={cleanText} labels={labels} />}
-                  {item.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={item.photo_url} alt="" /></a>}
-                  {item.video_url && !item.photo_url && <div className="entry-media"><video src={item.video_url} controls playsInline preload="metadata" /></div>}
+                  {item.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={item.photo_url} alt="" />{progressEl}</a>}
+                  {item.video_url && !item.photo_url && <div className="entry-media"><video src={item.video_url} controls playsInline preload="metadata" />{progressEl}</div>}
                 </>
               );
             })()}
@@ -205,18 +216,6 @@ export default function FeedClient({ labels }) {
                 <Comments updateId={item.id} labels={labels.comments} />
               </div>
             )}
-            {item.journey.total_days > 0 && (() => {
-              const day = item.journey.current_day || 0;
-              const total = item.journey.total_days;
-              const pct = Math.min(100, Math.max(3, item.journey.progress_pct || Math.round((day / total) * 100)));
-              const left = Math.max(0, total - day);
-              return (
-                <div className="entry-progress" aria-hidden="true">
-                  <div className="ep-bar"><span style={{ width: pct + '%' }} /></div>
-                  <span className="ep-label">{(labels.progressFmt || '').replace('{d}', day).replace('{r}', left)}</span>
-                </div>
-              );
-            })()}
           </article>
         ))}
 
