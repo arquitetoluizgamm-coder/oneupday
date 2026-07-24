@@ -1987,3 +1987,13 @@ html.chrome-scrolling .top{box-shadow:none!important}
 .nc-closed{cursor:default;animation:ncGlow 3.2s ease-in-out infinite}
 @keyframes ncGlow{0%,100%{box-shadow:0 14px 34px rgba(13,17,48,.28), inset 0 0 0 1px rgba(255,255,255,.07)}50%{box-shadow:0 14px 40px rgba(35,43,110,.5), inset 0 0 0 1px rgba(159,208,255,.22)}}
 @media(max-width:640px){ .nc{margin-left:16px;margin-right:16px} }
+
+/* ---- Envelope de Amanhã ---- */
+.env-box{background:linear-gradient(135deg,#fdfbf6,#f7f2e8);border:1px solid #e8e0cf}
+.env-eyebrow{display:block;font-size:13px;font-weight:800;letter-spacing:.02em;color:#8a6d1d;margin-bottom:10px}
+.env-input{width:100%;border:1.5px solid #e2d8c2;border-radius:14px;padding:12px 14px;font:inherit;font-size:15px;line-height:1.5;resize:none;background:#fff}
+.env-input:focus{outline:0;border-color:#c9a94e}
+.env-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+.nc-env{margin:14px 0 0;background:rgba(242,179,76,.12);border:1px solid rgba(242,179,76,.3);border-radius:14px;padding:12px 14px}
+.nc-env small{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#f2b34c;margin-bottom:4px}
+.nc-env p{margin:0;font-size:15px;line-height:1.5;font-style:italic;color:#fff}

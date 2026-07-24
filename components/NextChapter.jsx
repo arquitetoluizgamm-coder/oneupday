@@ -1,11 +1,12 @@
 'use client';
 import { useState } from 'react';
+import { createClient } from '../lib/supabase/client';
 
 // Próximo Capítulo — antecipação, nunca ansiedade.
 // mode: 'sealed'  (postou hoje: cartão fechado pra amanhã)
 //       'reveal'  (voltou no dia seguinte: capítulo pronto)
 //       'return'  (voltou depois de uma pausa: nada expirou)
-export default function NextChapter({ mode, line, labels }) {
+export default function NextChapter({ mode, line, env, labels }) {
   const L = labels || {};
   const [open, setOpen] = useState(false);
   if (!mode) return null;
@@ -25,7 +26,10 @@ export default function NextChapter({ mode, line, labels }) {
       <section className="nc nc-closed" aria-label={L.title}>
         <span className="nc-eyebrow">{L.title}</span>
         <p className="nc-closed-text">{mode === 'return' ? L.returnTitle : L.ready}</p>
-        <button type="button" className="nc-open-btn" onClick={() => setOpen(true)}>{L.open}</button>
+        <button type="button" className="nc-open-btn" onClick={() => {
+          setOpen(true);
+          if (env?.id) { try { createClient().from('envelopes').update({ opened_at: new Date().toISOString() }).eq('id', env.id).then(() => {}); } catch {} }
+        }}>{L.open}</button>
       </section>
     );
   }
@@ -34,6 +38,12 @@ export default function NextChapter({ mode, line, labels }) {
     <section className="nc nc-openned" aria-label={L.title}>
       <span className="nc-eyebrow">{L.title}</span>
       <p className="nc-lead">{mode === 'return' ? L.returnLead : L.lead}</p>
+      {env && env.text && (
+        <div className="nc-env">
+          <small>{mode === 'return' ? L.envLeadReturn : L.envLead}</small>
+          <p>“{env.text}”</p>
+        </div>
+      )}
       <div className="nc-step"><small>{L.stepLabel}</small><b>{L.step}</b></div>
       <p className="nc-identity">{L.identity}</p>
       {line && line.days && line.days.length > 0 && (

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 import TrackPicker from './TrackPicker';
 import ImageCropper from '../../components/ImageCropper';
-import { track } from '../../lib/track';
+import { track as trackEvent } from '../../lib/track';
 
 const ORDER = ['step', 'win', 'setback', 'learned'];
 
@@ -39,6 +39,9 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [uploading, setUploading] = useState(false);
   const [track, setTrack] = useState(null);
   const [aiErr, setAiErr] = useState('');
+  const [posted, setPosted] = useState(false);
+  const [envText, setEnvText] = useState('');
+  const [envBusy, setEnvBusy] = useState(false);
   const [rawFile, setRawFile] = useState(null);
   const [rawUrl, setRawUrl] = useState('');
   const photoRef = useRef(null);
@@ -135,8 +138,8 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     const { error } = await supabase.from('updates').insert({ journey_id: journeyId, day_number: dayNumber, kind, text: defaultText });
     setSaving(false);
     if (error) { alert(t.error); return; }
-    track('update_posted', { journeyId, kind, quick: true });
-    router.refresh();
+    trackEvent('update_posted', { journeyId, kind, quick: true });
+    setPosted(true);
   }
 
   async function post() {
@@ -153,16 +156,45 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     const { error } = await supabase.from('updates').insert(row);
     setSaving(false);
     if (error) { alert(t.error); return; }
-    track('update_posted', { journeyId, kind });
+    trackEvent('update_posted', { journeyId, kind });
     setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null);
     if (photoRef.current) photoRef.current.value = '';
     if (videoRef.current) videoRef.current.value = '';
+    setPosted(true);
+  }
+
+  async function doneEnvelope(save) {
+    if (envBusy) return;
+    setEnvBusy(true);
+    if (save && envText.trim()) {
+      try {
+        const sb = createClient();
+        const { data: { user } } = await sb.auth.getUser();
+        if (user) await sb.from('envelopes').insert({ user_id: user.id, journey_id: journeyId, text: envText.trim().slice(0, 200) });
+      } catch {}
+    }
+    setEnvBusy(false);
+    setPosted(false); setEnvText('');
     router.refresh();
   }
 
   const showCare = looksRisky(text);
   const dayNumber = Math.max(1, Math.floor((Date.now() - new Date(startDate).getTime()) / 86400000) + 1);
   const ph = t.placeholder.replace('{n}', dayNumber);
+
+  if (posted) {
+    return (
+      <div className="composer2 env-box">
+        <span className="env-eyebrow">💌 {t.env?.q}</span>
+        <textarea className="env-input" value={envText} onChange={e => setEnvText(e.target.value)}
+          maxLength={200} placeholder={t.env?.ph} rows={2} autoFocus />
+        <div className="env-actions">
+          <button type="button" className="ghost-btn" onClick={() => doneEnvelope(false)} disabled={envBusy}>{t.env?.skip}</button>
+          <button type="button" className="cta" onClick={() => doneEnvelope(true)} disabled={envBusy || !envText.trim()}>{t.env?.save}</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="composer2">

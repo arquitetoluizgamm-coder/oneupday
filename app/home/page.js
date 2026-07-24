@@ -75,6 +75,7 @@ export default async function Home() {
 
   // ---- Próximo Capítulo: antecipação pelo amanhã, nunca ansiedade ----
   let ncMode = null, ncLine = null, ncLead = '', ncIdentity = '';
+  let ncEnv = null, ncSealedEnv = false;
   if (primary) {
     try {
       const { data: ups } = await supabase.from('updates').select('day_number, kind, created_at').eq('journey_id', primary.id).order('created_at', { ascending: false }).limit(120);
@@ -93,6 +94,15 @@ export default async function Home() {
         ncLine = { total: primary.total_days || (days[days.length - 1] || 1), days, gold };
         ncLead = last.kind === 'setback' ? t.ncLeadSetback : t.ncLead;
         ncIdentity = [t.ncId1, t.ncId2, t.ncId3][days.length % 3];
+        // Envelope de Amanhã: o que a pessoa deixou pra si mesma
+        try {
+          const { data: env } = await supabase.from('envelopes').select('id, text, created_at, opened_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
+          if (env) {
+            const isToday = dayKey(new Date(env.created_at).getTime()) === dayKey(now);
+            if (ncMode === 'sealed' && isToday) ncSealedEnv = true;
+            else if ((ncMode === 'reveal' || ncMode === 'return') && !env.opened_at && !isToday) ncEnv = { id: env.id, text: env.text };
+          }
+        } catch {}
       }
     } catch {}
   }
@@ -107,6 +117,7 @@ export default async function Home() {
     aiErr: t.aiErr, aiRateErr: t.aiRateErr,
     moodQ: t.moodQ, prompts: t.prompts, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful },
     crop: { original: t.cropOriginal, square: t.cropSquare, portrait: t.cropPortrait, landscape: t.cropLandscape, use: t.cropUse, edit: t.cropEdit, cancel: t.cropCancel, hint: t.cropHint, hintOriginal: t.cropHintOriginal, zoom: t.cropZoom },
+    env: { q: t.envQ, ph: t.envPh, save: t.envSave, skip: t.envSkip },
   };
 
   const feedLabels = {
@@ -142,8 +153,9 @@ export default async function Home() {
       <DailyMood userId={user.id} answeredToday={moodToday} labels={{ title: t.dailyMoodTitle, sub: t.dailyMoodSub, skip: t.dailyMoodSkip, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful } }} />
       <main className="wrap feed-page">
         {ncMode && (
-          <NextChapter mode={ncMode} line={ncLine} labels={{
-            title: t.ncTitle, sealed: t.ncSealed, blur: t.ncBlur, open: t.ncOpen,
+          <NextChapter mode={ncMode} line={ncLine} env={ncEnv} labels={{
+            title: t.ncTitle, sealed: ncSealedEnv ? t.ncSealedEnv : t.ncSealed, blur: t.ncBlur, open: t.ncOpen,
+            envLead: t.envLead, envLeadReturn: t.envLeadReturn,
             ready: t.ncReady, returnTitle: t.ncReturnTitle,
             lead: ncLead, returnLead: t.ncReturnLead,
             stepLabel: t.ncStepLabel, step: t.ncStep, identity: ncIdentity,
