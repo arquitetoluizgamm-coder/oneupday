@@ -18,6 +18,12 @@ export async function GET() {
     if (jids.length) { const { data: js } = await supabase.from('journeys').select('owner_id').in('id', jids); (js || []).forEach((j) => ids.add(j.owner_id)); }
   } catch {}
   ids.delete(user.id);
+  // quem já recebeu meu apoio nas últimas 24h sai da lista
+  try {
+    const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+    const { data: hg } = await supabase.from('hugs').select('to_id').eq('from_id', user.id).gte('created_at', since);
+    (hg || []).forEach((h) => ids.delete(h.to_id));
+  } catch {}
   if (!ids.size) return NextResponse.json({ people: [] });
 
   let people = [];

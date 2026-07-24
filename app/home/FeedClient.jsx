@@ -174,8 +174,6 @@ export default function FeedClient({ labels }) {
         <button className={scope === 'following' ? 'on' : ''} onClick={() => switchScope('following')}>{labels.tabFollowing}</button>
       </div>
 
-      <NeedsSupport people={needs} labels={labels.needs} />
-
       <section className="feed-stream">
         {started && items.length === 0 && (
           <div className="feed-invite">
@@ -271,11 +269,21 @@ export default function FeedClient({ labels }) {
             )}
           </article>
           )}
-          {(idx === 5 || idx === 15) && suggestions.length > 0 && (
-            <SuggestionCard people={idx === 5 ? suggestions.slice(0, 5) : suggestions.slice(5, 10)} labels={labels.suggest} />
+          {idx === 1 && needs.length > 0 && (
+            <NeedsSupport people={needs} labels={labels.needs} />
+          )}
+          {idx === 4 && suggestions.length > 0 && (
+            <SuggestionCard people={suggestions} labels={labels.suggest} />
           )}
           </Fragment>
         ))}
+
+        {items.length > 0 && items.length < 2 && needs.length > 0 && (
+          <NeedsSupport people={needs} labels={labels.needs} />
+        )}
+        {items.length > 0 && items.length < 5 && suggestions.length > 0 && (
+          <SuggestionCard people={suggestions} labels={labels.suggest} />
+        )}
 
         {!done && <div ref={sentinel} className="feed-sentinel">{loading ? labels.loading : ''}</div>}
       </section>

@@ -22,14 +22,31 @@ export async function GET() {
   for (const j of (journeys || [])) {
     if (!j.owner_id || following.has(j.owner_id) || blocked.has(j.owner_id) || seen.has(j.owner_id)) continue;
     seen.add(j.owner_id);
-    people.push({ ownerId: j.owner_id, journeySlug: j.slug, journeyTitle: j.title });
-    if (people.length >= 10) break;
+    people.push({ ownerId: j.owner_id, journeyId: j.id, journeySlug: j.slug, journeyTitle: j.title });
+    if (people.length >= 24) break;
   }
   const ids = people.map((p) => p.ownerId);
   if (ids.length) {
-    const { data: profs } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', ids);
-    const pm = {}; (profs || []).forEach((p) => { pm[p.id] = p; });
-    people.forEach((p) => { const pr = pm[p.ownerId] || {}; p.name = pr.name; p.handle = pr.handle; p.avatar_url = pr.avatar_url; p.avatar_color = pr.avatar_color; });
+    const jids = people.map((p) => p.journeyId);
+    const guard = (pr) => Promise.resolve(pr).then((r) => r).catch(() => ({ data: [] }));
+    const [profsR, statsR, folR] = await Promise.all([
+      guard(supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', ids)),
+      guard(supabase.from('journey_stats').select('journey_id, current_day').in('journey_id', jids)),
+      guard(supabase.from('profile_follows').select('following_id').in('following_id', ids)),
+    ]);
+    const pm = {}; (profsR.data || []).forEach((p) => { pm[p.id] = p; });
+    const dayBy = {}; (statsR.data || []).forEach((st) => { dayBy[st.journey_id] = st.current_day || 0; });
+    const folBy = {}; (folR.data || []).forEach((f) => { folBy[f.following_id] = (folBy[f.following_id] || 0) + 1; });
+    people.forEach((p) => {
+      const pr = pm[p.ownerId] || {};
+      p.name = pr.name; p.handle = pr.handle; p.avatar_url = pr.avatar_url; p.avatar_color = pr.avatar_color;
+      p.day = dayBy[p.journeyId] || 0;
+      p.followers = folBy[p.ownerId] || 0;
+      p.newcomer = p.day > 0 && p.day <= 3;
+    });
+    // Anti-Instagram: prioriza quem precisa de companhia —
+    // menos seguidores primeiro, depois quem está mais no começo.
+    people.sort((a, b) => (a.followers - b.followers) || (a.day - b.day));
   }
-  return NextResponse.json({ people: people.filter((p) => p.name) });
+  return NextResponse.json({ people: people.filter((p) => p.name).slice(0, 12) });
 }
