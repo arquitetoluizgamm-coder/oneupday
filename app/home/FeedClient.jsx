@@ -186,9 +186,26 @@ export default function FeedClient({ labels }) {
               {item.kind === 'win' && <span className="entry-tag win">{labels.tagWin}</span>}
             </div>
 
-            {item.text && item.text !== '📷' && item.text !== '🎥' && <EntryText text={item.text} labels={labels} />}
-            {item.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={item.photo_url} alt="" /></a>}
-            {item.video_url && !item.photo_url && <div className="entry-media"><video src={item.video_url} controls playsInline preload="metadata" /></div>}
+            {(() => {
+              const hasMedia = !!(item.photo_url || item.video_url);
+              const cleanText = item.text && item.text !== '📷' && item.text !== '🎥' ? item.text : '';
+              if (!hasMedia && cleanText) {
+                return (
+                  <a href={`/${item.journey.slug}`} className={`entry-textcard${cleanText.length > 130 ? ' long' : ''}`}
+                    style={{ background: `linear-gradient(150deg, ${item.journey.cover_color || '#1b1f45'}, #10132D 90%)` }}>
+                    <span className="etc-day">{dayLabel(item.day_number)}</span>
+                    <p>{cleanText}</p>
+                  </a>
+                );
+              }
+              return (
+                <>
+                  {cleanText && <EntryText text={cleanText} labels={labels} />}
+                  {item.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={item.photo_url} alt="" /></a>}
+                  {item.video_url && !item.photo_url && <div className="entry-media"><video src={item.video_url} controls playsInline preload="metadata" /></div>}
+                </>
+              );
+            })()}
             {item.track && <TrackTag track={item.track} />}
 
             {item.demo ? (

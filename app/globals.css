@@ -1414,3 +1414,11 @@ html.chrome-scrolling .top{box-shadow:0 1px 0 var(--line)}
 /* ---- Padrão de mídia do feed: 4:5 (1080x1350), post inteiro na tela ---- */
 .entry-media{width:100%;overflow:hidden;background:#0b0d18}
 .entry-media img,.entry-media video{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;max-height:calc(100svh - 230px)}
+/* ---- Post sem mídia vira card tipográfico (feed sempre visual) ---- */
+.entry-textcard{display:flex;flex-direction:column;justify-content:center;gap:14px;width:100%;min-height:300px;border-radius:var(--r-card,16px);padding:30px 26px;margin-top:12px;color:#fff;text-decoration:none;overflow:hidden}
+.entry-textcard .etc-day{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.75}
+.entry-textcard p{margin:0;font-size:26px;line-height:1.35;font-weight:700;letter-spacing:-.02em;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:8;-webkit-box-orient:vertical;overflow:hidden}
+.entry-textcard.long p{font-size:19px;line-height:1.5;font-weight:600}
+@media(max-width:640px){
+  .entry-textcard{width:calc(100% + 32px);margin-left:-16px;border-radius:0;min-height:340px;padding:32px 22px}
+}

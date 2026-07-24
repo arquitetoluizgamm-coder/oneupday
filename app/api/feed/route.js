@@ -86,7 +86,7 @@ export async function GET(req) {
 
   const journeyIds = [...new Set(updates.map((item) => item.journey_id))];
   const { data: journeys } = journeyIds.length
-    ? await supabase.from('journeys').select('id, slug, title, category, owner_id').in('id', journeyIds)
+    ? await supabase.from('journeys').select('id, slug, title, category, owner_id, cover_color').in('id', journeyIds)
     : { data: [] };
   const journeyMap = {};
   (journeys || []).forEach((journey) => { journeyMap[journey.id] = journey; });
