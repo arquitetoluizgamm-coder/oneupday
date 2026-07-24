@@ -40,6 +40,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [track, setTrack] = useState(null);
   const [aiErr, setAiErr] = useState('');
   const [posted, setPosted] = useState(false);
+  const [postedKind, setPostedKind] = useState('step');
   const [envText, setEnvText] = useState('');
   const [envBusy, setEnvBusy] = useState(false);
   const [rawFile, setRawFile] = useState(null);
@@ -139,6 +140,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     setSaving(false);
     if (error) { alert(t.error); return; }
     trackEvent('update_posted', { journeyId, kind, quick: true });
+    setPostedKind(kind);
     setPosted(true);
   }
 
@@ -157,6 +159,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     setSaving(false);
     if (error) { alert(t.error); return; }
     trackEvent('update_posted', { journeyId, kind });
+    setPostedKind(kind);
     setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null);
     if (photoRef.current) photoRef.current.value = '';
     if (videoRef.current) videoRef.current.value = '';
@@ -185,6 +188,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   if (posted) {
     return (
       <div className="composer2 env-box">
+        <p className="env-meaning">{dayNumber === 1 ? t.meaning?.first : (postedKind === 'setback' ? t.meaning?.setback : t.meaning?.step)}</p>
         <span className="env-eyebrow">💌 {t.env?.q}</span>
         <textarea className="env-input" value={envText} onChange={e => setEnvText(e.target.value)}
           maxLength={200} placeholder={t.env?.ph} rows={2} autoFocus />

@@ -88,6 +88,7 @@ export default async function Home() {
     moodQ: t.moodQ, prompts: t.prompts, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful },
     crop: { original: t.cropOriginal, square: t.cropSquare, portrait: t.cropPortrait, landscape: t.cropLandscape, use: t.cropUse, edit: t.cropEdit, cancel: t.cropCancel, hint: t.cropHint, hintOriginal: t.cropHintOriginal, zoom: t.cropZoom },
     env: { q: t.envQ, ph: t.envPh, save: t.envSave, skip: t.envSkip },
+    meaning: { step: t.meaningStep, setback: t.meaningSetback, first: t.meaningFirst },
   };
 
   const feedLabels = {
