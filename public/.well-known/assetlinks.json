@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.oneupday.twa",
+      "sha256_cert_fingerprints": ["81:68:0E:6E:81:BD:2B:F3:BC:48:9F:FB:4B:A8:FF:E1:11:BF:C5:5F:84:69:2F:2E:D3:92:04:A9:85:87:CD:86"]
+    }
+  }
+]
