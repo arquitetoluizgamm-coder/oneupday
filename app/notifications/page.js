@@ -52,9 +52,16 @@ export default async function Notifications() {
               ? t.notifMeToo
               : n.type === 'welcome'
               ? t.notifWelcome
+              : n.type === 'challenge'
+              ? fill(t.notifChallenge, { name: a.name || '' })
+              : n.type === 'challenge_accept'
+              ? fill(t.notifChallengeAccept, { name: a.name || '' })
               : fill(t.notifEncourage, { name: a.name || '' });
+            const href = (n.type === 'challenge' || n.type === 'challenge_accept')
+              ? '/perfil'
+              : (j.slug ? `/${j.slug}` : (a.handle ? `/${a.handle}` : '/home'));
             return (
-              <a className={`notif-item${n.read ? '' : ' unread'}`} key={n.id} href={j.slug ? `/${j.slug}` : (a.handle ? `/${a.handle}` : '/home')}>
+              <a className={`notif-item${n.read ? '' : ' unread'}`} key={n.id} href={href}>
                 <span className="notif-ava" style={{ background: (n.type === 'welcome' || n.type === 'metoo') ? 'var(--night)' : (a.avatar_color || 'var(--orange)') }}>
                   {(n.type === 'welcome' || n.type === 'metoo') ? '💛' : (a.avatar_url ? <img src={a.avatar_url} alt="" /> : (a.name || '?')[0])}
                 </span>

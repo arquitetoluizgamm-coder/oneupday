@@ -13,6 +13,7 @@ import ProgressBar from '../../components/ProgressBar';
 import ReportButton from './ReportButton';
 import MediaGallery from '../../components/MediaGallery';
 import FollowUserButton from './FollowUserButton';
+import DuoChallengeButton from '../../components/ChallengeButton';
 import OwnerMedia from '../../components/OwnerMedia';
 import EditUpdate from '../../components/EditUpdate';
 import Comments from '../../components/Comments';
@@ -89,6 +90,35 @@ async function ProfilePage({ handle }) {
   const { profile, journeys, statsById, photoBy, media } = data;
   const t = getDict(getLocale());
   const initial = (profile.name || '?')[0];
+
+  // ---- Desafios: botão (entre quem se segue) + área pública ----
+  const sb2 = createClient();
+  const { data: { user: viewer } } = await sb2.auth.getUser();
+  let canChallenge = false;
+  let pubChallenges = [];
+  const chProf = {};
+  try {
+    if (viewer && viewer.id !== profile.id) {
+      const [a, b, open] = await Promise.all([
+        sb2.from('profile_follows').select('follower_id').eq('follower_id', viewer.id).eq('following_id', profile.id).maybeSingle(),
+        sb2.from('profile_follows').select('follower_id').eq('follower_id', profile.id).eq('following_id', viewer.id).maybeSingle(),
+        sb2.from('challenges').select('id')
+          .or(`and(from_id.eq.${viewer.id},to_id.eq.${profile.id}),and(from_id.eq.${profile.id},to_id.eq.${viewer.id})`)
+          .in('status', ['pending', 'active']).limit(1),
+      ]);
+      canChallenge = (!!a.data || !!b.data) && !(open.data && open.data.length);
+    }
+    const { data: chs } = await sb2.from('challenges').select('id, title, days, from_id, to_id')
+      .eq('status', 'active')
+      .or(`from_id.eq.${profile.id},to_id.eq.${profile.id}`)
+      .order('created_at', { ascending: false }).limit(6);
+    pubChallenges = chs || [];
+    const ids = [...new Set(pubChallenges.flatMap((c) => [c.from_id, c.to_id]))];
+    if (ids.length) {
+      const { data: cps } = await sb2.from('profiles').select('id, name, avatar_url, avatar_color').in('id', ids);
+      (cps || []).forEach((p) => { chProf[p.id] = p; });
+    }
+  } catch {}
   return (
     <>
       <header className="top">
@@ -110,9 +140,27 @@ async function ProfilePage({ handle }) {
             </div>
             <div className="pc-follow">
               <FollowUserButton profileId={profile.id} labelFollow={t.follow} labelFollowing={t.following} labelBack={t.followBack} />
+              {canChallenge && (
+                <DuoChallengeButton toId={profile.id} toName={profile.name}
+                  labels={{ btn: t.chBtn, modalTitle: t.chModalTitle, what: t.chWhat, ph: t.chPh, daysFmt: t.chDays, together: t.chTogether, send: t.chSend, sending: t.chSending, sent: t.chSent, cancel: t.epCancel, errExists: t.chErrExists, errConn: t.chErrConn, err: t.chErr }} />
+              )}
             </div>
           </div>
         </section>
+
+        {pubChallenges.length > 0 && (
+          <section className="ch-block">
+            <p className="eyebrow">{t.chTitle}</p>
+            {pubChallenges.map((c) => { const pa = chProf[c.from_id] || {}; const pb = chProf[c.to_id] || {}; return (
+              <a className="ch-card link" key={c.id} href={`/desafio/${c.id}`}>
+                <span className="ch-ava" style={{ background: pa.avatar_color || 'var(--orange)' }}>{pa.avatar_url ? <img src={pa.avatar_url} alt="" /> : (pa.name || '?')[0]}</span>
+                <span className="ch-sline" aria-hidden="true"><i /></span>
+                <span className="ch-ava" style={{ background: pb.avatar_color || 'var(--orange)' }}>{pb.avatar_url ? <img src={pb.avatar_url} alt="" /> : (pb.name || '?')[0]}</span>
+                <div className="ch-info"><b>{c.title}</b><p>{t.chTogether} · {fill(t.chDays, { d: c.days })}</p></div>
+              </a>
+            ); })}
+          </section>
+        )}
 
         <section className="home-head"><div><p className="eyebrow">{t.profileJourneys}</p></div></section>
         {journeys.length === 0 && <div className="empty"><b>{t.noPublicJourneys}</b></div>}

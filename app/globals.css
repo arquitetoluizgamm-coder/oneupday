@@ -2434,3 +2434,58 @@ h1 { letter-spacing: -0.03em; }
 .dp-meta{min-height:24px;display:flex;align-items:center;gap:14px;margin-top:8px;padding:0 2px}
 .dp-meta .entry-comeback,.dp-meta .entry-kindline,.dp-meta .entry-milestone{margin:0}
 @media(max-width:640px){ .dp-meta{padding:0 16px} .dp-meta .entry-comeback,.dp-meta .entry-milestone{margin-left:0} }
+
+/* ---- Desafios: caminhada junta, sem vencedor ---- */
+/* linha no feed: avatar → linha se desenha → avatar + título (altura fixa) */
+.ch-strip{display:flex;align-items:center;gap:8px;margin-top:10px;padding:9px 2px 0;border-top:1px solid #efede8;text-decoration:none;min-height:32px}
+.ch-sava{width:22px;height:22px;border-radius:50%!important;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex:0 0 auto}
+.ch-sava img{width:100%;height:100%;object-fit:cover}
+.ch-sline{flex:0 0 44px;height:2px;background:rgba(193,111,84,.18);position:relative;overflow:hidden}
+.ch-sline i{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--orange);transform-origin:left;transform:scaleX(0);animation:chLine 1.1s cubic-bezier(.22,1,.36,1) .25s forwards}
+@keyframes chLine{to{transform:scaleX(1)}}
+.ch-sline.big{flex:0 0 72px;height:2.5px}
+.ch-stitle{font-size:12.5px;font-weight:650;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-strip:hover .ch-stitle{color:var(--ink)}
+@media(max-width:640px){ .ch-strip{padding-left:16px;padding-right:16px} }
+@media(prefers-reduced-motion:reduce){ .ch-sline i{animation:none;transform:scaleX(1)} }
+
+/* bloco de desafios no perfil */
+.ch-block{background:var(--surface);border:1px solid var(--line);padding:16px 18px;margin:14px 0}
+.ch-card{display:flex;align-items:center;gap:12px;padding:11px 0;text-decoration:none;color:inherit}
+.ch-card + .ch-card{border-top:1px solid #efede8}
+.ch-card .ch-ava{width:38px;height:38px;border-radius:50%!important;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;flex:0 0 auto}
+.ch-card .ch-ava img{width:100%;height:100%;object-fit:cover}
+.ch-info{flex:1;min-width:0}
+.ch-info b{font-size:14.5px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-info p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.ch-card.muted{opacity:.7}
+.ch-resp{display:flex;gap:6px;flex:0 0 auto}
+.ch-resp .cta{padding:7px 13px;font-size:12.5px}
+.ch-resp .ghost-btn{padding:7px 11px;font-size:12.5px}
+.pc-follow{display:flex;gap:8px;align-items:center}
+.ch-btn{white-space:nowrap}
+.ch-days{display:flex;gap:8px;margin:12px 0 4px}
+.ch-sent{font-family:var(--serif);font-style:italic;font-size:16px;margin:14px 0 4px}
+@media(max-width:640px){ .ch-block{margin-left:-16px;margin-right:-16px;border-left:0;border-right:0} }
+
+/* página do desafio */
+.chp{background:var(--surface);border:1px solid var(--line);padding:26px 26px 24px;margin-top:10px}
+.chp-title{font-size:26px;letter-spacing:-.02em;margin:2px 0 6px}
+.chp-sub{color:var(--muted);font-size:13.5px;margin:0 0 20px}
+.chp-ava{border-radius:50%!important;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;flex:0 0 auto}
+.chp-ava img{width:100%;height:100%;object-fit:cover}
+.chp-who-row{display:flex;align-items:center;gap:12px;margin:8px 0 14px}
+.chp-inv{font-family:var(--serif);font-style:italic;font-size:16px;margin:0 0 12px}
+.chp-part{padding:14px 0;border-top:1px solid #efede8}
+.chp-who{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.chp-who b{font-size:15px}
+.chp-count{margin-left:auto;font-size:12.5px;color:var(--muted);font-weight:650}
+.chp-dots{display:flex;flex-wrap:wrap;gap:7px}
+.chp-dots i{width:11px;height:11px;border-radius:50%!important;background:#e7e4dc}
+.chp-dots i.on{background:var(--sage)}
+.chp-dots i.today{box-shadow:0 0 0 3px rgba(232,166,76,.28)}
+.chp-dots i.on.today{background:#E8A64C}
+.chp-check{margin-top:18px}
+.chp-done{margin:18px 0 0;font-family:var(--serif);font-style:italic;font-size:16px;color:var(--muted)}
+.chp-done.gold{color:#b3874a}
+@media(max-width:640px){ .chp{margin-left:-16px;margin-right:-16px;border-left:0;border-right:0} }

@@ -9,6 +9,7 @@ import HugButton from '../../components/HugButton';
 import NeedsSupport from '../../components/NeedsSupport';
 import MeTooButton from '../../components/MeTooButton';
 import EditUpdate from '../../components/EditUpdate';
+import ChallengeStrip from '../../components/ChallengeStrip';
 import { MOODS, moodGlow } from '../../lib/moods';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
@@ -313,6 +314,7 @@ export default function FeedClient({ labels }) {
               <Comments mediaId={item.mediaId} labels={labels.comments} />
               <HugButton toId={item.owner.id} mediaId={item.mediaId} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
             </div>
+            {item.challenge && <ChallengeStrip challenge={item.challenge} />}
           </article>
           ) : (
           <article className={`entry ${item.kind || 'step'}${item.demo ? ' is-demo' : ''}`}>
@@ -388,6 +390,7 @@ export default function FeedClient({ labels }) {
             )}
             </>
             )}
+            {item.challenge && !item.demo && <ChallengeStrip challenge={item.challenge} />}
           </article>
           )}
           {idx === 1 && needs.length > 0 && (

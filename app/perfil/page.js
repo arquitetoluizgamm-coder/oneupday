@@ -23,6 +23,7 @@ import EditJourney from '../../components/EditJourney';
 import JourneyDays from '../../components/JourneyDays';
 import JourneyFold from '../../components/JourneyFold';
 import { pickUpi } from '../../lib/upi';
+import ChallengeRespond from '../../components/ChallengeRespond';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -111,6 +112,25 @@ export default async function Perfil() {
     upi = pickUpi({ locale: getLocale(), userId: user.id, hasJourney: list.length > 0, day: pDay, streak: maxStreak, lastKind: last?.kind || '', daysSince, updatesCount });
   } catch {}
 
+  // ---- Desafios (caminhada junta) ----
+  let chInvites = [], chWaiting = [], chActive = [];
+  const chProfiles = {};
+  try {
+    const { data: chs } = await supabase.from('challenges').select('*')
+      .or(`from_id.eq.${user.id},to_id.eq.${user.id}`)
+      .in('status', ['pending', 'active'])
+      .order('created_at', { ascending: false }).limit(20);
+    const chList = chs || [];
+    const otherIds = [...new Set(chList.flatMap((c) => [c.from_id, c.to_id]).filter((id) => id !== user.id))];
+    if (otherIds.length) {
+      const { data: cps } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', otherIds);
+      (cps || []).forEach((p) => { chProfiles[p.id] = p; });
+    }
+    chInvites = chList.filter((c) => c.status === 'pending' && c.to_id === user.id);
+    chWaiting = chList.filter((c) => c.status === 'pending' && c.from_id === user.id);
+    chActive = chList.filter((c) => c.status === 'active');
+  } catch {}
+
   // ---- Quem te apoia: abraços recebidos + apoios nos seus posts ----
   let supporters = [];
   try {
@@ -172,6 +192,32 @@ export default async function Perfil() {
               <p>{upi.line}</p>
             </div>
           </div>
+        )}
+
+        {(chInvites.length > 0 || chActive.length > 0 || chWaiting.length > 0) && (
+          <section className="ch-block">
+            <p className="eyebrow">{t.chTitle}</p>
+            {chInvites.map((c) => { const p = chProfiles[c.from_id] || {}; return (
+              <div className="ch-card" key={c.id}>
+                <span className="ch-ava" style={{ background: p.avatar_color || 'var(--orange)' }}>{p.avatar_url ? <img src={p.avatar_url} alt="" /> : (p.name || '?')[0]}</span>
+                <div className="ch-info"><b>{fill(t.chInviteFrom, { name: (p.name || '').split(' ')[0] })}</b><p>{c.title} · {fill(t.chDays, { d: c.days })}</p></div>
+                <ChallengeRespond id={c.id} labels={{ accept: t.chAccept, decline: t.chDecline }} />
+              </div>
+            ); })}
+            {chActive.map((c) => { const p = chProfiles[c.from_id === user.id ? c.to_id : c.from_id] || {}; return (
+              <a className="ch-card link" key={c.id} href={`/desafio/${c.id}`}>
+                <span className="ch-ava" style={{ background: p.avatar_color || 'var(--orange)' }}>{p.avatar_url ? <img src={p.avatar_url} alt="" /> : (p.name || '?')[0]}</span>
+                <div className="ch-info"><b>{c.title}</b><p>{t.chTogether} · {fill(t.chDays, { d: c.days })}</p></div>
+                <span className="view-link">{t.chOpen}</span>
+              </a>
+            ); })}
+            {chWaiting.map((c) => { const p = chProfiles[c.to_id] || {}; return (
+              <div className="ch-card muted" key={c.id}>
+                <span className="ch-ava" style={{ background: p.avatar_color || 'var(--orange)' }}>{p.avatar_url ? <img src={p.avatar_url} alt="" /> : (p.name || '?')[0]}</span>
+                <div className="ch-info"><b>{c.title}</b><p>{fill(t.chWaiting, { name: (p.name || '').split(' ')[0] })}</p></div>
+              </div>
+            ); })}
+          </section>
         )}
 
         {list.length === 0 && (

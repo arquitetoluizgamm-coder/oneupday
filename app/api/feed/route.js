@@ -151,7 +151,40 @@ export async function GET(req) {
   const mediaProf = {};
   (mediaProfR.data || []).forEach((pr) => { mediaProf[pr.id] = pr; });
   const mediaEncSet = new Set((mediaEncR.data || []).map((e) => e.media_id));
-  const mediaFeed = mediaRows.map((m) => ({ id: 'media-' + m.id, media: true, mediaId: m.id, url: m.url, kind: m.kind, caption: m.caption || '', created_at: m.created_at, owner: mediaProf[m.user_id] || {}, encouraged: mediaEncSet.has(m.id) }));
+
+  // ---- desafio ativo do dono do post (linha embaixo do card) ----
+  const challengeByOwner = {};
+  try {
+    const chOwnerIds = [...new Set([...ownerIds, ...mediaOwnerIds])];
+    if (chOwnerIds.length) {
+      const inList = chOwnerIds.join(',');
+      const { data: chs } = await supabase.from('challenges')
+        .select('id, title, from_id, to_id, created_at')
+        .eq('status', 'active')
+        .or(`from_id.in.(${inList}),to_id.in.(${inList})`)
+        .order('created_at', { ascending: false })
+        .limit(40);
+      const chList = chs || [];
+      const missing = [...new Set(chList.flatMap((c) => [c.from_id, c.to_id]))]
+        .filter((id) => !profileMap[id] && !mediaProf[id]);
+      const extra = {};
+      if (missing.length) {
+        const { data: xs } = await supabase.from('profiles').select('id, name, avatar_url, avatar_color').in('id', missing);
+        (xs || []).forEach((p) => { extra[p.id] = p; });
+      }
+      const prof = (id) => profileMap[id] || mediaProf[id] || extra[id] || {};
+      chList.forEach((c) => {
+        const packed = {
+          id: c.id, title: c.title,
+          from: { name: prof(c.from_id).name, avatar_url: prof(c.from_id).avatar_url, avatar_color: prof(c.from_id).avatar_color },
+          to: { name: prof(c.to_id).name, avatar_url: prof(c.to_id).avatar_url, avatar_color: prof(c.to_id).avatar_color },
+        };
+        if (!challengeByOwner[c.from_id]) challengeByOwner[c.from_id] = packed;
+        if (!challengeByOwner[c.to_id]) challengeByOwner[c.to_id] = packed;
+      });
+    }
+  } catch {}
+  const mediaFeed = mediaRows.map((m) => ({ id: 'media-' + m.id, media: true, mediaId: m.id, url: m.url, kind: m.kind, caption: m.caption || '', created_at: m.created_at, owner: mediaProf[m.user_id] || {}, encouraged: mediaEncSet.has(m.id), challenge: challengeByOwner[m.user_id] || null }));
   const mediaTotal = mediaFeed.length;
 
   // ---- a jornada é um post só: dias agrupados, navegáveis no card ----
@@ -180,6 +213,7 @@ export async function GET(req) {
     return {
       ...item,
       days: daysArr.length > 1 ? daysArr : null,
+      challenge: challengeByOwner[journey.owner_id] || null,
       journey: { slug: journey.slug, title: journey.title, category: journey.category, total_days: journey.total_days, current_day: (statsByJourney[journey.id] || {}).current_day || 0, progress_pct: (statsByJourney[journey.id] || {}).progress_pct || 0 },
       owner: { ...(profileMap[journey.owner_id] || {}), mood: ownerMoodById[journey.owner_id] || null },
       own: journey.owner_id === user.id,
