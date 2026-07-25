@@ -2428,3 +2428,9 @@ h1 { letter-spacing: -0.03em; }
 .dp-text .entry-text.expanded{-webkit-line-clamp:unset}
 .dp-text .entry-expand{display:block;margin-top:4px;line-height:1.2;padding:0;text-align:left}
 @media(max-width:640px){ .dp-text{min-height:72px} }
+
+/* ---- Linha de categoria com altura fixa (vitória/recaída/marco/recomeço) ---- */
+/* slot sempre presente: com ou sem categoria, o card não muda de tamanho */
+.dp-meta{min-height:24px;display:flex;align-items:center;gap:14px;margin-top:8px;padding:0 2px}
+.dp-meta .entry-comeback,.dp-meta .entry-kindline,.dp-meta .entry-milestone{margin:0}
+@media(max-width:640px){ .dp-meta{padding:0 16px} .dp-meta .entry-comeback,.dp-meta .entry-milestone{margin-left:0} }

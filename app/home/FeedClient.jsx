@@ -86,10 +86,12 @@ function DayPager({ item, labels, dayLabel }) {
 
   return (
     <>
-      {d.comeback && <div className="entry-comeback">{(labels.comebackFmt || '').replace('{d}', d.comeback)}</div>}
-      {d.kind === 'setback' && <div className="entry-kindline setback">{labels.tagSetback}</div>}
-      {d.kind === 'win' && <div className="entry-kindline win">{labels.tagWin}</div>}
-      {[7, 30, 60, 100].includes(d.day_number) && <div className="entry-milestone">{(labels.milestoneFmt || '').replace('{d}', d.day_number)}</div>}
+      <div className="dp-meta">
+        {d.comeback && <span className="entry-comeback">{(labels.comebackFmt || '').replace('{d}', d.comeback)}</span>}
+        {d.kind === 'setback' && <span className="entry-kindline setback">{labels.tagSetback}</span>}
+        {d.kind === 'win' && <span className="entry-kindline win">{labels.tagWin}</span>}
+        {[7, 30, 60, 100].includes(d.day_number) && <span className="entry-milestone">{(labels.milestoneFmt || '').replace('{d}', d.day_number)}</span>}
+      </div>
 
       <div className="dp-stage" onTouchStart={onTS} onTouchEnd={onTE}>
         <div className="dp-slide" key={d.id}>
