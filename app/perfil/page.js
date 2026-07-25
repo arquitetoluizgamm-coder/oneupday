@@ -25,6 +25,7 @@ import JourneyFold from '../../components/JourneyFold';
 import { pickUpi } from '../../lib/upi';
 import ChallengeRespond from '../../components/ChallengeRespond';
 import UpiGreeting from '../../components/UpiGreeting';
+import PushToggle from '../../components/PushToggle';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -184,6 +185,9 @@ export default async function Perfil() {
             </div>
           </div>
         </section>
+
+        <PushToggle vapidKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''}
+          labels={{ title: t.pushTitle, onSub: t.pushOnSub, offSub: t.pushOffSub, denied: t.pushDenied, turnOn: t.pushTurnOn, turnOff: t.pushTurnOff, wait: t.pushWait }} />
 
         {upi?.line && (
           <UpiGreeting line={upi.line} cat={upi.cat}

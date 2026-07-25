@@ -2563,3 +2563,13 @@ h1 { letter-spacing: -0.03em; }
 .legal-sec h2{font-size:16.5px;margin:0 0 5px}
 .legal-sec p{margin:0;font-size:14.5px;line-height:1.65;color:#3f4654}
 .legal-care{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ---- Notificações no aparelho (push) ---- */
+.push-row{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);
+  padding:14px 18px;margin:14px 0 0}
+.push-info{flex:1;min-width:0}
+.push-info b{font-size:14.5px;display:block}
+.push-info p{margin:3px 0 0;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.push-row .cta{flex:0 0 auto;padding:9px 16px;font-size:13px}
+.push-row .ghost-btn{flex:0 0 auto;padding:8px 14px;font-size:12.5px;cursor:pointer}
+@media(max-width:640px){ .push-row{margin-left:-16px;margin-right:-16px;border-left:0;border-right:0} }

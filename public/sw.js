@@ -33,3 +33,35 @@ self.addEventListener('fetch', (e) => {
       .catch(() => caches.match(req).then((m) => m || caches.match('/')))
   );
 });
+
+// ---- Push: recebe e mostra a notificação ----
+self.addEventListener('push', (e) => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch { d = { body: e.data && e.data.text() }; }
+  const title = d.title || 'One Up Day';
+  e.waitUntil(self.registration.showNotification(title, {
+    body: d.body || '',
+    icon: '/app-icon-192.png',
+    badge: '/app-icon-192.png',
+    tag: d.tag || 'oud',
+    renotify: false,
+    data: { url: d.url || '/home' },
+  }));
+});
+
+// ---- Clique: abre a aba do app ou foca a existente ----
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const target = (e.notification.data && e.notification.data.url) || '/home';
+  e.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const c of list) {
+        if (c.url.includes(self.location.origin) && 'focus' in c) {
+          c.navigate(target);
+          return c.focus();
+        }
+      }
+      return clients.openWindow(target);
+    })
+  );
+});
