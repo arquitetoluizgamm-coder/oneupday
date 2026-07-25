@@ -122,7 +122,7 @@ export default async function Perfil() {
       <main className="wrap">
         <section className="profile-card">
           <div className="pc-banner" style={profile.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : undefined}>
-            <EditBanner userId={user.id} label={t.editBanner} uploadingLabel={t.uploading} />
+            <EditBanner userId={user.id} label={t.editBanner} uploadingLabel={t.uploading} cropLabels={{ cover: t.cropCover, use: t.cropUse, cancel: t.cropCancel, hint: t.cropHint, zoom: t.cropZoom }} />
           </div>
           <div className="pc-info">
             <div className="pc-avatar" style={{ background: profile.avatar_color || 'var(--orange)' }}>

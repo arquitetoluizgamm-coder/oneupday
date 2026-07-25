@@ -8,18 +8,19 @@ const ASPECTS = [
   ['landscape', 16 / 9],
 ];
 
-export default function ImageCropper({ src, labels, onCancel, onDone }) {
+export default function ImageCropper({ src, labels, onCancel, onDone, aspects }) {
+  const ASPECT_LIST = aspects || ASPECTS;
   const L = labels || {};
   const wrapRef = useRef(null);
   const imgRef = useRef(null);
   const dragRef = useRef(null);
   const [nat, setNat] = useState(null);
-  const [aspect, setAspect] = useState('portrait');
+  const [aspect, setAspect] = useState((aspects && aspects[0] && aspects[0][0]) || 'portrait');
   const [zoom, setZoom] = useState(1);
   const [off, setOff] = useState({ x: 0, y: 0 });
   const [frame, setFrame] = useState({ w: 320, h: 400 });
 
-  const arVal = ASPECTS.find((a) => a[0] === aspect)?.[1] || null;
+  const arVal = ASPECT_LIST.find((a) => a[0] === aspect)?.[1] || null;
   const cover = nat ? Math.max(frame.w / nat.w, frame.h / nat.h) : 1;
   const scale = cover * zoom;
   const dispW = nat ? nat.w * scale : frame.w;
@@ -74,11 +75,13 @@ export default function ImageCropper({ src, labels, onCancel, onDone }) {
 
   return (
     <div className="cropper">
+      {ASPECT_LIST.length > 1 && (
       <div className="crop-aspects">
-        {ASPECTS.map(([k]) => (
+        {ASPECT_LIST.map(([k]) => (
           <button key={k} type="button" className={`chip${aspect === k ? ' on' : ''}`} onClick={() => setAspect(k)}>{L[k] || k}</button>
         ))}
       </div>
+      )}
       <div className="crop-stage" ref={wrapRef}>
         <div className="crop-frame" style={{ width: frame.w, height: frame.h }}
           onMouseDown={start} onMouseMove={move} onMouseUp={end} onMouseLeave={end}
