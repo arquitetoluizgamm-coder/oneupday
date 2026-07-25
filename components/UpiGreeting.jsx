@@ -33,7 +33,7 @@ export default function UpiGreeting({ line, cat, msgKey }) {
       ) : (
         <button type="button" className="upi-closed" onClick={openMsg} aria-label="Upi">
           <img className="upi-char bob" src={src} alt="Upi" />
-          <span className="upi-hint" aria-hidden="true">…</span>
+          <span className="upi-typing" aria-hidden="true"><i /><i /><i /></span>
         </button>
       )}
     </div>
