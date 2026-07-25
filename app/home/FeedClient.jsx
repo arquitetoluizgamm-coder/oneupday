@@ -110,12 +110,14 @@ function DayPager({ item, labels, dayLabel }) {
         </div>
         {i > 0 && (
           <button type="button" className="dp-nav left" onClick={(e) => go(i - 1, e)} aria-label={(labels.dp || {}).prev || ''}>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M15 5l-7 7 7 7" /></svg>
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="butt"><path d="M15 5l-7 7 7 7" /></svg>
+            <span>{dayLabel(days[i - 1].day_number)}</span>
           </button>
         )}
         {i < days.length - 1 && (
           <button type="button" className="dp-nav right" onClick={(e) => go(i + 1, e)} aria-label={(labels.dp || {}).next || ''}>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M9 5l7 7-7 7" /></svg>
+            <span>{dayLabel(days[i + 1].day_number)}</span>
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="butt"><path d="M9 5l7 7-7 7" /></svg>
           </button>
         )}
         {total > 0 && (

@@ -2388,3 +2388,13 @@ h1 { letter-spacing: -0.03em; }
   .feed-page .dp-stage{margin-left:-16px;margin-right:-16px}
   .feed-page .dp-stage .entry-media,.feed-page .dp-stage .entry-textcard{margin-left:0;margin-right:0;width:100%}
 }
+
+/* ---- Card de jornada: padrão 4:3 + setas com o dia ---- */
+.feed-page .entry-media{aspect-ratio:4/3}
+.feed-page .entry-textcard{aspect-ratio:4/3;min-height:0}
+/* setas viram chips com o número do dia (mais claras de entender) */
+.dp-nav{width:auto;height:28px;padding:0 9px;border-radius:0!important;gap:5px;
+  font:inherit;font-size:11.5px;font-weight:700;letter-spacing:.01em;color:#fff}
+.dp-nav span{line-height:1}
+.dp-nav svg{flex:0 0 auto}
+@media(max-width:640px){ .dp-nav{height:26px;padding:0 8px;font-size:11px} }

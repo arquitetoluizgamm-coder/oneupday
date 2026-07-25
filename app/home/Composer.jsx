@@ -236,7 +236,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       {rawUrl && (
         <div className="crop-modal" role="dialog" aria-modal="true">
           <div className="crop-modal-card">
-            <ImageCropper src={rawUrl} labels={t.crop || {}} aspects={[['portrait', 4 / 5]]} onDone={onCropDone} onCancel={onCropCancel} />
+            <ImageCropper src={rawUrl} labels={t.crop || {}} aspects={[['photo', 4 / 3]]} onDone={onCropDone} onCancel={onCropCancel} />
           </div>
         </div>
       )}
