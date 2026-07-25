@@ -2131,3 +2131,9 @@ h1 { letter-spacing: -0.03em; }
 .ej-cover-actions{display:flex;gap:8px}
 .ej-cover-del{background:rgba(255,255,255,.92);color:#b3261e}
 @media(max-width:640px){ .jcover-text h1{font-size:25px} }
+
+/* ---- Remover foto do post (dono): ✕ visível sobre a mídia ---- */
+.owner-media{position:relative}
+.om-x{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;
+  background:rgba(16,19,45,.62);color:#fff;font-size:15px;line-height:1;backdrop-filter:blur(4px)}
+.om-x:hover{background:rgba(179,38,30,.85)}

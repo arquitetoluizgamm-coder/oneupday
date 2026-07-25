@@ -14,6 +14,7 @@ import ReportButton from './ReportButton';
 import MediaGallery from '../../components/MediaGallery';
 import FollowUserButton from './FollowUserButton';
 import UpdateManage from './UpdateManage';
+import OwnerMedia from '../../components/OwnerMedia';
 import Comments from '../../components/Comments';
 import { notFound } from 'next/navigation';
 import Track from '../../components/Track';
@@ -350,8 +351,12 @@ export default async function JourneyPage({ params, searchParams }) {
               <div className="body">
                 <span className="day">{fill(t.dayShort, { d: u.day_number })}</span>
                 {tagFor(u.kind) && <span className={`tag ${u.kind}`}>{tagFor(u.kind)}</span>}
-                {u.photo_url && <div className="update-photo"><img src={u.photo_url} alt="" /></div>}
-                {u.video_url && <div className="update-photo"><video src={u.video_url} controls playsInline preload="metadata" /></div>}
+                {u.photo_url && (isOwner
+                  ? <OwnerMedia updateId={u.id} url={u.photo_url} kind="photo" labels={{ remove: t.mediaRemove, confirm: t.mediaRemoveConfirm, error: t.postError }} />
+                  : <div className="update-photo"><img src={u.photo_url} alt="" /></div>)}
+                {u.video_url && (isOwner
+                  ? <OwnerMedia updateId={u.id} url={u.video_url} kind="video" labels={{ remove: t.mediaRemove, confirm: t.mediaRemoveConfirm, error: t.postError }} />
+                  : <div className="update-photo"><video src={u.video_url} controls playsInline preload="metadata" /></div>)}
                 {u.text && u.text !== '📷' && u.text !== '🎥' && <p>{u.text}</p>}
                 {isOwner && (meTooByUpdate[u.id] || []).length > 0 && (
                   <div className="metoo-author">
