@@ -2504,3 +2504,12 @@ h1 { letter-spacing: -0.03em; }
 .ch-ssee{flex:0 0 auto;font-size:11.5px;font-weight:650;color:var(--muted);white-space:nowrap}
 .ch-strip:hover .ch-ssee{color:var(--ink)}
 .ch-strip{min-height:44px}
+
+/* carimbo do dia no desafio */
+.chp-checkrow{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+.chp-checkrow .chp-check{margin-top:0}
+.chp-photo{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:650;padding:10px 14px;cursor:pointer}
+.chp-stamp{width:26px;height:26px;border-radius:50%!important;background-size:cover;background-position:center;
+  box-shadow:0 0 0 2px var(--sage);flex:0 0 auto;display:inline-block}
+.chp-stamp.today{box-shadow:0 0 0 2px #E8A64C,0 0 0 5px rgba(232,166,76,.25)}
+.chp-dots{align-items:center}

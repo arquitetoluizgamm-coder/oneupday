@@ -19,10 +19,25 @@ export async function POST(req) {
     return NextResponse.json({ error: 'not-allowed' }, { status: 403 });
   }
 
+  const photoUrl = typeof body.photoUrl === 'string' && body.photoUrl.length > 0 && body.photoUrl.length < 500 ? body.photoUrl : null;
   const dayKey = new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10);
-  const { error } = await supabase.from('challenge_checks').insert({ challenge_id: id, user_id: user.id, day_key: dayKey });
-  if (error && !String(error.message || '').toLowerCase().includes('duplicate')) {
-    return NextResponse.json({ error: 'db' }, { status: 500 });
+  const row = { challenge_id: id, user_id: user.id, day_key: dayKey };
+  if (photoUrl) row.photo_url = photoUrl;
+  const { error } = await supabase.from('challenge_checks').insert(row);
+  if (error) {
+    const msg = String(error.message || '').toLowerCase();
+    if (msg.includes('duplicate')) {
+      // já marcou hoje: se veio foto, carimba o dia
+      if (photoUrl) {
+        await supabase.from('challenge_checks').update({ photo_url: photoUrl })
+          .eq('challenge_id', id).eq('user_id', user.id).eq('day_key', dayKey);
+      }
+    } else if (photoUrl && msg.includes('photo_url')) {
+      // coluna ainda não existe (SQL pendente): registra sem foto
+      await supabase.from('challenge_checks').insert({ challenge_id: id, user_id: user.id, day_key: dayKey });
+    } else {
+      return NextResponse.json({ error: 'db' }, { status: 500 });
+    }
   }
   return NextResponse.json({ ok: true, dayKey });
 }

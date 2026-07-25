@@ -23,10 +23,21 @@ export default async function Desafio({ params }) {
   const pmap = {};
   (ps || []).forEach((p) => { pmap[p.id] = p; });
 
-  const { data: checks } = await supabase.from('challenge_checks')
-    .select('user_id, day_key').eq('challenge_id', ch.id);
+  let checks = null;
+  {
+    // tolerante: se a coluna photo_url ainda não existir, busca sem ela
+    const r1 = await supabase.from('challenge_checks').select('user_id, day_key, photo_url').eq('challenge_id', ch.id);
+    if (r1.error) {
+      const r2 = await supabase.from('challenge_checks').select('user_id, day_key').eq('challenge_id', ch.id);
+      checks = r2.data;
+    } else checks = r1.data;
+  }
   const byUser = {};
-  (checks || []).forEach((c) => { (byUser[c.user_id] ||= new Set()).add(String(c.day_key)); });
+  const photoBy = {};
+  (checks || []).forEach((c) => {
+    (byUser[c.user_id] ||= new Set()).add(String(c.day_key));
+    if (c.photo_url) (photoBy[c.user_id] ||= {})[String(c.day_key)] = c.photo_url;
+  });
 
   const today = dayKeyOf(Date.now());
   const start = ch.accepted_at ? new Date(ch.accepted_at) : null;
@@ -81,9 +92,12 @@ export default async function Desafio({ params }) {
                       <span className="chp-count">{fill(t.chPresence, { n, d: ch.days })}</span>
                     </div>
                     <div className="chp-dots">
-                      {dayKeys.map((k) => (
-                        <i key={k} className={`${set.has(k) ? 'on' : ''}${k === today ? ' today' : ''}`} />
-                      ))}
+                      {dayKeys.map((k) => {
+                        const ph = (photoBy[id] || {})[k];
+                        return ph
+                          ? <span key={k} className={`chp-stamp${k === today ? ' today' : ''}`} style={{ backgroundImage: `url(${ph})` }} title={k} />
+                          : <i key={k} className={`${set.has(k) ? 'on' : ''}${k === today ? ' today' : ''}`} />;
+                      })}
                     </div>
                   </div>
                 );
@@ -91,9 +105,13 @@ export default async function Desafio({ params }) {
 
               {ended
                 ? <p className="chp-done gold">{t.chDone}</p>
-                : isPart && (checkedToday
-                    ? <p className="chp-done">{t.chChecked}</p>
-                    : <ChallengeCheck id={ch.id} label={t.chCheck} />)}
+                : isPart && (
+                  <>
+                    {checkedToday && <p className="chp-done">{t.chChecked}</p>}
+                    <ChallengeCheck id={ch.id} userId={user.id} label={t.chCheck} photoLabel={t.chStamp} checkedToday={checkedToday}
+                      cropLabels={{ square: t.cropSquare, use: t.cropUse, cancel: t.cropCancel, hint: t.cropHint, zoom: t.cropZoom }} />
+                  </>
+                )}
             </>
           )}
         </section>
