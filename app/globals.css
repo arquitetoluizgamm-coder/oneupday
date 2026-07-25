@@ -2368,3 +2368,23 @@ h1 { letter-spacing: -0.03em; }
 /* a barra cresce suave ao passar os dias */
 .media-progress .mp-bar span{transition:width .45s cubic-bezier(.22,1,.36,1)}
 @media(max-width:640px){ .dp-nav{width:30px;height:30px} .dp-nav.left{left:8px} .dp-nav.right{right:8px} }
+
+/* ---- Feed 4:5 padrão + barra de evolução no padrão do perfil ---- */
+/* toda imagem do feed em 4:5; o enquadramento certo é decidido ao postar */
+.feed-page .entry-media{aspect-ratio:4/5;overflow:hidden}
+.feed-page .entry-media img,.feed-page .entry-media video{width:100%;height:100%;aspect-ratio:auto;object-fit:cover;max-height:none}
+
+/* barra do card: trilho + preenchimento gradiente + dia e % (como no perfil) */
+.dp-stage .media-progress{position:absolute;left:0;right:0;bottom:0;z-index:3}
+.dp-progress{flex-direction:column;align-items:stretch;gap:7px;padding:18px 16px 12px}
+.dp-progress .mp-bar{flex:none;height:8px;background:rgba(255,255,255,.32);box-shadow:inset 0 1px 2px rgba(9,12,42,.18)}
+.dp-progress .mp-bar span{background:var(--up)}
+.dp-progress .mp-meta{display:flex;justify-content:space-between;align-items:baseline}
+.dp-progress .mp-meta span{font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.dp-progress .mp-pct{font-size:13px;letter-spacing:-.01em}
+
+/* no celular, o palco carrega o sangramento (barra alinhada com a foto) */
+@media(max-width:640px){
+  .feed-page .dp-stage{margin-left:-16px;margin-right:-16px}
+  .feed-page .dp-stage .entry-media,.feed-page .dp-stage .entry-textcard{margin-left:0;margin-right:0;width:100%}
+}

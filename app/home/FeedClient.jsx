@@ -72,12 +72,6 @@ function DayPager({ item, labels, dayLabel }) {
   const left = Math.max(0, total - (d.day_number || 0));
   const cleanText = d.text && d.text !== '📷' && d.text !== '🎥' ? d.text : '';
   const hasMedia = !!(d.photo_url || d.video_url);
-  const progressEl = total > 0 ? (
-    <div className="media-progress" aria-hidden="true">
-      <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
-      <span className="mp-label">{(labels.progressFmt || '').replace('{d}', d.day_number).replace('{r}', left)}</span>
-    </div>
-  ) : null;
   const trackEl = d.track ? <TrackTag key={'t' + d.id} track={d.track} float hasBar={total > 0} /> : null;
 
   function go(next, e) { if (e) { e.preventDefault(); e.stopPropagation(); } setIdx(next); }
@@ -103,14 +97,13 @@ function DayPager({ item, labels, dayLabel }) {
             <a href={`/${item.journey.slug}`} className={`entry-textcard${cleanText.length > 130 ? ' long' : ''}`}>
               <span className="etc-day">{dayLabel(d.day_number)}</span>
               <p>{cleanText}</p>
-              {progressEl}
               {trackEl}
             </a>
           ) : (
             <>
               {cleanText && <EntryText key={'x' + d.id} text={cleanText} labels={labels} />}
-              {d.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={d.photo_url} alt="" />{progressEl}{trackEl}</a>}
-              {d.video_url && !d.photo_url && <div className="entry-media"><video src={d.video_url} controls playsInline preload="metadata" />{progressEl}{trackEl}</div>}
+              {d.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={d.photo_url} alt="" />{trackEl}</a>}
+              {d.video_url && !d.photo_url && <div className="entry-media"><video src={d.video_url} controls playsInline preload="metadata" />{trackEl}</div>}
               {!hasMedia && !cleanText && d.track && <TrackTag key={'t' + d.id} track={d.track} />}
             </>
           )}
@@ -124,6 +117,15 @@ function DayPager({ item, labels, dayLabel }) {
           <button type="button" className="dp-nav right" onClick={(e) => go(i + 1, e)} aria-label={(labels.dp || {}).next || ''}>
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M9 5l7 7-7 7" /></svg>
           </button>
+        )}
+        {total > 0 && (
+          <div className="media-progress dp-progress" aria-hidden="true">
+            <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
+            <div className="mp-meta">
+              <span>{(labels.progressFmt || '').replace('{d}', d.day_number).replace('{r}', left)}</span>
+              <span className="mp-pct">{pct}%</span>
+            </div>
+          </div>
         )}
       </div>
 

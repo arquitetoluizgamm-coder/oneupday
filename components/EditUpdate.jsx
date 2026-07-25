@@ -73,7 +73,7 @@ export default function EditUpdate({ update, labels, onChanged }) {
         <div className="crop-modal" role="dialog" aria-modal="true" onClick={() => !busy && !rawUrl && setOpen(false)}>
           <div className="crop-modal-card ep-card" onClick={(e) => e.stopPropagation()}>
             {rawUrl ? (
-              <ImageCropper src={rawUrl}
+              <ImageCropper src={rawUrl} aspects={[['portrait', 4 / 5]]}
                 labels={{ original: L.cropOriginal, square: L.cropSquare, portrait: L.cropPortrait, landscape: L.cropLandscape, use: L.cropUse, cancel: L.cropCancel, hint: L.cropHint, hintOriginal: L.cropHintOriginal, zoom: L.cropZoom }}
                 onDone={onCropDone} onCancel={() => { URL.revokeObjectURL(rawUrl); setRawUrl(''); }} />
             ) : (
