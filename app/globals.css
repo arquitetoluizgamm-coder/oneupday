@@ -2154,3 +2154,34 @@ h1 { letter-spacing: -0.03em; }
 .eu-add-photo:hover{border-color:var(--night);color:var(--ink)}
 .eu-photo{aspect-ratio:4/3}
 .eu-del{margin-top:2px;text-align:center;font-size:13px}
+
+/* ============================================================
+   AÇÕES COM IDENTIDADE — chips OUD (fim dos links pelados)
+   ============================================================ */
+.jcard-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.jcard-tools .view-link, .jcard-tools button.view-link{
+  display:inline-flex;align-items:center;border:1.5px solid var(--line);background:var(--surface);
+  color:var(--ink);font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:999px;
+  text-decoration:none;cursor:pointer;font-family:inherit;transition:border-color .15s,background .15s}
+.jcard-tools .view-link:hover{border-color:var(--sage);background:var(--sage-soft)}
+.jcard-tools .danger-link{border-color:#EAD5D3;color:#b3261e}
+.jcard-tools .danger-link:hover{border-color:#b3261e;background:#FBEDEC}
+.profile-tools .ghost-btn{border-radius:999px}
+
+/* linha do tempo editável no perfil */
+.jdays{margin-top:12px}
+.jdays-toggle{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--surface);
+  color:var(--ink);font:inherit;font-size:13px;font-weight:750;padding:9px 16px;border-radius:999px;cursor:pointer;
+  transition:border-color .15s,background .15s}
+.jdays-toggle:hover,.jdays-toggle.on{border-color:var(--sage);background:var(--sage-soft)}
+.jdays-toggle svg{color:var(--orange)}
+.jdays-list{margin-top:10px;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
+.jdays-row{display:flex;align-items:center;gap:12px;padding:11px 14px}
+.jdays-row + .jdays-row{border-top:1px solid rgba(16,19,45,.05)}
+.jdays-day{flex:0 0 auto;font-size:11.5px;font-weight:800;color:var(--sage-deep);background:var(--sage-soft);padding:4px 10px;border-radius:999px;white-space:nowrap}
+.jdays-thumb{flex:0 0 auto;width:44px;height:44px;border-radius:10px;background-size:cover;background-position:center;border:1px solid var(--line)}
+.jdays-text{flex:1;min-width:0;font-size:13.5px;color:#3A3F45;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.jdays-row .view-link{flex:0 0 auto;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);
+  font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;cursor:pointer;font-family:inherit}
+.jdays-row .view-link:hover{border-color:var(--sage);background:var(--sage-soft)}
+.jdays-note{margin:0;padding:14px;font-size:13px;color:var(--muted)}

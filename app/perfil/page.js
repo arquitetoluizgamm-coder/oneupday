@@ -20,6 +20,7 @@ import ProfileTabs from '../../components/ProfileTabs';
 import EditProfileInfo from '../../components/EditProfileInfo';
 import DeleteJourney from '../../components/DeleteJourney';
 import EditJourney from '../../components/EditJourney';
+import JourneyDays from '../../components/JourneyDays';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -184,6 +185,9 @@ export default async function Perfil() {
                         </div>
                       </div>
                       <ProgressBar day={day} total={j.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+                      <JourneyDays journeyId={j.id}
+                        labels={{ show: t.jdShow, hide: t.jdHide, empty: t.jdEmpty, loading: t.jdLoading, dayFmt: t.dayShort }}
+                        editLabels={{ btn: t.euBtn, title: t.euTitle, text: t.euText, photo: t.euPhoto, photoAdd: t.ejCoverAdd, photoChange: t.ejCoverChange, photoRemove: t.ejCoverRemove, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errSave: t.epErrSave, errEmpty: t.euErrEmpty, deletePost: t.euDeletePost, deleteConfirm: t.postDeleteConfirm, cropOriginal: t.cropOriginal, cropSquare: t.cropSquare, cropPortrait: t.cropPortrait, cropLandscape: t.cropLandscape, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropHintOriginal: t.cropHintOriginal, cropZoom: t.cropZoom }} />
                       <Composer journeyId={j.id} startDate={j.created_at} aiOn={aiOn} labels={kindLabels} t={{
                         placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
                         addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded,

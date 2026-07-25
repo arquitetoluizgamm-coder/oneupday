@@ -5,7 +5,7 @@ import { createClient } from '../lib/supabase/client';
 import ImageCropper from './ImageCropper';
 
 // Editar um dia da jornada: texto + foto (adicionar/trocar/remover) + excluir post.
-export default function EditUpdate({ update, labels }) {
+export default function EditUpdate({ update, labels, onChanged }) {
   const L = labels || {};
   const isPlaceholder = (tx) => tx === '📷' || tx === '🎥';
   const [open, setOpen] = useState(false);
@@ -49,6 +49,7 @@ export default function EditUpdate({ update, labels }) {
     setBusy(false);
     if (error) { setErr(L.errSave); return; }
     setOpen(false);
+    if (onChanged) onChanged();
     router.refresh();
   }
 
@@ -61,6 +62,7 @@ export default function EditUpdate({ update, labels }) {
     setBusy(false);
     if (error) { setErr(L.errSave); return; }
     setOpen(false);
+    if (onChanged) onChanged();
     router.refresh();
   }
 
