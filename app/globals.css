@@ -2216,3 +2216,31 @@ h1 { letter-spacing: -0.03em; }
 .feed-track-float .feed-track-spk.on{background:rgba(16,19,45,.62);border:0;color:#fff}
 .feed-track-float .feed-track-eq{height:12px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
 .feed-track-float .feed-track-eq i{background:#fff;opacity:.9}
+
+/* ---- Avisos do feed suaves + comentários premium ---- */
+/* marco, recomeço e tipo do dia: voz discreta, sem negrito pesado */
+.entry-kindline{font-weight:600;font-size:12px;letter-spacing:.02em;opacity:.62}
+.entry-kindline::before{opacity:.55}
+.entry-milestone{font-family:var(--serif);font-style:italic;font-weight:500;font-size:13px;letter-spacing:0;color:#b3874a}
+.entry-comeback{font-family:var(--serif);font-style:italic;font-weight:500;font-size:13px;letter-spacing:0;color:#2f8f6b;background:transparent;padding:0;border-radius:0}
+
+/* comentários: abrem numa linha própria abaixo, sem empurrar os ícones */
+.entry-actions{flex-wrap:wrap}
+.entry-actions .comments{display:contents}
+.entry-actions .comment-panel{order:99;flex-basis:100%;width:100%}
+
+/* painel minimalista: sem caixa, só uma linha fina de respiro */
+.comment-panel{margin-top:12px;padding:10px 0 0;border:0;border-top:1px solid #efede8;border-radius:0;background:transparent}
+.comment-thread{border-bottom:0;padding:7px 0}
+.comment-item{border-bottom:0;padding:3px 0}
+.comment-item b{font-size:13px;font-weight:650}
+.comment-item p{margin:2px 0 0;font-size:13.5px;line-height:1.5;color:#4a5060}
+.comment-item-reply{border-left:2px solid #eceae4}
+.comment-empty{font-size:12.5px;margin:2px 0 8px}
+.comment-form{margin-top:8px;gap:0;align-items:center;border:1.5px solid var(--line);border-radius:999px;background:var(--surface,#fff);padding:3px 3px 3px 14px;transition:border-color .2s cubic-bezier(.22,1,.36,1)}
+.comment-form:focus-within{border-color:var(--sage)}
+.comment-form input{border:0;background:transparent;padding:8px 8px 8px 0;font-size:13.5px}
+.comment-form input:focus{outline:none}
+.comment-form button{border-radius:999px;padding:8px 15px;font-size:12.5px;font-weight:700}
+.comment-more{font-weight:600;color:var(--muted);margin:8px 0 0;display:block;text-align:left}
+.comment-replying{background:transparent;border-left:2px solid var(--line);border-radius:0;padding:4px 0 4px 10px}
