@@ -22,6 +22,7 @@ import DeleteJourney from '../../components/DeleteJourney';
 import EditJourney from '../../components/EditJourney';
 import JourneyDays from '../../components/JourneyDays';
 import JourneyFold from '../../components/JourneyFold';
+import { pickUpi } from '../../lib/upi';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -97,6 +98,19 @@ export default async function Perfil() {
   const primary = list[0] || null;
   const nc = await computeNextChapter(supabase, user.id, primary, t);
 
+  // ---- Upi: o pingo que acompanha ----
+  let upi = null;
+  try {
+    let last = null;
+    if (jIds.length) {
+      const { data: lu } = await supabase.from('updates').select('kind, created_at').in('journey_id', jIds).order('created_at', { ascending: false }).limit(1).maybeSingle();
+      last = lu;
+    }
+    const daysSince = last ? Math.floor((Date.now() - new Date(last.created_at).getTime()) / 86400000) : 0;
+    const pDay = (statsById[primary?.id] || {}).current_day || 0;
+    upi = pickUpi({ locale: getLocale(), userId: user.id, hasJourney: list.length > 0, day: pDay, streak: maxStreak, lastKind: last?.kind || '', daysSince, updatesCount });
+  } catch {}
+
   // ---- Quem te apoia: abraços recebidos + apoios nos seus posts ----
   let supporters = [];
   try {
@@ -149,6 +163,16 @@ export default async function Perfil() {
             </div>
           </div>
         </section>
+
+        {upi?.line && (
+          <div className="upi" role="status">
+            <span className={`upi-dot${upi.cat === 'comeback' ? ' gold' : ''}`} aria-hidden="true" />
+            <div className="upi-bubble">
+              <b className="upi-name">Upi</b>
+              <p>{upi.line}</p>
+            </div>
+          </div>
+        )}
 
         {list.length === 0 && (
           <section className="onboarding-block">
