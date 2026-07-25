@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 // Despachante: roda no cron da Vercel.
 // 1) manda push das notificações novas (curtida, comentário, seguir, abraço, desafio)
 // 2) manda o lembrete diário do Upi na hora escolhida por cada pessoa
-export async function GET(req) {
+async function handler(req) {
   const secret = process.env.CRON_SECRET;
   const auth = req.headers.get('authorization') || '';
   const url = new URL(req.url);
@@ -140,3 +140,8 @@ export async function GET(req) {
 
   return NextResponse.json({ ok: true, sentNotif, sentReminder });
 }
+
+// GET  -> usado pelo cron da Vercel
+// POST -> usado pelo gatilho do banco (pg_net) e por serviços de cron externos
+export const GET = handler;
+export const POST = handler;
