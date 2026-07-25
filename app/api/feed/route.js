@@ -102,7 +102,7 @@ export async function GET(req) {
     updates.length ? guard(supabase.from('encouragements').select('update_id, user_id').in('update_id', uids)) : { data: [] },
     journeyIds.length ? guard(supabase.from('journey_stats').select('journey_id, current_day, progress_pct').in('journey_id', journeyIds)) : { data: [] },
     ownerIds.length ? guard(supabase.from('profiles').select('id, mood, mood_at').in('id', ownerIds).not('mood', 'is', null)) : { data: [] },
-    journeyIds.length ? guard(supabase.from('updates').select('id, journey_id, day_number').in('journey_id', journeyIds)) : { data: [] },
+    journeyIds.length ? guard(supabase.from('updates').select('id, journey_id, day_number, kind, text, photo_url, video_url, created_at').in('journey_id', journeyIds)) : { data: [] },
     scope === 'all' ? guard(supabase.from('media').select('*').eq('visibility', 'public').order('created_at', { ascending: false }).limit(60)) : { data: [] },
   ]);
 
@@ -119,7 +119,7 @@ export async function GET(req) {
     const daysByJourney = {};
     (allUpsR.data || []).forEach((u) => { (daysByJourney[u.journey_id] ||= []).push(u.day_number || 0); });
     Object.values(daysByJourney).forEach((arr) => arr.sort((a, b) => a - b));
-    updates.forEach((u) => {
+    (allUpsR.data || []).forEach((u) => {
       const arr = daysByJourney[u.journey_id] || [];
       let prev = null;
       for (const d of arr) { if (d < (u.day_number || 0)) prev = d; else break; }
@@ -154,11 +154,32 @@ export async function GET(req) {
   const mediaFeed = mediaRows.map((m) => ({ id: 'media-' + m.id, media: true, mediaId: m.id, url: m.url, kind: m.kind, caption: m.caption || '', created_at: m.created_at, owner: mediaProf[m.user_id] || {}, encouraged: mediaEncSet.has(m.id) }));
   const mediaTotal = mediaFeed.length;
 
+  // ---- a jornada é um post só: dias agrupados, navegáveis no card ----
+  const fullDaysByJourney = {};
+  (allUpsR.data || []).forEach((u) => { (fullDaysByJourney[u.journey_id] ||= []).push(u); });
+  Object.values(fullDaysByJourney).forEach((arr) => arr.sort((a, b) => ((a.day_number || 0) - (b.day_number || 0)) || (new Date(a.created_at) - new Date(b.created_at))));
+  const dayIds = [];
+  Object.values(fullDaysByJourney).forEach((arr) => arr.slice(-60).forEach((u) => dayIds.push(u.id)));
+  const [encAllR, tracksAllR] = await Promise.all([
+    dayIds.length ? guard(supabase.from('encouragements').select('update_id').eq('user_id', user.id).in('update_id', dayIds)) : { data: [] },
+    dayIds.length ? guard(supabase.from('updates').select('id, track_title, track_artist, track_audio_url').in('id', dayIds).not('track_audio_url', 'is', null)) : { data: [] },
+  ]);
+  const myEncAll = new Set((encAllR.data || []).map((e) => e.update_id));
+  (tracksAllR.data || []).forEach((item) => { trackByUpdate[item.id] = { title: item.track_title, artist: item.track_artist, audio_url: item.track_audio_url }; });
+
+  const seenJourney = new Set();
   const realItems = updates.map((item) => {
     const journey = journeyMap[item.journey_id];
     if (!journey) return null;
+    if (seenJourney.has(item.journey_id)) return null; // dias já agrupados no post da jornada
+    seenJourney.add(item.journey_id);
+    const daysArr = (fullDaysByJourney[item.journey_id] || []).slice(-60).map((u) => ({
+      id: u.id, day_number: u.day_number, kind: u.kind, text: u.text, photo_url: u.photo_url, video_url: u.video_url, created_at: u.created_at,
+      encouraged: myEncAll.has(u.id), track: trackByUpdate[u.id] || null, comeback: comebackByUpdate[u.id] || null,
+    }));
     return {
       ...item,
+      days: daysArr.length > 1 ? daysArr : null,
       journey: { slug: journey.slug, title: journey.title, category: journey.category, total_days: journey.total_days, current_day: (statsByJourney[journey.id] || {}).current_day || 0, progress_pct: (statsByJourney[journey.id] || {}).progress_pct || 0 },
       owner: { ...(profileMap[journey.owner_id] || {}), mood: ownerMoodById[journey.owner_id] || null },
       own: journey.owner_id === user.id,

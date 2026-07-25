@@ -59,6 +59,89 @@ function TrackTag({ track, float, hasBar }) {
   );
 }
 
+// ---- A jornada é um post só: dias navegáveis dentro do card ----
+function DayPager({ item, labels, dayLabel }) {
+  const [days, setDays] = useState(item.days || []);
+  const [idx, setIdx] = useState((item.days || []).length - 1);
+  const touch = useRef(null);
+  if (!days.length) return null;
+  const i = Math.max(0, Math.min(idx, days.length - 1));
+  const d = days[i];
+  const total = item.journey.total_days || 0;
+  const pct = total ? Math.min(100, Math.max(3, Math.round(((d.day_number || 0) / total) * 100))) : 0;
+  const left = Math.max(0, total - (d.day_number || 0));
+  const cleanText = d.text && d.text !== '📷' && d.text !== '🎥' ? d.text : '';
+  const hasMedia = !!(d.photo_url || d.video_url);
+  const progressEl = total > 0 ? (
+    <div className="media-progress" aria-hidden="true">
+      <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
+      <span className="mp-label">{(labels.progressFmt || '').replace('{d}', d.day_number).replace('{r}', left)}</span>
+    </div>
+  ) : null;
+  const trackEl = d.track ? <TrackTag key={'t' + d.id} track={d.track} float hasBar={total > 0} /> : null;
+
+  function go(next, e) { if (e) { e.preventDefault(); e.stopPropagation(); } setIdx(next); }
+  function onTS(e) { touch.current = e.touches[0].clientX; }
+  function onTE(e) {
+    if (touch.current == null) return;
+    const dx = e.changedTouches[0].clientX - touch.current;
+    touch.current = null;
+    if (dx > 44 && i > 0) setIdx(i - 1);
+    else if (dx < -44 && i < days.length - 1) setIdx(i + 1);
+  }
+
+  return (
+    <>
+      {d.comeback && <div className="entry-comeback">{(labels.comebackFmt || '').replace('{d}', d.comeback)}</div>}
+      {d.kind === 'setback' && <div className="entry-kindline setback">{labels.tagSetback}</div>}
+      {d.kind === 'win' && <div className="entry-kindline win">{labels.tagWin}</div>}
+      {[7, 30, 60, 100].includes(d.day_number) && <div className="entry-milestone">{(labels.milestoneFmt || '').replace('{d}', d.day_number)}</div>}
+
+      <div className="dp-stage" onTouchStart={onTS} onTouchEnd={onTE}>
+        <div className="dp-slide" key={d.id}>
+          {(!hasMedia && cleanText) ? (
+            <a href={`/${item.journey.slug}`} className={`entry-textcard${cleanText.length > 130 ? ' long' : ''}`}>
+              <span className="etc-day">{dayLabel(d.day_number)}</span>
+              <p>{cleanText}</p>
+              {progressEl}
+              {trackEl}
+            </a>
+          ) : (
+            <>
+              {cleanText && <EntryText key={'x' + d.id} text={cleanText} labels={labels} />}
+              {d.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={d.photo_url} alt="" />{progressEl}{trackEl}</a>}
+              {d.video_url && !d.photo_url && <div className="entry-media"><video src={d.video_url} controls playsInline preload="metadata" />{progressEl}{trackEl}</div>}
+              {!hasMedia && !cleanText && d.track && <TrackTag key={'t' + d.id} track={d.track} />}
+            </>
+          )}
+        </div>
+        {i > 0 && (
+          <button type="button" className="dp-nav left" onClick={(e) => go(i - 1, e)} aria-label={(labels.dp || {}).prev || ''}>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M15 5l-7 7 7 7" /></svg>
+          </button>
+        )}
+        {i < days.length - 1 && (
+          <button type="button" className="dp-nav right" onClick={(e) => go(i + 1, e)} aria-label={(labels.dp || {}).next || ''}>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M9 5l7 7-7 7" /></svg>
+          </button>
+        )}
+      </div>
+
+      <SupportStrip people={item.supporters} title={(labels.supportStrip || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
+
+      <div className="entry-actions">
+        <EncourageBar key={'e' + d.id} updateId={d.id} initialActive={d.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
+        {(d.kind === 'setback' || d.comeback) && !item.own && <MeTooButton key={'m' + d.id} updateId={d.id} labels={labels.metoo} />}
+        <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
+        <Comments key={'c' + d.id} updateId={d.id} labels={labels.comments} />
+        <HugButton key={'h' + d.id} toId={item.owner.id} updateId={d.id} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
+        {item.own && <EditUpdate key={'ed' + d.id} update={{ id: d.id, text: d.text, photo_url: d.photo_url, day: d.day_number }} labels={labels.editUpdate}
+          onChanged={(patch) => setDays((prev) => patch === null ? prev.filter((x) => x.id !== d.id) : prev.map((x) => x.id === d.id ? { ...x, ...patch } : x))} />}
+      </div>
+    </>
+  );
+}
+
 function EntryText({ text, labels }) {
   const [expanded, setExpanded] = useState(false);
   const compact = text.length > 180;
@@ -241,9 +324,13 @@ export default function FeedClient({ labels }) {
                 </span>
               </a>
               {item.owner.id && !item.own && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
-              {item.own && !item.demo && <EditUpdate update={{ id: item.id, text: item.text, photo_url: item.photo_url, day: item.day_number }} labels={labels.editUpdate}
+              {item.own && !item.demo && !item.days && <EditUpdate update={{ id: item.id, text: item.text, photo_url: item.photo_url, day: item.day_number }} labels={labels.editUpdate}
                 onChanged={(patch) => setItems((prev) => patch === null ? prev.filter((x) => x.id !== item.id) : prev.map((x) => x.id === item.id ? { ...x, ...patch } : x))} />}
             </div>
+            {item.days && !item.demo ? (
+              <DayPager item={item} labels={labels} dayLabel={dayLabel} />
+            ) : (
+            <>
             {item.comeback && <div className="entry-comeback">{(labels.comebackFmt || '').replace('{d}', item.comeback)}</div>}
             {item.kind === 'setback' && <div className="entry-kindline setback">{labels.tagSetback}</div>}
             {item.kind === 'win' && <div className="entry-kindline win">{labels.tagWin}</div>}
@@ -295,6 +382,8 @@ export default function FeedClient({ labels }) {
                 <Comments updateId={item.id} labels={labels.comments} />
                 <HugButton toId={item.owner.id} updateId={item.id} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
               </div>
+            )}
+            </>
             )}
           </article>
           )}
