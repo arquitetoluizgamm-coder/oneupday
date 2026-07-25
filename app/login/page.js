@@ -10,7 +10,7 @@ export default function Login() {
     <>
       <main className="auth-wrap">
         <div className="auth-card">
-          <div className="auth-mark auth-mark-anim"><AnimatedLogo width={280} /></div>
+          <div className="auth-mark auth-mark-anim"><AnimatedLogo /></div>
           <h1>{t.loginTitle}</h1>
           <p>{t.loginSub}</p>
           <GoogleButton labelIdle={t.continueGoogle} labelLoading={t.openingGoogle} errorMsg={t.loginError} />
