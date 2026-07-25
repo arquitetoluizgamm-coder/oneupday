@@ -2073,3 +2073,27 @@ h1 { letter-spacing: -0.03em; }
 }
 .auth-mark-anim.auth-mark{width:100%;height:auto;margin:4px auto 12px;border-radius:0;background:transparent;box-shadow:none;border:0;display:flex;justify-content:center;place-items:initial}
 .auth-mark-anim .oud-anim{display:block;width:min(400px,82vw);height:auto}
+
+/* ============================================================
+   PERFIL PÚBLICO PREMIUM — proporções que respeitam as imagens
+   ============================================================ */
+/* cartão do perfil */
+.profile-card{border-radius:20px;overflow:hidden;box-shadow:0 14px 40px rgba(16,19,45,.08)}
+/* capa: proporção fixa em vez de faixa espremida; gradiente da marca quando não há foto */
+.pc-banner{height:auto;aspect-ratio:16/6;min-height:140px;max-height:240px;
+  background:linear-gradient(135deg,var(--sage-deep),var(--sage) 60%,var(--orange))}
+/* avatar maior com anel e sombra */
+.pc-avatar{width:104px;height:104px;margin-top:-52px;border-width:5px;font-size:38px;
+  box-shadow:0 8px 22px rgba(16,19,45,.16)}
+.pc-meta h1{font-size:26px;font-family:var(--display)}
+/* cards de jornada: miniatura em proporção 16:10 — nada de foto achatada */
+.pj-card{border-radius:18px;overflow:hidden}
+.pj-thumb{height:auto;aspect-ratio:16/10;align-items:flex-end}
+.pj-body b{font-family:var(--display);letter-spacing:-.01em}
+/* explore mantém proporção também */
+.explore-screen .pj-thumb{height:auto;aspect-ratio:16/10}
+@media(max-width:640px){
+  .pc-banner{aspect-ratio:16/7;min-height:120px}
+  .pc-avatar{width:88px;height:88px;margin-top:-44px;font-size:32px}
+  .pc-meta h1{font-size:22px}
+}
