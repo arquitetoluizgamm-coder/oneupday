@@ -2412,3 +2412,12 @@ h1 { letter-spacing: -0.03em; }
 /* dia sem foto no pager: cartão 4:3 com o número do dia (mesmo tamanho da foto) */
 .dp-empty{aspect-ratio:4/3;min-height:0;display:flex;align-items:center;justify-content:center;padding:0}
 .dp-empty .etc-day{font-size:26px;opacity:.95}
+
+/* ---- correção: sem sangramento extra no palco (o feed mobile já é full-width) ---- */
+@media(max-width:640px){
+  .feed-page .dp-stage{margin-left:0;margin-right:0}
+  .feed-page .dp-stage .entry-media,.feed-page .dp-stage .entry-textcard{width:100%;margin-left:0;margin-right:0}
+}
+/* texto do pager alinhado com o cabeçalho do card em qualquer tela */
+.dp-text{padding-left:2px;padding-right:2px}
+@media(max-width:640px){ .dp-text{padding-left:16px;padding-right:16px} }
