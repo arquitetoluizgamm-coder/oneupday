@@ -103,11 +103,21 @@ export default function NewJourneyForm({ userId, t }) {
     }
     if (error || !journey) { setSaving(false); alert(t.createError); return; }
 
-    await supabase.from('updates').insert({
+    // Dia 1 nunca pode faltar: sem ele a jornada não aparece no feed.
+    const day1 = {
       journey_id: journey.id, day_number: 1, kind: 'step',
-      text: first || (photoUrl ? '\u{1F4F7}' : (videoUrl ? '\u{1F3A5}' : '')),
+      text: first || (photoUrl ? '\u{1F4F7}' : (videoUrl ? '\u{1F3A5}' : (t.firstDayDefault || 'Comecei.'))),
       photo_url: photoUrl, video_url: videoUrl,
-    });
+    };
+    let { error: upErr } = await supabase.from('updates').insert(day1);
+    if (upErr) {
+      // tenta sem os campos opcionais (coluna ausente / valor recusado)
+      const { error: retryErr } = await supabase.from('updates').insert({
+        journey_id: journey.id, day_number: 1, kind: 'step', text: day1.text,
+      });
+      upErr = retryErr;
+    }
+    if (upErr) { setSaving(false); alert(t.createError); return; }
     track('journey_created', { slug, visibility });
     track('day1_posted', { slug });
     router.push(`/created/${slug}`); router.refresh();
