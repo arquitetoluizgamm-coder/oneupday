@@ -2244,3 +2244,18 @@ h1 { letter-spacing: -0.03em; }
 .comment-form button{border-radius:999px;padding:8px 15px;font-size:12.5px;font-weight:700}
 .comment-more{font-weight:600;color:var(--muted);margin:8px 0 0;display:block;text-align:left}
 .comment-replying{background:transparent;border-left:2px solid var(--line);border-radius:0;padding:4px 0 4px 10px}
+
+/* ---- Visual reto: cantos quadrados em todo o app ---- */
+/* tudo que tinha borda arredondada vira canto reto; círculos verdadeiros
+   (avatares, pontos, botões redondos de ícone) são preservados abaixo */
+:root{--r-card:0px}
+*,*::before,*::after{border-radius:0!important}
+
+/* círculos preservados */
+.ava,.timeline .dot,.cover::after,.ob-steps li span,.feed-ava,.me-ava,.pc-avatar,
+.bell,.notif-ava,.success-mark,.demo-ava,.edit-avatar,.pj-ava,.header-ava,
+.follower-chip .fc-ava,.track-play,.feed-track-btn,.wall-ava,.entry-ava,
+.message-nav,.message-avatar,.supporters-icon,.demo-story-avatar,.icon-btn,
+.ss-ava,.heart-btn .heart-dot,.sg-ava,.mood-chip i,.dm-dot,
+.comment-panel .cmt-ava,.needs-ava,.ps-ava,.lb-close,.lb-nav,
+.rules-list li::before,.sgc-ava,.nc-close,.om-x,.feed-track-spk{border-radius:50%!important}
