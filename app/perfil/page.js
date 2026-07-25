@@ -186,7 +186,7 @@ export default async function Perfil() {
 
         {upi?.line && (
           <div className="upi" role="status">
-            <span className={`upi-dot${upi.cat === 'comeback' ? ' gold' : ''}`} aria-hidden="true" />
+            <img className="upi-char" src={upi.cat === 'comeback' ? '/upi-recomeco.svg' : '/upi.svg'} alt="Upi" />
             <div className="upi-bubble">
               <b className="upi-name">Upi</b>
               <p>{upi.line}</p>

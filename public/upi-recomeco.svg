@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="g" cx="0.36" cy="0.32" r="0.9">
+      <stop offset="0" stop-color="#D68A6F"/>
+      <stop offset="0.62" stop-color="#C16F54"/>
+      <stop offset="1" stop-color="#B4644A"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="250" r="228" fill="none" stroke="#E8A64C" stroke-width="12" stroke-dasharray="1153 280" stroke-linecap="butt"/>
+  <!-- corpo: o U do logo (haste direita quebrada, como no logo) -->
+  <path d="M166 112 L166 280 A90 90 0 0 0 346 280 L346 192" stroke="#84917A" stroke-width="34" stroke-linecap="butt" fill="none"/>
+  <!-- o pingo (terracota, no vão da haste) -->
+  <circle cx="346" cy="132" r="27" fill="url(#g)"/>
+  <!-- rosto -->
+  <path d="M214 226 A14 14 0 0 1 242 226" stroke="#10132D" stroke-width="11" stroke-linecap="butt" fill="none"/><path d="M270 226 A14 14 0 0 1 298 226" stroke="#10132D" stroke-width="11" stroke-linecap="butt" fill="none"/>
+  <path d="M226 268 A38 38 0 0 0 286 268" stroke="#10132D" stroke-width="13" stroke-linecap="butt" fill="none"/>
+</svg>
