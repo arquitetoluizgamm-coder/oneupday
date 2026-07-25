@@ -152,6 +152,23 @@ export async function GET(req) {
   (mediaProfR.data || []).forEach((pr) => { mediaProf[pr.id] = pr; });
   const mediaEncSet = new Set((mediaEncR.data || []).map((e) => e.media_id));
 
+  // ---- raio: pode desafiar? (seguem um ao outro e sem desafio aberto) ----
+  const canChallenge = new Set();
+  try {
+    const candIds = [...new Set([...ownerIds, ...mediaOwnerIds])].filter((id) => id !== user.id);
+    if (candIds.length) {
+      const [f1, f2, open] = await Promise.all([
+        guard(supabase.from('profile_follows').select('following_id').eq('follower_id', user.id).in('following_id', candIds)),
+        guard(supabase.from('profile_follows').select('follower_id').eq('following_id', user.id).in('follower_id', candIds)),
+        guard(supabase.from('challenges').select('from_id, to_id').in('status', ['pending', 'active']).or(`from_id.eq.${user.id},to_id.eq.${user.id}`)),
+      ]);
+      const iFollow = new Set((f1.data || []).map((r) => r.following_id));
+      const followsMe = new Set((f2.data || []).map((r) => r.follower_id));
+      const busyWithMe = new Set((open.data || []).flatMap((c) => [c.from_id, c.to_id]));
+      candIds.forEach((id) => { if (iFollow.has(id) && followsMe.has(id) && !busyWithMe.has(id)) canChallenge.add(id); });
+    }
+  } catch {}
+
   // ---- desafio ativo do dono do post (linha embaixo do card) ----
   const challengeByOwner = {};
   try {
@@ -199,23 +216,6 @@ export async function GET(req) {
   ]);
   const myEncAll = new Set((encAllR.data || []).map((e) => e.update_id));
   (tracksAllR.data || []).forEach((item) => { trackByUpdate[item.id] = { title: item.track_title, artist: item.track_artist, audio_url: item.track_audio_url }; });
-
-  // ---- raio: pode desafiar? (seguem um ao outro e sem desafio aberto) ----
-  const canChallenge = new Set();
-  try {
-    const candIds = [...new Set([...ownerIds, ...mediaOwnerIds])].filter((id) => id !== user.id);
-    if (candIds.length) {
-      const [f1, f2, open] = await Promise.all([
-        guard(supabase.from('profile_follows').select('following_id').eq('follower_id', user.id).in('following_id', candIds)),
-        guard(supabase.from('profile_follows').select('follower_id').eq('following_id', user.id).in('follower_id', candIds)),
-        guard(supabase.from('challenges').select('from_id, to_id').in('status', ['pending', 'active']).or(`from_id.eq.${user.id},to_id.eq.${user.id}`)),
-      ]);
-      const iFollow = new Set((f1.data || []).map((r) => r.following_id));
-      const followsMe = new Set((f2.data || []).map((r) => r.follower_id));
-      const busyWithMe = new Set((open.data || []).flatMap((c) => [c.from_id, c.to_id]));
-      candIds.forEach((id) => { if (iFollow.has(id) && followsMe.has(id) && !busyWithMe.has(id)) canChallenge.add(id); });
-    }
-  } catch {}
 
   const seenJourney = new Set();
   const realItems = updates.map((item) => {
