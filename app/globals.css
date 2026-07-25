@@ -2185,3 +2185,21 @@ h1 { letter-spacing: -0.03em; }
   font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;cursor:pointer;font-family:inherit}
 .jdays-row .view-link:hover{border-color:var(--sage);background:var(--sage-soft)}
 .jdays-note{margin:0;padding:14px;font-size:13px;color:var(--muted)}
+
+/* ---- Música no card: alto-falante mudo/ativo + equalizador ---- */
+.feed-track{display:flex;align-items:center;gap:10px;margin-top:10px}
+.feed-track-spk{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);
+  color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:all .15s}
+.feed-track-spk:hover{border-color:var(--sage);color:var(--ink)}
+.feed-track-spk.on{background:var(--night);border-color:var(--night);color:#fff}
+.feed-track-name{font-size:12.5px;font-weight:650;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.feed-track-eq{display:inline-flex;align-items:flex-end;gap:2px;height:14px}
+.feed-track-eq i{width:3px;background:var(--orange);border-radius:1px;animation:oudEq .9s ease-in-out infinite}
+.feed-track-eq i:nth-child(1){height:6px;animation-delay:0s}
+.feed-track-eq i:nth-child(2){height:12px;animation-delay:.2s}
+.feed-track-eq i:nth-child(3){height:8px;animation-delay:.4s}
+@keyframes oudEq{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1)}}
+/* chip Editar no cabeçalho do post próprio */
+.entry-head .view-link{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);
+  font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;cursor:pointer;font-family:inherit}
+.entry-head .view-link:hover{border-color:var(--sage);background:var(--sage-soft)}

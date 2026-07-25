@@ -8,6 +8,7 @@ import SuggestionCard from '../../components/SuggestionCard';
 import HugButton from '../../components/HugButton';
 import NeedsSupport from '../../components/NeedsSupport';
 import MeTooButton from '../../components/MeTooButton';
+import EditUpdate from '../../components/EditUpdate';
 import { MOODS, moodGlow } from '../../lib/moods';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
@@ -29,8 +30,15 @@ function TrackTag({ track }) {
 
   return (
     <div className="feed-track">
-      <button type="button" className="feed-track-btn" onClick={toggle}>{playing ? 'Pause' : 'Play'}</button>
+      <button type="button" className={`feed-track-spk${playing ? ' on' : ''}`} onClick={toggle} aria-label={playing ? 'pausar' : 'tocar'} title={track.title}>
+        {playing ? (
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>
+        ) : (
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
+        )}
+      </button>
       <span className="feed-track-name">{track.title}{track.artist ? ` · ${track.artist}` : ''}</span>
+      {playing && <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>}
       <audio ref={audio} src={track.audio_url} onEnded={() => setPlaying(false)} />
     </div>
   );
@@ -218,6 +226,8 @@ export default function FeedClient({ labels }) {
                 </span>
               </a>
               {item.owner.id && !item.own && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
+              {item.own && !item.demo && <EditUpdate update={{ id: item.id, text: item.text, photo_url: item.photo_url, day: item.day_number }} labels={labels.editUpdate}
+                onChanged={(patch) => setItems((prev) => patch === null ? prev.filter((x) => x.id !== item.id) : prev.map((x) => x.id === item.id ? { ...x, ...patch } : x))} />}
             </div>
             {item.comeback && <div className="entry-comeback">{(labels.comebackFmt || '').replace('{d}', item.comeback)}</div>}
             {item.kind === 'setback' && <div className="entry-kindline setback">{labels.tagSetback}</div>}

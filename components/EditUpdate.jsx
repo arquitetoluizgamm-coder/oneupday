@@ -49,7 +49,7 @@ export default function EditUpdate({ update, labels, onChanged }) {
     setBusy(false);
     if (error) { setErr(L.errSave); return; }
     setOpen(false);
-    if (onChanged) onChanged();
+    if (onChanged) onChanged({ text: value || '📷', photo_url: photoUrl || null });
     router.refresh();
   }
 
@@ -62,7 +62,7 @@ export default function EditUpdate({ update, labels, onChanged }) {
     setBusy(false);
     if (error) { setErr(L.errSave); return; }
     setOpen(false);
-    if (onChanged) onChanged();
+    if (onChanged) onChanged(null);
     router.refresh();
   }
 
