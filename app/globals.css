@@ -2529,3 +2529,14 @@ h1 { letter-spacing: -0.03em; }
 
 /* Upi personagem no perfil (o U do logo, vivo) */
 .upi-char{width:52px;height:52px;flex:0 0 auto;margin-top:0}
+
+/* Upi animado: balança até abrirem a mensagem, depois fica quieto e aberto */
+.upi-wait{opacity:0}
+.upi-closed{border:0;background:transparent;display:flex;align-items:center;gap:9px;cursor:pointer;padding:0;font:inherit}
+.upi-char.bob{animation:upiBob 1.7s cubic-bezier(.45,0,.55,1) infinite}
+@keyframes upiBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.upi-hint{background:var(--surface);border:1px solid var(--line);color:var(--muted);
+  font-weight:800;font-size:17px;line-height:1;padding:9px 13px;letter-spacing:2px}
+.upi-closed:hover .upi-hint{color:var(--ink);border-color:var(--sage)}
+.upi-open{animation:upiIn .5s cubic-bezier(.22,1,.36,1)}
+@media(prefers-reduced-motion:reduce){.upi-char.bob{animation:none}}

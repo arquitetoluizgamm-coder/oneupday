@@ -24,6 +24,7 @@ import JourneyDays from '../../components/JourneyDays';
 import JourneyFold from '../../components/JourneyFold';
 import { pickUpi } from '../../lib/upi';
 import ChallengeRespond from '../../components/ChallengeRespond';
+import UpiGreeting from '../../components/UpiGreeting';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -185,13 +186,8 @@ export default async function Perfil() {
         </section>
 
         {upi?.line && (
-          <div className="upi" role="status">
-            <img className="upi-char" src={upi.cat === 'comeback' ? '/upi-recomeco.svg' : '/upi.svg'} alt="Upi" />
-            <div className="upi-bubble">
-              <b className="upi-name">Upi</b>
-              <p>{upi.line}</p>
-            </div>
-          </div>
+          <UpiGreeting line={upi.line} cat={upi.cat}
+            msgKey={`${new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10)}:${upi.cat}`} />
         )}
 
         <section className="ch-block">
