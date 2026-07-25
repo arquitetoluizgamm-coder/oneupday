@@ -10,6 +10,7 @@ import NeedsSupport from '../../components/NeedsSupport';
 import MeTooButton from '../../components/MeTooButton';
 import EditUpdate from '../../components/EditUpdate';
 import ChallengeStrip from '../../components/ChallengeStrip';
+import ChallengeButton from '../../components/ChallengeButton';
 import { MOODS, moodGlow } from '../../lib/moods';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
@@ -139,6 +140,7 @@ function DayPager({ item, labels, dayLabel }) {
         <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
         <Comments key={'c' + d.id} updateId={d.id} labels={labels.comments} />
         <HugButton key={'h' + d.id} toId={item.owner.id} updateId={d.id} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
+        {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
         {item.own && <EditUpdate key={'ed' + d.id} update={{ id: d.id, text: d.text, photo_url: d.photo_url, day: d.day_number }} labels={labels.editUpdate}
           onChanged={(patch) => setDays((prev) => patch === null ? prev.filter((x) => x.id !== d.id) : prev.map((x) => x.id === d.id ? { ...x, ...patch } : x))} />}
       </div>
@@ -313,6 +315,7 @@ export default function FeedClient({ labels }) {
               <FeedShare slug={item.owner.handle || ''} title={item.owner.name} label={labels.share} copiedLabel={labels.linkCopied} />
               <Comments mediaId={item.mediaId} labels={labels.comments} />
               <HugButton toId={item.owner.id} mediaId={item.mediaId} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
+              {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
             </div>
             {item.challenge && <ChallengeStrip challenge={item.challenge} />}
           </article>
@@ -386,6 +389,7 @@ export default function FeedClient({ labels }) {
                 <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
                 <Comments updateId={item.id} labels={labels.comments} />
                 <HugButton toId={item.owner.id} updateId={item.id} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
+                {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
               </div>
             )}
             </>

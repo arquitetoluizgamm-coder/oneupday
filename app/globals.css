@@ -2492,3 +2492,7 @@ h1 { letter-spacing: -0.03em; }
 
 /* estado vazio dos desafios */
 .ch-empty{margin:4px 0 2px;font-size:13.5px;line-height:1.5;color:var(--muted)}
+
+/* raio de desafiar nas ações do feed */
+.entry-actions .ch-bolt{color:var(--muted)}
+.entry-actions .ch-bolt:hover{color:var(--orange);text-decoration:none}

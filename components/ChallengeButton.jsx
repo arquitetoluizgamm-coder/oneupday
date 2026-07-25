@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 
-// Lançar um desafio no perfil de alguém que você segue / te segue
-export default function ChallengeButton({ toId, toName, labels }) {
+// Lançar um desafio: chip no perfil, ou raio (icon) nas ações do feed
+export default function ChallengeButton({ toId, toName, labels, icon }) {
   const L = labels || {};
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
@@ -28,7 +28,13 @@ export default function ChallengeButton({ toId, toName, labels }) {
 
   return (
     <>
-      <button type="button" className="ghost-btn ch-btn" onClick={() => setOpen(true)}>{L.btn}</button>
+      {icon ? (
+        <button type="button" className="comment-toggle ch-bolt" onClick={() => setOpen(true)} aria-label={L.btn} title={L.btn}>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="butt" strokeLinejoin="miter"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" /></svg>
+        </button>
+      ) : (
+        <button type="button" className="ghost-btn ch-btn" onClick={() => setOpen(true)}>{L.btn}</button>
+      )}
       {open && (
         <div className="crop-modal" role="dialog" aria-modal="true" onClick={() => !busy && setOpen(false)}>
           <div className="crop-modal-card ep-card" onClick={(e) => e.stopPropagation()}>
