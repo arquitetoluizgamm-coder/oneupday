@@ -13,11 +13,12 @@ import { MOODS, moodGlow } from '../../lib/moods';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
 
-function TrackTag({ track }) {
+function TrackTag({ track, float, hasBar }) {
   const [playing, setPlaying] = useState(false);
   const audio = useRef(null);
 
-  function toggle() {
+  function toggle(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
     if (!audio.current) return;
     if (playing) {
       audio.current.pause();
@@ -28,15 +29,29 @@ function TrackTag({ track }) {
     }
   }
 
+  const btn = (
+    <button type="button" className={`feed-track-spk${playing ? ' on' : ''}`} onClick={toggle} aria-label={playing ? 'pausar' : 'tocar'} title={track.title + (track.artist ? ` · ${track.artist}` : '')}>
+      {playing ? (
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>
+      ) : (
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
+      )}
+    </button>
+  );
+
+  if (float) {
+    return (
+      <span className={`feed-track-float${hasBar ? ' above-bar' : ''}`}>
+        {playing && <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>}
+        {btn}
+        <audio ref={audio} src={track.audio_url} onEnded={() => setPlaying(false)} />
+      </span>
+    );
+  }
+
   return (
     <div className="feed-track">
-      <button type="button" className={`feed-track-spk${playing ? ' on' : ''}`} onClick={toggle} aria-label={playing ? 'pausar' : 'tocar'} title={track.title}>
-        {playing ? (
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>
-        ) : (
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
-        )}
-      </button>
+      {btn}
       <span className="feed-track-name">{track.title}{track.artist ? ` · ${track.artist}` : ''}</span>
       {playing && <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>}
       <audio ref={audio} src={track.audio_url} onEnded={() => setPlaying(false)} />
@@ -247,24 +262,26 @@ export default function FeedClient({ labels }) {
                   <span className="mp-label">{(labels.progressFmt || '').replace('{d}', day).replace('{r}', left)}</span>
                 </div>
               ) : null;
+              const trackFloat = item.track ? <TrackTag track={item.track} float hasBar={total > 0} /> : null;
               if (!hasMedia && cleanText) {
                 return (
                   <a href={`/${item.journey.slug}`} className={`entry-textcard${cleanText.length > 130 ? ' long' : ''}`}>
                     <span className="etc-day">{dayLabel(item.day_number)}</span>
                     <p>{cleanText}</p>
                     {progressEl}
+                    {trackFloat}
                   </a>
                 );
               }
               return (
                 <>
                   {cleanText && <EntryText text={cleanText} labels={labels} />}
-                  {item.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={item.photo_url} alt="" />{progressEl}</a>}
-                  {item.video_url && !item.photo_url && <div className="entry-media"><video src={item.video_url} controls playsInline preload="metadata" />{progressEl}</div>}
+                  {item.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={item.photo_url} alt="" />{progressEl}{trackFloat}</a>}
+                  {item.video_url && !item.photo_url && <div className="entry-media"><video src={item.video_url} controls playsInline preload="metadata" />{progressEl}{trackFloat}</div>}
+                  {!hasMedia && !cleanText && item.track && <TrackTag track={item.track} />}
                 </>
               );
             })()}
-            {item.track && <TrackTag track={item.track} />}
 
             <SupportStrip people={item.supporters} title={(labels.supportStrip || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
 

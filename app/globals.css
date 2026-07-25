@@ -2203,3 +2203,16 @@ h1 { letter-spacing: -0.03em; }
 .entry-head .view-link{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);
   font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;cursor:pointer;font-family:inherit}
 .entry-head .view-link:hover{border-color:var(--sage);background:var(--sage-soft)}
+
+/* ---- Alto-falante flutuante sobre o card (feed) ---- */
+.feed-track-float{position:absolute;right:10px;bottom:12px;z-index:3;display:inline-flex;align-items:center;gap:7px;pointer-events:none}
+.feed-track-float.above-bar{bottom:44px}
+.feed-track-float .feed-track-spk{pointer-events:auto;width:30px;height:30px;border:0;
+  background:rgba(16,19,45,.38);color:#fff;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+  box-shadow:0 1px 6px rgba(9,10,20,.22);display:inline-flex;align-items:center;justify-content:center;
+  transition:background .2s cubic-bezier(.22,1,.36,1)}
+.feed-track-float .feed-track-spk svg{width:15px;height:15px}
+.feed-track-float .feed-track-spk:hover{border:0;background:rgba(16,19,45,.6);color:#fff}
+.feed-track-float .feed-track-spk.on{background:rgba(16,19,45,.62);border:0;color:#fff}
+.feed-track-float .feed-track-eq{height:12px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+.feed-track-float .feed-track-eq i{background:#fff;opacity:.9}
