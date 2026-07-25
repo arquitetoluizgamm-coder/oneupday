@@ -2318,3 +2318,37 @@ h1 { letter-spacing: -0.03em; }
 @keyframes upiIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.upi{animation:none}}
 @media(max-width:640px){.upi{margin-left:0;margin-right:0}}
+
+/* ---- Perfil mobile: ferramentas na capa, abas em 1 linha, cards de ponta a ponta ---- */
+/* ferramentas agora DENTRO da capa, canto inferior direito (Editar capa segue no topo) */
+.pc-tools{position:absolute;height:auto;bottom:10px;right:10px;top:auto;left:auto;z-index:4;
+  display:flex;justify-content:flex-end;align-items:center;gap:6px;padding:0}
+.pc-tools > *{margin-top:0}
+.pc-tools form{display:contents}
+.pc-tools form button{margin-top:0}
+.pc-tools .ghost-btn{font-size:11px;font-weight:650;padding:5px 10px;border:0;line-height:1.2;
+  background:rgba(9,12,42,.5);color:#fff;cursor:pointer;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.pc-tools .ghost-btn:hover{background:rgba(9,12,42,.7);color:#fff;border:0}
+@media(max-width:640px){ .pc-tools{bottom:8px;right:8px;gap:4px} .pc-tools .ghost-btn{font-size:10px;padding:4px 8px} }
+
+/* abas + ações: uma linha também no celular (rótulos curtos) */
+.al-short{display:none}
+@media(max-width:640px){
+  .ptabs-row{flex-wrap:nowrap;gap:6px}
+  .ptabs-row .ptabs{flex:1;flex-basis:auto;min-width:0;padding:3px;gap:2px}
+  .ptabs-row .ptab{font-size:12px;padding:7px 2px}
+  .ptabs-row .ptab-actions{margin-left:0;gap:5px}
+  .ptabs-row .ptab-actions .cta{padding:7px 9px;font-size:11.5px;white-space:nowrap}
+  .ptabs-row .ptab-actions .ghost-btn{padding:6px 8px;font-size:11.5px;white-space:nowrap}
+  .al-full{display:none}
+  .al-short{display:inline}
+}
+
+/* cards do perfil de ponta a ponta no celular: menos linhas, mais tela */
+@media(max-width:640px){
+  .profile-card,.jcard,.onboarding-block,.followers-block,.tab-empty{
+    margin-left:-16px;margin-right:-16px;border-left:0;border-right:0}
+  .nc-neutral .nc{margin-left:-16px;margin-right:-16px;border-left:0;border-right:0}
+  .upi{margin-left:0;margin-right:0}
+  .upi-bubble{max-width:none;flex:1}
+}

@@ -142,11 +142,11 @@ export default async function Perfil() {
         <section className="profile-card">
           <div className="pc-banner" style={profile.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : undefined}>
             <EditBanner userId={user.id} label={t.editBanner} uploadingLabel={t.uploading} cropLabels={{ cover: t.cropCover, use: t.cropUse, cancel: t.cropCancel, hint: t.cropHint, zoom: t.cropZoom }} />
-          </div>
-          <div className="pc-tools">
-            <EditProfileInfo userId={user.id} initialName={profile.name} initialHandle={profile.handle} labels={{ btn: t.epBtn, title: t.epTitle, name: t.epName, handle: t.epHandle, hint: t.epHint, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errName: t.epErrName, errHandle: t.epErrHandle, errTaken: t.epErrTaken, errSave: t.epErrSave }} />
-            <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
-            <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
+            <div className="pc-tools">
+              <EditProfileInfo userId={user.id} initialName={profile.name} initialHandle={profile.handle} labels={{ btn: t.epBtn, title: t.epTitle, name: t.epName, handle: t.epHandle, hint: t.epHint, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errName: t.epErrName, errHandle: t.epErrHandle, errTaken: t.epErrTaken, errSave: t.epErrSave }} />
+              <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
+              <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
+            </div>
           </div>
           <div className="pc-info">
             <div className="pc-avatar" style={{ background: profile.avatar_color || 'var(--orange)' }}>
@@ -188,7 +188,10 @@ export default async function Perfil() {
         {list.length > 0 && (
           <ProfileTabs
             labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, people: t.profTabPeople }}
-            actions={(<><a className="ghost-btn" href="/midia">{t.mediaAdd}</a><a className="cta" href="/new">{t.newJourney}</a></>)}
+            actions={(<>
+              <a className="ghost-btn" href="/midia"><span className="al-full">{t.mediaAdd}</span><span className="al-short">{t.mediaAddShort}</span></a>
+              <a className="cta" href="/new"><span className="al-full">{t.newJourney}</span><span className="al-short">{t.newJourneyShort}</span></a>
+            </>)}
             journeys={(
               <>
                 {list.map(j => {
