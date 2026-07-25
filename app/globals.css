@@ -2031,3 +2031,25 @@ html.chrome-scrolling .top{box-shadow:none!important}
 
 /* ---- Devolução de significado (pós-post, acima do envelope) ---- */
 .env-meaning{margin:0 0 14px;font-size:16px;font-weight:750;letter-spacing:-.02em;line-height:1.4;color:var(--ink)}
+
+/* ============================================================
+   OUD REBRAND — tokens oficiais da marca (etapa 9)
+   Fonte da verdade: oneupday/brand/ · Este bloco vence a cascata.
+   ============================================================ */
+:root{
+  --bg:#FAF7F2;                 /* branco quente */
+  --line:#E3DED4;               /* linha */
+  --orange:#C16F54;             /* terracota — a ação da marca */
+  --pink:#C16F54;               /* apoio herda o terracota */
+  --support:#C16F54; --support-soft:#F2DED4;
+  --sage:#84917A; --sage-soft:#DDE3D6; --sage-deep:#5E6B55;
+  --gold:#E8A64C;               /* dourado do recomeço */
+  --sky:#9FC3DE; --rose:#D493A6;
+  --display:'Montserrat','Century Gothic',ui-sans-serif,sans-serif;
+}
+/* display: Montserrat nos títulos e CTAs (ecoa a geometria do logo) */
+h1, h2, .cta, .post-btn { font-family: var(--display); }
+h1 { letter-spacing: -0.03em; }
+/* halo/realces que eram rosa-choque agora seguem a paleta */
+.needs-send { color: var(--orange); }
+.needs-send:hover { background: var(--support-soft); }
