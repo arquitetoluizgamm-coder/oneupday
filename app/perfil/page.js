@@ -19,6 +19,7 @@ import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
 import ProfileTabs from '../../components/ProfileTabs';
 import EditProfileInfo from '../../components/EditProfileInfo';
 import DeleteJourney from '../../components/DeleteJourney';
+import EditJourney from '../../components/EditJourney';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -178,6 +179,7 @@ export default async function Perfil() {
                           <PrivacyToggle journeyId={j.id} initial={j.visibility || (j.is_public ? 'public' : 'private')} labels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} />
                           <a className="view-link" href={`/retro/${j.slug}`}>{t.retroLink}</a>
                           <a className="view-link" href={`/${j.slug}`}>{t.viewPublic}</a>
+                          <EditJourney journey={j} labels={{ btn: t.ejBtn, title: t.ejTitle, name: t.ejName, goal: t.ejGoal, cover: t.ejCover, coverAdd: t.ejCoverAdd, coverChange: t.ejCoverChange, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errTitle: t.ejErrTitle, errSave: t.epErrSave, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropZoom: t.cropZoom }} />
                           <DeleteJourney journeyId={j.id} title={j.title} labels={{ btn: t.jDeleteBtn, confirm: t.jDeleteConfirm, error: t.jDeleteErr }} />
                         </div>
                       </div>

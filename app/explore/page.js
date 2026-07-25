@@ -85,8 +85,8 @@ export default async function Explore({ searchParams }) {
             const pct = Math.min(100, stats.progress_pct || 0);
             return (
               <a className="pj-card" key={journey.id} href={`/${journey.slug}`}>
-                <div className="pj-thumb" style={photoBy[journey.id]
-                  ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.1), rgba(9,12,42,.5)), url(${photoBy[journey.id]})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+                <div className="pj-thumb" style={(journey.cover_url || photoBy[journey.id])
+                  ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.1), rgba(9,12,42,.5)), url(${journey.cover_url || photoBy[journey.id]})`, backgroundSize: 'cover', backgroundPosition: 'center' }
                   : { background: `linear-gradient(135deg, var(--night), ${journey.cover_color})` }}>
                   <span>{fill(t.dayShort, { d: stats.current_day || 0 })}</span>
                 </div>

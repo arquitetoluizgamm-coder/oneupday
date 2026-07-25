@@ -2113,3 +2113,9 @@ h1 { letter-spacing: -0.03em; }
 .ep-err{margin:0;font-size:13px;color:#b3261e;font-weight:600}
 .danger-link{color:#b3261e;border:0;background:transparent;cursor:pointer;font:inherit;font-size:inherit}
 .danger-link:hover{text-decoration:underline}
+
+/* ---- Editar jornada: capa ---- */
+.ej-goal{border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font:inherit;font-size:15px;line-height:1.5;resize:none;color:var(--ink)}
+.ej-goal:focus{outline:0;border-color:var(--night)}
+.ej-cover{aspect-ratio:16/10;border-radius:14px;background-size:cover;background-position:center;display:grid;place-items:center;border:1px solid var(--line)}
+.ej-cover-btn{border:0;cursor:pointer;background:rgba(255,255,255,.92);color:#10132D;font:inherit;font-size:13px;font-weight:750;padding:9px 16px;border-radius:999px;box-shadow:0 4px 14px rgba(16,19,45,.18)}

@@ -121,7 +121,7 @@ async function ProfilePage({ handle }) {
             const pct = Math.min(100, st.progress_pct || 0);
             return (
               <a className="pj-card" key={j.id} href={`/${j.slug}`}>
-                <div className="pj-thumb" style={photoBy[j.id] ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.1), rgba(9,12,42,.5)), url(${photoBy[j.id]})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: `linear-gradient(135deg, var(--night), ${j.cover_color})` }}>
+                <div className="pj-thumb" style={(j.cover_url || photoBy[j.id]) ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.1), rgba(9,12,42,.5)), url(${j.cover_url || photoBy[j.id]})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: `linear-gradient(135deg, var(--night), ${j.cover_color})` }}>
                   <span>{fill(t.dayShort, { d: st.current_day || 0 })}</span>
                 </div>
                 <div className="pj-body">
@@ -289,8 +289,8 @@ export default async function JourneyPage({ params, searchParams }) {
       <Track type="journey_view" meta={{ slug: journey.slug }} />
       {fromShare && <Track type="card_clicked" meta={{ slug: journey.slug }} />}
       <main className="wrap">
-        <section className={`cover${owner?.banner_url ? ' has-banner' : ''}`} style={owner?.banner_url
-          ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.25), rgba(9,12,42,.82)), url(${owner.banner_url})` }
+        <section className={`cover${(journey.cover_url || owner?.banner_url) ? ' has-banner' : ''}`} style={(journey.cover_url || owner?.banner_url)
+          ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.25), rgba(9,12,42,.82)), url(${journey.cover_url || owner.banner_url})` }
           : { background: `linear-gradient(135deg, var(--night), ${journey.cover_color})` }}>
           <p className="eyebrow">{t.publicJourney}</p>
           {momentLabel && <a className="moment-tag" href={`/grupo/${journey.moment}`}>{momentLabel}</a>}
