@@ -31,8 +31,9 @@ export async function GET(req) {
   const url = new URL(req.url);
   const updateId = url.searchParams.get('updateId');
   const mediaId = url.searchParams.get('mediaId');
-  const col = mediaId ? 'media_id' : 'update_id';
-  const val = mediaId || updateId;
+  const challengeId = url.searchParams.get('challengeId');
+  const col = challengeId ? 'challenge_id' : mediaId ? 'media_id' : 'update_id';
+  const val = challengeId || mediaId || updateId;
   if (!val) return NextResponse.json({ comments: [] });
   const supabase = createClient();
   const { data: comments } = await supabase.from('comments')
@@ -54,12 +55,16 @@ export async function POST(req) {
   const body = await req.json().catch(() => ({}));
   const updateId = String(body.updateId || '');
   const mediaId = body.mediaId ? String(body.mediaId) : '';
-  const col = mediaId ? 'media_id' : 'update_id';
-  const val = mediaId || updateId;
+  const challengeId = body.challengeId ? String(body.challengeId) : '';
+  const col = challengeId ? 'challenge_id' : mediaId ? 'media_id' : 'update_id';
+  const val = challengeId || mediaId || updateId;
   const text = String(body.text || '').trim();
   const parentId = body.parentId ? String(body.parentId) : null;
   if (!val || !text || text.length > 500) return NextResponse.json({ error: 'invalid' }, { status: 400 });
-  if (mediaId) {
+  if (challengeId) {
+    const { data: ch } = await supabase.from('challenges').select('id, status').eq('id', challengeId).maybeSingle();
+    if (!ch || ch.status === 'declined') return NextResponse.json({ error: 'notfound' }, { status: 404 });
+  } else if (mediaId) {
     const { data: m } = await supabase.from('media').select('user_id, visibility').eq('id', mediaId).maybeSingle();
     if (!m || (m.visibility === 'private' && m.user_id !== user.id)) return NextResponse.json({ error: 'notfound' }, { status: 404 });
   } else {

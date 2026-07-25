@@ -2513,3 +2513,7 @@ h1 { letter-spacing: -0.03em; }
   box-shadow:0 0 0 2px var(--sage);flex:0 0 auto;display:inline-block}
 .chp-stamp.today{box-shadow:0 0 0 2px #E8A64C,0 0 0 5px rgba(232,166,76,.25)}
 .chp-dots{align-items:center}
+
+/* comentários na página do desafio */
+.chp-comments{margin-top:16px;padding-top:12px;border-top:1px solid #efede8}
+.chp-comments .comment-toggle{font-size:13px;font-weight:650}

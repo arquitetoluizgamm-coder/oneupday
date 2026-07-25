@@ -5,6 +5,7 @@ import { getDict, fill } from '../../../lib/i18n';
 import AppTop from '../../../components/AppTop';
 import ChallengeCheck from '../../../components/ChallengeCheck';
 import ChallengeRespond from '../../../components/ChallengeRespond';
+import Comments from '../../../components/Comments';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,6 +103,11 @@ export default async function Desafio({ params }) {
                   </div>
                 );
               })}
+
+              <div className="chp-comments">
+                <Comments challengeId={ch.id}
+                  labels={{ comment: t.comment, close: t.commentClose, empty: t.commentEmpty, placeholder: t.commentPlaceholder, send: t.commentSend, sending: t.commentSending, unsafe: t.commentUnsafe, error: t.commentError, someone: t.commentSomeone, reply: t.commentReply, more: t.commentMore, less: t.commentLess, replying: t.commentReplying, cancel: t.commentCancel }} />
+              </div>
 
               {ended
                 ? <p className="chp-done gold">{t.chDone}</p>

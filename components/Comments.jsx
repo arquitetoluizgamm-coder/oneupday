@@ -1,10 +1,10 @@
 'use client';
 import { useState } from 'react';
 
-export default function Comments({ updateId, mediaId, labels }) {
+export default function Comments({ updateId, mediaId, challengeId, labels }) {
   const L = labels || {};
-  const qs = mediaId ? `mediaId=${encodeURIComponent(mediaId)}` : `updateId=${encodeURIComponent(updateId)}`;
-  const targetBody = mediaId ? { mediaId } : { updateId };
+  const qs = challengeId ? `challengeId=${encodeURIComponent(challengeId)}` : mediaId ? `mediaId=${encodeURIComponent(mediaId)}` : `updateId=${encodeURIComponent(updateId)}`;
+  const targetBody = challengeId ? { challengeId } : mediaId ? { mediaId } : { updateId };
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [text, setText] = useState('');
