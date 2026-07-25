@@ -2398,3 +2398,17 @@ h1 { letter-spacing: -0.03em; }
 .dp-nav span{line-height:1}
 .dp-nav svg{flex:0 0 auto}
 @media(max-width:640px){ .dp-nav{height:26px;padding:0 8px;font-size:11px} }
+
+/* ---- Card de jornada: tamanho padrão na troca de dia ---- */
+/* zona de texto sempre com altura de 3 linhas: escreveu pouco, muito ou nada,
+   o card não muda de tamanho ao passar os dias */
+.dp-text{min-height:70px;margin-top:10px}
+.dp-text .entry-text{margin:0;font-size:15px;line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.dp-text .entry-text.expanded{display:block;-webkit-line-clamp:unset;overflow:visible}
+.dp-text .entry-expand{margin-top:2px}
+@media(max-width:640px){ .dp-text{min-height:66px;padding-left:16px;padding-right:16px} }
+
+/* dia sem foto no pager: cartão 4:3 com o número do dia (mesmo tamanho da foto) */
+.dp-empty{aspect-ratio:4/3;min-height:0;display:flex;align-items:center;justify-content:center;padding:0}
+.dp-empty .etc-day{font-size:26px;opacity:.95}

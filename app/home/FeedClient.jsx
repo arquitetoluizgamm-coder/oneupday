@@ -93,19 +93,16 @@ function DayPager({ item, labels, dayLabel }) {
 
       <div className="dp-stage" onTouchStart={onTS} onTouchEnd={onTE}>
         <div className="dp-slide" key={d.id}>
-          {(!hasMedia && cleanText) ? (
-            <a href={`/${item.journey.slug}`} className={`entry-textcard${cleanText.length > 130 ? ' long' : ''}`}>
+          <div className="dp-text">
+            {cleanText && <EntryText key={'x' + d.id} text={cleanText} labels={labels} />}
+          </div>
+          {d.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={d.photo_url} alt="" />{trackEl}</a>}
+          {d.video_url && !d.photo_url && <div className="entry-media"><video src={d.video_url} controls playsInline preload="metadata" />{trackEl}</div>}
+          {!hasMedia && (
+            <a href={`/${item.journey.slug}`} className={`entry-textcard dp-empty${d.kind === 'setback' ? ' setback' : ''}`}>
               <span className="etc-day">{dayLabel(d.day_number)}</span>
-              <p>{cleanText}</p>
               {trackEl}
             </a>
-          ) : (
-            <>
-              {cleanText && <EntryText key={'x' + d.id} text={cleanText} labels={labels} />}
-              {d.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={d.photo_url} alt="" />{trackEl}</a>}
-              {d.video_url && !d.photo_url && <div className="entry-media"><video src={d.video_url} controls playsInline preload="metadata" />{trackEl}</div>}
-              {!hasMedia && !cleanText && d.track && <TrackTag key={'t' + d.id} track={d.track} />}
-            </>
           )}
         </div>
         {i > 0 && (
