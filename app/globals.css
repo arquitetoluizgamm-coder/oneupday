@@ -2071,5 +2071,5 @@ h1 { letter-spacing: -0.03em; }
   .oud-anim .oa-o,.oud-anim .oa-u,.oud-anim .oa-dot,.oud-anim .oa-d{stroke-dashoffset:0;animation:none}
   .oud-anim .oa-word{opacity:1;transform:none;animation:none}
 }
-.auth-mark-anim{display:flex;justify-content:center;margin:4px 0 10px}
-.auth-mark-anim .oud-anim{width:min(400px,82vw)}
+.auth-mark-anim.auth-mark{width:100%;height:auto;margin:4px auto 12px;border-radius:0;background:transparent;box-shadow:none;border:0;display:flex;justify-content:center;place-items:initial}
+.auth-mark-anim .oud-anim{display:block;width:min(400px,82vw);height:auto}
