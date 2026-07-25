@@ -1,6 +1,6 @@
 import { getLocale } from '../../lib/locale';
 import { getDict } from '../../lib/i18n';
-import { Symbol } from '../../components/Logo';
+import AnimatedLogo from '../../components/AnimatedLogo';
 import GoogleButton from './GoogleButton';
 
 export default function Login() {
@@ -10,7 +10,7 @@ export default function Login() {
     <>
       <main className="auth-wrap">
         <div className="auth-card">
-          <div className="auth-mark"><Symbol size={72} /></div>
+          <div className="auth-mark auth-mark-anim"><AnimatedLogo width={280} /></div>
           <h1>{t.loginTitle}</h1>
           <p>{t.loginSub}</p>
           <GoogleButton labelIdle={t.continueGoogle} labelLoading={t.openingGoogle} errorMsg={t.loginError} />

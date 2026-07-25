@@ -2053,3 +2053,22 @@ h1 { letter-spacing: -0.03em; }
 /* halo/realces que eram rosa-choque agora seguem a paleta */
 .needs-send { color: var(--orange); }
 .needs-send:hover { background: var(--support-soft); }
+
+/* ---- Logo animado (chegada/login): as letras se desenham ---- */
+.oud-anim .oa-o, .oud-anim .oa-u, .oud-anim .oa-dot, .oud-anim .oa-d{
+  stroke-dasharray:950; stroke-dashoffset:950}
+.oud-anim .oa-o  { animation:oudDraw .9s cubic-bezier(.22,1,.36,1) .10s forwards }
+.oud-anim .oa-u  { animation:oudDraw .8s cubic-bezier(.22,1,.36,1) .45s forwards }
+.oud-anim .oa-dot{ animation:oudDraw .3s cubic-bezier(.22,1,.36,1) 1.05s forwards }
+.oud-anim .oa-d  { animation:oudDraw .9s cubic-bezier(.22,1,.36,1) 1.15s forwards }
+.oud-anim .oa-word{ opacity:0; transform:translateY(10px);
+  font-family:var(--display,'Montserrat',sans-serif); font-size:60px; font-weight:500;
+  letter-spacing:30px; fill:#4E4E4E;
+  animation:oudRise .6s cubic-bezier(.22,1,.36,1) 1.7s forwards }
+@keyframes oudDraw{ to{ stroke-dashoffset:0 } }
+@keyframes oudRise{ to{ opacity:1; transform:none } }
+@media (prefers-reduced-motion: reduce){
+  .oud-anim .oa-o,.oud-anim .oa-u,.oud-anim .oa-dot,.oud-anim .oa-d{stroke-dashoffset:0;animation:none}
+  .oud-anim .oa-word{opacity:1;transform:none;animation:none}
+}
+.auth-mark-anim{display:flex;justify-content:center;margin-bottom:6px}
