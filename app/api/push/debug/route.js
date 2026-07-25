@@ -15,6 +15,15 @@ export async function GET() {
   const priv = process.env.VAPID_PRIVATE_KEY || '';
   const subj = process.env.VAPID_SUBJECT || '';
   const svc = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+  const cron = process.env.CRON_SECRET || '';
+  out.passos['0_cron_secret'] = {
+    CRON_SECRET: cron ? `ok (${cron.length} caracteres)` : 'FALTANDO',
+    tamanho_esperado: '32 caracteres',
+    tem_espaco_ou_quebra_de_linha: cron !== cron.trim() ? 'SIM — apague os espacos/quebras no comeco ou fim' : 'nao',
+    primeiros_4: cron ? cron.slice(0, 4) : '-',
+    ultimos_4: cron ? cron.slice(-4) : '-',
+    dica: 'Compare com o valor do SQL: deve comecar com JVno e terminar com vRZX',
+  };
   out.passos['1_variaveis'] = {
     VAPID_PUBLIC_KEY: pub ? `ok (${pub.length} caracteres)` : 'FALTANDO',
     NEXT_PUBLIC_VAPID_PUBLIC_KEY: pubPublic ? `ok (${pubPublic.length} caracteres)` : 'FALTANDO',
