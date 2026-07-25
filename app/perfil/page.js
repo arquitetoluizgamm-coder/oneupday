@@ -21,6 +21,7 @@ import EditProfileInfo from '../../components/EditProfileInfo';
 import DeleteJourney from '../../components/DeleteJourney';
 import EditJourney from '../../components/EditJourney';
 import JourneyDays from '../../components/JourneyDays';
+import JourneyFold from '../../components/JourneyFold';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -128,6 +129,11 @@ export default async function Perfil() {
           <div className="pc-banner" style={profile.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : undefined}>
             <EditBanner userId={user.id} label={t.editBanner} uploadingLabel={t.uploading} cropLabels={{ cover: t.cropCover, use: t.cropUse, cancel: t.cropCancel, hint: t.cropHint, zoom: t.cropZoom }} />
           </div>
+          <div className="pc-tools">
+            <EditProfileInfo userId={user.id} initialName={profile.name} initialHandle={profile.handle} labels={{ btn: t.epBtn, title: t.epTitle, name: t.epName, handle: t.epHandle, hint: t.epHint, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errName: t.epErrName, errHandle: t.epErrHandle, errTaken: t.epErrTaken, errSave: t.epErrSave }} />
+            <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
+            <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
+          </div>
           <div className="pc-info">
             <div className="pc-avatar" style={{ background: profile.avatar_color || 'var(--orange)' }}>
               {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : profile.name[0]}
@@ -144,14 +150,6 @@ export default async function Perfil() {
           </div>
         </section>
 
-        <div className="profile-tools">
-          <EditProfileInfo userId={user.id} initialName={profile.name} initialHandle={profile.handle} labels={{ btn: t.epBtn, title: t.epTitle, name: t.epName, handle: t.epHandle, hint: t.epHint, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errName: t.epErrName, errHandle: t.epErrHandle, errTaken: t.epErrTaken, errSave: t.epErrSave }} />
-          <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
-          <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
-        </div>
-
-        {nc.mode && <NextChapter mode={nc.mode} line={nc.line} env={nc.env} labels={ncLabels(t, nc)} />}
-
         {list.length === 0 && (
           <section className="onboarding-block">
             <div className="ob-head">
@@ -166,9 +164,9 @@ export default async function Perfil() {
         {list.length > 0 && (
           <ProfileTabs
             labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, people: t.profTabPeople }}
+            actions={(<><a className="ghost-btn" href="/midia">{t.mediaAdd}</a><a className="cta" href="/new">{t.newJourney}</a></>)}
             journeys={(
               <>
-                <div className="head-actions ptab-actions"><a className="ghost-btn" href="/midia">{t.mediaAdd}</a><a className="cta" href="/new">{t.newJourney}</a></div>
                 {list.map(j => {
                   const s = statsById[j.id] || {};
                   const day = s.current_day || 0;
@@ -185,6 +183,7 @@ export default async function Perfil() {
                         </div>
                       </div>
                       <ProgressBar day={day} total={j.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+                      <JourneyFold openLabel={t.jfOpen} closeLabel={t.jfClose}>
                       <JourneyDays journeyId={j.id}
                         labels={{ show: t.jdShow, hide: t.jdHide, empty: t.jdEmpty, loading: t.jdLoading, dayFmt: t.dayShort }}
                         editLabels={{ btn: t.euBtn, title: t.euTitle, text: t.euText, photo: t.euPhoto, photoAdd: t.ejCoverAdd, photoChange: t.ejCoverChange, photoRemove: t.ejCoverRemove, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errSave: t.epErrSave, errEmpty: t.euErrEmpty, deletePost: t.euDeletePost, deleteConfirm: t.postDeleteConfirm, cropOriginal: t.cropOriginal, cropSquare: t.cropSquare, cropPortrait: t.cropPortrait, cropLandscape: t.cropLandscape, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropHintOriginal: t.cropHintOriginal, cropZoom: t.cropZoom }} />
@@ -202,6 +201,7 @@ export default async function Perfil() {
                 meaning: { step: t.meaningStep, setback: t.meaningSetback, first: t.meaningFirst },
                       }} />
                       {aiOn && <NextStep journeyId={j.id} label={t.aiNextStep} thinking={t.aiThinking} errLabel={t.aiErr} rateLabel={t.aiRateErr} />}
+                      </JourneyFold>
                     </section>
                   );
                 })}
@@ -262,6 +262,12 @@ export default async function Perfil() {
               </>
             )}
           />
+        )}
+
+        {nc.mode && (
+          <div className="nc-neutral">
+            <NextChapter mode={nc.mode} line={nc.line} env={nc.env} labels={ncLabels(t, nc)} />
+          </div>
         )}
       </main>
       <BottomNav active="profile" t={t} />

@@ -2259,3 +2259,50 @@ h1 { letter-spacing: -0.03em; }
 .ss-ava,.heart-btn .heart-dot,.sg-ava,.mood-chip i,.dm-dot,
 .comment-panel .cmt-ava,.needs-ava,.ps-ava,.lb-close,.lb-nav,
 .rules-list li::before,.sgc-ava,.nc-close,.om-x,.feed-track-spk{border-radius:50%!important}
+
+/* ---- Perfil compacto: ferramentas no card, abas em uma linha, jornada dobrável ---- */
+/* botões Editar perfil / Ver público / Sair: discretos, canto direito sob a capa */
+.pc-tools{height:0;display:flex;justify-content:flex-end;align-items:flex-start;gap:6px;padding:0 12px;position:relative;z-index:3}
+.pc-tools > *{margin-top:10px}
+.pc-tools form{display:contents}
+.pc-tools form button{margin-top:10px}
+.pc-tools .ghost-btn{font-size:11px;font-weight:600;padding:4px 10px;border:1px solid var(--line);
+  background:rgba(255,255,255,.85);color:var(--muted);cursor:pointer;line-height:1.2}
+.pc-tools .ghost-btn:hover{color:var(--ink);border-color:var(--sage)}
+@media(max-width:640px){ .pc-tools{padding:0 10px;gap:5px} .pc-tools .ghost-btn{font-size:10.5px;padding:3px 8px} }
+
+/* abas + ações em uma linha só */
+.ptabs-row{display:flex;align-items:center;gap:10px;margin:6px 0 18px}
+.ptabs-row .ptabs{flex:1;margin:0}
+.ptabs-row .ptab-actions{margin:0;flex:0 0 auto;display:flex;align-items:center;gap:8px}
+.ptabs-row .ptab-actions .cta{padding:8px 13px;font-size:12.5px}
+.ptabs-row .ptab-actions .ghost-btn{padding:7px 12px;font-size:12.5px}
+@media(max-width:640px){
+  .ptabs-row{flex-wrap:wrap;gap:8px}
+  .ptabs-row .ptabs{flex-basis:100%}
+  .ptabs-row .ptab-actions{margin-left:auto}
+}
+
+/* jornada dobrável: card mostra só até a barra de progresso */
+.jfold-btn{display:flex;align-items:center;gap:6px;margin-top:12px;border:0;background:transparent;
+  color:var(--muted);font:inherit;font-size:12.5px;font-weight:650;cursor:pointer;padding:4px 0}
+.jfold-btn:hover{color:var(--ink)}
+.jfold-btn svg{transition:transform .25s cubic-bezier(.22,1,.36,1)}
+.jfold-btn.on svg{transform:rotate(180deg)}
+.jfold-body{margin-top:4px}
+
+/* Próximo Capítulo neutro (casa fixa no fim do perfil) */
+.nc-neutral{margin-top:20px}
+.nc-neutral .nc{background:var(--surface);color:var(--ink);box-shadow:none;border:1px solid var(--line);animation:none}
+.nc-neutral .nc::after{display:none}
+.nc-neutral .nc-eyebrow{color:var(--muted)}
+.nc-neutral .nc-sealed-text,.nc-neutral .nc-closed-text,.nc-neutral .nc-lead{color:var(--ink)}
+.nc-neutral .nc-blur{color:var(--muted)}
+.nc-neutral .nc-identity{color:var(--muted)}
+.nc-neutral .nc-step{background:rgba(16,19,45,.04);border-color:var(--line)}
+.nc-neutral .nc-step small{color:var(--muted)}
+.nc-neutral .nc-env{background:rgba(232,166,76,.08);border-color:rgba(232,166,76,.28)}
+.nc-neutral .nc-env small{color:#8a6d1d}
+.nc-neutral .nc-env p{color:var(--ink)}
+.nc-neutral .nc-open-btn,.nc-neutral .nc-cta{background:var(--night);color:#fff;box-shadow:none}
+.nc-neutral .nc-close{background:rgba(16,19,45,.07);color:var(--ink)}
