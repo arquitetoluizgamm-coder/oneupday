@@ -217,7 +217,7 @@ export default function FeedClient({ labels }) {
                   <small><span className="entry-journey">{item.journey.title}</span> · {dayLabel(item.day_number)}</small>
                 </span>
               </a>
-              {item.owner.id && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
+              {item.owner.id && !item.own && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
             </div>
             {item.comeback && <div className="entry-comeback">{(labels.comebackFmt || '').replace('{d}', item.comeback)}</div>}
             {item.kind === 'setback' && <div className="entry-kindline setback">{labels.tagSetback}</div>}
@@ -263,7 +263,7 @@ export default function FeedClient({ labels }) {
             ) : (
               <div className="entry-actions">
                 <EncourageBar updateId={item.id} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
-                {(item.kind === 'setback' || item.comeback) && !item.demo && <MeTooButton updateId={item.id} labels={labels.metoo} />}
+                {(item.kind === 'setback' || item.comeback) && !item.demo && !item.own && <MeTooButton updateId={item.id} labels={labels.metoo} />}
                 <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
                 <Comments updateId={item.id} labels={labels.comments} />
                 <HugButton toId={item.owner.id} updateId={item.id} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />

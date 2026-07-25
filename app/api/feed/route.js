@@ -47,10 +47,10 @@ export async function GET(req) {
       .filter((journey) => !blocked.has(journey.owner_id) && !mutedCats.has(journey.category))
       .map((journey) => journey.id);
   } else {
+    // inclui as próprias jornadas: sua história também aparece no seu feed
     const { data: publicJourneys } = await supabase.from('journeys')
       .select('id, owner_id, category')
       .eq('visibility', 'public')
-      .neq('owner_id', user.id)
       .order('created_at', { ascending: false })
       .limit(80);
 
@@ -161,6 +161,7 @@ export async function GET(req) {
       ...item,
       journey: { slug: journey.slug, title: journey.title, category: journey.category, total_days: journey.total_days, current_day: (statsByJourney[journey.id] || {}).current_day || 0, progress_pct: (statsByJourney[journey.id] || {}).progress_pct || 0 },
       owner: { ...(profileMap[journey.owner_id] || {}), mood: ownerMoodById[journey.owner_id] || null },
+      own: journey.owner_id === user.id,
       track: trackByUpdate[item.id] || null,
       encouraged: myEnc.has(item.id),
       supporters: supportersByUpdate[item.id] || [],
