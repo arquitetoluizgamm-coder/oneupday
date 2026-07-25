@@ -10,10 +10,19 @@ export const dynamic = 'force-dynamic';
 // 2) manda o lembrete diário do Upi na hora escolhida por cada pessoa
 async function handler(req) {
   const secret = process.env.CRON_SECRET;
-  const auth = req.headers.get('authorization') || '';
-  const url = new URL(req.url);
-  if (secret && auth !== `Bearer ${secret}` && url.searchParams.get('key') !== secret) {
-    return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  if (secret) {
+    // aceita a chave de três formas: cabeçalho (cron da Vercel),
+    // corpo JSON (gatilho do banco) ou query (teste manual)
+    const auth = req.headers.get('authorization') || '';
+    const url = new URL(req.url);
+    let bodyKey = '';
+    if (req.method === 'POST') {
+      try { bodyKey = (await req.json().catch(() => ({})))?.key || ''; } catch {}
+    }
+    const ok = auth === `Bearer ${secret}`
+      || url.searchParams.get('key') === secret
+      || bodyKey === secret;
+    if (!ok) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
   }
   if (!pushReady()) return NextResponse.json({ error: 'no-vapid' }, { status: 500 });
 
