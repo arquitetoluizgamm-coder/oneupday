@@ -94,7 +94,7 @@ function DayPager({ item, labels, dayLabel }) {
       <div className="dp-stage" onTouchStart={onTS} onTouchEnd={onTE}>
         <div className="dp-slide" key={d.id}>
           <div className="dp-text">
-            {cleanText && <EntryText key={'x' + d.id} text={cleanText} labels={labels} />}
+            {cleanText && <EntryText key={'x' + d.id} text={cleanText} labels={labels} limit={100} />}
           </div>
           {d.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={d.photo_url} alt="" />{trackEl}</a>}
           {d.video_url && !d.photo_url && <div className="entry-media"><video src={d.video_url} controls playsInline preload="metadata" />{trackEl}</div>}
@@ -143,9 +143,9 @@ function DayPager({ item, labels, dayLabel }) {
   );
 }
 
-function EntryText({ text, labels }) {
+function EntryText({ text, labels, limit = 180 }) {
   const [expanded, setExpanded] = useState(false);
-  const compact = text.length > 180;
+  const compact = text.length > limit;
 
   return (
     <>

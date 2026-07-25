@@ -2421,3 +2421,10 @@ h1 { letter-spacing: -0.03em; }
 /* texto do pager alinhado com o cabeçalho do card em qualquer tela */
 .dp-text{padding-left:2px;padding-right:2px}
 @media(max-width:640px){ .dp-text{padding-left:16px;padding-right:16px} }
+
+/* ---- Zona de texto: 2 linhas + "ler mais" na terceira (altura sempre fixa) ---- */
+.dp-text{min-height:72px}
+.dp-text .entry-text{-webkit-line-clamp:2}
+.dp-text .entry-text.expanded{-webkit-line-clamp:unset}
+.dp-text .entry-expand{display:block;margin-top:4px;line-height:1.2;padding:0;text-align:left}
+@media(max-width:640px){ .dp-text{min-height:72px} }
