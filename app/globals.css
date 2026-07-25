@@ -2554,3 +2554,12 @@ h1 { letter-spacing: -0.03em; }
 @keyframes upiTyping{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
 .upi-closed:hover .upi-typing{border-color:var(--sage)}
 @media(prefers-reduced-motion:reduce){.upi-typing i{animation:none;opacity:.7}}
+
+/* página legal (privacidade) */
+.legal{max-width:640px;padding-top:26px}
+.legal h1{font-size:30px;letter-spacing:-.02em;margin:4px 0 4px}
+.legal-date{color:var(--muted);font-size:13px;margin:0 0 22px}
+.legal-sec{margin:0 0 18px}
+.legal-sec h2{font-size:16.5px;margin:0 0 5px}
+.legal-sec p{margin:0;font-size:14.5px;line-height:1.65;color:#3f4654}
+.legal-care{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}

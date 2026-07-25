@@ -1,19 +1,32 @@
 {
+  "id": "/",
   "name": "One Up Day",
   "short_name": "One Up Day",
+  "description": "A rede social do recomeço. Registre sua jornada um dia de cada vez — e volte sempre que precisar.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#FAF7F2",
+  "background_color": "#FAF7F2",
   "icons": [
     {
       "src": "/app-icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/app-icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ],
-  "theme_color": "#FAF7F2",
-  "background_color": "#FAF7F2",
-  "display": "standalone"
+  ]
 }

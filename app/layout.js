@@ -1,6 +1,7 @@
 import './globals.css';
 import { getLocale } from '../lib/locale';
 import { getDict } from '../lib/i18n';
+import SwRegister from '../components/SwRegister';
 
 export const viewport = {
   width: 'device-width',
@@ -38,7 +39,7 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>{children}<SwRegister /></body>
     </html>
   );
 }
