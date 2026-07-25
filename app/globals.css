@@ -2081,7 +2081,8 @@ h1 { letter-spacing: -0.03em; }
 .profile-card{border-radius:20px;overflow:hidden;box-shadow:0 14px 40px rgba(16,19,45,.08)}
 /* capa: proporção fixa em vez de faixa espremida; gradiente da marca quando não há foto */
 .pc-banner{height:auto;aspect-ratio:16/6;min-height:140px;max-height:240px;
-  background:linear-gradient(135deg,var(--sage-deep),var(--sage) 60%,var(--orange))}
+  background-image:linear-gradient(135deg,var(--sage-deep),var(--sage) 60%,var(--orange));
+  background-size:cover;background-position:center}
 /* avatar maior com anel e sombra */
 .pc-avatar{width:104px;height:104px;margin-top:-52px;border-width:5px;font-size:38px;
   box-shadow:0 8px 22px rgba(16,19,45,.16)}
