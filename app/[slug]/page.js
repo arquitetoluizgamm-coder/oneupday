@@ -13,8 +13,8 @@ import ProgressBar from '../../components/ProgressBar';
 import ReportButton from './ReportButton';
 import MediaGallery from '../../components/MediaGallery';
 import FollowUserButton from './FollowUserButton';
-import UpdateManage from './UpdateManage';
 import OwnerMedia from '../../components/OwnerMedia';
+import EditUpdate from '../../components/EditUpdate';
 import Comments from '../../components/Comments';
 import { notFound } from 'next/navigation';
 import Track from '../../components/Track';
@@ -371,7 +371,7 @@ export default async function JourneyPage({ params, searchParams }) {
                   <EncourageBar updateId={u.id} initialActive={myEncSet.has(u.id)} labelIdle={t.withYouIdle} labelActive={t.withYouActive} supportersLabel={t.supporters} supportersLoading={t.supportersLoading} supportersEmpty={t.supportersEmpty} />
                   <Comments updateId={u.id} labels={{ comment: t.comment, close: t.commentClose, empty: t.commentEmpty, placeholder: t.commentPlaceholder, send: t.commentSend, sending: t.commentSending, unsafe: t.commentUnsafe, error: t.commentError, someone: t.commentSomeone, reply: t.commentReply, more: t.commentMore, less: t.commentLess, replying: t.commentReplying, cancel: t.commentCancel }} />
                   {isOwner
-                    ? <UpdateManage updateId={u.id} hasMedia={!!(u.photo_url || u.video_url)} labels={{ manage: t.managePost, replace: t.mediaReplace, remove: t.mediaRemove, delete: t.postDelete, deleteConfirm: t.postDeleteConfirm, uploading: t.uploading, error: t.postError }} />
+                    ? <EditUpdate update={{ id: u.id, text: u.text, photo_url: u.photo_url, day: u.day_number }} labels={{ btn: t.euBtn, title: t.euTitle, text: t.euText, photo: t.euPhoto, photoAdd: t.ejCoverAdd, photoChange: t.ejCoverChange, photoRemove: t.ejCoverRemove, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errSave: t.epErrSave, errEmpty: t.euErrEmpty, deletePost: t.euDeletePost, deleteConfirm: t.postDeleteConfirm, cropOriginal: t.cropOriginal, cropSquare: t.cropSquare, cropPortrait: t.cropPortrait, cropLandscape: t.cropLandscape, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropHintOriginal: t.cropHintOriginal, cropZoom: t.cropZoom }} />
                     : <ReportButton updateId={u.id} label={t.report} doneLabel={t.reported} />}
                 </div>
               </div>
