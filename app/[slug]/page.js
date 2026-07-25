@@ -289,14 +289,26 @@ export default async function JourneyPage({ params, searchParams }) {
       <Track type="journey_view" meta={{ slug: journey.slug }} />
       {fromShare && <Track type="card_clicked" meta={{ slug: journey.slug }} />}
       <main className="wrap">
-        <section className={`cover${(journey.cover_url || owner?.banner_url) ? ' has-banner' : ''}`} style={(journey.cover_url || owner?.banner_url)
-          ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.25), rgba(9,12,42,.82)), url(${journey.cover_url || owner.banner_url})` }
+        {journey.cover_url ? (
+          <>
+            <div className="jcover-media" style={{ backgroundImage: `url(${journey.cover_url})` }} />
+            <section className="jcover-text">
+              <p className="eyebrow">{t.publicJourney}</p>
+              {momentLabel && <a className="moment-tag jt-moment" href={`/grupo/${journey.moment}`}>{momentLabel}</a>}
+              <h1>{journey.title}</h1>
+              {journey.goal && <p>{journey.goal}</p>}
+            </section>
+          </>
+        ) : (
+        <section className={`cover${owner?.banner_url ? ' has-banner' : ''}`} style={owner?.banner_url
+          ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.25), rgba(9,12,42,.82)), url(${owner.banner_url})` }
           : { background: `linear-gradient(135deg, var(--night), ${journey.cover_color})` }}>
           <p className="eyebrow">{t.publicJourney}</p>
           {momentLabel && <a className="moment-tag" href={`/grupo/${journey.moment}`}>{momentLabel}</a>}
           <h1>{journey.title}</h1>
           <p>{journey.goal}</p>
         </section>
+        )}
 
         <div className="who">
           <a className="ava" href={`/${owner?.handle || ''}`} style={{ background: owner?.avatar_color || 'var(--orange)' }}>{owner?.avatar_url ? <img src={owner.avatar_url} alt="" /> : initial}</a>

@@ -75,7 +75,10 @@ export default function EditJourney({ journey, labels }) {
                 </label>
                 <div className="ep-field">{L.cover}
                   <div className="ej-cover" style={coverUrl ? { backgroundImage: `url(${coverUrl})` } : { background: `linear-gradient(135deg, var(--night), ${journey.cover_color || '#84917A'})` }}>
-                    <button type="button" className="ej-cover-btn" onClick={() => fileRef.current?.click()} disabled={busy}>{coverUrl ? L.coverChange : L.coverAdd}</button>
+                    <div className="ej-cover-actions">
+                      <button type="button" className="ej-cover-btn" onClick={() => fileRef.current?.click()} disabled={busy}>{coverUrl ? L.coverChange : L.coverAdd}</button>
+                      {coverUrl && <button type="button" className="ej-cover-btn ej-cover-del" onClick={() => setCoverUrl('')} disabled={busy}>{L.coverRemove}</button>}
+                    </div>
                   </div>
                   <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPick} />
                 </div>

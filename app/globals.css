@@ -2119,3 +2119,15 @@ h1 { letter-spacing: -0.03em; }
 .ej-goal:focus{outline:0;border-color:var(--night)}
 .ej-cover{aspect-ratio:16/10;border-radius:14px;background-size:cover;background-position:center;display:grid;place-items:center;border:1px solid var(--line)}
 .ej-cover-btn{border:0;cursor:pointer;background:rgba(255,255,255,.92);color:#10132D;font:inherit;font-size:13px;font-weight:750;padding:9px 16px;border-radius:999px;box-shadow:0 4px 14px rgba(16,19,45,.18)}
+
+/* ---- Página da jornada: capa limpa (16:10 = mesmo recorte do editor) ---- */
+.jcover-media{aspect-ratio:16/10;border-radius:20px;background-size:cover;background-position:center;
+  box-shadow:0 14px 40px rgba(16,19,45,.10);margin-top:4px}
+.jcover-text{padding:20px 6px 4px}
+.jcover-text .eyebrow{color:var(--orange);margin-bottom:6px}
+.jcover-text h1{margin:8px 0 8px;font-size:30px;letter-spacing:-.035em;line-height:1.12;font-family:var(--display);color:var(--ink)}
+.jcover-text p{margin:0;color:#4b5563;font-size:16px;line-height:1.55;max-width:34rem}
+.jt-moment{background:var(--sage-soft);color:var(--sage-deep)}
+.ej-cover-actions{display:flex;gap:8px}
+.ej-cover-del{background:rgba(255,255,255,.92);color:#b3261e}
+@media(max-width:640px){ .jcover-text h1{font-size:25px} }
