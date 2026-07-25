@@ -17,6 +17,8 @@ import AppTop from '../../components/AppTop';
 import NextChapter from '../../components/NextChapter';
 import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
 import ProfileTabs from '../../components/ProfileTabs';
+import EditProfileInfo from '../../components/EditProfileInfo';
+import DeleteJourney from '../../components/DeleteJourney';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -141,6 +143,7 @@ export default async function Perfil() {
         </section>
 
         <div className="profile-tools">
+          <EditProfileInfo userId={user.id} initialName={profile.name} initialHandle={profile.handle} labels={{ btn: t.epBtn, title: t.epTitle, name: t.epName, handle: t.epHandle, hint: t.epHint, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errName: t.epErrName, errHandle: t.epErrHandle, errTaken: t.epErrTaken, errSave: t.epErrSave }} />
           <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
           <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
         </div>
@@ -175,6 +178,7 @@ export default async function Perfil() {
                           <PrivacyToggle journeyId={j.id} initial={j.visibility || (j.is_public ? 'public' : 'private')} labels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} />
                           <a className="view-link" href={`/retro/${j.slug}`}>{t.retroLink}</a>
                           <a className="view-link" href={`/${j.slug}`}>{t.viewPublic}</a>
+                          <DeleteJourney journeyId={j.id} title={j.title} labels={{ btn: t.jDeleteBtn, confirm: t.jDeleteConfirm, error: t.jDeleteErr }} />
                         </div>
                       </div>
                       <ProgressBar day={day} total={j.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
