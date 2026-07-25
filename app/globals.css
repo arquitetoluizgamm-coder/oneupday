@@ -2489,3 +2489,6 @@ h1 { letter-spacing: -0.03em; }
 .chp-done{margin:18px 0 0;font-family:var(--serif);font-style:italic;font-size:16px;color:var(--muted)}
 .chp-done.gold{color:#b3874a}
 @media(max-width:640px){ .chp{margin-left:-16px;margin-right:-16px;border-left:0;border-right:0} }
+
+/* estado vazio dos desafios */
+.ch-empty{margin:4px 0 2px;font-size:13.5px;line-height:1.5;color:var(--muted)}

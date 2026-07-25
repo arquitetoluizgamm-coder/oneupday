@@ -194,9 +194,11 @@ export default async function Perfil() {
           </div>
         )}
 
-        {(chInvites.length > 0 || chActive.length > 0 || chWaiting.length > 0) && (
-          <section className="ch-block">
+        <section className="ch-block">
             <p className="eyebrow">{t.chTitle}</p>
+            {chInvites.length === 0 && chActive.length === 0 && chWaiting.length === 0 && (
+              <p className="ch-empty">{t.chEmpty}</p>
+            )}
             {chInvites.map((c) => { const p = chProfiles[c.from_id] || {}; return (
               <div className="ch-card" key={c.id}>
                 <span className="ch-ava" style={{ background: p.avatar_color || 'var(--orange)' }}>{p.avatar_url ? <img src={p.avatar_url} alt="" /> : (p.name || '?')[0]}</span>
@@ -217,8 +219,7 @@ export default async function Perfil() {
                 <div className="ch-info"><b>{c.title}</b><p>{fill(t.chWaiting, { name: (p.name || '').split(' ')[0] })}</p></div>
               </div>
             ); })}
-          </section>
-        )}
+        </section>
 
         {list.length === 0 && (
           <section className="onboarding-block">
