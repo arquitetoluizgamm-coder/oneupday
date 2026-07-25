@@ -71,12 +71,22 @@ export async function GET(req) {
 
     if (VALID_KINDS.has(kind)) updatesQuery = updatesQuery.eq('kind', kind);
 
+    // janela ampla: o feed agrupa por jornada, então precisamos de muitas linhas
+    // para não perder jornadas atrás de quem postou vários dias seguidos
     const { data: rows } = await updatesQuery
       .order('created_at', { ascending: false })
       .order('id', { ascending: false })
-      .range(0, Math.min(offset + PAGE, 300) - 1);
+      .limit(400);
 
-    updates = rows || [];
+    const all = rows || [];
+    // uma linha por jornada (a mais recente), mantendo a ordem de recência
+    const seen = new Set();
+    updates = [];
+    for (const u of all) {
+      if (seen.has(u.journey_id)) continue;
+      seen.add(u.journey_id);
+      updates.push(u);
+    }
   }
 
   const journeyIds = [...new Set(updates.map((item) => item.journey_id))];
@@ -217,12 +227,9 @@ export async function GET(req) {
   const myEncAll = new Set((encAllR.data || []).map((e) => e.update_id));
   (tracksAllR.data || []).forEach((item) => { trackByUpdate[item.id] = { title: item.track_title, artist: item.track_artist, audio_url: item.track_audio_url }; });
 
-  const seenJourney = new Set();
   const realItems = updates.map((item) => {
     const journey = journeyMap[item.journey_id];
     if (!journey) return null;
-    if (seenJourney.has(item.journey_id)) return null; // dias já agrupados no post da jornada
-    seenJourney.add(item.journey_id);
     const daysArr = (fullDaysByJourney[item.journey_id] || []).slice(-60).map((u) => ({
       id: u.id, day_number: u.day_number, kind: u.kind, text: u.text, photo_url: u.photo_url, video_url: u.video_url, created_at: u.created_at,
       encouraged: myEncAll.has(u.id), track: trackByUpdate[u.id] || null, comeback: comebackByUpdate[u.id] || null,
