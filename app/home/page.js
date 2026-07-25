@@ -108,7 +108,7 @@ export default async function Home() {
     <>
       <header className="top top-3">
         <div className="top-left">
-          <HeaderHeart likes={heartLikes} follows={heartFollows} ariaLabel={t.notifications} />
+          <HeaderHeart likes={heartLikes} follows={heartFollows} unread={unread || 0} ariaLabel={t.notifications} />
         </div>
         <a className="top-brand" href="/home" aria-label="One Up Day">
           <img src="/logo-name.png" alt="One Up Day" />

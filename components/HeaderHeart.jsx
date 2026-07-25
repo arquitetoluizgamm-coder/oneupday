@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-export default function HeaderHeart({ likes = 0, follows = 0, ariaLabel }) {
+export default function HeaderHeart({ likes = 0, follows = 0, unread = 0, ariaLabel }) {
   const [open, setOpen] = useState(false);
   const has = (likes + follows) > 0;
 
@@ -18,7 +18,7 @@ export default function HeaderHeart({ likes = 0, follows = 0, ariaLabel }) {
         <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 20.5C12 20.5 3.5 15.5 3.5 9.2 3.5 6.4 5.6 4.5 8 4.5c1.7 0 3.1 1 4 2.4.9-1.4 2.3-2.4 4-2.4 2.4 0 4.5 1.9 4.5 4.7 0 6.3-8.5 11.3-8.5 11.3z" />
         </svg>
-        {has && <i className="heart-dot" />}
+        {unread > 0 && <i className="heart-dot" />}
       </a>
       {open && has && (
         <div className="heart-pop" role="status">
