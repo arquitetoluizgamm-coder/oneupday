@@ -2573,3 +2573,7 @@ h1 { letter-spacing: -0.03em; }
 .push-row .cta{flex:0 0 auto;padding:9px 16px;font-size:13px}
 .push-row .ghost-btn{flex:0 0 auto;padding:8px 14px;font-size:12.5px;cursor:pointer}
 @media(max-width:640px){ .push-row{margin-left:-16px;margin-right:-16px;border-left:0;border-right:0} }
+
+/* página legal: intro e separador entre idiomas */
+.legal-intro{font-size:15px;line-height:1.6;color:#3f4654;margin:0 0 22px}
+.legal-sep{border:0;border-top:1px solid var(--line);margin:36px 0 30px}
