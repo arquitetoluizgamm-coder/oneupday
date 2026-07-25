@@ -6,6 +6,7 @@ import AppTop from '../../../components/AppTop';
 import ChallengeCheck from '../../../components/ChallengeCheck';
 import ChallengeRespond from '../../../components/ChallengeRespond';
 import Comments from '../../../components/Comments';
+import ChallengeStamp from '../../../components/ChallengeStamp';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,7 +97,8 @@ export default async function Desafio({ params }) {
                       {dayKeys.map((k) => {
                         const ph = (photoBy[id] || {})[k];
                         return ph
-                          ? <span key={k} className={`chp-stamp${k === today ? ' today' : ''}`} style={{ backgroundImage: `url(${ph})` }} title={k} />
+                          ? <ChallengeStamp key={k} challengeId={ch.id} dayKey={k} photo={ph} today={k === today}
+                              canRemove={!!user && user.id === id} labels={{ remove: t.chRemovePhoto, confirm: t.chRemovePhotoConfirm }} />
                           : <i key={k} className={`${set.has(k) ? 'on' : ''}${k === today ? ' today' : ''}`} />;
                       })}
                     </div>

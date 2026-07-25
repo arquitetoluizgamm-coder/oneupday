@@ -19,6 +19,15 @@ export async function POST(req) {
     return NextResponse.json({ error: 'not-allowed' }, { status: 403 });
   }
 
+  // remover a foto de um dia (a presença fica)
+  if (body.removePhoto) {
+    const dk = String(body.dayKey || '').slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dk)) return NextResponse.json({ error: 'invalid' }, { status: 400 });
+    await supabase.from('challenge_checks').update({ photo_url: null })
+      .eq('challenge_id', id).eq('user_id', user.id).eq('day_key', dk);
+    return NextResponse.json({ ok: true });
+  }
+
   const photoUrl = typeof body.photoUrl === 'string' && body.photoUrl.length > 0 && body.photoUrl.length < 500 ? body.photoUrl : null;
   const dayKey = new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10);
   const row = { challenge_id: id, user_id: user.id, day_key: dayKey };
