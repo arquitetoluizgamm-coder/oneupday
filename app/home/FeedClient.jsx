@@ -317,7 +317,7 @@ export default function FeedClient({ labels }) {
               <HugButton toId={item.owner.id} mediaId={item.mediaId} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
               {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
             </div>
-            {item.challenge && <ChallengeStrip challenge={item.challenge} />}
+            {item.challenge && <ChallengeStrip challenge={item.challenge} labels={labels.ch} />}
           </article>
           ) : (
           <article className={`entry ${item.kind || 'step'}${item.demo ? ' is-demo' : ''}`}>
@@ -394,7 +394,7 @@ export default function FeedClient({ labels }) {
             )}
             </>
             )}
-            {item.challenge && !item.demo && <ChallengeStrip challenge={item.challenge} />}
+            {item.challenge && !item.demo && <ChallengeStrip challenge={item.challenge} labels={labels.ch} />}
           </article>
           )}
           {idx === 1 && needs.length > 0 && (
