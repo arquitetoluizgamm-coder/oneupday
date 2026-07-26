@@ -2720,3 +2720,30 @@ h1 { letter-spacing: -0.03em; }
 
 /* 4. aspa acompanha o card menor */
 .dp-card.dark::before{top:2px;left:18px;font-size:52px}
+
+/* ============================================================
+   PADRAO RESTAURADO — todos os cards 4:3, sem excecao
+   O vazio do card de texto se resolve com tipografia maior,
+   nao mudando o tamanho do card.
+   ============================================================ */
+.dp-card{
+  aspect-ratio:4/3!important;
+  min-height:0;
+  justify-content:center;
+  align-items:flex-start;
+  padding:30px 28px;
+}
+@media(max-width:640px){ .dp-card{padding:26px 22px} }
+
+/* tipografia se adapta ao texto para preencher o card 4:3 */
+.entry-textcard .dpc-text.short,
+.dp-card .dpc-text.short{font-size:29px;line-height:1.26;-webkit-line-clamp:4}
+.entry-textcard .dpc-text,
+.dp-card .dpc-text{font-size:24px;line-height:1.32;-webkit-line-clamp:6}
+.entry-textcard .dpc-text.long,
+.dp-card .dpc-text.long{font-size:19px;line-height:1.45;-webkit-line-clamp:8}
+@media(max-width:640px){
+  .entry-textcard .dpc-text.short{font-size:25px;-webkit-line-clamp:5}
+  .entry-textcard .dpc-text{font-size:21px}
+  .entry-textcard .dpc-text.long{font-size:17.5px;-webkit-line-clamp:9}
+}

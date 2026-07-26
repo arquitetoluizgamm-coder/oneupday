@@ -128,7 +128,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
           ) : (
             // sem foto: o texto mora dentro do card, como no carrossel
             <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}`}>
-              <p className={`dpc-text${(cleanText || '').length > 120 ? ' long' : ''}`}>{cleanText}</p>
+              <p className={`dpc-text${(cleanText || '').length > 140 ? ' long' : ((cleanText || '').length < 70 ? ' short' : '')}`}>{cleanText}</p>
               {trackEl}
             </a>
           )}
