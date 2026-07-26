@@ -4127,3 +4127,10 @@ h1 { letter-spacing: -0.03em; }
 }
 .elog-links button:hover:not(:disabled){color:var(--ink)}
 .elog-links button:disabled{opacity:.45;cursor:default}
+
+/* codigo mais longo que 6 digitos: aperta o espacamento para nao estourar */
+.elog-code.longo{font-size:26px;letter-spacing:.24em;text-indent:.24em}
+@media(max-width:380px){
+  .elog-code{font-size:26px;letter-spacing:.3em;text-indent:.3em}
+  .elog-code.longo{font-size:22px;letter-spacing:.16em;text-indent:.16em}
+}

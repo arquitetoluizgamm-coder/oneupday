@@ -16,7 +16,14 @@ import { createClient } from '../../lib/supabase/client';
 // hoje simplesmente não entra — e não avisa ninguém.
 // ============================================================
 
-const ESPERA = 45; // segundos antes de poder pedir outro código
+const ESPERA = 45;   // segundos antes de poder pedir outro código
+
+// O Supabase permite configurar o tamanho do código (6 a 10 dígitos), e o
+// padrão nem sempre é 6. Travar em 6 aqui foi erro meu: chegou código de 8
+// e o campo não deixava digitar o último. Agora a tela aceita a faixa toda,
+// e nunca mais depende de uma configuração que pode mudar no painel.
+const MIN_DIGITOS = 6;
+const MAX_DIGITOS = 10;
 
 export default function EmailLogin({ t }) {
   const [fase, setFase] = useState('email');   // 'email' | 'codigo'
@@ -62,7 +69,7 @@ export default function EmailLogin({ t }) {
 
   async function conferir() {
     const limpo = codigo.replace(/\D/g, '');
-    if (ocupado || limpo.length !== 6) return;
+    if (ocupado || limpo.length < MIN_DIGITOS) return;
     setOcupado(true);
     setErro('');
     const supabase = createClient();
@@ -89,21 +96,21 @@ export default function EmailLogin({ t }) {
 
         <input
           ref={campoCodigo}
-          className="elog-code"
+          className={`elog-code${codigo.length > 6 ? ' longo' : ''}`}
           value={codigo}
-          onChange={(e) => setCodigo(e.target.value.replace(/\D/g, '').slice(0, 6))}
+          onChange={(e) => setCodigo(e.target.value.replace(/\D/g, '').slice(0, MAX_DIGITOS))}
           onKeyDown={(e) => { if (e.key === 'Enter') conferir(); }}
           inputMode="numeric"
           autoComplete="one-time-code"
-          maxLength={6}
-          placeholder="000000"
+          maxLength={MAX_DIGITOS}
+          placeholder="••••••"
           aria-label={t.mailCode}
         />
 
         {erro && <p className="elog-erro" role="alert">{erro}</p>}
 
         <button type="button" className="cta grow elog-go"
-          onClick={conferir} disabled={ocupado || codigo.length !== 6}>
+          onClick={conferir} disabled={ocupado || codigo.length < MIN_DIGITOS}>
           {ocupado ? t.mailChecking : t.mailEnter}
         </button>
 
