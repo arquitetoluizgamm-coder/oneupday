@@ -3682,3 +3682,36 @@ h1 { letter-spacing: -0.03em; }
   text-transform:uppercase;color:rgba(255,255,255,.88);min-height:30px;
 }
 .media-cap-more:hover{color:#fff}
+
+/* ============================================================
+   "APOIANDO FULANO" — nome longo nao pode pular de linha
+   Causa: o .entry-actions e flex-wrap:wrap, e o navegador decide
+   a QUEBRA antes de decidir o ENCOLHIMENTO. Com flex-basis:auto
+   o item nasce do tamanho do texto, nao cabe e vai para a linha
+   de baixo — o text-overflow:ellipsis nunca chega a agir.
+   Correcao: flex-basis:0. O item nasce com largura zero, sempre
+   cabe na linha, cresce no espaco que sobrou e so entao o texto
+   e reticenciado.
+   ============================================================ */
+.feed-acts .sl-title{
+  flex:1 1 0;               /* base ZERO: nunca provoca quebra de linha */
+  min-width:0;
+  max-width:58%;
+  margin-left:auto;
+  justify-content:flex-end; /* continua colado a direita */
+  overflow:hidden;
+}
+.feed-acts .sl-text{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  min-width:0;
+  flex:0 1 auto;            /* o texto e a unica parte que encolhe */
+}
+.feed-acts .sl-chev{flex:0 0 auto}
+
+/* telas estreitas: o nome ganha um pouco mais de espaco */
+@media(max-width:400px){
+  .feed-acts .sl-title{max-width:64%}
+  .feed-acts .sl-text{letter-spacing:.06em}
+}
