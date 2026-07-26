@@ -3478,3 +3478,57 @@ h1 { letter-spacing: -0.03em; }
   border:1.5px solid #84917A;background:#fbfcfa}
 .pv-item b{font-size:13.5px;font-weight:650;color:var(--ink)}
 .pv-item i{font-style:normal;font-size:11px;color:var(--muted)}
+
+/* ============================================================
+   HOJE — a porta de entrada e o seu proprio capitulo
+   ============================================================ */
+.hj-block{margin:4px 2px 22px;padding:0}
+@media(max-width:640px){ .hj-block{margin-left:16px;margin-right:16px} }
+.hj-hi{display:block;font-family:var(--display);font-weight:800;font-size:9.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.hj-q{margin:0;font-family:var(--display);font-weight:800;font-size:21px;line-height:1.22;
+  letter-spacing:-.025em;color:var(--ink);max-width:22ch}
+.hj-q.done{font-size:15px;font-weight:600;color:var(--muted);letter-spacing:0;font-family:inherit}
+.hj-step{margin:9px 0 0;padding-left:11px;border-left:2px solid #E8A64C;
+  font-size:15.5px;line-height:1.45;color:var(--ink)}
+.hj-step em{font-style:normal;color:var(--muted);font-size:13.5px}
+.hj-cta{display:inline-flex;align-items:center;justify-content:center;margin-top:16px;
+  height:46px;padding:0 22px;background:#C16F54;color:#fff;text-decoration:none;
+  font-family:var(--display);font-weight:800;font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;transition:background .2s}
+.hj-cta:hover{background:#a85c44}
+
+/* ============================================================
+   EM ANDAMENTO — as historias que voce acompanha
+   ============================================================ */
+.an-block{margin:0 0 24px}
+.an-title{margin:0 0 11px;padding:0 2px;font-family:var(--display);font-weight:800;font-size:9.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+@media(max-width:640px){ .an-title{padding-left:16px} }
+.an-scroll{display:flex;gap:9px;overflow-x:auto;padding:2px 2px 4px;
+  scroll-snap-type:x proximity;scrollbar-width:none;-ms-overflow-style:none}
+.an-scroll::-webkit-scrollbar{display:none}
+@media(max-width:640px){ .an-scroll{padding-left:16px;padding-right:16px} }
+.an-card{flex:0 0 auto;width:216px;scroll-snap-align:start;display:flex;flex-direction:column;
+  gap:8px;padding:13px;background:var(--surface);border:1px solid var(--line);
+  border-left:3px solid var(--line);text-decoration:none;color:var(--ink);
+  transition:border-color .2s}
+.an-card:hover{border-color:rgba(16,19,45,.25)}
+.an-card.an-voltou{border-left-color:#E8A64C;background:#fffdf9}
+.an-card.an-quase{border-left-color:#C16F54}
+.an-card.an-esperando{border-left-color:#c9c4ba}
+.an-top{display:flex;align-items:center;gap:8px}
+.an-ava{width:26px;height:26px;border-radius:50%;overflow:hidden;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:11px}
+.an-ava img{width:100%;height:100%;object-fit:cover}
+.an-top b{font-size:13px;font-weight:650;line-height:1.3;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.an-card q{font-size:12px;line-height:1.45;color:var(--muted);font-style:italic;quotes:'“' '”';
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.an-go{margin-top:auto;font-family:var(--display);font-weight:800;font-size:9px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.an-voltou .an-go{color:#b3874a}
+
+/* espelho dentro do feed: privado, cortando o publico */
+.esp-teaser.in-feed,.esp-card.in-feed{margin:22px 2px}
+@media(max-width:640px){ .esp-teaser.in-feed,.esp-card.in-feed{margin-left:16px;margin-right:16px} }

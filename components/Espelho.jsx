@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 // O Espelho: o Upi aponta, a pessoa conclui.
 // Nunca diagnostica — só mostra as palavras dela, com data.
-export default function Espelho({ labels }) {
+export default function Espelho({ labels, inFeed }) {
   const L = labels || {};
   const [dado, setDado] = useState(null);
   const [aberto, setAberto] = useState(false);
@@ -37,7 +37,7 @@ export default function Espelho({ labels }) {
 
   if (!aberto) {
     return (
-      <button type="button" className="esp-teaser" onClick={() => setAberto(true)}>
+      <button type="button" className={`esp-teaser${inFeed ? ' in-feed' : ''}`} onClick={() => setAberto(true)}>
         <img src="/upi.svg" alt="" width="30" height="30" />
         <span>{L.teaser || 'Reparei numa coisa.'}</span>
       </button>
@@ -45,7 +45,7 @@ export default function Espelho({ labels }) {
   }
 
   return (
-    <section className="esp-card" role="status">
+    <section className={`esp-card${inFeed ? ' in-feed' : ''}`} role="status">
       <header className="esp-head">
         <img src="/upi.svg" alt="" width="30" height="30" />
         <span>{L.eyebrow || 'Upi'}</span>
