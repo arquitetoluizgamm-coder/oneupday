@@ -2577,3 +2577,58 @@ h1 { letter-spacing: -0.03em; }
 /* página legal: intro e separador entre idiomas */
 .legal-intro{font-size:15px;line-height:1.6;color:#3f4654;margin:0 0 22px}
 .legal-sep{border:0;border-top:1px solid var(--line);margin:36px 0 30px}
+
+/* ações do bloco de notificações */
+.push-acts{display:flex;gap:8px;flex:0 0 auto}
+@media(max-width:640px){ .push-acts{flex-direction:column} }
+
+/* ============================================================
+   Visual do carrossel dentro do app
+   pontinhos de presenca + tags em pilula + card escuro alternado
+   ============================================================ */
+
+/* --- linha de presenca no topo do card --- */
+.dp-top{display:flex;align-items:center;gap:10px;margin-top:12px;padding:0 2px}
+.pdots{display:flex;align-items:center;gap:6px;flex:1;min-width:0;flex-wrap:wrap}
+.pdots i{width:7px;height:7px;border-radius:50%!important;background:rgba(16,19,45,.14);flex:0 0 auto;
+  transition:background .3s cubic-bezier(.22,1,.36,1)}
+.pdots i.on{background:#E8A64C}
+.pdots i.on.now{box-shadow:0 0 0 3px rgba(232,166,76,.22)}
+.dp-daymark{flex:0 0 auto;font-family:var(--display);font-weight:800;font-size:10.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+@media(max-width:640px){ .dp-top{padding:0 16px} }
+
+/* --- tipo do dia em pilula (PASSO, VITORIA, RECAIDA) --- */
+.dp-meta .entry-kindline{display:inline-flex;align-items:center;font-family:var(--display);
+  font-weight:800;font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:1;
+  padding:5px 11px;border:1.5px solid currentColor;color:var(--muted)}
+.dp-meta .entry-kindline::before{content:none}
+.dp-meta .entry-kindline.setback{color:#C16F54}
+.dp-meta .entry-kindline.win{color:#84917A}
+.dp-meta .entry-comeback,.dp-meta .entry-milestone{font-family:var(--display);font-weight:800;
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-style:normal}
+
+/* --- card de texto: fonte do carrossel --- */
+.dp-card{display:flex;flex-direction:column;justify-content:flex-end;gap:14px;
+  aspect-ratio:4/3;min-height:0;padding:30px 28px;position:relative;overflow:hidden}
+.dp-card .etc-day{font-family:var(--display);font-weight:800;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;opacity:.7;font-style:normal}
+.dpc-text{margin:0;font-family:var(--display);font-weight:700;font-size:22px;line-height:1.3;
+  letter-spacing:-.02em;white-space:pre-wrap;
+  display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+@media(max-width:640px){ .dpc-text{font-size:20px} }
+
+/* --- card claro (padrao) --- */
+.dp-card:not(.dark){background:var(--surface);border:1px solid var(--line);color:var(--ink)}
+.dp-card:not(.dark)::after{display:none}
+
+/* --- card escuro (1 a cada 3) --- */
+.dp-card.dark{background:linear-gradient(160deg,#10132D 0%,#171d4d 100%);color:#FAF7F2;border:0}
+.dp-card.dark .etc-day{color:#E8A64C;opacity:1}
+.dp-card.dark .dpc-text{color:#FAF7F2}
+/* aspa decorativa dourada — ornamento, nao citacao */
+.dp-card.dark::before{content:'\201D';position:absolute;top:-18px;left:20px;
+  font-family:var(--display);font-weight:800;font-size:110px;line-height:1;
+  color:#E8A64C;opacity:.16;pointer-events:none}
+.dp-card.dark::after{display:none}
+.dp-card.dark .media-progress .mp-bar{background:rgba(255,255,255,.18)}

@@ -61,8 +61,23 @@ function TrackTag({ track, float, hasBar }) {
   );
 }
 
+// ---- Linha de presença: os pontinhos do carrossel ----
+function PresenceDots({ day, total }) {
+  if (!total || total < 1) return null;
+  const max = 10;
+  const n = Math.min(total, max);
+  const filled = Math.max(0, Math.min(n, Math.round((day / total) * n)));
+  return (
+    <div className="pdots" aria-hidden="true">
+      {Array.from({ length: n }).map((_, i) => (
+        <i key={i} className={i < filled ? (i === filled - 1 ? 'on now' : 'on') : ''} />
+      ))}
+    </div>
+  );
+}
+
 // ---- A jornada é um post só: dias navegáveis dentro do card ----
-function DayPager({ item, labels, dayLabel }) {
+function DayPager({ item, labels, dayLabel, dark }) {
   const [days, setDays] = useState(item.days || []);
   const [idx, setIdx] = useState((item.days || []).length - 1);
   const touch = useRef(null);
@@ -88,6 +103,11 @@ function DayPager({ item, labels, dayLabel }) {
 
   return (
     <>
+      <div className="dp-top">
+        <PresenceDots day={d.day_number} total={total} />
+        {total > 0 && <span className="dp-daymark">{(labels.dayOfShort || 'Dia {d} / {t}').replace('{d}', d.day_number).replace('{t}', total)}</span>}
+      </div>
+
       <div className="dp-meta">
         {d.comeback && <span className="entry-comeback">{(labels.comebackFmt || '').replace('{d}', d.comeback)}</span>}
         {d.kind === 'setback' && <span className="entry-kindline setback">{labels.tagSetback}</span>}
@@ -97,14 +117,19 @@ function DayPager({ item, labels, dayLabel }) {
 
       <div className="dp-stage" onTouchStart={onTS} onTouchEnd={onTE}>
         <div className="dp-slide" key={d.id}>
-          <div className="dp-text">
-            {cleanText && <EntryText key={'x' + d.id} text={cleanText} labels={labels} limit={100} />}
-          </div>
-          {d.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={d.photo_url} alt="" />{trackEl}</a>}
-          {d.video_url && !d.photo_url && <div className="entry-media"><video src={d.video_url} controls playsInline preload="metadata" />{trackEl}</div>}
-          {!hasMedia && (
-            <a href={`/${item.journey.slug}`} className={`entry-textcard dp-empty${d.kind === 'setback' ? ' setback' : ''}`}>
+          {hasMedia ? (
+            <>
+              <div className="dp-text">
+                {cleanText && <EntryText key={'x' + d.id} text={cleanText} labels={labels} limit={100} />}
+              </div>
+              {d.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={d.photo_url} alt="" />{trackEl}</a>}
+              {d.video_url && !d.photo_url && <div className="entry-media"><video src={d.video_url} controls playsInline preload="metadata" />{trackEl}</div>}
+            </>
+          ) : (
+            // sem foto: o texto mora dentro do card, como no carrossel
+            <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}`}>
               <span className="etc-day">{dayLabel(d.day_number)}</span>
+              <p className="dpc-text">{cleanText}</p>
               {trackEl}
             </a>
           )}
@@ -336,7 +361,7 @@ export default function FeedClient({ labels }) {
                 onChanged={(patch) => setItems((prev) => patch === null ? prev.filter((x) => x.id !== item.id) : prev.map((x) => x.id === item.id ? { ...x, ...patch } : x))} />}
             </div>
             {item.days && !item.demo ? (
-              <DayPager item={item} labels={labels} dayLabel={dayLabel} />
+              <DayPager item={item} labels={labels} dayLabel={dayLabel} dark={idx % 3 === 2} />
             ) : (
             <>
             {item.comeback && <div className="entry-comeback">{(labels.comebackFmt || '').replace('{d}', item.comeback)}</div>}
