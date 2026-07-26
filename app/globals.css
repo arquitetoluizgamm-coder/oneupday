@@ -3571,3 +3571,41 @@ h1 { letter-spacing: -0.03em; }
 .eco-acts button:hover{color:var(--ink)}
 .eco-info{margin:9px 0 0!important;padding-top:9px;border-top:1px solid #f0ebe1;
   font-size:11.5px!important;line-height:1.5!important;color:var(--muted)!important}
+
+/* ============================================================
+   MIDIA COM ENQUADRAMENTO LIVRE
+   Sem carrossel, nao ha mais motivo para cortar tudo em 4:3:
+   a pessoa ja escolheu o quadro na hora de postar. O JS mede o
+   arquivo e escreve a proporcao no proprio elemento; aqui so
+   cuidamos do preenchimento, do fundo e dos extremos.
+   O CARD DE TEXTO CONTINUA 4:3 — isso nao muda.
+   ============================================================ */
+
+/* enquanto o arquivo nao carrega, 4:3 segura o lugar e evita salto */
+.feed-page .entry-media.livre{
+  aspect-ratio:4/3;
+  overflow:hidden;
+  background:#0f1014;
+}
+
+/* foto preenche o quadro que ela mesma definiu — corte so nos extremos */
+.feed-page .entry-media.livre img{
+  width:100%;height:100%;
+  aspect-ratio:auto;
+  object-fit:cover;
+  max-height:none;
+  display:block;
+}
+
+/* video nunca corta: em 9:16 o corte cortaria rosto. Letterbox discreto. */
+.feed-page .entry-media.livre video{
+  width:100%;height:100%;
+  aspect-ratio:auto;
+  object-fit:contain;
+  max-height:none;
+  display:block;
+  background:#0f1014;
+}
+
+/* a barra de progresso e a musica continuam ancoradas no rodape da midia */
+.feed-page .entry-media.livre .media-progress{bottom:0}

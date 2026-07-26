@@ -66,6 +66,43 @@ function TrackTag({ track, float, hasBar }) {
   );
 }
 
+// ---- Foto e vídeo mantêm o enquadramento de quem postou ----
+// Sem carrossel, não há mais motivo para cortar tudo em 4:3: a pessoa
+// escolheu o quadro na hora de postar. Só travamos os extremos — nada
+// mais alto que 4:5 (senão um post sozinho toma a tela inteira) nem mais
+// largo que 16:9 (senão vira uma tira). O card de TEXTO continua 4:3.
+const RATIO_ALTO = 4 / 5;      // limite retrato
+const RATIO_LARGO = 16 / 9;    // limite paisagem
+
+function razao(w, h) {
+  if (!w || !h) return null;
+  return Math.min(RATIO_LARGO, Math.max(RATIO_ALTO, w / h));
+}
+
+function Media({ photo, video, href, children }) {
+  // começa em 4:3 (o padrão do CSS) e ajusta assim que sabe o tamanho real
+  const [r, setR] = useState(null);
+  const style = r ? { aspectRatio: String(r) } : undefined;
+
+  const conteudo = video ? (
+    <video
+      src={video} controls playsInline preload="metadata"
+      onLoadedMetadata={(e) => setR(razao(e.target.videoWidth, e.target.videoHeight))}
+    />
+  ) : (
+    <img
+      src={photo} alt=""
+      onLoad={(e) => setR(razao(e.target.naturalWidth, e.target.naturalHeight))}
+    />
+  );
+
+  // vídeo não vira link: o toque é para dar play, não para navegar
+  if (href && !video) {
+    return <a href={href} className="entry-media livre" style={style}>{conteudo}{children}</a>;
+  }
+  return <div className="entry-media livre" style={style}>{conteudo}{children}</div>;
+}
+
 // ---- Um card por jornada: mostra o dia mais recente. Sem slides. ----
 function DayPager({ item, labels, dayLabel, dark }) {
   const [days, setDays] = useState(item.days || []);
@@ -88,8 +125,8 @@ function DayPager({ item, labels, dayLabel, dark }) {
         <div className="dp-slide" key={d.id}>
           {hasMedia ? (
             <>
-              {d.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={d.photo_url} alt="" />{trackEl}</a>}
-              {d.video_url && !d.photo_url && <div className="entry-media"><video src={d.video_url} controls playsInline preload="metadata" />{trackEl}</div>}
+              {d.photo_url && <Media photo={d.photo_url} href={`/${item.journey.slug}`}>{trackEl}</Media>}
+              {d.video_url && !d.photo_url && <Media video={d.video_url}>{trackEl}</Media>}
             </>
           ) : (
             <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}`}>
@@ -368,9 +405,7 @@ export default function FeedClient({ labels }) {
               </span>
               <span className="entry-id"><b>{item.owner.name}</b></span>
             </a>
-            <div className="entry-media">
-              {item.kind === 'video' ? <video src={item.url} controls playsInline preload="metadata" /> : <img src={item.url} alt="" />}
-            </div>
+            {item.kind === 'video' ? <Media video={item.url} /> : <Media photo={item.url} />}
             {item.caption && <div className="dp-text under"><EntryText text={item.caption} labels={labels} limit={100} /></div>}
             <div className="entry-actions feed-acts">
               <EncourageBar mediaId={item.mediaId} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
@@ -439,8 +474,8 @@ export default function FeedClient({ labels }) {
               }
               return (
                 <>
-                  {item.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={item.photo_url} alt="" />{trackFloat}</a>}
-                  {item.video_url && !item.photo_url && <div className="entry-media"><video src={item.video_url} controls playsInline preload="metadata" />{trackFloat}</div>}
+                  {item.photo_url && <Media photo={item.photo_url} href={`/${item.journey.slug}`}>{trackFloat}</Media>}
+                  {item.video_url && !item.photo_url && <Media video={item.video_url}>{trackFloat}</Media>}
                   {!hasMedia && !cleanText && item.track && <TrackTag track={item.track} />}
                   {cleanText && <div className="dp-text under"><EntryText text={cleanText} labels={labels} limit={100} /></div>}
                   {progressEl}
