@@ -2686,3 +2686,37 @@ h1 { letter-spacing: -0.03em; }
 /* 5. Marcadores de recomeco/marco viram pilula dourada discreta */
 .dp-meta .entry-comeback{padding:5px 11px;border:1.5px solid #E8A64C;color:#b3874a;background:transparent}
 .dp-meta .entry-milestone{padding:5px 11px;border:1.5px solid #E8A64C;color:#b3874a}
+
+/* ============================================================
+   AJUSTE FINO do card de texto
+   sem sobra no topo, texto ocupando a largura, setas no rodape
+   ============================================================ */
+
+/* 1. altura acompanha o texto (nada de 4:3 forcado sobrando) */
+.dp-card{
+  aspect-ratio:auto!important;
+  min-height:180px;
+  justify-content:center;
+  padding:28px 26px;
+}
+@media(max-width:640px){ .dp-card{padding:26px 20px;min-height:160px} }
+
+/* 2. texto usa a largura toda — some a sobra de um lado so */
+.entry-textcard .dpc-text,
+.dp-card .dpc-text{
+  max-width:none;
+  width:100%;
+  -webkit-line-clamp:6;
+}
+.entry-textcard .dpc-text.long{max-width:none;-webkit-line-clamp:8}
+
+/* 3. setas de dia no RODAPE, nao no meio da imagem */
+.dp-nav{top:auto;bottom:14px;transform:none}
+.dp-stage:not(.is-text) .dp-nav{bottom:58px}   /* acima da barra, nas fotos */
+@media(max-width:640px){
+  .dp-nav{bottom:12px}
+  .dp-stage:not(.is-text) .dp-nav{bottom:54px}
+}
+
+/* 4. aspa acompanha o card menor */
+.dp-card.dark::before{top:2px;left:18px;font-size:52px}
