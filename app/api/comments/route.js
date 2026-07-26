@@ -37,9 +37,9 @@ export async function GET(req) {
   if (!val) return NextResponse.json({ comments: [] });
   const supabase = createClient();
   const { data: comments } = await supabase.from('comments')
-    .select('id, user_id, parent_id, body, created_at').eq(col, val)
+    .select('id, user_id, parent_id, body, created_at, eco, eco_tipo').eq(col, val)
     .eq('status', 'published').order('created_at', { ascending: true }).limit(50);
-  const ids = [...new Set((comments || []).map(c => c.user_id))];
+  const ids = [...new Set((comments || []).map(c => c.user_id).filter(Boolean))];
   const { data: profiles } = ids.length
     ? await supabase.from('profiles').select('id, name, avatar_url, avatar_color').in('id', ids)
     : { data: [] };

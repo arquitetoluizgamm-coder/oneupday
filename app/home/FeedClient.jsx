@@ -123,7 +123,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
 
       <ActionsRow people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])}>
         <EncourageBar key={'e' + d.id} updateId={d.id} initialActive={d.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
-        <Comments key={'c' + d.id} updateId={d.id} labels={labels.comments} />
+        <Comments key={'c' + d.id} updateId={d.id} own={item.own} labels={labels.comments} />
         <Percepcao updateId={d.id} toId={item.owner.id} own={item.own} labels={labels.pc} />
         <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
         {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
@@ -269,6 +269,7 @@ export default function FeedClient({ labels }) {
   const [needs, setNeeds] = useState([]);
   useEffect(() => { fetch('/api/needs').then((r) => r.json()).then((j) => setNeeds(j.people || [])).catch(() => {}); }, []);
   useEffect(() => { fetch('/api/suggestions').then((r) => r.json()).then((j) => setSuggestions(j.people || [])).catch(() => {}); }, []);
+  useEffect(() => { fetch('/api/eco', { method: 'POST' }).catch(() => {}); }, []);
   useEffect(() => { fetch('/api/andamento').then((r) => r.json()).then((j) => { setAndamento(j.andamento || []); setHoje(j.hoje || null); }).catch(() => {}); }, []);
   useEffect(() => { fetch('/api/momentos').then((r) => r.json()).then((j) => setMomentos({ transformacoes: j.transformacoes || [], amanha: j.amanha || [], retornos: j.retornos || [] })).catch(() => {}); }, []);
 
@@ -456,7 +457,7 @@ export default function FeedClient({ labels }) {
             ) : (
               <ActionsRow people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])}>
                 <EncourageBar updateId={item.id} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
-                <Comments updateId={item.id} labels={labels.comments} />
+                <Comments updateId={item.id} own={item.own} labels={labels.comments} />
                 <Percepcao updateId={item.id} toId={item.owner.id} own={item.own} labels={labels.pc} />
                 <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
                 {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}

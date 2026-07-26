@@ -30,6 +30,7 @@ import { pickUpi } from '../../lib/upi';
 import ChallengeRespond from '../../components/ChallengeRespond';
 import UpiGreeting from '../../components/UpiGreeting';
 import PushToggle from '../../components/PushToggle';
+import EcoToggle from '../../components/EcoToggle';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
@@ -37,7 +38,7 @@ const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'
 async function ensureProfile(supabase, user) {
   const meta = user.user_metadata || {};
   const googleAvatar = meta.avatar_url || meta.picture || null;
-  const { data: existing } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color, banner_url, notif_paused').eq('id', user.id).maybeSingle();
+  const { data: existing } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color, banner_url, notif_paused, eco_on').eq('id', user.id).maybeSingle();
   if (existing) {
     if (!existing.avatar_url && googleAvatar) {
       await supabase.from('profiles').update({ avatar_url: googleAvatar }).eq('id', user.id);
@@ -225,6 +226,8 @@ export default async function Perfil() {
 
         <PushToggle vapidKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''}
           labels={{ title: t.pushTitle, onSub: t.pushOnSub, offSub: t.pushOffSub, denied: t.pushDenied, turnOn: t.pushTurnOn, turnOff: t.pushTurnOff, wait: t.pushWait, test: t.pushTest, testSent: t.pushTestSent, testFail: t.pushTestFail }} />
+
+        <EcoToggle inicial={profile.eco_on !== false} labels={{ title: t.ecoTitle, sub: t.ecoSub, on: t.ecoOn, off: t.ecoOff }} />
 
         {upi?.line && (
           <UpiGreeting line={upi.line} cat={upi.cat}

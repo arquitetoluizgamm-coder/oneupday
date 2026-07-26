@@ -1,7 +1,8 @@
 'use client';
 import { useState } from 'react';
 
-export default function Comments({ updateId, mediaId, challengeId, labels }) {
+export default function Comments({ updateId, mediaId, challengeId, labels, own }) {
+  const podeApagarEco = !!own;
   const L = labels || {};
   const qs = challengeId ? `challengeId=${encodeURIComponent(challengeId)}` : mediaId ? `mediaId=${encodeURIComponent(mediaId)}` : `updateId=${encodeURIComponent(updateId)}`;
   const targetBody = challengeId ? { challengeId } : mediaId ? { mediaId } : { updateId };
@@ -22,6 +23,15 @@ export default function Comments({ updateId, mediaId, challengeId, labels }) {
     const next = !open; setOpen(next); setMessage('');
     if (next) await load();
   }
+  const [ecoInfo, setEcoInfo] = useState(null);
+
+  async function apagarEco(id) {
+    if (!window.confirm(L.ecoDelConfirm || '')) return;
+    const sb = (await import('../lib/supabase/client')).createClient();
+    await sb.from('comments').delete().eq('id', id);
+    await load();
+  }
+
   async function submit(e) {
     e.preventDefault();
     if (!text.trim() || busy) return;
@@ -41,10 +51,26 @@ export default function Comments({ updateId, mediaId, challengeId, labels }) {
         {items.length === 0 ? <p className="comment-empty">{L.empty}</p> : (() => {
           const roots = items.filter(c => !c.parent_id);
           const shownRoots = expanded ? roots : roots.slice(0, 2);
-          const renderComment = (c, nested = false) => <div className={`comment-item${nested ? ' comment-item-reply' : ''}`} key={c.id}>
-            <div className="comment-item-head"><b>{c.author?.name || L.someone}</b><button type="button" className="comment-reply" onClick={() => setReplyTo(c)}>{L.reply}</button></div>
-            <p>{c.body}</p>
-          </div>;
+          const renderComment = (c, nested = false) => c.eco ? (
+            // Primeiro Eco: sempre identificado como IA, nunca fingindo ser gente
+            <div className="comment-item eco-item" key={c.id}>
+              <div className="eco-head">
+                <img src="/upi.svg" alt="" width="22" height="22" />
+                <b>Upi</b><span className="eco-tag">{L.ecoTag}</span>
+              </div>
+              <p>{c.body}</p>
+              <div className="eco-acts">
+                <button type="button" onClick={() => setEcoInfo(c.id === ecoInfo ? null : c.id)}>{L.ecoWhy}</button>
+                {podeApagarEco && <button type="button" onClick={() => apagarEco(c.id)}>{L.ecoDel}</button>}
+              </div>
+              {ecoInfo === c.id && <p className="eco-info">{L.ecoWhyText}</p>}
+            </div>
+          ) : (
+            <div className={`comment-item${nested ? ' comment-item-reply' : ''}`} key={c.id}>
+              <div className="comment-item-head"><b>{c.author?.name || L.someone}</b><button type="button" className="comment-reply" onClick={() => setReplyTo(c)}>{L.reply}</button></div>
+              <p>{c.body}</p>
+            </div>
+          );
           return <>
             {shownRoots.map(c => <div className="comment-thread" key={c.id}>
               {renderComment(c)}
