@@ -115,7 +115,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
         {[7, 30, 60, 100].includes(d.day_number) && <span className="entry-milestone">{(labels.milestoneFmt || '').replace('{d}', d.day_number)}</span>}
       </div>
 
-      <div className="dp-stage" onTouchStart={onTS} onTouchEnd={onTE}>
+      <div className={`dp-stage${hasMedia ? '' : ' is-text'}`} onTouchStart={onTS} onTouchEnd={onTE}>
         <div className="dp-slide" key={d.id}>
           {hasMedia ? (
             <>
@@ -128,8 +128,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
           ) : (
             // sem foto: o texto mora dentro do card, como no carrossel
             <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}`}>
-              <span className="etc-day">{dayLabel(d.day_number)}</span>
-              <p className="dpc-text">{cleanText}</p>
+              <p className={`dpc-text${(cleanText || '').length > 120 ? ' long' : ''}`}>{cleanText}</p>
               {trackEl}
             </a>
           )}

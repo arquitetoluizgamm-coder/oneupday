@@ -2632,3 +2632,57 @@ h1 { letter-spacing: -0.03em; }
   color:#E8A64C;opacity:.16;pointer-events:none}
 .dp-card.dark::after{display:none}
 .dp-card.dark .media-progress .mp-bar{background:rgba(255,255,255,.18)}
+
+/* ============================================================
+   CORRECAO do card de texto (especificidade + respiro)
+   ============================================================ */
+
+/* 1. FONTE: .entry-textcard p tinha mais peso que .dpc-text.
+      Agora a regra e mais especifica e a Montserrat vence. */
+.entry-textcard .dpc-text,
+.dp-card .dpc-text{
+  font-family:var(--display)!important;
+  font-weight:700;
+  font-size:23px;
+  line-height:1.32;
+  letter-spacing:-.022em;
+  text-align:left;
+  margin:0;
+  max-width:22ch;
+  white-space:pre-wrap;
+  display:-webkit-box;
+  -webkit-line-clamp:6;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.entry-textcard .dpc-text.long{font-size:19px;line-height:1.42;max-width:26ch;-webkit-line-clamp:7}
+@media(max-width:640px){
+  .entry-textcard .dpc-text{font-size:21px}
+  .entry-textcard .dpc-text.long{font-size:18px}
+}
+
+/* 2. RESPIRO: o texto ficava colado na barra. Agora o card
+      centraliza o texto e a barra some nos posts sem foto
+      (os pontinhos no topo ja mostram o progresso). */
+.dp-card{justify-content:center;align-items:flex-start;padding:34px 30px}
+.dp-card::after{content:none!important}
+.dp-stage.is-text .dp-progress{display:none}
+@media(max-width:640px){ .dp-card{padding:30px 24px} }
+
+/* 3. ASPA: menor, inteira dentro do card, atras do texto */
+.dp-card.dark::before{
+  content:'\201C';
+  top:6px;left:22px;
+  font-size:64px;
+  opacity:.18;
+  z-index:0;
+}
+.dp-card .dpc-text{position:relative;z-index:1}
+
+/* 4. Card claro: papel, nao caixa vazia */
+.dp-card:not(.dark){background:#fffdf9;border:1px solid var(--line);color:var(--ink)}
+.dp-card:not(.dark) .dpc-text{color:var(--ink)}
+
+/* 5. Marcadores de recomeco/marco viram pilula dourada discreta */
+.dp-meta .entry-comeback{padding:5px 11px;border:1.5px solid #E8A64C;color:#b3874a;background:transparent}
+.dp-meta .entry-milestone{padding:5px 11px;border:1.5px solid #E8A64C;color:#b3874a}
