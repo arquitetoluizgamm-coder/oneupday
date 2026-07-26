@@ -58,7 +58,7 @@ export default async function Home() {
 
   return (
     <>
-      <header className="top land-top"><Logo href="/" size={40} /></header>
+      <header className="top land-top"><Logo href="/" size={40} showText /></header>
 
       <Track type="landing_view" />
       <main className="landing">
@@ -68,6 +68,14 @@ export default async function Home() {
           <p className="land-identity"><span>{t.landIdentity1}</span><b>{t.landIdentity2}</b></p>
           <a className="cta grow land-cta" href="/login">{t.landCta}</a>
           <p className="land-safety">{t.landExplain}</p>
+        </section>
+
+        {/* Exigido pela verificação de marca do Google: a página inicial
+            precisa dizer, em texto, o nome do app e para que ele serve. */}
+        <section className="land-about">
+          <h2>{t.aboutTitle}</h2>
+          <p>{t.aboutText}</p>
+          <p className="land-about-data">{t.aboutData}</p>
         </section>
 
         <section className="land-see">

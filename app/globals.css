@@ -4047,3 +4047,25 @@ h1 { letter-spacing: -0.03em; }
   max-height:60svh;
   display:block;
 }
+
+/* ============================================================
+   LANDING — bloco "o que e o One Up Day"
+   A verificacao de marca do Google exige que a pagina inicial
+   diga, em texto, o nome do app e a finalidade dele. O nome so
+   existia como imagem no topo e dividido no rodape.
+   ============================================================ */
+.land-about{max-width:640px;margin:36px auto 8px;padding:0 20px;text-align:left}
+.land-about h2{
+  margin:0 0 12px;font-family:var(--display);font-weight:800;font-size:19px;
+  letter-spacing:-.01em;color:var(--ink);
+}
+.land-about p{margin:0 0 10px;font-size:15.5px;line-height:1.62;color:var(--ink)}
+.land-about-data{font-size:13.5px!important;color:var(--muted)!important}
+@media(max-width:640px){
+  .land-about{margin-top:28px}
+  .land-about h2{font-size:17.5px}
+  .land-about p{font-size:15px}
+}
+/* o nome da marca no topo da landing, agora em texto */
+.land-top .oud-word{font-size:19px;letter-spacing:-.01em}
+@media(max-width:640px){ .land-top .oud-word{font-size:17px} }
