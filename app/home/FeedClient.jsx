@@ -8,6 +8,9 @@ import NeedsSupport from '../../components/NeedsSupport';
 import EditUpdate from '../../components/EditUpdate';
 import ChallengeStrip from '../../components/ChallengeStrip';
 import ChallengeButton from '../../components/ChallengeButton';
+import Transformacao from '../../components/Transformacao';
+import Amanha from '../../components/Amanha';
+import Retornos from '../../components/Retornos';
 import { MOODS, moodGlow } from '../../lib/moods';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
@@ -245,9 +248,11 @@ export default function FeedClient({ labels }) {
   const scopeRef = useRef('all');
   const busy = useRef(false);
   const [suggestions, setSuggestions] = useState([]);
+  const [momentos, setMomentos] = useState({ transformacoes: [], amanha: [], retornos: [] });
   const [needs, setNeeds] = useState([]);
   useEffect(() => { fetch('/api/needs').then((r) => r.json()).then((j) => setNeeds(j.people || [])).catch(() => {}); }, []);
   useEffect(() => { fetch('/api/suggestions').then((r) => r.json()).then((j) => setSuggestions(j.people || [])).catch(() => {}); }, []);
+  useEffect(() => { fetch('/api/momentos').then((r) => r.json()).then((j) => setMomentos({ transformacoes: j.transformacoes || [], amanha: j.amanha || [], retornos: j.retornos || [] })).catch(() => {}); }, []);
 
   async function load() {
     if (busy.current || doneRef.current) return;
@@ -432,11 +437,23 @@ export default function FeedClient({ labels }) {
             {item.challenge && !item.demo && <ChallengeStrip challenge={item.challenge} labels={labels.ch} />}
           </article>
           )}
+          {idx === 0 && momentos.amanha.length > 0 && (
+            <Amanha people={momentos.amanha} labels={labels.amanha} />
+          )}
           {idx === 1 && needs.length > 0 && (
             <NeedsSupport people={needs} labels={labels.needs} />
           )}
+          {idx === 2 && momentos.transformacoes[0] && (
+            <Transformacao item={momentos.transformacoes[0]} labels={labels.transf} />
+          )}
+          {idx === 3 && momentos.retornos.length > 0 && (
+            <Retornos people={momentos.retornos} labels={labels.retornos} />
+          )}
           {idx === 4 && suggestions.length > 0 && (
             <SuggestionCard people={suggestions} labels={labels.suggest} />
+          )}
+          {idx === 6 && momentos.transformacoes[1] && (
+            <Transformacao item={momentos.transformacoes[1]} labels={labels.transf} />
           )}
           </Fragment>
         ))}
@@ -446,6 +463,15 @@ export default function FeedClient({ labels }) {
         )}
         {items.length > 0 && items.length < 5 && suggestions.length > 0 && (
           <SuggestionCard people={suggestions} labels={labels.suggest} />
+        )}
+        {items.length < 3 && momentos.amanha.length > 0 && (
+          <Amanha people={momentos.amanha} labels={labels.amanha} />
+        )}
+        {items.length < 3 && momentos.transformacoes[0] && (
+          <Transformacao item={momentos.transformacoes[0]} labels={labels.transf} />
+        )}
+        {items.length < 4 && momentos.retornos.length > 0 && (
+          <Retornos people={momentos.retornos} labels={labels.retornos} />
         )}
 
         {!done && <div ref={sentinel} className="feed-sentinel">{loading ? labels.loading : ''}</div>}
