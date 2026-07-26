@@ -3609,3 +3609,22 @@ h1 { letter-spacing: -0.03em; }
 
 /* a barra de progresso e a musica continuam ancoradas no rodape da midia */
 .feed-page .entry-media.livre .media-progress{bottom:0}
+
+/* --- vídeo: opção de preencher o quadro --- */
+/* Um 9:16 dentro do limite 4:5 sobra dos dois lados. O padrão continua
+   sendo mostrar o vídeo inteiro (nada de decapitar quem fala), mas quem
+   quiser preencher toca no botão do canto. A escolha é de quem assiste. */
+.feed-page .entry-media.livre.encher video{object-fit:cover}
+
+.media-fit{
+  position:absolute;top:10px;right:10px;z-index:4;
+  width:32px;height:32px;display:grid;place-items:center;
+  border:0;border-radius:50%;cursor:pointer;
+  background:rgba(16,19,45,.55);color:#fff;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  opacity:.85;transition:opacity .15s ease,background .15s ease;
+}
+.media-fit:hover,.media-fit:focus-visible{opacity:1;background:rgba(16,19,45,.72)}
+.feed-page .entry-media.livre{position:relative}
+@media(max-width:640px){ .media-fit{top:8px;right:8px;width:34px;height:34px} }
+@media(prefers-reduced-motion:reduce){ .media-fit{transition:none} }

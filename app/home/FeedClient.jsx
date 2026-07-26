@@ -74,33 +74,64 @@ function TrackTag({ track, float, hasBar }) {
 const RATIO_ALTO = 4 / 5;      // limite retrato
 const RATIO_LARGO = 16 / 9;    // limite paisagem
 
-function razao(w, h) {
-  if (!w || !h) return null;
-  return Math.min(RATIO_LARGO, Math.max(RATIO_ALTO, w / h));
-}
-
-function Media({ photo, video, href, children }) {
+function Media({ photo, video, href, labels, children }) {
   // começa em 4:3 (o padrão do CSS) e ajusta assim que sabe o tamanho real
-  const [r, setR] = useState(null);
+  const [nat, setNat] = useState(null);   // proporção real do arquivo
+  const [encher, setEncher] = useState(false);
+  const L = labels || {};
+
+  const r = nat ? Math.min(RATIO_LARGO, Math.max(RATIO_ALTO, nat)) : null;
   const style = r ? { aspectRatio: String(r) } : undefined;
+  // um 9:16 dentro de um quadro 4:5 sobra dos dois lados: aí vale oferecer preencher
+  const sobra = !!(nat && r && Math.abs(nat - r) > 0.02);
 
   const conteudo = video ? (
     <video
       src={video} controls playsInline preload="metadata"
-      onLoadedMetadata={(e) => setR(razao(e.target.videoWidth, e.target.videoHeight))}
+      onLoadedMetadata={(e) => {
+        const w = e.target.videoWidth, h = e.target.videoHeight;
+        if (w && h) setNat(w / h);
+      }}
     />
   ) : (
     <img
       src={photo} alt=""
-      onLoad={(e) => setR(razao(e.target.naturalWidth, e.target.naturalHeight))}
+      onLoad={(e) => {
+        const w = e.target.naturalWidth, h = e.target.naturalHeight;
+        if (w && h) setNat(w / h);
+      }}
     />
   );
 
+  // botão só no vídeo e só quando existe sobra de verdade
+  const alternar = video && sobra ? (
+    <button
+      type="button"
+      className="media-fit"
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEncher((v) => !v); }}
+      aria-label={encher ? (L.videoFit || 'Ajustar') : (L.videoFill || 'Preencher')}
+      title={encher ? (L.videoFit || 'Ajustar') : (L.videoFill || 'Preencher')}
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        {encher ? (
+          // setas para dentro = voltar a caber inteiro
+          <><path d="M9 3v6H3" /><path d="M15 21v-6h6" /><path d="M21 3l-6 6" /><path d="M3 21l6-6" /></>
+        ) : (
+          // setas para fora = preencher o quadro
+          <><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></>
+        )}
+      </svg>
+    </button>
+  ) : null;
+
+  const cls = `entry-media livre${encher ? ' encher' : ''}`;
+
   // vídeo não vira link: o toque é para dar play, não para navegar
   if (href && !video) {
-    return <a href={href} className="entry-media livre" style={style}>{conteudo}{children}</a>;
+    return <a href={href} className={cls} style={style}>{conteudo}{children}</a>;
   }
-  return <div className="entry-media livre" style={style}>{conteudo}{children}</div>;
+  return <div className={cls} style={style}>{conteudo}{alternar}{children}</div>;
 }
 
 // ---- Um card por jornada: mostra o dia mais recente. Sem slides. ----
@@ -126,7 +157,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
           {hasMedia ? (
             <>
               {d.photo_url && <Media photo={d.photo_url} href={`/${item.journey.slug}`}>{trackEl}</Media>}
-              {d.video_url && !d.photo_url && <Media video={d.video_url}>{trackEl}</Media>}
+              {d.video_url && !d.photo_url && <Media video={d.video_url} labels={labels}>{trackEl}</Media>}
             </>
           ) : (
             <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}`}>
@@ -405,7 +436,7 @@ export default function FeedClient({ labels }) {
               </span>
               <span className="entry-id"><b>{item.owner.name}</b></span>
             </a>
-            {item.kind === 'video' ? <Media video={item.url} /> : <Media photo={item.url} />}
+            {item.kind === 'video' ? <Media video={item.url} labels={labels} /> : <Media photo={item.url} />}
             {item.caption && <div className="dp-text under"><EntryText text={item.caption} labels={labels} limit={100} /></div>}
             <div className="entry-actions feed-acts">
               <EncourageBar mediaId={item.mediaId} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
@@ -475,7 +506,7 @@ export default function FeedClient({ labels }) {
               return (
                 <>
                   {item.photo_url && <Media photo={item.photo_url} href={`/${item.journey.slug}`}>{trackFloat}</Media>}
-                  {item.video_url && !item.photo_url && <Media video={item.video_url}>{trackFloat}</Media>}
+                  {item.video_url && !item.photo_url && <Media video={item.video_url} labels={labels}>{trackFloat}</Media>}
                   {!hasMedia && !cleanText && item.track && <TrackTag track={item.track} />}
                   {cleanText && <div className="dp-text under"><EntryText text={cleanText} labels={labels} limit={100} /></div>}
                   {progressEl}
