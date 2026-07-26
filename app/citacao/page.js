@@ -25,7 +25,7 @@ export default async function Citacao() {
           <h1>{t.citTitle}</h1>
           <p className="sub">{t.citSub}</p>
         </div>
-        <CitacaoForm t={t} autorPadrao={perfil?.handle || ''} />
+        <CitacaoForm t={t} userId={user.id} autorPadrao={perfil?.handle || ''} />
       </main>
       <BottomNav active="create" t={t} />
     </>

@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '../../lib/supabase/client';
 import { FUNDOS, fundosPara, corpoPara } from '../../lib/fundos';
 
 // ============================================================
@@ -90,7 +92,7 @@ function desenhar(ctx, img, fundo, texto, autor) {
   }
 }
 
-export default function CitacaoForm({ t, autorPadrao }) {
+export default function CitacaoForm({ t, userId, autorPadrao }) {
   const [texto, setTexto] = useState('');
   const [autor, setAutor] = useState(autorPadrao || '');
   const [escolhido, setEscolhido] = useState(FUNDOS[0].arquivo);
@@ -98,8 +100,11 @@ export default function CitacaoForm({ t, autorPadrao }) {
   const [baixando, setBaixando] = useState(false);
   const [imagem, setImagem] = useState(null);   // { url, blob } da imagem pronta
   const [erro, setErro] = useState('');
+  const [visibilidade, setVisibilidade] = useState('public');
+  const [publicando, setPublicando] = useState(false);
   const canvas = useRef(null);
   const imgs = useRef({});
+  const router = useRouter();
 
   const elegiveis = useMemo(() => fundosPara(texto), [texto]);
   const fundo = elegiveis.find((f) => f.arquivo === escolhido) || elegiveis[0];
@@ -153,6 +158,40 @@ export default function CitacaoForm({ t, autorPadrao }) {
     const buf = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
     return new Blob([buf], { type: 'image/png' });
+  }
+
+  // ------------------------------------------------------------
+  // Publicar: a citação vira um post do álbum, como uma foto.
+  // O texto da frase vira a legenda — assim ela continua buscável
+  // e legível para quem usa leitor de tela, que não lê imagem.
+  // ------------------------------------------------------------
+  async function publicar() {
+    const cv = canvas.current;
+    if (!cv || publicando || !texto.trim()) return;
+    setPublicando(true);
+    setErro('');
+    try {
+      const blob = await gerarBlob(cv);
+      const supabase = createClient();
+      const caminho = `${userId}/${crypto.randomUUID()}.png`;
+      const { error: eUp } = await supabase.storage.from('photos').upload(caminho, blob, { upsert: false, contentType: 'image/png' });
+      if (eUp) throw eUp;
+      const url = supabase.storage.from('photos').getPublicUrl(caminho).data.publicUrl;
+
+      const linha = { user_id: userId, url, kind: 'photo', visibility: visibilidade, caption: texto.trim() };
+      let { error } = await supabase.from('media').insert(linha);
+      if (error && /caption|column/i.test(error.message || '')) {
+        const { caption: _c, ...semCap } = linha;
+        ({ error } = await supabase.from('media').insert(semCap));
+      }
+      if (error) throw error;
+
+      router.push('/perfil');
+      router.refresh();
+    } catch (e) {
+      setErro((t.citPostError || '') + (e?.message ? ` (${e.message})` : ''));
+      setPublicando(false);
+    }
   }
 
   async function salvar() {
@@ -237,9 +276,23 @@ export default function CitacaoForm({ t, autorPadrao }) {
         <input value={autor} onChange={(e) => setAutor(e.target.value.slice(0, 30))} maxLength={30} placeholder={t.citAuthorPh} />
       </label>
 
+      <div className="cit-field">
+        <span className="cit-label">{t.citWhoSees}</span>
+        <div className="cit-vis">
+          {[['public', t.pubPublic], ['followers', t.pubFollowers], ['private', t.pubPrivate]].map(([v, l]) => (
+            <button key={v} type="button" className={`wz-chip${visibilidade === v ? ' on' : ''}`}
+              onClick={() => setVisibilidade(v)}>{l}</button>
+          ))}
+        </div>
+      </div>
+
       {erro && <p className="ep-err" role="alert">{erro}</p>}
 
-      <button type="button" className="cta grow cit-go" onClick={salvar} disabled={!texto.trim() || baixando}>
+      <button type="button" className="cta grow cit-go" onClick={publicar} disabled={!texto.trim() || publicando || baixando}>
+        {publicando ? t.citPosting : t.citPost}
+      </button>
+
+      <button type="button" className="ghost-btn cit-alt" onClick={salvar} disabled={!texto.trim() || baixando || publicando}>
         {baixando ? t.citSaving : t.citSave}
       </button>
 

@@ -4009,3 +4009,6 @@ h1 { letter-spacing: -0.03em; }
 }
 .cit-final-acts{display:flex;gap:8px}
 .cit-final-acts .cta{min-height:46px}
+
+.cit-vis{display:flex;flex-wrap:wrap;gap:6px}
+.cit-alt{width:100%;min-height:44px;margin-top:-6px}
