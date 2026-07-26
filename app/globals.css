@@ -3006,3 +3006,27 @@ h1 { letter-spacing: -0.03em; }
   .sl-person{flex:0 0 auto;width:84px}
   .sl-ava{width:62px;height:62px;font-size:23px}
 }
+
+/* ============================================================
+   BARRA DE PROGRESSO: colada no conteudo + degrade do perfil
+   ============================================================ */
+
+/* 1. gruda logo abaixo da imagem (ou do texto, quando ha texto) */
+.progress-under{margin:8px 2px 0}
+@media(max-width:640px){ .progress-under{margin:8px 16px 0} }
+/* o texto ja tem respiro proprio; a barra logo em seguida fica junto */
+.dp-text.under{margin-bottom:0}
+.dp-text.under + .progress-under{margin-top:8px}
+/* sem texto: a barra encosta na imagem */
+.dp-stage + .progress-under,
+.entry-media + .progress-under{margin-top:7px}
+
+/* 2. mesmo degrade da barra do perfil */
+.progress-under .mp-bar{height:8px;border-radius:999px;background:#eceae4;overflow:hidden}
+.progress-under .mp-bar span{
+  display:block;height:100%;border-radius:999px;min-width:5px;
+  background:linear-gradient(90deg,#f02f87 0%,#ff7a45 55%,#ffd33d 100%);
+  box-shadow:0 2px 8px rgba(240,47,135,.28);
+  transition:width .5s cubic-bezier(.22,1,.36,1);
+}
+.progress-under .mp-meta{margin-top:5px}
