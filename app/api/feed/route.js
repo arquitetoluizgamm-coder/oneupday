@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '../../../lib/supabase/server';
 import { getLocale } from '../../../lib/locale';
-import { buildDemoFeedItems } from '../../../lib/demoStories';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -48,9 +47,11 @@ export async function GET(req) {
       .map((journey) => journey.id);
   } else {
     // inclui as próprias jornadas: sua história também aparece no seu feed
+    // públicas + as "só seguidores" que ESTE usuário pode ver.
+    // A RLS já filtra: quem não segue simplesmente não recebe a linha.
     const { data: publicJourneys } = await supabase.from('journeys')
       .select('id, owner_id, category')
-      .eq('visibility', 'public')
+      .in('visibility', ['public', 'followers'])
       .order('created_at', { ascending: false })
       .limit(80);
 
@@ -59,8 +60,8 @@ export async function GET(req) {
       .map((journey) => journey.id);
   }
 
-  let demoItems = [];
-  try { if (scope === 'all') demoItems = buildDemoFeedItems(locale).filter((item) => !mutedCats.has(item.journey.category) && (!kind || item.kind === kind)); } catch {}
+  // pessoas de exemplo removidas do feed: só gente real aqui
+  const demoItems = [];
   if (!targetIds.length && !demoItems.length) return NextResponse.json({ items: [] });
 
   let updates = [];

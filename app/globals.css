@@ -3050,3 +3050,8 @@ h1 { letter-spacing: -0.03em; }
 /* contagem de apoio/seguidores no topo: sem negrito */
 .heart-pop .hp-stat{font-weight:500;font-size:15px}
 .heart-pop{cursor:pointer}
+
+/* icone de apoio no topo: proporcional ao logo */
+.heart-btn{width:44px;height:44px}
+.heart-btn svg{width:27px;height:27px}
+.heart-btn .heart-dot{top:8px;right:9px}
