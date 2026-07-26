@@ -43,6 +43,8 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [postedKind, setPostedKind] = useState('step');
   const [envText, setEnvText] = useState('');
   const [envBusy, setEnvBusy] = useState(false);
+  const [lastId, setLastId] = useState(null);
+  const [quando, setQuando] = useState('');
   const [rawFile, setRawFile] = useState(null);
   const [rawUrl, setRawUrl] = useState('');
   const photoRef = useRef(null);
@@ -136,12 +138,26 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     if (saving || uploading) return;
     setSaving(true);
     const supabase = createClient();
-    const { error } = await supabase.from('updates').insert({ journey_id: journeyId, day_number: dayNumber, kind, text: defaultText });
+    const { data: novo, error } = await supabase.from('updates').insert({ journey_id: journeyId, day_number: dayNumber, kind, text: defaultText }).select('id').maybeSingle();
     setSaving(false);
     if (error) { alert(t.error); return; }
+    if (novo?.id) { setLastId(novo.id); await fecharCapituloAnterior(supabase, novo.id); }
     trackEvent('update_posted', { journeyId, kind, quick: true });
     setPostedKind(kind);
     setPosted(true);
+  }
+
+  // fecha o capítulo aberto do dia anterior desta jornada
+  async function fecharCapituloAnterior(sb, novoId) {
+    try {
+      const { data: aberto } = await sb.from('updates')
+        .select('id').eq('journey_id', journeyId)
+        .not('next_step', 'is', null).is('closed_by', null)
+        .order('created_at', { ascending: false }).limit(1).maybeSingle();
+      if (aberto && aberto.id && aberto.id !== novoId) {
+        await sb.from('updates').update({ closed_by: novoId }).eq('id', aberto.id);
+      }
+    } catch {}
   }
 
   async function post() {
@@ -155,9 +171,10 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       text: value || fallback, photo_url: photoUrl, video_url: videoUrl,
     };
     if (track) { row.track_title = track.title; row.track_artist = track.artist; row.track_audio_url = track.audio_url; }
-    const { error } = await supabase.from('updates').insert(row);
+    const { data: novo, error } = await supabase.from('updates').insert(row).select('id').maybeSingle();
     setSaving(false);
     if (error) { alert(t.error); return; }
+    if (novo?.id) { setLastId(novo.id); await fecharCapituloAnterior(supabase, novo.id); }
     trackEvent('update_posted', { journeyId, kind });
     setPostedKind(kind);
     setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null);
@@ -169,15 +186,19 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   async function doneEnvelope(save) {
     if (envBusy) return;
     setEnvBusy(true);
-    if (save && envText.trim()) {
+    const passo = envText.trim().slice(0, 200);
+    if (save && passo) {
       try {
         const sb = createClient();
         const { data: { user } } = await sb.auth.getUser();
-        if (user) await sb.from('envelopes').insert({ user_id: user.id, journey_id: journeyId, text: envText.trim().slice(0, 200) });
+        // carta pra si (o Próximo Capítulo continua funcionando)
+        if (user) await sb.from('envelopes').insert({ user_id: user.id, journey_id: journeyId, text: passo });
+        // e o mesmo passo fica visível no post, abrindo o capítulo
+        if (lastId) await sb.from('updates').update({ next_step: passo, next_when: quando || null }).eq('id', lastId);
       } catch {}
     }
     setEnvBusy(false);
-    setPosted(false); setEnvText('');
+    setPosted(false); setEnvText(''); setQuando(''); setLastId(null);
     router.refresh();
   }
 
@@ -189,12 +210,24 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     return (
       <div className="composer2 env-box">
         <p className="env-meaning">{dayNumber === 1 ? t.meaning?.first : (postedKind === 'setback' ? t.meaning?.setback : t.meaning?.step)}</p>
-        <span className="env-eyebrow">💌 {t.env?.q}</span>
+        <span className="env-eyebrow">{t.step?.q}</span>
         <textarea className="env-input" value={envText} onChange={e => setEnvText(e.target.value)}
-          maxLength={200} placeholder={t.env?.ph} rows={2} autoFocus />
+          maxLength={200} placeholder={t.step?.ph} rows={2} autoFocus />
+        {envText.trim() && (
+          <>
+            <span className="step-when-q">{t.step?.whenQ}</span>
+            <div className="step-when">
+              {(t.step?.whens || []).map((w, i) => (
+                <button type="button" key={i} className={`when-chip${quando === w ? ' on' : ''}`}
+                  onClick={() => setQuando(quando === w ? '' : w)}>{w}</button>
+              ))}
+            </div>
+          </>
+        )}
+        <p className="step-note">{t.step?.note}</p>
         <div className="env-actions">
           <button type="button" className="ghost-btn" onClick={() => doneEnvelope(false)} disabled={envBusy}>{t.env?.skip}</button>
-          <button type="button" className="cta" onClick={() => doneEnvelope(true)} disabled={envBusy || !envText.trim()}>{t.env?.save}</button>
+          <button type="button" className="cta" onClick={() => doneEnvelope(true)} disabled={envBusy || !envText.trim()}>{t.step?.save}</button>
         </div>
       </div>
     );

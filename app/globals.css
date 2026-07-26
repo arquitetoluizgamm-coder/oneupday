@@ -3134,3 +3134,42 @@ h1 { letter-spacing: -0.03em; }
   letter-spacing:.1em;text-transform:uppercase;min-height:34px}
 .rt-btn:hover{background:#E8A64C;color:#10132D}
 .rt-btn.on{border-color:rgba(255,255,255,.28);color:rgba(250,247,242,.7);background:none;cursor:default}
+
+/* ============================================================
+   CAPITULO EM ABERTO
+   O post deixa de terminar em si mesmo.
+   ============================================================ */
+
+/* --- no composer: qual e o proximo passo --- */
+.step-when-q{display:block;margin:12px 0 7px;font-family:var(--display);font-weight:800;
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.step-when{display:flex;flex-wrap:wrap;gap:7px}
+.when-chip{border:1.5px solid var(--line);background:none;cursor:pointer;padding:7px 12px;
+  font-size:12.5px;color:var(--muted);min-height:36px}
+.when-chip:hover{border-color:var(--ink);color:var(--ink)}
+.when-chip.on{border-color:#C16F54;color:#C16F54;font-weight:650}
+.step-note{margin:12px 0 0;font-size:11.5px;line-height:1.45;color:var(--muted)}
+
+/* --- no feed: o capitulo aberto --- */
+.step-open{display:flex;align-items:center;gap:12px;margin:11px 2px 0;padding:11px 13px;
+  background:#fffdf9;border-left:3px solid #E8A64C}
+@media(max-width:640px){ .step-open{margin-left:16px;margin-right:16px} }
+.so-body{flex:1;min-width:0}
+.so-eyebrow{display:inline-flex;align-items:center;gap:6px;font-family:var(--display);
+  font-weight:800;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#b3874a}
+.so-step{margin:4px 0 0;font-size:14.5px;line-height:1.4;color:var(--ink)}
+.so-step em{font-style:normal;color:var(--muted);font-size:13px}
+.so-btn{flex:0 0 auto;border:1.5px solid var(--ink);background:none;color:var(--ink);cursor:pointer;
+  padding:8px 12px;font-family:var(--display);font-weight:800;font-size:9.5px;
+  letter-spacing:.1em;text-transform:uppercase;min-height:38px;max-width:38%}
+.so-btn:hover{background:var(--ink);color:#fff}
+.so-btn.on{border-color:#84917A;color:#84917A;background:none}
+
+/* --- no feed: a continuacao --- */
+.step-result{margin:0 2px 9px;padding:10px 13px;background:var(--night);color:#FAF7F2}
+@media(max-width:640px){ .step-result{margin-left:16px;margin-right:16px} }
+.sr-eyebrow{font-family:var(--display);font-weight:800;font-size:9.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:#E8A64C}
+.sr-step{margin:4px 0 8px;font-size:14.5px;line-height:1.4;color:rgba(250,247,242,.9);font-style:italic}
+.sr-tag{display:inline-block;font-family:var(--display);font-weight:800;font-size:9.5px;
+  letter-spacing:.12em;text-transform:uppercase;color:#10132D;background:#E8A64C;padding:3px 9px}

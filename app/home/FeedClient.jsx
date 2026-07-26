@@ -11,6 +11,7 @@ import ChallengeButton from '../../components/ChallengeButton';
 import Transformacao from '../../components/Transformacao';
 import Amanha from '../../components/Amanha';
 import Retornos from '../../components/Retornos';
+import { StepOpen, StepResult } from '../../components/StepChapter';
 import { MOODS, moodGlow } from '../../lib/moods';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
@@ -75,6 +76,10 @@ function DayPager({ item, labels, dayLabel, dark }) {
 
   return (
     <>
+      {d.closes && d.closes.step && (
+        <StepResult decided={d.closes.step} name={(item.owner.name || '').split(' ')[0]} labels={labels.step} />
+      )}
+
       <div className={`dp-stage${hasMedia ? '' : ' is-text'}`}>
         <div className="dp-slide" key={d.id}>
           {hasMedia ? (
@@ -105,6 +110,11 @@ function DayPager({ item, labels, dayLabel, dark }) {
             <span className="mp-pct">{pct}%</span>
           </div>
         </div>
+      )}
+
+      {d.nextStep && (
+        <StepOpen updateId={d.id} step={d.nextStep} when={d.nextWhen}
+          name={(item.owner.name || '').split(' ')[0]} following={d.stepFollowing} own={item.own} labels={labels.step} />
       )}
 
       <ActionsRow people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])}>
@@ -377,6 +387,9 @@ export default function FeedClient({ labels }) {
               <DayPager item={item} labels={labels} dayLabel={dayLabel} dark={idx % 3 === 2} />
             ) : (
             <>
+            {item.closes && item.closes.step && (
+              <StepResult decided={item.closes.step} name={(item.owner.name || '').split(' ')[0]} labels={labels.step} />
+            )}
             {item.comeback && <div className="entry-comeback">{(labels.comebackFmt || '').replace('{d}', item.comeback)}</div>}
             {item.kind === 'setback' && <div className="entry-kindline setback">{labels.tagSetback}</div>}
             {item.kind === 'win' && <div className="entry-kindline win">{labels.tagWin}</div>}
@@ -422,6 +435,10 @@ export default function FeedClient({ labels }) {
               );
             })()}
 
+            {item.nextStep && (
+              <StepOpen updateId={item.id} step={item.nextStep} when={item.nextWhen}
+                name={(item.owner.name || '').split(' ')[0]} following={item.stepFollowing} own={item.own} labels={labels.step} />
+            )}
             {item.demo ? (
               <DemoActions item={item} labels={labels} />
             ) : (

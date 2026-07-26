@@ -67,7 +67,7 @@ export async function GET(req) {
   let updates = [];
   if (targetIds.length) {
     let updatesQuery = supabase.from('updates')
-      .select('id, day_number, kind, text, photo_url, video_url, journey_id, created_at')
+      .select('id, day_number, kind, text, photo_url, video_url, journey_id, created_at, next_step, next_when, closed_by')
       .in('journey_id', targetIds);
 
     if (VALID_KINDS.has(kind)) updatesQuery = updatesQuery.eq('kind', kind);
@@ -228,12 +228,28 @@ export async function GET(req) {
   const myEncAll = new Set((encAllR.data || []).map((e) => e.update_id));
   (tracksAllR.data || []).forEach((item) => { trackByUpdate[item.id] = { title: item.track_title, artist: item.track_artist, audio_url: item.track_audio_url }; });
 
+  // capítulos: quais passos eu acompanho e qual passo cada dia fechou
+  const meusPassos = new Set();
+  const passoFechadoPor = {};
+  try {
+    const idsDia = updates.map((u) => u.id);
+    if (idsDia.length) {
+      const { data: sf } = await supabase.from('step_follows').select('update_id').eq('user_id', user.id).in('update_id', idsDia);
+      (sf || []).forEach((r) => meusPassos.add(r.update_id));
+      const { data: fechados } = await supabase.from('updates')
+        .select('next_step, next_when, closed_by').in('closed_by', idsDia);
+      (fechados || []).forEach((r) => { if (r.closed_by) passoFechadoPor[r.closed_by] = { step: r.next_step, when: r.next_when }; });
+    }
+  } catch {}
+
   const realItems = updates.map((item) => {
     const journey = journeyMap[item.journey_id];
     if (!journey) return null;
     const daysArr = (fullDaysByJourney[item.journey_id] || []).slice(-60).map((u) => ({
       id: u.id, day_number: u.day_number, kind: u.kind, text: u.text, photo_url: u.photo_url, video_url: u.video_url, created_at: u.created_at,
       encouraged: myEncAll.has(u.id), track: trackByUpdate[u.id] || null, comeback: comebackByUpdate[u.id] || null,
+      nextStep: u.closed_by ? null : (u.next_step || null), nextWhen: u.next_when || null,
+      stepFollowing: meusPassos.has(u.id), closes: passoFechadoPor[u.id] || null,
     }));
     return {
       ...item,
@@ -244,6 +260,8 @@ export async function GET(req) {
       owner: { ...(profileMap[journey.owner_id] || {}), mood: ownerMoodById[journey.owner_id] || null },
       own: journey.owner_id === user.id,
       track: trackByUpdate[item.id] || null,
+      nextStep: item.closed_by ? null : (item.next_step || null), nextWhen: item.next_when || null,
+      stepFollowing: meusPassos.has(item.id), closes: passoFechadoPor[item.id] || null,
       encouraged: myEnc.has(item.id),
       supporters: supportersByUpdate[item.id] || [],
       comeback: comebackByUpdate[item.id] || null,
