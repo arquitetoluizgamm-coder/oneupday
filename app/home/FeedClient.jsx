@@ -547,7 +547,7 @@ export default function FeedClient({ labels }) {
                   {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}
                 </span>
                 <span className="entry-id">
-                  <b>{item.owner.name}{item.owner.mood && (labels.moods || {})[item.owner.mood] && <span className="entry-mood" style={{ color: MOODS[item.owner.mood] }}> · {labels.moods[item.owner.mood]}</span>}</b>
+                  <b>{item.owner.name}{item.historia && <span className="hist-selo">{labels.histSelo}</span>}{item.owner.mood && (labels.moods || {})[item.owner.mood] && <span className="entry-mood" style={{ color: MOODS[item.owner.mood] }}> · {labels.moods[item.owner.mood]}</span>}</b>
                   <small><span className="entry-journey">{item.journey.title}</span> · {dayLabel(item.day_number)}</small>
                 </span>
               </a>
@@ -609,6 +609,16 @@ export default function FeedClient({ labels }) {
               <StepOpen updateId={item.id} step={item.nextStep} when={item.nextWhen}
                 name={(item.owner.name || '').split(' ')[0]} following={item.stepFollowing} own={item.own} labels={labels.step} />
             )}
+            {/* A revelacao vem depois do dia 7, que e o que o feed mostra:
+                a pessoa le a historia inteira e so entao descobre o convite. */}
+            {item.historia && (
+              <a className="hist-reveal" href="/new">
+                <b>{labels.histTitle}</b>
+                <span>{labels.histSub}</span>
+                <em>{labels.histCta}</em>
+              </a>
+            )}
+
             {item.demo ? (
               <DemoActions item={item} labels={labels} />
             ) : (

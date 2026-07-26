@@ -226,7 +226,9 @@ function DemoJourneyPage({ story, t, locale }) {
 
         <div className="who">
           <span className="ava" style={{ background: story.owner.avatarColor || 'var(--orange)' }}>
-            <img src={story.owner.avatarUrl} alt="" />
+            {story.owner.avatarUrl
+              ? <img src={story.owner.avatarUrl} alt="" />
+              : (story.owner.name || '?')[0]}
           </span>
           <div className="who-name">
             <b>{story.owner.name}</b>
