@@ -7,6 +7,10 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
+  "categories": ["social", "lifestyle", "health"],
+  "prefer_related_applications": false,
+  "lang": "pt-BR",
+  "dir": "ltr",
   "theme_color": "#FAF7F2",
   "background_color": "#FAF7F2",
   "icons": [

@@ -1,51 +1,49 @@
 -- ============================================================
--- PUSH INSTANTÂNEO
--- Faz o banco chamar o disparador assim que uma notificação
--- nasce — a pessoa recebe em segundos, sem esperar o cron.
+-- PUSH INSTANTÂNEO (v2 — chave no corpo, não no cabeçalho)
 --
--- ANTES DE RODAR: troque COLE_SEU_CRON_SECRET_AQUI (2 lugares)
--- pelo valor do CRON_SECRET que está no CHAVES-VERCEL.txt
+-- ATENÇÃO: esta é a versão SEGURA para o GitHub.
+-- A chave real foi trocada por COLE_AQUI_O_CRON_SECRET.
+-- A versão com a chave preenchida fica só na sua máquina, em
+-- web/supabase/push-instantaneo.sql — essa NUNCA vai para o GitHub.
+--
+-- Se precisar rodar de novo: copie este arquivo, troque as duas
+-- ocorrências de COLE_AQUI_O_CRON_SECRET pelo valor do CRON_SECRET
+-- (Vercel -> Settings -> Environment Variables) e rode no SQL Editor.
 -- ============================================================
 
--- 1. Extensão que permite o banco fazer chamadas HTTP
 create extension if not exists pg_net with schema extensions;
 
--- 2. Função: chama o disparador do push
 create or replace function public.disparar_push()
 returns trigger
 language plpgsql
 security definer
+set search_path = public, extensions, net
 as $$
 begin
   perform net.http_post(
     url := 'https://oneupday.app/api/push/send',
-    headers := jsonb_build_object(
-      'Content-Type', 'application/json',
-      'Authorization', 'Bearer JVnoKnlnAPYcwczf5OdINnJcaLb7vRZX'
-    ),
-    body := '{}'::jsonb
+    headers := jsonb_build_object('Content-Type', 'application/json'),
+    body := jsonb_build_object('key', 'COLE_AQUI_O_CRON_SECRET')
   );
   return new;
 exception when others then
-  -- nunca deixa o push quebrar a criação da notificação
   return new;
 end $$;
 
--- 3. Gatilho: toda notificação nova aciona o disparador
 drop trigger if exists trg_disparar_push on public.notifications;
 create trigger trg_disparar_push
   after insert on public.notifications
   for each row execute function public.disparar_push();
 
--- ============================================================
--- TESTE MANUAL (opcional): roda o disparador agora mesmo.
--- Troque o secret aqui também antes de executar.
--- ============================================================
--- select net.http_post(
---   url := 'https://oneupday.app/api/push/send',
---   headers := jsonb_build_object(
---     'Content-Type', 'application/json',
---     'Authorization', 'Bearer COLE_SEU_CRON_SECRET_AQUI'
---   ),
---   body := '{}'::jsonb
--- );
+-- Teste imediato
+select net.http_post(
+  url := 'https://oneupday.app/api/push/send',
+  headers := jsonb_build_object('Content-Type', 'application/json'),
+  body := jsonb_build_object('key', 'COLE_AQUI_O_CRON_SECRET')
+) as id_da_chamada;
+
+-- Confira 5 segundos depois (rode esta parte sozinha):
+-- select id, status_code, content, created
+--   from net._http_response
+--  order by id desc
+--  limit 3;

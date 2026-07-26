@@ -55,6 +55,30 @@ export async function GET() {
     };
     return NextResponse.json(out);
   }
+  // 3b. quem sou eu e quais notificacoes chegaram pra mim
+  try {
+    const { data: me } = await supabase.from('profiles').select('name, handle, push_on, notif_paused').eq('id', user.id).maybeSingle();
+    const { data: notifs } = await supabase.from('notifications')
+      .select('type, actor_id, pushed, read, created_at')
+      .eq('recipient_id', user.id).order('created_at', { ascending: false }).limit(8);
+    const pend = (notifs || []).filter((n) => n.pushed === false).length;
+    out.passos['3b_quem_sou_eu'] = {
+      conta_logada_agora: `${me?.name || '?'} (${me?.handle || '?'})`,
+      ATENCAO: 'As notificacoes chegam para o DONO do post. Se voce curtiu com esta mesma conta, nada e enviado (ninguem se notifica sozinho). O celular precisa estar logado na conta que RECEBE.',
+      push_ligado_no_perfil: me?.push_on === false ? 'NAO — reative no Perfil' : 'sim',
+      notificacoes_pausadas: me?.notif_paused ? 'SIM — desative a pausa nas notificacoes' : 'nao',
+      minhas_ultimas_notificacoes: (notifs || []).map((n) => ({
+        tipo: n.type, enviada_por_push: n.pushed ? 'sim' : 'ainda nao', quando: n.created_at,
+      })),
+      total_esperando_envio: pend,
+      LEITURA: (notifs || []).length === 0
+        ? 'NENHUMA NOTIFICACAO CHEGOU PARA ESTA CONTA. Ou a curtida veio desta mesma conta, ou foi em post de outra pessoa.'
+        : pend > 0
+          ? 'Existem notificacoes esperando. O disparador ainda nao rodou ou falhou.'
+          : 'As notificacoes ja foram processadas para push.',
+    };
+  } catch (e) {}
+
   const subs = r.data || [];
   out.passos['3_inscricoes_deste_aparelho'] = {
     total: subs.length,

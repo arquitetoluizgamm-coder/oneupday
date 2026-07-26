@@ -15,6 +15,7 @@ export default function PushToggle({ vapidKey, labels }) {
   const L = labels || {};
   const [state, setState] = useState('loading'); // loading | off | on | unsupported | denied
   const [busy, setBusy] = useState(false);
+  const [testMsg, setTestMsg] = useState('');
 
   useEffect(() => {
     let alive = true;
@@ -75,17 +76,31 @@ export default function PushToggle({ vapidKey, labels }) {
     setBusy(false);
   }
 
+  async function sendTest() {
+    if (busy) return;
+    setBusy(true); setTestMsg('');
+    const r = await fetch('/api/push/test', { method: 'POST' }).catch(() => null);
+    setTestMsg(r && r.ok ? (L.testSent || '') : (L.testFail || ''));
+    setBusy(false);
+    setTimeout(() => setTestMsg(''), 6000);
+  }
+
   if (state === 'loading' || state === 'unsupported') return null;
 
   return (
     <div className="push-row">
       <div className="push-info">
         <b>{L.title}</b>
-        <p>{state === 'denied' ? L.denied : state === 'on' ? L.onSub : L.offSub}</p>
+        <p>{testMsg || (state === 'denied' ? L.denied : state === 'on' ? L.onSub : L.offSub)}</p>
       </div>
       {state !== 'denied' && (
         state === 'on'
-          ? <button type="button" className="ghost-btn" onClick={disable} disabled={busy}>{L.turnOff}</button>
+          ? (
+            <div className="push-acts">
+              <button type="button" className="ghost-btn" onClick={sendTest} disabled={busy}>{L.test}</button>
+              <button type="button" className="ghost-btn" onClick={disable} disabled={busy}>{L.turnOff}</button>
+            </div>
+          )
           : <button type="button" className="cta" onClick={enable} disabled={busy}>{busy ? L.wait : L.turnOn}</button>
       )}
     </div>
