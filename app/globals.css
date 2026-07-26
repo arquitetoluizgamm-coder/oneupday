@@ -3715,3 +3715,44 @@ h1 { letter-spacing: -0.03em; }
   .feed-acts .sl-title{max-width:64%}
   .feed-acts .sl-text{letter-spacing:.06em}
 }
+
+/* ============================================================
+   CARDS EM 4:5 — mesma pegada do video vertical
+   O 4:3 vinha do tempo do carrossel. Com o video vertical
+   ocupando a tela em pe, o card de texto deitado destoava a cada
+   rolagem. Agora os dois respiram no mesmo ritmo.
+   O card ficou 67% mais alto: a tipografia sobe junto, senao o
+   texto vira uma ilha no meio do vazio.
+   ============================================================ */
+.dp-card,
+.feed-page .entry-textcard{aspect-ratio:4/5!important;min-height:0}
+.dp-empty{aspect-ratio:4/5}
+
+/* enquanto a midia nao carrega, o vazio ja nasce em pe:
+   e o formato mais provavel, entao o salto de layout fica menor */
+.feed-page .entry-media{aspect-ratio:4/5}
+.feed-page .entry-media.livre{aspect-ratio:4/5}
+
+/* respiro maior num card maior */
+.dp-card{padding:38px 30px}
+@media(max-width:640px){ .dp-card{padding:34px 24px} }
+
+/* escala de tipo recalibrada para a altura nova */
+.entry-textcard .dpc-text.short,
+.dp-card .dpc-text.short{font-size:32px;line-height:1.24;-webkit-line-clamp:7}
+.entry-textcard .dpc-text,
+.dp-card .dpc-text{font-size:26px;line-height:1.32;-webkit-line-clamp:9}
+.entry-textcard .dpc-text.long,
+.dp-card .dpc-text.long{font-size:20px;line-height:1.45;-webkit-line-clamp:12}
+
+@media(max-width:640px){
+  .entry-textcard .dpc-text.short,
+  .dp-card .dpc-text.short{font-size:30px;-webkit-line-clamp:7}
+  .entry-textcard .dpc-text,
+  .dp-card .dpc-text{font-size:24px;-webkit-line-clamp:9}
+  .entry-textcard .dpc-text.long,
+  .dp-card .dpc-text.long{font-size:19px;-webkit-line-clamp:12}
+}
+
+/* aspa decorativa acompanha o card maior */
+.dp-card.dark::before{top:6px;left:22px;font-size:64px}
