@@ -3,7 +3,7 @@ import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
 import { getDemoStory } from '../../lib/demoStories';
 import { comCapa } from '../../lib/media';
-import Logo from '../../components/Logo';
+import AppTop from '../../components/AppTop';
 import ShareButton from './ShareButton';
 import Dia1Card from './Dia1Card';
 import ChallengeButton from './ChallengeButton';
@@ -21,7 +21,12 @@ import Comments from '../../components/Comments';
 import { notFound } from 'next/navigation';
 import Track from '../../components/Track';
 
-export const revalidate = 60;
+// O topo agora mostra avatar e sino de quem esta olhando, ou seja a
+// pagina depende da sessao. Ela ja era dinamica de fato (o codigo le
+// cookies para saber quem apoiou o quê), mas com 'revalidate' no
+// arquivo isso ficava implicito — e um cache errado aqui serviria o
+// avatar de uma pessoa para outra. Agora esta declarado.
+export const dynamic = 'force-dynamic';
 
 async function loadJourney(slug) {
   try {
@@ -122,12 +127,7 @@ async function ProfilePage({ handle }) {
   } catch {}
   return (
     <>
-      <header className="top">
-        <Logo />
-        <div className="top-right">
-          <a className="cta" href="/login">{t.startYourJourney}</a>
-        </div>
-      </header>
+      <AppTop />
       <main className="wrap">
         <section className="profile-card">
           <div className="pc-banner" style={profile.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : undefined}></div>
@@ -206,12 +206,7 @@ function DemoJourneyPage({ story, t, locale }) {
 
   return (
     <>
-      <header className="top">
-        <Logo />
-        <div className="top-right">
-          <a className="cta" href="/login">{t.startYourJourney}</a>
-        </div>
-      </header>
+      <AppTop />
 
       <Track type="demo_journey_view" meta={{ slug: story.slug }} />
       <main className="wrap">
@@ -331,12 +326,7 @@ export default async function JourneyPage({ params, searchParams }) {
 
   return (
     <>
-      <header className="top">
-        <Logo />
-        <div className="top-right">
-          <a className="cta" href="/login">{t.startYourJourney}</a>
-        </div>
-      </header>
+      <AppTop />
 
       <Track type="journey_view" meta={{ slug: journey.slug }} />
       {fromShare && <Track type="card_clicked" meta={{ slug: journey.slug }} />}

@@ -4225,3 +4225,38 @@ h1 { letter-spacing: -0.03em; }
 .pc-meta .pc-sub{margin-top:0;line-height:1.34}
 .pc-meta .pc-sub span{line-height:1.34}
 .pc-meta .pc-consistency{margin-top:7px}
+
+/* ============================================================
+   PERFIL — os dois botoes entraram no card
+   Fora do card, o + e a engrenagem dividiam a linha com o Upi:
+   o resultado era 44+44+gap comendo a largura da fala dele, que
+   quebrava a cada palavra. Agora eles moram no canto do card, na
+   linha do nome, e o Upi fica com a linha inteira embaixo.
+   ============================================================ */
+.pc-info{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:'ava acoes-topo' 'meta acoes';
+  align-items:end;
+  column-gap:12px;row-gap:0;
+}
+.pc-info > .pc-avatar{grid-area:ava;justify-self:start}
+.pc-info > .pc-meta{grid-area:meta}
+.pc-acoes{
+  grid-area:acoes;
+  display:flex;align-items:center;gap:8px;
+  padding-bottom:2px;
+}
+
+/* o Upi sozinho na linha: nada mais disputa a largura com ele */
+.pc-bar{display:block;flex-wrap:nowrap}
+.pc-bar-upi{flex:none;width:100%}
+
+@media(max-width:339px){
+  /* so nos aparelhos muito estreitos (iPhone SE 1a geracao e afins):
+     ali os 96px dos botoes deixariam menos de 130px para o nome. Eles
+     descem para a direita, abaixo do nome. Num celular de 390px eles
+     continuam na linha do nome, com 218px sobrando para ele. */
+  .pc-info{grid-template-columns:100%;grid-template-areas:'ava' 'meta' 'acoes'}
+  .pc-acoes{justify-content:flex-end;padding-top:12px;padding-bottom:0}
+}

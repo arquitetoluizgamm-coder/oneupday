@@ -1,7 +1,7 @@
 import { getSupabase } from '../../../lib/supabase';
 import { getLocale } from '../../../lib/locale';
 import { getDict, fill } from '../../../lib/i18n';
-import Logo from '../../../components/Logo';
+import AppTop from '../../../components/AppTop';
 import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -49,7 +49,7 @@ export default async function Group({ params }) {
 
   return (
     <>
-      <header className="top"><Logo href="/" /><div className="top-right"><a className="cta" href="/login">{t.startYourJourney}</a></div></header>
+      <AppTop />
       <main className="wrap">
         <section className="group-hero">
           <p className="eyebrow">{t.groups}</p>

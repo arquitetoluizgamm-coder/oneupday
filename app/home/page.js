@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '../../lib/supabase/server';
 import { getLocale } from '../../lib/locale';
 import { getDict } from '../../lib/i18n';
-import Logo from '../../components/Logo';
+import AppTop from '../../components/AppTop';
 import BottomNav from '../../components/BottomNav';
 import FeedClient from './FeedClient';
 import Composer from './Composer';
@@ -10,7 +10,6 @@ import NextStep from './NextStep';
 import ProgressBar from '../../components/ProgressBar';
 import Track from '../../components/Track';
 import ScrollChrome from '../../components/ScrollChrome';
-import HeaderHeart from '../../components/HeaderHeart';
 import DailyMood from '../../components/DailyMood';
 import NextChapter from '../../components/NextChapter';
 import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
@@ -120,19 +119,10 @@ export default async function Home() {
 
   return (
     <>
-      <header className="top top-3">
-        <div className="top-left">
-          <HeaderHeart likes={heartLikes} follows={heartFollows} unread={unread || 0} ariaLabel={t.notifications} />
-        </div>
-        <a className="top-brand" href="/home" aria-label="One Up Day">
-          <img src="/logo-name.png" alt="One Up Day" />
-        </a>
-        <div className="top-right">
-          <a className="header-ava" href="/perfil" aria-label={profile.name} style={{ background: profile.avatar_color || 'var(--orange)', ...(myMood && MOODS[myMood] ? { boxShadow: moodGlow(MOODS[myMood]) } : {}) }}>
-            {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : profile.name[0]}
-          </a>
-        </div>
-      </header>
+      {/* mesmo topo do resto do app. A home passa os numeros do sino
+          porque ja os calculou aqui — evita repetir as consultas. */}
+      <AppTop likes={heartLikes} follows={heartFollows} unread={unread || 0}
+        avatarStyle={myMood && MOODS[myMood] ? { boxShadow: moodGlow(MOODS[myMood]) } : undefined} />
 
       <Track type="visit" meta={{ page: "home" }} />
       <ScrollChrome />

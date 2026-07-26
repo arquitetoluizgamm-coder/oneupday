@@ -2,7 +2,7 @@ import { redirect, notFound } from 'next/navigation';
 import { createClient } from '../../../lib/supabase/server';
 import { getLocale } from '../../../lib/locale';
 import { getDict } from '../../../lib/i18n';
-import Logo from '../../../components/Logo';
+import AppTop from '../../../components/AppTop';
 import LoopMarca from '../../../components/LoopMarca';
 import ShareButton from '../../[slug]/ShareButton';
 import Dia1Card from '../../[slug]/Dia1Card';
@@ -30,7 +30,7 @@ export default async function Created({ params }) {
 
   return (
     <>
-      <header className="top"><Logo href="/home" /></header>
+      <AppTop />
       <main className="wrap">
         <section className="success">
           <div className="success-mark"><LoopMarca size={168} /></div>

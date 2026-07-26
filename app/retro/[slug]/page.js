@@ -2,7 +2,7 @@ import { redirect, notFound } from 'next/navigation';
 import { createClient } from '../../../lib/supabase/server';
 import { getLocale } from '../../../lib/locale';
 import { getDict, fill } from '../../../lib/i18n';
-import Logo from '../../../components/Logo';
+import AppTop from '../../../components/AppTop';
 import ShareButton from '../../[slug]/ShareButton';
 
 export const dynamic = 'force-dynamic';
@@ -38,7 +38,7 @@ export default async function Retro({ params }) {
 
   return (
     <>
-      <header className="top"><Logo href="/home" /><div className="top-right"><a className="ghost-btn" href="/home">{t.navHome}</a></div></header>
+      <AppTop />
       <main className="wrap">
         <section className="retro-cover" style={{ background: `linear-gradient(135deg, var(--night), ${journey.cover_color})` }}>
           <p className="eyebrow">{t.retroTitle}</p>
