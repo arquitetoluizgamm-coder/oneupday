@@ -67,24 +67,42 @@ function TrackTag({ track, float, hasBar }) {
   );
 }
 
-// ---- Foto e vídeo mantêm o enquadramento de quem postou ----
-// Sem carrossel, não há mais motivo para cortar tudo em 4:3: a pessoa
-// escolheu o quadro na hora de postar. Só travamos os extremos — nada
-// mais alto que 4:5 (senão um post sozinho toma a tela inteira) nem mais
-// largo que 16:9 (senão vira uma tira). O card de TEXTO continua 4:3.
-const RATIO_ALTO = 4 / 5;      // limite retrato
-const RATIO_LARGO = 16 / 9;    // limite paisagem
+// ============================================================
+// MÍDIA — a foto e o vídeo mantêm o enquadramento de quem postou
+//
+// Sem carrossel, não há motivo para cortar tudo em 4:3. Mas os limites
+// são DIFERENTES para foto e vídeo, e de propósito:
+//
+//   FOTO  vai até 4:5. Foto vertical extrema é rara e quase sempre é
+//         print de tela — não vale entregar meia tela a um print.
+//   VÍDEO vai até 9:16. Vídeo de celular é 9:16 na esmagadora maioria;
+//         forçar 4:5 corta 30% da altura, ou seja, corta a pessoa.
+//
+// O teto de altura (78svh, no CSS) é o que impede o vídeo vertical de
+// engolir a tela inteira. Isto aqui não é o TikTok: embaixo do vídeo
+// existem os ícones de apoio, e eles são o ponto da rede. Se ninguém
+// enxerga o "Estou com você" sem rolar, a rede deixa de acontecer.
+// ============================================================
+const RATIO_ALTO_FOTO = 4 / 5;    // limite retrato da foto
+const RATIO_ALTO_VIDEO = 9 / 16;  // limite retrato do vídeo
+const RATIO_LARGO = 16 / 9;       // limite paisagem dos dois
+const LIMITE_VERTICAL = 0.85;     // abaixo disso é "vertical" para a legenda
 
-function Media({ photo, video, href, labels, children }) {
+const ehVertical = (r) => r !== null && r !== undefined && r < LIMITE_VERTICAL;
+
+function Media({ photo, video, href, labels, caption, onRatio, children }) {
   // começa em 4:3 (o padrão do CSS) e ajusta assim que sabe o tamanho real
   const [nat, setNat] = useState(null);   // proporção real do arquivo
-  const [encher, setEncher] = useState(false);
+  const [inteiro, setInteiro] = useState(false); // ver o quadro todo (contain)
   const L = labels || {};
 
-  const r = nat ? Math.min(RATIO_LARGO, Math.max(RATIO_ALTO, nat)) : null;
+  const minimo = video ? RATIO_ALTO_VIDEO : RATIO_ALTO_FOTO;
+  const r = nat ? Math.min(RATIO_LARGO, Math.max(minimo, nat)) : null;
   const style = r ? { aspectRatio: String(r) } : undefined;
-  // um 9:16 dentro de um quadro 4:5 sobra dos dois lados: aí vale oferecer preencher
-  const sobra = !!(nat && r && Math.abs(nat - r) > 0.02);
+  const vertical = ehVertical(r);
+  const cortado = !!(nat && r && Math.abs(nat - r) > 0.02);
+
+  useEffect(() => { if (onRatio && r) onRatio(r); }, [r]);
 
   const conteudo = video ? (
     <video
@@ -108,40 +126,108 @@ function Media({ photo, video, href, labels, children }) {
     />
   );
 
-  // botão só no vídeo e só quando existe sobra de verdade
-  const alternar = video && sobra ? (
+  // botão só no vídeo, e só quando há corte de verdade (ou teto de altura)
+  const alternar = video && (cortado || vertical) ? (
     <button
       type="button"
       className="media-fit"
-      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEncher((v) => !v); }}
-      aria-label={encher ? (L.videoFit || 'Ajustar') : (L.videoFill || 'Preencher')}
-      title={encher ? (L.videoFit || 'Ajustar') : (L.videoFill || 'Preencher')}
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setInteiro((v) => !v); }}
+      aria-label={inteiro ? (L.videoFill || 'Preencher') : (L.videoFit || 'Ajustar')}
+      title={inteiro ? (L.videoFill || 'Preencher') : (L.videoFit || 'Ajustar')}
     >
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        {encher ? (
-          // setas para dentro = voltar a caber inteiro
-          <><path d="M9 3v6H3" /><path d="M15 21v-6h6" /><path d="M21 3l-6 6" /><path d="M3 21l6-6" /></>
-        ) : (
+        {inteiro ? (
           // setas para fora = preencher o quadro
           <><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></>
+        ) : (
+          // setas para dentro = ver o quadro inteiro
+          <><path d="M9 3v6H3" /><path d="M15 21v-6h6" /><path d="M21 3l-6 6" /><path d="M3 21l6-6" /></>
         )}
       </svg>
     </button>
   ) : null;
 
-  const cls = `entry-media livre${encher ? ' encher' : ''}`;
+  // legenda POR CIMA só no vertical: embaixo de um vídeo de 650px ela
+  // cairia fora da tela e ninguém leria
+  const legenda = video && vertical && caption ? (
+    <LegendaSobreposta text={caption} labels={L} />
+  ) : null;
+
+  const cls = `entry-media livre${vertical ? ' vertical' : ''}${inteiro ? ' inteiro' : ''}`;
 
   // vídeo não vira link: o toque é para dar play, não para navegar
   if (href && !video) {
-    return <a href={href} className={cls} style={style}>{conteudo}{children}</a>;
+    return <a href={href} className={cls} style={style}>{conteudo}{legenda}{children}</a>;
   }
-  return <div className={cls} style={style}>{conteudo}{alternar}{children}</div>;
+  return <div className={cls} style={style}>{conteudo}{alternar}{legenda}{children}</div>;
+}
+
+// ---- Legenda sobre o vídeo vertical, com "ler mais" ----
+// Fica ACIMA da barra de controle do vídeo, não em cima dela.
+function LegendaSobreposta({ text, labels }) {
+  const [aberta, setAberta] = useState(false);
+  const longo = text.length > 90;
+
+  return (
+    <div className={`media-cap${aberta ? ' aberta' : ''}`} onClick={(e) => e.stopPropagation()}>
+      <p className={aberta ? 'expanded' : 'clamp2'}>{text}</p>
+      {longo && (
+        <button
+          type="button"
+          className="media-cap-more"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAberta((v) => !v); }}
+        >
+          {aberta ? (labels.lessText || 'menos') : (labels.moreText || 'ler mais')}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ---- Mídia + legenda do item solto do feed ----
+// Componente próprio, e não um trecho inline, porque hooks não podem
+// morar dentro de um .map(): a ordem mudaria a cada item da lista.
+function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat }) {
+  const [proporcao, setProporcao] = useState(null);
+  const soVideo = !!(item.video_url && !item.photo_url);
+  const legendaEmCima = soVideo && ehVertical(proporcao);
+
+  return (
+    <>
+      {item.photo_url && <Media photo={item.photo_url} href={`/${item.journey.slug}`}>{trackFloat}</Media>}
+      {item.video_url && !item.photo_url && (
+        <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackFloat}</Media>
+      )}
+      {!hasMedia && !cleanText && item.track && <TrackTag track={item.track} />}
+      {cleanText && !legendaEmCima && (
+        <div className="dp-text under"><EntryText text={cleanText} labels={labels} limit={100} /></div>
+      )}
+    </>
+  );
+}
+
+// ---- Mídia da galeria (post de foto/vídeo solto) ----
+function MidiaGaleria({ item, labels }) {
+  const [proporcao, setProporcao] = useState(null);
+  const legendaEmCima = item.kind === 'video' && ehVertical(proporcao);
+
+  return (
+    <>
+      {item.kind === 'video'
+        ? <Media video={item.url} labels={labels} caption={item.caption} onRatio={setProporcao} />
+        : <Media photo={item.url} />}
+      {item.caption && !legendaEmCima && (
+        <div className="dp-text under"><EntryText text={item.caption} labels={labels} limit={100} /></div>
+      )}
+    </>
+  );
 }
 
 // ---- Um card por jornada: mostra o dia mais recente. Sem slides. ----
 function DayPager({ item, labels, dayLabel, dark }) {
   const [days, setDays] = useState(item.days || []);
+  const [proporcao, setProporcao] = useState(null);
   if (!days.length) return null;
   const d = days[days.length - 1];
   const total = item.journey.total_days || 0;
@@ -150,6 +236,9 @@ function DayPager({ item, labels, dayLabel, dark }) {
   const cleanText = d.text && d.text !== '📷' && d.text !== '🎥' ? d.text : '';
   const hasMedia = !!(d.photo_url || d.video_url);
   const trackEl = d.track ? <TrackTag key={'t' + d.id} track={d.track} float hasBar={false} /> : null;
+  // vídeo vertical leva a legenda por cima; nesse caso ela não se repete embaixo
+  const soVideo = !!(d.video_url && !d.photo_url);
+  const legendaEmCima = soVideo && ehVertical(proporcao);
 
   return (
     <>
@@ -162,7 +251,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
           {hasMedia ? (
             <>
               {d.photo_url && <Media photo={d.photo_url} href={`/${item.journey.slug}`}>{trackEl}</Media>}
-              {d.video_url && !d.photo_url && <Media video={d.video_url} labels={labels}>{trackEl}</Media>}
+              {d.video_url && !d.photo_url && <Media video={d.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackEl}</Media>}
             </>
           ) : (
             <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}`}>
@@ -173,7 +262,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
         </div>
       </div>
 
-      {hasMedia && cleanText && (
+      {hasMedia && cleanText && !legendaEmCima && (
         <div className="dp-text under">
           <EntryText key={'x' + d.id} text={cleanText} labels={labels} limit={100} />
         </div>
@@ -441,8 +530,7 @@ export default function FeedClient({ labels }) {
               </span>
               <span className="entry-id"><b>{item.owner.name}</b></span>
             </a>
-            {item.kind === 'video' ? <Media video={item.url} labels={labels} /> : <Media photo={item.url} />}
-            {item.caption && <div className="dp-text under"><EntryText text={item.caption} labels={labels} limit={100} /></div>}
+            <MidiaGaleria item={item} labels={labels} />
             <div className="entry-actions feed-acts">
               <EncourageBar mediaId={item.mediaId} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
               <Comments mediaId={item.mediaId} labels={labels.comments} />
@@ -510,10 +598,8 @@ export default function FeedClient({ labels }) {
               }
               return (
                 <>
-                  {item.photo_url && <Media photo={item.photo_url} href={`/${item.journey.slug}`}>{trackFloat}</Media>}
-                  {item.video_url && !item.photo_url && <Media video={item.video_url} labels={labels}>{trackFloat}</Media>}
-                  {!hasMedia && !cleanText && item.track && <TrackTag track={item.track} />}
-                  {cleanText && <div className="dp-text under"><EntryText text={cleanText} labels={labels} limit={100} /></div>}
+                  <MidiaComLegenda item={item} labels={labels} cleanText={cleanText}
+                    hasMedia={hasMedia} trackFloat={trackFloat} />
                   {progressEl}
                 </>
               );
