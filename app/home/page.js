@@ -121,7 +121,7 @@ export default async function Home() {
     <>
       {/* mesmo topo do resto do app. A home passa os numeros do sino
           porque ja os calculou aqui — evita repetir as consultas. */}
-      <AppTop likes={heartLikes} follows={heartFollows} unread={unread || 0}
+      <AppTop sino likes={heartLikes} follows={heartFollows} unread={unread || 0}
         avatarStyle={myMood && MOODS[myMood] ? { boxShadow: moodGlow(MOODS[myMood]) } : undefined} />
 
       <Track type="visit" meta={{ page: "home" }} />

@@ -4244,8 +4244,11 @@ h1 { letter-spacing: -0.03em; }
 .pc-info > .pc-meta{grid-area:meta}
 .pc-acoes{
   grid-area:acoes;
+  align-self:end;          /* colados na base do card, nao na linha do nome */
   display:flex;align-items:center;gap:8px;
-  padding-bottom:2px;
+  /* -3px: o texto tem espaco para as pernas do "g" e do "p" abaixo da
+     linha de base. Sem isso os botoes parecem 3px altos demais. */
+  margin-bottom:-3px;
 }
 
 /* o Upi sozinho na linha: nada mais disputa a largura com ele */

@@ -2,6 +2,7 @@ import { createClient } from '../lib/supabase/server';
 import { getLocale } from '../lib/locale';
 import { getDict } from '../lib/i18n';
 import HeaderHeart from './HeaderHeart';
+import BackBtn from './BackBtn';
 import Logo from './Logo';
 
 // ============================================================
@@ -16,14 +17,16 @@ import Logo from './Logo';
 // o app parecia outro app, sem sino e sem avatar, oferecendo que
 // ela criasse a conta que ela já tinha.
 //
-// Agora é um componente com duas caras, decididas pela sessão:
-//   · com conta  → [sino] [marca] [avatar]
-//   · sem conta  → [marca] [começar sua jornada]
+// Agora é um componente só. A marca no meio e o avatar à direita
+// são sempre iguais; o que muda é o canto esquerdo:
 //
-// O botão "voltar" saiu. Não porque atrapalhava, mas porque era a
-// única coisa que quebrava o padrão — e o caminho de volta existe
-// em três outros lugares: o botão do Android, o gesto do
-// navegador e a barra de baixo.
+//   · feed (`sino`)  → [sino]    [marca] [avatar]
+//   · demais páginas → [voltar]  [marca] [avatar]
+//   · sem conta      → [marca] [começar sua jornada]
+//
+// O sino mora no feed porque é de lá que se sai para ver quem
+// apoiou. Nas outras telas a pessoa entrou para fazer uma coisa —
+// o que ela precisa ali é do caminho de volta.
 // ============================================================
 
 // Os números do sino. Ficam aqui para nenhuma página precisar
@@ -60,7 +63,11 @@ async function contarSinais(sb, userId) {
   return { unread, likes, follows: seguidores.size };
 }
 
-export default async function AppTop({ likes, follows, unread, avatarStyle }) {
+export default async function AppTop({
+  sino = false,            // true só no feed
+  backHref = '/home', backLabel,
+  likes, follows, unread, avatarStyle,
+}) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const t = getDict(getLocale());
@@ -81,15 +88,21 @@ export default async function AppTop({ likes, follows, unread, avatarStyle }) {
   const { data: profile } = await supabase.from('profiles')
     .select('name, handle, avatar_url, avatar_color').eq('id', user.id).maybeSingle();
 
-  // se a página já contou, não conta de novo
-  const jaTem = unread !== undefined && likes !== undefined && follows !== undefined;
-  const sinais = jaTem ? { unread, likes, follows } : await contarSinais(supabase, user.id);
+  // Contar sinal só faz sentido onde o sino aparece. Fora do feed
+  // isso seria meia dúzia de consultas por página para desenhar nada.
+  let sinais = null;
+  if (sino) {
+    const jaTem = unread !== undefined && likes !== undefined && follows !== undefined;
+    sinais = jaTem ? { unread, likes, follows } : await contarSinais(supabase, user.id);
+  }
 
   return (
     <header className="top top-3">
       <div className="top-left">
-        <HeaderHeart likes={sinais.likes} follows={sinais.follows}
-          unread={sinais.unread} ariaLabel={t.notifications} />
+        {sino
+          ? <HeaderHeart likes={sinais.likes} follows={sinais.follows}
+              unread={sinais.unread} ariaLabel={t.notifications} />
+          : <BackBtn fallback={backHref} label={backLabel || t.back} />}
       </div>
 
       <a className="top-brand" href="/home" aria-label="One Up Day">
