@@ -6,7 +6,6 @@ import Composer from '../home/Composer';
 import NewJourneyForm from '../new/NewJourneyForm';
 import EditBanner from '../../components/EditBanner';
 import BottomNav from '../../components/BottomNav';
-import PrivacyToggle from '../home/PrivacyToggle';
 import EditAvatar from '../../components/EditAvatar';
 import CompanionCard from '../home/CompanionCard';
 import NextStep from '../home/NextStep';
@@ -289,10 +288,9 @@ export default async function Perfil() {
                       <div className="jcard-head">
                         <div><h2>{j.title}</h2><span>{fill(t.dayOf, { d: day, t: j.total_days, s: s.streak || 0 })}</span></div>
                         <div className="jcard-tools">
-                          <PrivacyToggle journeyId={j.id} initial={j.visibility || (j.is_public ? 'public' : 'private')} labels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} />
                           <a className="view-link" href={`/retro/${j.slug}`}>{t.retroLink}</a>
                           <a className="view-link" href={`/${j.slug}`}>{t.viewPublic}</a>
-                          <EditJourney journey={j} labels={{ btn: t.ejBtn, title: t.ejTitle, name: t.ejName, goal: t.ejGoal, cover: t.ejCover, coverAdd: t.ejCoverAdd, coverChange: t.ejCoverChange, coverRemove: t.ejCoverRemove, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errTitle: t.ejErrTitle, errSave: t.epErrSave, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropZoom: t.cropZoom }} />
+                          <EditJourney journey={j} currentDay={day} t={t} />
                           <DeleteJourney journeyId={j.id} title={j.title} labels={{ btn: t.jDeleteBtn, confirm: t.jDeleteConfirm, error: t.jDeleteErr }} />
                         </div>
                       </div>

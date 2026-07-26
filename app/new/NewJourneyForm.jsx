@@ -56,6 +56,7 @@ export default function NewJourneyForm({ userId, t }) {
   const [customCat, setCustomCat] = useState('');
   const [first, setFirst] = useState('');
   const [visibility, setVisibility] = useState('public');
+  const [privAberta, setPrivAberta] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -89,9 +90,12 @@ export default function NewJourneyForm({ userId, t }) {
     [t.wizT4, t.wizS4],
   ];
 
+  // O motivo deixa de ser obrigatorio. Quem chega com pressa nao sabe
+  // responder "por que isso importa" — e travar aqui perde a pessoa
+  // justamente no momento em que ela decidiu comecar.
   const podeAvancar =
     (step === 0 && title.trim().length >= 2 && (dur !== 'other' || parseInt(customDur || '0', 10) > 0)) ||
-    (step === 1 && goal.trim().length >= 3) ||
+    step === 1 ||
     step === 2;
 
   function irPara(n) {
@@ -264,6 +268,7 @@ export default function NewJourneyForm({ userId, t }) {
           <div className="wz-area">
             <textarea value={goal} onChange={(e) => setGoal(e.target.value)}
               maxLength={300} rows={5} placeholder={t.fWhyPh} autoFocus />
+            <span className="wz-opcional">{t.wizWhyOptional}</span>
             <span className="wz-inline-count">{goal.length}/300</span>
           </div>
           <p className="wz-hint">{t.wizWhyNote}</p>
@@ -310,17 +315,29 @@ export default function NewJourneyForm({ userId, t }) {
             <input ref={videoRef} type="file" accept="video/*" hidden onChange={onVideo} />
           </div>
 
-          <div className="wz-field">
-            <span className="wz-label">{t.wizTpriv}</span>
+        </div>
+      )}
+
+      {/* Privacidade: nao e uma decisao do fluxo, mas ninguem pode ser
+          publicado sem saber. Uma linha declara o que vai acontecer e
+          abre as tres opcoes so para quem quiser mexer. */}
+      {step === STEPS - 1 && (
+        <div className={`wz-priv${privAberta ? ' aberta' : ''}`}>
+          <div className="wz-priv-line">
+            <span>{(t.wizPrivShort || '').replace('{v}', (VIS.find(([v]) => v === visibility) || [])[1] || '')}</span>
+            <button type="button" onClick={() => setPrivAberta((v) => !v)}>{t.wizPrivChange}</button>
+          </div>
+          {privAberta && (
             <div className="wz-vis">
               {VIS.map(([v, l, sub]) => (
-                <button type="button" key={v} className={`wz-opt${visibility === v ? ' on' : ''}`} onClick={() => setVisibility(v)}>
+                <button type="button" key={v} className={`wz-opt${visibility === v ? ' on' : ''}`}
+                  onClick={() => { setVisibility(v); setPrivAberta(false); }}>
                   <i aria-hidden="true" />
                   <span><b>{l}</b><em>{sub}</em></span>
                 </button>
               ))}
             </div>
-          </div>
+          )}
         </div>
       )}
 

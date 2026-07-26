@@ -3756,3 +3756,54 @@ h1 { letter-spacing: -0.03em; }
 
 /* aspa decorativa acompanha o card maior */
 .dp-card.dark::before{top:6px;left:22px;font-size:64px}
+
+/* ============================================================
+   WIZARD — privacidade recolhida e campo opcional
+   A privacidade saiu do corpo da ultima tela: virou uma linha que
+   declara o que vai acontecer e abre as opcoes so para quem quiser
+   mexer. Ninguem e publicado sem saber, e ninguem trava numa
+   decisao de configuracao no momento de criar.
+   ============================================================ */
+.wz-priv{margin:14px 2px 0;padding-top:12px;border-top:1px solid var(--line)}
+@media(max-width:640px){ .wz-priv{margin:14px 16px 0} }
+.wz-priv-line{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.wz-priv-line span{font-size:13px;color:var(--muted);line-height:1.4}
+.wz-priv-line button{
+  border:0;background:none;padding:4px 0;cursor:pointer;flex:0 0 auto;min-height:32px;
+  font-family:var(--display);font-weight:800;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink);text-decoration:underline;text-underline-offset:3px;
+}
+.wz-priv .wz-vis{margin-top:12px}
+
+/* marca discreta de campo opcional */
+.wz-area{position:relative}
+.wz-opcional{
+  position:absolute;top:10px;right:12px;pointer-events:none;
+  font-family:var(--display);font-weight:800;font-size:9px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);opacity:.7;
+}
+
+/* ============================================================
+   EDITAR JORNADA — uma tela com tudo
+   Passou a ter categoria, duracao e privacidade. Como cresceu,
+   o miolo rola e os botoes ficam sempre visiveis no rodape.
+   ============================================================ */
+.ej-card{max-height:88svh;display:flex;flex-direction:column}
+.ej-scroll{
+  overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  margin:0 -2px;padding:0 2px 4px;flex:1 1 auto;min-height:0;
+}
+.ej-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.ej-small{
+  margin-top:8px;width:100%;padding:10px 12px;
+  border:1px solid var(--line);background:#fff;font-size:14px;color:var(--ink);
+}
+.ej-num{display:flex;align-items:center;gap:8px;margin-top:8px}
+.ej-num input{
+  width:104px;padding:10px 12px;border:1px solid var(--line);background:#fff;
+  font-size:14px;color:var(--ink);
+}
+.ej-num span{font-size:13px;color:var(--muted)}
+.ej-note{margin:8px 0 0;font-size:11.5px;line-height:1.5;color:var(--muted)}
+.ej-vis{margin-top:7px}
+.ej-card .crop-actions{flex:0 0 auto;padding-top:12px;border-top:1px solid var(--line)}
