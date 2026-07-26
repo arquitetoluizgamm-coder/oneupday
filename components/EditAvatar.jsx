@@ -3,7 +3,21 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../lib/supabase/client';
 
-export default function EditAvatar({ userId, label }) {
+// ============================================================
+// TROCAR FOTO DO PERFIL
+//
+// Era uma camerinha grudada na borda do avatar. Ficava por cima
+// da foto da pessoa, competindo com ela, e num toque errado
+// abria o seletor de arquivo sem querer.
+//
+// Agora mora atras da engrenagem, na mesma lista de "trocar
+// capa" e "editar perfil" — que é onde a pessoa procura quando
+// quer mudar alguma coisa dela.
+//
+// `modo="linha"` desenha como item de menu; sem ele, continua
+// sendo o botao redondo (nada mais usa hoje, mas nao custa).
+// ============================================================
+export default function EditAvatar({ userId, label, uploadingLabel, modo }) {
   const ref = useRef(null);
   const [busy, setBusy] = useState(false);
   const router = useRouter();
@@ -23,6 +37,17 @@ export default function EditAvatar({ userId, label }) {
     setBusy(false);
     if (ref.current) ref.current.value = '';
   }
+  if (modo === 'linha') {
+    return (
+      <>
+        <button type="button" className="ghost-btn" onClick={() => ref.current?.click()} disabled={busy}>
+          {busy ? (uploadingLabel || label) : label}
+        </button>
+        <input ref={ref} type="file" accept="image/*" hidden onChange={onPick} />
+      </>
+    );
+  }
+
   return (
     <>
       <button className="edit-avatar" onClick={() => ref.current?.click()} disabled={busy} title={label} aria-label={label}>

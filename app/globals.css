@@ -4211,3 +4211,17 @@ h1 { letter-spacing: -0.03em; }
   .pc-bar .upi-bubble{padding:9px 12px 10px}
   .pc-bar .upi-bubble p{font-size:14px;line-height:1.5}
 }
+
+/* ============================================================
+   PERFIL — nome e @ como um bloco so
+   O nome tinha entrelinha 1.1 (colada) e o @ vinha com margem
+   propria: as duas linhas ficavam com respiros diferentes, e o
+   conjunto parecia empurrado para cima. Agora as duas usam a
+   mesma entrelinha e nenhuma margem — o espaco entre elas passa
+   a ser so a entrelinha, igual em cima e embaixo.
+   ============================================================ */
+.pc-meta{display:flex;flex-direction:column;justify-content:center}
+.pc-meta h1{line-height:1.34}
+.pc-meta .pc-sub{margin-top:0;line-height:1.34}
+.pc-meta .pc-sub span{line-height:1.34}
+.pc-meta .pc-consistency{margin-top:7px}

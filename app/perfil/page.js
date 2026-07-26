@@ -92,8 +92,9 @@ export default async function Perfil() {
       followers = profs || [];
     }
   }
-  const { count: encGiven } = await supabase.from('encouragements').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
-  const points = updatesCount * 10 + setbackCount * 15 + (encGiven || 0) * 5 + maxStreak * 2;
+  // Pontuacao saiu da tela: num app de recomeco, um numero que sobe
+  // vira nota — e o dia ruim, que aqui e' parte do processo, passa a
+  // parecer prejuizo. O calculo tambem ia embora com ela.
 
   const kindLabels = { step: t.kindStep, win: t.kindWin, setback: t.kindSetback, learned: t.kindLearned };
   let aiPrefOff = false;
@@ -205,13 +206,11 @@ export default async function Perfil() {
           <div className="pc-info">
             <div className="pc-avatar" style={{ background: profile.avatar_color || 'var(--orange)' }}>
               {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : profile.name[0]}
-              <EditAvatar userId={user.id} label={t.editPhoto} />
             </div>
             <div className="pc-meta">
               <h1>{profile.name}</h1>
               <div className="pc-sub">
                 <span>{profile.handle}</span>
-                <div className="points-chip" title={t.pointsExplain}><b>{points}</b> {t.pointsWord}</div>
               </div>
               {maxStreak > 0 && <p className="consistency pc-consistency">{t.consistencyLine.replace('{n}', maxStreak)}</p>}
             </div>
@@ -236,6 +235,7 @@ export default async function Perfil() {
             sair={<form action="/auth/signout" method="post"><button className="pm-sair-btn" type="submit">{t.signOut}</button></form>}
           >
             <div className="pm-linhas">
+              <EditAvatar userId={user.id} label={t.editPhoto} uploadingLabel={t.uploading} modo="linha" />
               <EditBanner userId={user.id} label={t.editBanner} uploadingLabel={t.uploading} cropLabels={{ cover: t.cropCover, use: t.cropUse, cancel: t.cropCancel, hint: t.cropHint, zoom: t.cropZoom }} />
               <EditProfileInfo userId={user.id} initialName={profile.name} initialHandle={profile.handle} labels={{ btn: t.epBtn, title: t.epTitle, name: t.epName, handle: t.epHandle, hint: t.epHint, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errName: t.epErrName, errHandle: t.epErrHandle, errTaken: t.epErrTaken, errSave: t.epErrSave }} />
               <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
