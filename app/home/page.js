@@ -99,6 +99,7 @@ export default async function Home() {
     tabAll: t.tabAll, tabFollowing: t.tabFollowing, followingEmptyTitle: t.followingEmptyTitle, followingEmptySub: t.followingEmptySub,
     supportIdle: t.withYouIdle, supportActive: t.withYouActive, supporters: t.supporters, supportersLoading: t.supportersLoading, supportersEmpty: t.supportersEmpty, supportStrip: t.supportStrip, supporting: t.supportingFmt, progressFmt: t.progressFmt, suggest: { title: t.suggestTitle, sub: t.suggestSub, follow: t.follow, following: t.following, followBack: t.followBack, newcomer: t.suggestNewcomer, dayFmt: t.dayShort }, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful },
     share: t.shareShort, linkCopied: t.linkCopied,
+    pc: { title: t.pcTitle, sub: t.pcSub, done: t.pcDone, cancel: t.epCancel, tipos: t.pcTipos },
     step: { back: t.stepBack, follow: t.stepFollow, following: t.stepFollowing, decided: t.stepDecided, result: t.stepResult, open: t.stepOpen },
     transf: { tag: t.trTag, dayFmt: t.trDayFmt, gap: t.trGap, see: t.trSee },
     amanha: { title: t.amTitle, comecou: t.amComecou, termina: t.amTermina, chegou: t.amChegou, marco: t.amMarco },

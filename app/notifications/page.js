@@ -52,6 +52,8 @@ export default async function Notifications() {
               ? t.notifMeToo
               : n.type === 'welcome'
               ? t.notifWelcome
+              : n.type === 'percepcao'
+              ? fill(t.notifPercepcao, { name: a.name || '' })
               : n.type === 'step_result'
               ? fill(t.notifStepResult, { name: a.name || '' })
               : n.type === 'comment'

@@ -17,6 +17,7 @@ import AppTop from '../../components/AppTop';
 import NextChapter from '../../components/NextChapter';
 import Espelho, { PorQue } from '../../components/Espelho';
 import Capacidades from '../../components/Capacidades';
+import { PercebidoEm } from '../../components/Percepcao';
 import { analisarCapacidades } from '../../lib/capacidades';
 import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
 import ProfileTabs from '../../components/ProfileTabs';
@@ -126,6 +127,15 @@ export default async function Perfil() {
         .order('created_at', { ascending: true }).limit(400);
       capacidades = analisarCapacidades(todos || []);
     }
+  } catch {}
+
+  // ---- O que as pessoas percebem em você ----
+  let percebido = [];
+  try {
+    const { data: pcs } = await supabase.from('percepcoes').select('tipo').eq('to_id', user.id);
+    const conta = {};
+    (pcs || []).forEach((x) => { conta[x.tipo] = (conta[x.tipo] || 0) + 1; });
+    percebido = Object.entries(conta).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([tipo, n]) => ({ tipo, n }));
   } catch {}
 
   // ---- Upi: o pingo que acompanha ----
@@ -368,6 +378,7 @@ export default async function Perfil() {
         {nc.mode && (
           <div className="nc-neutral">
             {porque && <PorQue texto={porque} labels={{ eyebrow: t.pqEyebrow }} />}
+            <PercebidoEm itens={percebido} labels={{ blockTitle: t.pcBlockTitle, byN: t.pcByN, tipos: t.pcTipos }} />
             <Capacidades lista={capacidades} labels={{ title: t.capTitle, note: t.capNote,
               voltarTitulo: t.capVoltar, voltarAntes: t.capVoltarAntes, voltarAgora: t.capVoltarAgora, voltarMaior: t.capVoltarMaior,
               dificilTitulo: t.capDificil, dificilProva: t.capDificilProva,

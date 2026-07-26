@@ -12,6 +12,7 @@ import Transformacao from '../../components/Transformacao';
 import Amanha from '../../components/Amanha';
 import Retornos from '../../components/Retornos';
 import { StepOpen, StepResult } from '../../components/StepChapter';
+import Percepcao from '../../components/Percepcao';
 import { MOODS, moodGlow } from '../../lib/moods';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
@@ -120,6 +121,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
       <ActionsRow people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])}>
         <EncourageBar key={'e' + d.id} updateId={d.id} initialActive={d.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
         <Comments key={'c' + d.id} updateId={d.id} labels={labels.comments} />
+        <Percepcao updateId={d.id} toId={item.owner.id} own={item.own} labels={labels.pc} />
         <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
         {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
         {item.own && <EditUpdate key={'ed' + d.id} update={{ id: d.id, text: d.text, photo_url: d.photo_url, day: d.day_number }} labels={labels.editUpdate}
@@ -445,6 +447,7 @@ export default function FeedClient({ labels }) {
               <ActionsRow people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])}>
                 <EncourageBar updateId={item.id} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
                 <Comments updateId={item.id} labels={labels.comments} />
+                <Percepcao updateId={item.id} toId={item.owner.id} own={item.own} labels={labels.pc} />
                 <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
                 {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
               </ActionsRow>

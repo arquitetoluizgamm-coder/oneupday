@@ -147,7 +147,54 @@ async function handler(req) {
     }
   } catch (e) {}
 
-  return NextResponse.json({ ok: true, sentNotif, sentReminder });
+  // ---------- Espelho semanal: "algo em você está mudando" ----------
+  // Chega uma vez por semana, no mesmo horário do lembrete.
+  let sentEspelho = 0;
+  try {
+    const { analisar } = await import('../../../../lib/espelho');
+    const horaBRT = new Date(Date.now() - 3 * 3600 * 1000).getUTCHours();
+    const TXT_ESPELHO = 'Reparei numa coisa em você. Quer ver?';
+    const { data: pessoas } = await sb.from('profiles')
+      .select('id, reminder_hour, push_on, notif_paused, espelho_push_em')
+      .eq('reminder_hour', horaBRT).neq('push_on', false).limit(200);
+
+    await loadSubs((pessoas || []).map((p) => p.id));
+    for (const p of (pessoas || [])) {
+      if (p.notif_paused) continue;
+      if (p.espelho_push_em && (Date.now() - new Date(p.espelho_push_em).getTime()) < 7 * 86400000) continue;
+
+      const { data: js } = await sb.from('journeys').select('id').eq('owner_id', p.id)
+        .order('created_at', { ascending: false }).limit(1);
+      const j = (js || [])[0];
+      if (!j) continue;
+
+      const { data: ups } = await sb.from('updates')
+        .select('id, day_number, kind, text, created_at').eq('journey_id', j.id)
+        .order('day_number', { ascending: true }).limit(200);
+      const dias = ups || [];
+      if (dias.length < 8) continue;
+      if (dias[dias.length - 1]?.kind === 'setback') continue;   // nunca depois de um dia ruim
+
+      const esp = analisar(dias, 'pt');
+      if (!esp) continue;
+
+      const subs = subsByUser[p.id] || [];
+      let ok = false;
+      for (const sub of subs) {
+        const r = await sendPush(sub, {
+          title: 'Upi', body: TXT_ESPELHO, url: '/perfil', tag: 'oud-espelho',
+        });
+        if (r.ok) ok = true;
+        if (r.status === 404 || r.status === 410) await sb.from('push_subs').delete().eq('id', sub.id);
+      }
+      if (ok) {
+        sentEspelho++;
+        await sb.from('profiles').update({ espelho_push_em: new Date().toISOString() }).eq('id', p.id);
+      }
+    }
+  } catch {}
+
+  return NextResponse.json({ ok: true, sentNotif, sentReminder, sentEspelho });
 }
 
 // GET  -> usado pelo cron da Vercel
