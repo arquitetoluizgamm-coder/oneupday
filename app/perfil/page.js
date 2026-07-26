@@ -275,17 +275,6 @@ export default async function Perfil() {
             ); })}
         </section>
 
-        {list.length === 0 && (
-          <section className="onboarding-block">
-            <div className="ob-head">
-              <h2>{t.obTitle.replace('{name}', profile.name.split(' ')[0])}</h2>
-              <p>{t.obSub}</p>
-            </div>
-            <ol className="ob-steps"><li><span>1</span>{t.obStep1}</li><li><span>2</span>{t.obStep2}</li><li><span>3</span>{t.obStep3}</li></ol>
-            <NewJourneyForm userId={user.id} t={t} />
-          </section>
-        )}
-
         {list.length > 0 && (
           <ProfileTabs
             labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, people: t.profTabPeople }}
@@ -295,37 +284,19 @@ export default async function Perfil() {
                   const s = statsById[j.id] || {};
                   const day = s.current_day || 0;
                   return (
-                    <section className="jcard" key={j.id}>
+                    <a className="jcard jcard-link" key={j.id} href={`/perfil/jornada/${j.slug}`}>
                       <div className="jcard-head">
-                        <div><h2>{j.title}</h2><span>{fill(t.dayOf, { d: day, t: j.total_days, s: s.streak || 0 })}</span></div>
-                        <div className="jcard-tools">
-                          <a className="view-link" href={`/retro/${j.slug}`}>{t.retroLink}</a>
-                          <a className="view-link" href={`/${j.slug}`}>{t.viewPublic}</a>
-                          <EditJourney journey={j} currentDay={day} t={t} />
-                          <DeleteJourney journeyId={j.id} title={j.title} labels={{ btn: t.jDeleteBtn, confirm: t.jDeleteConfirm, error: t.jDeleteErr }} />
+                        <div>
+                          <h2>{j.title}</h2>
+                          <span>{fill(t.dayOf, { d: day, t: j.total_days, s: s.streak || 0 })}</span>
                         </div>
+                        <svg className="jcard-seta" viewBox="0 0 24 24" width="20" height="20" fill="none"
+                          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="m9 18 6-6-6-6" />
+                        </svg>
                       </div>
                       <ProgressBar day={day} total={j.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
-                      <JourneyFold openLabel={t.jfOpen} closeLabel={t.jfClose}>
-                      <JourneyDays journeyId={j.id}
-                        labels={{ show: t.jdShow, hide: t.jdHide, empty: t.jdEmpty, loading: t.jdLoading, dayFmt: t.dayShort }}
-                        editLabels={{ btn: t.euBtn, title: t.euTitle, text: t.euText, photo: t.euPhoto, photoAdd: t.ejCoverAdd, photoChange: t.ejCoverChange, photoRemove: t.ejCoverRemove, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errSave: t.epErrSave, errEmpty: t.euErrEmpty, deletePost: t.euDeletePost, deleteConfirm: t.postDeleteConfirm, cropOriginal: t.cropOriginal, cropSquare: t.cropSquare, cropPortrait: t.cropPortrait, cropLandscape: t.cropLandscape, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropHintOriginal: t.cropHintOriginal, cropZoom: t.cropZoom }} />
-                      <Composer journeyId={j.id} startDate={j.created_at} aiOn={aiOn} labels={kindLabels} t={{
-                        placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
-                        addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded,
-                        addVideo: t.addVideo, videoAdded: t.videoAdded, videoTooBig: t.videoTooBig,
-                        crisisTitle: t.crisisTitle, crisisText: t.crisisText,
-                        ritualQ: t.ritualQ, rDid: t.rDid, rTried: t.rTried, rPaused: t.rPaused,
-                        rDidText: t.rDidText, rTriedText: t.rTriedText, rPausedText: t.rPausedText, aiWrite: t.aiWrite,
-                        musicAdd: t.musicAdd, musicTitle: t.musicTitle, musicUse: t.musicUse, musicRemove: t.musicRemove, musicEmpty: t.musicEmpty, musicSearchPh: t.musicSearchPh, musicKeyNeeded: t.musicKeyNeeded,
-                        aiErr: t.aiErr, aiRateErr: t.aiRateErr,
-                        moodQ: t.moodQ, prompts: t.prompts, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful },
-                        env: { q: t.envQ, ph: t.envPh, save: t.envSave, skip: t.envSkip },
-                meaning: { step: t.meaningStep, setback: t.meaningSetback, first: t.meaningFirst },
-                      }} />
-                      {aiOn && <NextStep journeyId={j.id} label={t.aiNextStep} thinking={t.aiThinking} errLabel={t.aiErr} rateLabel={t.aiRateErr} />}
-                      </JourneyFold>
-                    </section>
+                    </a>
                   );
                 })}
                 {aiConfigured && <CompanionCard userId={user.id} title={t.companionTitle} btn={t.companionBtn} loading={t.companionLoading} initialOff={aiPrefOff} labels={{ consent: t.aiConsent, off: t.aiOff, offState: t.aiOffState, reactivate: t.aiReactivate, err: t.aiErr, rateErr: t.aiRateErr }} />}
