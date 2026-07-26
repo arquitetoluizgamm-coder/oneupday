@@ -4012,3 +4012,38 @@ h1 { letter-spacing: -0.03em; }
 
 .cit-vis{display:flex;flex-wrap:wrap;gap:6px}
 .cit-alt{width:100%;min-height:44px;margin-top:-6px}
+
+/* Sino do topo na mesma altura da marca: 23px no celular, 26px no resto.
+   Antes ficava em 27px — maior que o logo, o que puxava o olho para o
+   aviso em vez da marca, e no celular ainda por cima borrava. */
+.heart-btn svg{width:26px;height:26px}
+@media(max-width:640px){
+  .heart-btn{width:42px;height:42px}
+  .heart-btn svg{width:23px;height:23px}
+  .heart-btn .heart-dot{top:8px;right:9px;width:6px;height:6px}
+}
+
+/* ============================================================
+   FOTO DO DIA — livre tambem fora do feed
+   Sobraram tres lugares em 4:3, todos previa de foto de dia:
+   editar dia, dia 1 do wizard e a previa do compositor. A foto
+   aparecia enquadrada de um jeito na previa e de outro no feed,
+   o que faz a pessoa achar que o app cortou a foto dela.
+   ============================================================ */
+.eu-photo,
+.wz-media,
+.photo-preview{
+  aspect-ratio:auto!important;
+  height:auto;
+  max-height:60svh;
+  background:#0f1014;
+}
+.eu-photo{background-size:contain!important;background-repeat:no-repeat;background-position:center;min-height:220px}
+.wz-media img,.wz-media video,
+.photo-preview img,.photo-preview video{
+  width:100%;height:auto;
+  aspect-ratio:auto!important;
+  object-fit:contain;
+  max-height:60svh;
+  display:block;
+}
