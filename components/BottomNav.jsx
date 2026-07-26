@@ -24,6 +24,10 @@ export default function BottomNav({ active, t }) {
       {menu && (
         <div className="create-backdrop" onClick={() => setMenu(false)}>
           <div className="create-menu" onClick={e => e.stopPropagation()}>
+            <a href="/perfil" className="cm-item cm-main">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="butt"><path d="M4 19h16M6 15.5 15.5 6a2.1 2.1 0 0 1 3 3L9 18.5l-4 1z" /></svg>
+              {t.navToday}
+            </a>
             <a href="/midia" className="cm-item">
               <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="9" cy="10" r="1.6" /><path d="m4 18 5-5 4 4 3-3 4 4" /></svg>
               {t.navMedia}

@@ -2747,3 +2747,27 @@ h1 { letter-spacing: -0.03em; }
   .entry-textcard .dpc-text{font-size:21px}
   .entry-textcard .dpc-text.long{font-size:17.5px;-webkit-line-clamp:9}
 }
+
+/* ============================================================
+   ALVOS DE TOQUE — padrao WCAG (min 24px, confortavel 44px)
+   Os icones de acao estavam em 22px, abaixo do minimo.
+   ============================================================ */
+.entry-actions{gap:6px}
+.entry-actions .support-pill,
+.entry-actions .feed-share,
+.entry-actions .comment-toggle,
+.entry-actions .ch-bolt,
+.entry-actions .hug-btn,
+.entry-actions .metoo-btn,
+.entry-actions .view-link{
+  min-width:44px;min-height:44px;
+  display:inline-flex!important;align-items:center;justify-content:center;
+}
+.entry-actions svg{width:25px!important;height:25px!important}
+/* o chip Editar mantem o texto, so ganha area de toque */
+.entry-actions .view-link{min-width:0;padding:0 12px}
+
+/* menu de criar: a acao principal em destaque */
+.cm-item.cm-main{background:var(--night);color:#FAF7F2;font-weight:700}
+.cm-item.cm-main svg{color:#E8A64C}
+.cm-item.cm-main:hover{background:#171d4d}
