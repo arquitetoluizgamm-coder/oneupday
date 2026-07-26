@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { createClient } from '../../lib/supabase/client';
+import LoopMarca from '../../components/LoopMarca';
 
 export default function GoogleButton({ labelIdle, labelLoading, errorMsg }) {
   const [loading, setLoading] = useState(false);
@@ -13,6 +14,16 @@ export default function GoogleButton({ labelIdle, labelLoading, errorMsg }) {
     });
     if (error) { setLoading(false); alert(errorMsg); }
   }
+  // enquanto o Google abre, a espera vira respiração da marca
+  if (loading) {
+    return (
+      <div className="login-wait">
+        <LoopMarca size={140} />
+        <span>{labelLoading}</span>
+      </div>
+    );
+  }
+
   return (
     <button className="google-btn" onClick={signIn} disabled={loading}>
       <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
@@ -21,7 +32,7 @@ export default function GoogleButton({ labelIdle, labelLoading, errorMsg }) {
         <path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1z"/>
         <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.47.9 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/>
       </svg>
-      {loading ? labelLoading : labelIdle}
+      {labelIdle}
     </button>
   );
 }

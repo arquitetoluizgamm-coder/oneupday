@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 46 512 390" width="512" height="390" role="img" aria-label="One Up Day">
+  <title>One Up Day</title>
+  <!--
+    LOOP DA MARCA — geometria oficial do logo (mesma do upi.svg).
+    O pingo desce pelo lado DIREITO, atravessa o fundo, sobe pelo
+    ESQUERDO, descansa, e volta pelo mesmo caminho.
+    Descer e continuar: é a Base do produto em movimento.
+    Plano, sem sombra, sem volume. Loop matematicamente exato.
+  -->
+  <defs>
+    <radialGradient id="oudDot" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#D68A6F"/>
+      <stop offset="1" stop-color="#B4644A"/>
+    </radialGradient>
+
+    <!-- trilha do pingo: a linha de centro do U, do topo direito ao topo esquerdo -->
+    <path id="oudTrilha" fill="none"
+      d="M346 132 L346 280 A90 90 0 0 1 166 280 L166 112"/>
+  </defs>
+
+  <!-- o U: traço sage, ponta reta, exatamente como na marca -->
+  <path d="M166 112 L166 280 A90 90 0 0 0 346 280 L346 192"
+        fill="none" stroke="#84917A" stroke-width="34" stroke-linecap="butt"/>
+
+  <!-- brilho do recomeço: acende no fundo da curva, onde a volta acontece -->
+  <circle cx="256" cy="370" r="30" fill="#E8A64C" opacity="0">
+    <animate attributeName="opacity"
+      values="0;0;0;0.22;0.28;0.22;0;0;0"
+      keyTimes="0;0.28;0.40;0.47;0.50;0.53;0.60;0.72;1"
+      dur="7s" repeatCount="indefinite" calcMode="spline"
+      keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1;.4 0 .6 1;.4 0 .6 1;.4 0 .6 1;.4 0 .6 1;.4 0 .6 1"/>
+  </circle>
+
+  <!-- o pingo -->
+  <circle r="27" fill="url(#oudDot)">
+    <!--
+      Ida e volta na mesma trilha. keyPoints controla a posição ao
+      longo do caminho: 0 = topo direito, 1 = topo esquerdo.
+      As pausas nas pontas fazem a virada ser imperceptível.
+    -->
+    <animateMotion dur="7s" repeatCount="indefinite"
+      calcMode="spline"
+      keyTimes="0;0.07;0.43;0.50;0.57;0.93;1"
+      keyPoints="0;0;1;1;1;0;0"
+      keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1">
+      <mpath href="#oudTrilha"/>
+    </animateMotion>
+  </circle>
+</svg>

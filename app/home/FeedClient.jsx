@@ -15,6 +15,7 @@ import { StepOpen, StepResult } from '../../components/StepChapter';
 import Percepcao from '../../components/Percepcao';
 import Andamento, { Hoje } from '../../components/Andamento';
 import Espelho from '../../components/Espelho';
+import LoopMarca from '../../components/LoopMarca';
 import { MOODS, moodGlow } from '../../lib/moods';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
@@ -349,6 +350,7 @@ export default function FeedClient({ labels }) {
       <section className="feed-stream">
         {started && items.length === 0 && (
           <div className="feed-invite">
+            <LoopMarca size={132} />
             <b>{emptyTitle}</b>
             <p>{emptySub}</p>
             <a className="cta grow" href="/explore">{labels.inviteCta}</a>
