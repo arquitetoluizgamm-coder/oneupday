@@ -18,12 +18,7 @@ export default async function NewJourney() {
   return (
     <>
       <AppTop backLabel={t.back} />
-      <main className="wrap">
-        <div className="create-head">
-          <p className="eyebrow">{t.createEyebrow}</p>
-          <h1>{t.createTitle}</h1>
-          <p className="sub">{t.createSub}</p>
-        </div>
+      <main className="wrap wrap-wz">
         <NewJourneyForm userId={user.id} t={t} />
       </main>
       <BottomNav active="create" t={t} />

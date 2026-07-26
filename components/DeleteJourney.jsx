@@ -1,11 +1,9 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function DeleteJourney({ journeyId, title, labels }) {
   const L = labels || {};
   const [busy, setBusy] = useState(false);
-  const router = useRouter();
 
   async function del() {
     if (busy) return;
@@ -20,7 +18,8 @@ export default function DeleteJourney({ journeyId, title, labels }) {
     }).catch(() => null);
     setBusy(false);
     if (!r || !r.ok) { alert(L.error || 'Não foi possível excluir. Tente de novo.'); return; }
-    router.refresh();
+    // recarga completa: router.refresh() nem sempre repinta a lista do perfil
+    window.location.href = '/perfil';
   }
 
   return (

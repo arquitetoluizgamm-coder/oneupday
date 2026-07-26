@@ -179,6 +179,12 @@ export default function NewJourneyForm({ userId, t }) {
     if (step < STEPS - 1) avancar();
   }
 
+  // Prévia: a jornada vai se montando à medida que a pessoa escreve.
+  const totalPreview = dur === 'other' ? (parseInt(customDur || '0', 10) || 0) : parseInt(dur, 10);
+  const catLabel = cat === 'other'
+    ? (customCat.trim() || t.catOther)
+    : (CATS.find(([v]) => v === cat) || [])[1];
+
   return (
     <div className="wz" onKeyDown={onKeyDown}>
       <div className="wz-rail" aria-hidden="true">
@@ -192,6 +198,32 @@ export default function NewJourneyForm({ userId, t }) {
         <h1>{heads[step][0]}</h1>
         <p>{heads[step][1]}</p>
       </div>
+
+      {/* a jornada nascendo — cresce a cada tela */}
+      {title.trim() && (
+        <aside className="wz-prev" aria-hidden="true">
+          <span className="wz-prev-tag">{t.wizPreview}</span>
+          <b className="wz-prev-title">{title.trim()}</b>
+          {totalPreview > 0 && (
+            <div className="wz-prev-line">
+              <span className="wz-prev-dots">
+                {Array.from({ length: Math.min(totalPreview, 12) }).map((_, i) => (
+                  <i key={i} className={i === 0 ? 'on' : ''} />
+                ))}
+              </span>
+              <em>{(t.dayXofY || 'Dia {d} de {t}').replace('{d}', 1).replace('{t}', totalPreview)}</em>
+            </div>
+          )}
+          {step >= 1 && goal.trim() && <q className="wz-prev-why">{goal.trim()}</q>}
+          {step >= 1 && catLabel && <span className="wz-prev-cat">{catLabel}</span>}
+          {step >= 2 && (first.trim() || photoUrl) && (
+            <div className="wz-prev-day">
+              {photoUrl && <img src={photoUrl} alt="" />}
+              {first.trim() && <p>{first.trim()}</p>}
+            </div>
+          )}
+        </aside>
+      )}
 
       {/* ---------------- 1 · o que e por quanto tempo ---------------- */}
       {step === 0 && (
