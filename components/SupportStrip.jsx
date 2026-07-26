@@ -1,7 +1,7 @@
 'use client';
 import { useRef } from 'react';
 
-export default function SupportStrip({ people, title }) {
+export default function SupportStrip({ people, title, inline }) {
   const ref = useRef(null);
   const drag = useRef({ down: false, x: 0, left: 0, moved: false });
   if (!people || !people.length) return null;
@@ -12,7 +12,7 @@ export default function SupportStrip({ people, title }) {
   function onClickCapture(e) { if (drag.current.moved) { e.preventDefault(); e.stopPropagation(); } }
 
   return (
-    <div className="support-strip">
+    <div className={`support-strip${inline ? ' inline' : ''}`}>
       <span className="ss-title">{title}</span>
       <div className="ss-scroll" ref={ref} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerLeave={onUp} onClickCapture={onClickCapture}>
         {people.map((p, idx) => {

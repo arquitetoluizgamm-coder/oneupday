@@ -2771,3 +2771,56 @@ h1 { letter-spacing: -0.03em; }
 .cm-item.cm-main{background:var(--night);color:#FAF7F2;font-weight:700}
 .cm-item.cm-main svg{color:#E8A64C}
 .cm-item.cm-main:hover{background:#171d4d}
+
+/* ============================================================
+   CARD LIMPO — pontinhos no topo da imagem, progresso embaixo,
+   acoes em icones puros + faixa "Apoiando" com avatares
+   ============================================================ */
+
+/* pontinhos de slide centralizados no topo da imagem */
+.slide-top{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:4;
+  display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:none}
+.st-dots{display:flex;gap:5px;padding:5px 9px;background:rgba(16,19,45,.32);backdrop-filter:blur(6px)}
+.st-dots i{width:5.5px;height:5.5px;border-radius:50%!important;background:rgba(255,255,255,.45);flex:0 0 auto;transition:background .25s}
+.st-dots i.on{background:#fff}
+.st-day{font-family:var(--display);font-weight:800;font-size:9.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:#fff;background:rgba(16,19,45,.32);padding:3px 9px;backdrop-filter:blur(6px)}
+
+/* barra de progresso ABAIXO do card, acima dos icones */
+.progress-under{margin:10px 2px 0;display:flex;flex-direction:column;gap:5px}
+.progress-under .mp-bar{height:4px;background:rgba(16,19,45,.08);overflow:hidden;border-radius:0}
+.progress-under .mp-bar span{display:block;height:100%;background:#E8A64C;transition:width .45s cubic-bezier(.22,1,.36,1)}
+.progress-under .mp-meta{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
+@media(max-width:640px){ .progress-under{margin:10px 16px 0} }
+
+/* setas de dia: sempre no rodape do card (nao ha mais barra dentro) */
+.dp-stage .dp-nav{top:auto;bottom:12px;transform:none}
+.dp-stage:not(.is-text) .dp-nav{bottom:12px}
+
+/* acoes: icones puros, sem caixa, sem rotulo */
+.feed-acts{display:flex;align-items:center;gap:2px}
+.feed-acts .action-label{display:none!important}
+.feed-acts .supporters-icon{display:none!important}
+.feed-acts .support-pill,
+.feed-acts .comment-toggle,
+.feed-acts .feed-share,
+.feed-acts .metoo-btn,
+.feed-acts .ch-bolt,
+.feed-acts .hug-btn{
+  background:none!important;border:0!important;padding:0!important;box-shadow:none!important;
+  min-width:44px;min-height:44px;color:var(--ink);
+}
+/* apoiado: so o contorno terracota, sem preenchimento e sem caixa */
+.feed-acts .support-pill.on{color:#C16F54!important;background:none!important}
+.feed-acts .support-pill.on svg{fill:none!important}
+
+/* faixa "Apoiando" ao lado dos icones: linha + avatares rolaveis */
+.support-strip.inline{flex:1 1 auto;min-width:0;margin:0;padding:0;border:0;background:none;
+  display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.support-strip.inline .ss-title{font-family:var(--display);font-weight:800;font-size:9.5px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;margin:0}
+.support-strip.inline .ss-scroll{display:flex;gap:4px;overflow-x:auto;max-width:100%;
+  scrollbar-width:none;-ms-overflow-style:none;padding:0}
+.support-strip.inline .ss-scroll::-webkit-scrollbar{display:none}
+.support-strip.inline .ss-ava{width:22px;height:22px;font-size:10px}

@@ -5,7 +5,6 @@ import FeedShare from './FeedShare';
 import Comments from '../../components/Comments';
 import SupportStrip from '../../components/SupportStrip';
 import SuggestionCard from '../../components/SuggestionCard';
-import HugButton from '../../components/HugButton';
 import NeedsSupport from '../../components/NeedsSupport';
 import MeTooButton from '../../components/MeTooButton';
 import EditUpdate from '../../components/EditUpdate';
@@ -61,21 +60,6 @@ function TrackTag({ track, float, hasBar }) {
   );
 }
 
-// ---- Linha de presença: os pontinhos do carrossel ----
-function PresenceDots({ day, total }) {
-  if (!total || total < 1) return null;
-  const max = 10;
-  const n = Math.min(total, max);
-  const filled = Math.max(0, Math.min(n, Math.round((day / total) * n)));
-  return (
-    <div className="pdots" aria-hidden="true">
-      {Array.from({ length: n }).map((_, i) => (
-        <i key={i} className={i < filled ? (i === filled - 1 ? 'on now' : 'on') : ''} />
-      ))}
-    </div>
-  );
-}
-
 // ---- A jornada é um post só: dias navegáveis dentro do card ----
 function DayPager({ item, labels, dayLabel, dark }) {
   const [days, setDays] = useState(item.days || []);
@@ -89,7 +73,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
   const left = Math.max(0, total - (d.day_number || 0));
   const cleanText = d.text && d.text !== '📷' && d.text !== '🎥' ? d.text : '';
   const hasMedia = !!(d.photo_url || d.video_url);
-  const trackEl = d.track ? <TrackTag key={'t' + d.id} track={d.track} float hasBar={total > 0} /> : null;
+  const trackEl = d.track ? <TrackTag key={'t' + d.id} track={d.track} float hasBar={false} /> : null;
 
   function go(next, e) { if (e) { e.preventDefault(); e.stopPropagation(); } setIdx(next); }
   function onTS(e) { touch.current = e.touches[0].clientX; }
@@ -103,19 +87,22 @@ function DayPager({ item, labels, dayLabel, dark }) {
 
   return (
     <>
-      <div className="dp-top">
-        <PresenceDots day={d.day_number} total={total} />
-        {total > 0 && <span className="dp-daymark">{(labels.dayOfShort || 'Dia {d} / {t}').replace('{d}', d.day_number).replace('{t}', total)}</span>}
-      </div>
-
-      <div className="dp-meta">
-        {d.comeback && <span className="entry-comeback">{(labels.comebackFmt || '').replace('{d}', d.comeback)}</span>}
-        {d.kind === 'setback' && <span className="entry-kindline setback">{labels.tagSetback}</span>}
-        {d.kind === 'win' && <span className="entry-kindline win">{labels.tagWin}</span>}
-        {[7, 30, 60, 100].includes(d.day_number) && <span className="entry-milestone">{(labels.milestoneFmt || '').replace('{d}', d.day_number)}</span>}
-      </div>
-
       <div className={`dp-stage${hasMedia ? '' : ' is-text'}`} onTouchStart={onTS} onTouchEnd={onTE}>
+        {/* pontinhos de slide no topo da imagem, estilo Instagram, com o dia atual */}
+        <div className="slide-top" aria-hidden="true">
+          {days.length > 1 && (
+            <div className="st-dots">
+              {(() => {
+                const max = 7;
+                const start = Math.max(0, Math.min(i - 3, days.length - max));
+                return days.slice(start, start + max).map((x, k) => (
+                  <i key={x.id} className={start + k === i ? 'on' : ''} />
+                ));
+              })()}
+            </div>
+          )}
+          <span className="st-day">{dayLabel(d.day_number)}</span>
+        </div>
         <div className="dp-slide" key={d.id}>
           {hasMedia ? (
             <>
@@ -145,28 +132,27 @@ function DayPager({ item, labels, dayLabel, dark }) {
             <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="butt"><path d="M9 5l7 7-7 7" /></svg>
           </button>
         )}
-        {total > 0 && (
-          <div className="media-progress dp-progress" aria-hidden="true">
-            <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
-            <div className="mp-meta">
-              <span>{(labels.progressFmt || '').replace('{d}', d.day_number).replace('{r}', left)}</span>
-              <span className="mp-pct">{pct}%</span>
-            </div>
-          </div>
-        )}
       </div>
 
-      <SupportStrip people={item.supporters} title={(labels.supportStrip || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
+      {total > 0 && (
+        <div className="progress-under" aria-hidden="true">
+          <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
+          <div className="mp-meta">
+            <span>{(labels.progressFmt || '').replace('{d}', d.day_number).replace('{r}', left)}</span>
+            <span className="mp-pct">{pct}%</span>
+          </div>
+        </div>
+      )}
 
-      <div className="entry-actions">
+      <div className="entry-actions feed-acts">
         <EncourageBar key={'e' + d.id} updateId={d.id} initialActive={d.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
-        {(d.kind === 'setback' || d.comeback) && !item.own && <MeTooButton key={'m' + d.id} updateId={d.id} labels={labels.metoo} />}
-        <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
         <Comments key={'c' + d.id} updateId={d.id} labels={labels.comments} />
-        <HugButton key={'h' + d.id} toId={item.owner.id} updateId={d.id} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
+        <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
+        {(d.kind === 'setback' || d.comeback) && !item.own && <MeTooButton key={'m' + d.id} updateId={d.id} labels={labels.metoo} />}
         {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
         {item.own && <EditUpdate key={'ed' + d.id} update={{ id: d.id, text: d.text, photo_url: d.photo_url, day: d.day_number }} labels={labels.editUpdate}
           onChanged={(patch) => setDays((prev) => patch === null ? prev.filter((x) => x.id !== d.id) : prev.map((x) => x.id === d.id ? { ...x, ...patch } : x))} />}
+        <SupportStrip inline people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
       </div>
     </>
   );
@@ -195,9 +181,14 @@ function DemoActions({ item, labels }) {
   const commenters = (item.supporters || []).slice(0, 3);
   return (
     <>
-    <div className="entry-actions">
+    <div className="entry-actions feed-acts">
       <button type="button" className={`support-pill${liked ? ' on' : ''}`} onClick={() => setLiked((v) => !v)} aria-label={labels.supportIdle}>
-        <svg className="sp-heart" viewBox="0 0 24 24" width="22" height="22" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1 7.8 7.8 7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+        <svg className="sp-heart" viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M11 14h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16" />
+          <path d="m7 20 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9" />
+          <path d="m2 15 6 6" />
+          <path d="M19.5 8.5c.7-.7 1.5-1.6 1.5-2.7A2.73 2.73 0 0 0 16 4a2.78 2.78 0 0 0-5 1.8c0 1.2.8 2 1.5 2.8L16 12Z" />
+        </svg>
         <span className="action-label">{labels.supportIdle}</span>
       </button>
       <button type="button" className="comment-toggle" aria-label={labels.comments.comment} onClick={() => setShowC((v) => !v)}>
@@ -205,7 +196,7 @@ function DemoActions({ item, labels }) {
         <span className="action-label">{labels.comments.comment}</span>
       </button>
       <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
-      <HugButton demo name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
+      <SupportStrip inline people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
     </div>
     {showC && (
       <div className="comment-panel">
@@ -334,11 +325,10 @@ export default function FeedClient({ labels }) {
             <div className="entry-media">
               {item.kind === 'video' ? <video src={item.url} controls playsInline preload="metadata" /> : <img src={item.url} alt="" />}
             </div>
-            <div className="entry-actions">
+            <div className="entry-actions feed-acts">
               <EncourageBar mediaId={item.mediaId} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
-              <FeedShare slug={item.owner.handle || ''} title={item.owner.name} label={labels.share} copiedLabel={labels.linkCopied} />
               <Comments mediaId={item.mediaId} labels={labels.comments} />
-              <HugButton toId={item.owner.id} mediaId={item.mediaId} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
+              <FeedShare slug={item.owner.handle || ''} title={item.owner.name} label={labels.share} copiedLabel={labels.linkCopied} />
               {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
             </div>
             {item.challenge && <ChallengeStrip challenge={item.challenge} labels={labels.ch} />}
@@ -402,18 +392,16 @@ export default function FeedClient({ labels }) {
               );
             })()}
 
-            <SupportStrip people={item.supporters} title={(labels.supportStrip || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
-
             {item.demo ? (
               <DemoActions item={item} labels={labels} />
             ) : (
-              <div className="entry-actions">
+              <div className="entry-actions feed-acts">
                 <EncourageBar updateId={item.id} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
-                {(item.kind === 'setback' || item.comeback) && !item.demo && !item.own && <MeTooButton updateId={item.id} labels={labels.metoo} />}
-                <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
                 <Comments updateId={item.id} labels={labels.comments} />
-                <HugButton toId={item.owner.id} updateId={item.id} name={(item.owner.name || '').split(' ')[0]} labels={labels.hug} />
+                <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
+                {(item.kind === 'setback' || item.comeback) && !item.demo && !item.own && <MeTooButton updateId={item.id} labels={labels.metoo} />}
                 {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
+                <SupportStrip inline people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
               </div>
             )}
             </>
