@@ -4,86 +4,103 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 import { track } from '../../lib/track';
 
-const COLORS = {
-  art: '#6c5ce7', body: '#0ea5e9', home: '#ff7a45', work: '#111827', life: '#16a34a',
-  study: '#2563eb', health: '#16a34a', mind: '#6c5ce7', money: '#0e9f6e',
-  relationship: '#f02f87', habit: '#ff7a45', creative: '#a855f7',
-};
 const MAX_VIDEO = 60 * 1024 * 1024;
 const STEPS = 3;
 
+const COLORS = {
+  art: '#6c5ce7', body: '#0ea5e9', home: '#ff7a45', work: '#111827', life: '#16a34a',
+  study: '#2563eb', health: '#16a34a', mind: '#6c5ce7', money: '#0e9f6e',
+  relationship: '#f02f87', habit: '#ff7a45', creative: '#a855f7', other: '#8a8a8a',
+};
+
+// Adivinha a categoria pelo título. A pessoa pode trocar,
+// mas não precisa decidir nada se o palpite estiver certo.
+const PISTAS = {
+  body: ['academia', 'treino', 'malhar', 'correr', 'corrida', 'caminhar', 'caminhada', 'emagrecer', 'muscul', 'gym', 'run', 'walk', 'workout'],
+  health: ['saude', 'agua', 'dormir', 'sono', 'fumar', 'beber', 'alcool', 'remedio', 'medico', 'health', 'sleep', 'quit', 'water'],
+  study: ['estudar', 'estudo', 'ingles', 'faculdade', 'prova', 'concurso', 'curso', 'aula', 'ler ', 'leitura', 'study', 'read', 'course', 'english'],
+  work: ['trabalho', 'emprego', 'carreira', 'curriculo', 'negocio', 'cliente', 'vender', 'work', 'job', 'career'],
+  money: ['dinheiro', 'divida', 'economizar', 'poupar', 'financ', 'money', 'debt', 'save'],
+  mind: ['ansiedade', 'meditar', 'meditacao', 'calma', 'mente', 'terapia', 'respirar', 'mind', 'anxiety', 'meditate'],
+  creative: ['desenhar', 'desenho', 'pintar', 'escrever', 'musica', 'tocar', 'violao', 'foto', 'draw', 'paint', 'write', 'music'],
+  relationship: ['familia', 'pai', 'mae', 'filho', 'filha', 'amigo', 'namoro', 'casamento', 'conversar', 'family', 'friend'],
+  home: ['casa', 'organizar', 'arrumar', 'limpar', 'quarto', 'cozinha', 'home', 'clean', 'organize'],
+  habit: ['habito', 'rotina', 'celular', 'tela', 'habit', 'routine', 'screen'],
+};
+const semAcento = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+function adivinhar(txt) {
+  const t = semAcento(txt);
+  if (t.length < 3) return '';
+  for (const [c, palavras] of Object.entries(PISTAS)) {
+    for (const p of palavras) if (t.includes(semAcento(p))) return c;
+  }
+  return '';
+}
+
 function slugify(title) {
-  const base = title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'journey';
+  const base = semAcento(title).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'journey';
   return `${base}-${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
 export default function NewJourneyForm({ userId, t }) {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [erro, setErro] = useState('');
+
   const [title, setTitle] = useState('');
+  const [dur, setDur] = useState('30');
+  const [customDur, setCustomDur] = useState('');
   const [goal, setGoal] = useState('');
-  const [cat, setCat] = useState('art');
-  const [moment, setMoment] = useState('');
+  const [cat, setCat] = useState('');
+  const [catTocada, setCatTocada] = useState(false);
+  const [customCat, setCustomCat] = useState('');
+  const [first, setFirst] = useState('');
   const [visibility, setVisibility] = useState('public');
   const [photoUrl, setPhotoUrl] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const customRef = useRef(null);
-  const durRef = useRef(null);
-  const [dur, setDur] = useState('30');
-  const [customDur, setCustomDur] = useState('');
-  const firstRef = useRef(null);
+
   const photoRef = useRef(null);
   const videoRef = useRef(null);
   const router = useRouter();
 
   const CATS = [
-    ['art', t.catArt], ['body', t.catBody], ['health', t.catHealth], ['mind', t.catMind],
-    ['study', t.catStudy], ['work', t.catWork], ['money', t.catMoney], ['relationship', t.catRelationship],
-    ['habit', t.catHabit], ['creative', t.catCreative], ['home', t.catHome], ['life', t.catLife],
+    ['body', t.catBody], ['health', t.catHealth], ['mind', t.catMind], ['study', t.catStudy],
+    ['work', t.catWork], ['money', t.catMoney], ['relationship', t.catRelationship],
+    ['creative', t.catCreative], ['home', t.catHome], ['habit', t.catHabit], ['life', t.catLife],
   ];
-  const suggestions = [t.ex1, t.ex2, t.ex3, t.ex4, t.ex5];
-  const MOMENTS = [
-    ['starting', t.mStarting], ['notgiveup', t.mNotgiveup], ['rebuilding', t.mRebuilding],
-    ['health', t.mHealth], ['courage', t.mCourage], ['hardphase', t.mHardphase], ['building', t.mBuilding],
+  const sugestoes = [t.ex1, t.ex2, t.ex3, t.ex4, t.ex5].filter(Boolean);
+  const DURS = [['7', t.dur7], ['30', t.dur30], ['60', t.dur60], ['100', t.dur100], ['other', t.durCustom]];
+  const VIS = [
+    ['public', t.pubPublic, t.pubPublicSub],
+    ['followers', t.pubFollowers, t.pubFollowersSub],
+    ['private', t.pubPrivate, t.pubPrivateSub],
   ];
-  // Adivinha a categoria pelo que a pessoa escreveu. Ela pode trocar,
-  // mas não precisa decidir nada se o palpite estiver certo.
-  const PISTAS = {
-    body: ['academia', 'treino', 'malhar', 'correr', 'corrida', 'caminhar', 'caminhada', 'peso', 'emagrecer', 'muscul', 'gym', 'run', 'walk', 'workout'],
-    health: ['saude', 'saúde', 'agua', 'água', 'dormir', 'sono', 'parar de fumar', 'beber', 'alcool', 'álcool', 'remedio', 'terapia', 'health', 'sleep', 'quit'],
-    study: ['estudar', 'estudo', 'ingles', 'inglês', 'faculdade', 'prova', 'concurso', 'curso', 'aula', 'ler', 'livro', 'study', 'read', 'course', 'english'],
-    work: ['trabalho', 'emprego', 'carreira', 'curriculo', 'currículo', 'negocio', 'negócio', 'cliente', 'vender', 'work', 'job', 'career'],
-    money: ['dinheiro', 'divida', 'dívida', 'economizar', 'poupar', 'gastar', 'financ', 'money', 'debt', 'save'],
-    mind: ['ansiedade', 'meditar', 'meditacao', 'meditação', 'calma', 'mente', 'terapia', 'respirar', 'mind', 'anxiety', 'meditate'],
-    creative: ['desenhar', 'desenho', 'pintar', 'escrever', 'musica', 'música', 'tocar', 'violao', 'violão', 'foto', 'draw', 'paint', 'write', 'music'],
-    relationship: ['familia', 'família', 'pai', 'mae', 'mãe', 'filho', 'filha', 'amigo', 'namoro', 'casamento', 'conversar', 'family', 'friend'],
-    home: ['casa', 'organizar', 'arrumar', 'limpar', 'quarto', 'cozinha', 'home', 'clean', 'organize'],
-    habit: ['habito', 'hábito', 'rotina', 'todo dia', 'celular', 'tela', 'habit', 'routine', 'screen'],
-  };
-  function adivinhar(txt) {
-    const t2 = (txt || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    for (const [c, palavras] of Object.entries(PISTAS)) {
-      for (const p of palavras) {
-        const pn = p.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        if (t2.includes(pn)) return c;
-      }
-    }
-    return '';
-  }
-  const [catTocada, setCatTocada] = useState(false);
+
   useEffect(() => {
     if (catTocada) return;
     const g = adivinhar(title);
     if (g) setCat(g);
-  }, [title, catTocada]);
+  }, [title, catTocada]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const heads = [
-    [t.wizT1, t.wizS1],   // O que você vai continuar + por quanto tempo
-    [t.wizT3, t.wizS3],   // Por que isso importa
-    [t.wizT4, t.wizS4],   // Seu primeiro dia
+    [t.wizT1, t.wizS1],
+    [t.wizT3, t.wizS3],
+    [t.wizT4, t.wizS4],
   ];
+
+  const podeAvancar =
+    (step === 0 && title.trim().length >= 2 && (dur !== 'other' || parseInt(customDur || '0', 10) > 0)) ||
+    (step === 1 && goal.trim().length >= 3) ||
+    step === 2;
+
+  function irPara(n) {
+    setErro('');
+    setStep(n);
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function avancar() { if (podeAvancar && step < STEPS - 1) irPara(step + 1); }
+  function voltar() { if (step > 0) irPara(step - 1); }
 
   async function upload(file) {
     const supabase = createClient();
@@ -96,168 +113,201 @@ export default function NewJourneyForm({ userId, t }) {
   async function onPhoto(e) {
     const file = e.target.files?.[0]; if (!file) return;
     setUploading(true); const url = await upload(file); setUploading(false);
-    if (!url) { alert(t.createError); return; }
+    if (!url) { setErro(t.createError); return; }
     setPhotoUrl(url); setVideoUrl(null); if (videoRef.current) videoRef.current.value = '';
   }
   async function onVideo(e) {
     const file = e.target.files?.[0]; if (!file) return;
-    if (file.size > MAX_VIDEO) { alert(t.videoTooBig); e.target.value = ''; return; }
+    if (file.size > MAX_VIDEO) { setErro(t.videoTooBig); e.target.value = ''; return; }
     setUploading(true); const url = await upload(file); setUploading(false);
-    if (!url) { alert(t.createError); return; }
+    if (!url) { setErro(t.createError); return; }
     setVideoUrl(url); setPhotoUrl(null); if (photoRef.current) photoRef.current.value = '';
   }
 
-  const canNext = (step === 0 && !!title.trim()) || (step === 1 && !!goal.trim()) || step === 2;
-  function next() { if (canNext && step < STEPS - 1) setStep(step + 1); }
-  function back() { if (step > 0) setStep(step - 1); }
+  // Só cria quando a pessoa toca no botão da última tela.
+  // Não existe <form>: nada aqui pode enviar sozinho.
+  async function criar() {
+    if (saving || uploading || step !== STEPS - 1) return;
+    setSaving(true); setErro('');
 
-  async function onSubmit(e) {
-    e.preventDefault(); if (saving) return; setSaving(true);
-    let category = cat;
-    if (cat === 'other') category = (customRef.current?.value.trim().toLowerCase() || 'other').slice(0, 24);
-    const total_days = dur === 'other' ? Math.min(730, Math.max(1, parseInt(customDur || '30', 10) || 30)) : parseInt(dur, 10);
-    const first = (firstRef.current?.value || '').trim();
+    const category = cat === 'other'
+      ? (customCat.trim().toLowerCase() || 'other').slice(0, 24)
+      : (cat || 'life');
+    const total_days = dur === 'other'
+      ? Math.min(730, Math.max(1, parseInt(customDur || '30', 10) || 30))
+      : parseInt(dur, 10);
 
     const supabase = createClient();
     const slug = slugify(title);
     const payload = {
       owner_id: userId, slug, title: title.trim(), category, goal: goal.trim(), total_days,
-      cover_color: COLORS[category] || '#ff7a45', is_public: visibility === 'public', visibility, moment: moment || null,
+      cover_color: COLORS[category] || '#ff7a45', is_public: visibility === 'public', visibility,
     };
+
     let { data: journey, error } = await supabase.from('journeys').insert(payload).select().single();
     if (error && /visibility|column/i.test(error.message || '')) {
-      const { visibility: _v, ...noVis } = payload;
-      ({ data: journey, error } = await supabase.from('journeys').insert(noVis).select().single());
+      const { visibility: _v, ...semVis } = payload;
+      ({ data: journey, error } = await supabase.from('journeys').insert(semVis).select().single());
     }
-    if (error || !journey) { setSaving(false); alert(t.createError); return; }
+    if (error || !journey) { setSaving(false); setErro(t.createError); return; }
 
-    // Dia 1 nunca pode faltar: sem ele a jornada não aparece no feed.
-    const day1 = {
-      journey_id: journey.id, day_number: 1, kind: 'step',
-      text: first || (photoUrl ? '\u{1F4F7}' : (videoUrl ? '\u{1F3A5}' : (t.firstDayDefault || 'Comecei.'))),
+    // O dia 1 nunca pode faltar: sem ele a jornada não aparece no feed.
+    const texto = first.trim() || (photoUrl ? '\u{1F4F7}' : (videoUrl ? '\u{1F3A5}' : (t.firstDayDefault || 'Comecei.')));
+    let { error: upErr } = await supabase.from('updates').insert({
+      journey_id: journey.id, day_number: 1, kind: 'step', text: texto,
       photo_url: photoUrl, video_url: videoUrl,
-    };
-    let { error: upErr } = await supabase.from('updates').insert(day1);
+    });
     if (upErr) {
-      // tenta sem os campos opcionais (coluna ausente / valor recusado)
-      const { error: retryErr } = await supabase.from('updates').insert({
-        journey_id: journey.id, day_number: 1, kind: 'step', text: day1.text,
+      const { error: retry } = await supabase.from('updates').insert({
+        journey_id: journey.id, day_number: 1, kind: 'step', text: texto,
       });
-      upErr = retryErr;
+      upErr = retry;
     }
-    if (upErr) { setSaving(false); alert(t.createError); return; }
+    if (upErr) { setSaving(false); setErro(t.createError); return; }
+
     track('journey_created', { slug, visibility });
     track('day1_posted', { slug });
-    router.push(`/created/${slug}`); router.refresh();
+    router.push(`/created/${slug}`);
+    router.refresh();
   }
 
+  // Enter nunca envia nada: no máximo avança de tela.
   function onKeyDown(e) {
-    if (e.key === 'Enter' && e.target.tagName === 'INPUT' && step < STEPS - 1) { e.preventDefault(); next(); }
+    if (e.key !== 'Enter') return;
+    if (e.target.tagName === 'TEXTAREA') return;
+    e.preventDefault();
+    if (step < STEPS - 1) avancar();
   }
 
   return (
-    <form className="wizard" onSubmit={onSubmit} onKeyDown={onKeyDown}>
-      <div className="wiz-top">
-        <div className="wiz-dots">
-          {Array.from({ length: STEPS }).map((_, i) => (
-            <span key={i} className={`wiz-dot${i === step ? ' on' : ''}${i < step ? ' done' : ''}`} />
-          ))}
-        </div>
-        <span className="wiz-count">{t.wizStep.replace('{n}', step + 1).replace('{t}', STEPS)}</span>
+    <div className="wz" onKeyDown={onKeyDown}>
+      <div className="wz-rail" aria-hidden="true">
+        {Array.from({ length: STEPS }).map((_, i) => (
+          <span key={i} className={`wz-bar${i === step ? ' on' : ''}${i < step ? ' done' : ''}`} />
+        ))}
       </div>
 
-      <div className="wiz-head">
-        <h2>{heads[step][0]}</h2>
+      <div className="wz-head">
+        <span className="wz-count">{(t.wizStep || '{n}/{t}').replace('{n}', step + 1).replace('{t}', STEPS)}</span>
+        <h1>{heads[step][0]}</h1>
         <p>{heads[step][1]}</p>
       </div>
 
-      {/* ---------- 1. O que você vai continuar ---------- */}
-      <div className="wiz-step" style={{ display: step === 0 ? 'block' : 'none' }}>
-        <input className="wiz-title" value={title} onChange={e => setTitle(e.target.value)}
-          maxLength={80} placeholder={t.fNamePh} autoFocus />
-        <div className="sug-pills">
-          {suggestions.map((sg, i) => (
-            <button key={i} type="button" className="sug-pill" onClick={() => setTitle(sg)}>{sg}</button>
-          ))}
-        </div>
+      {/* ---------------- 1 · o que e por quanto tempo ---------------- */}
+      {step === 0 && (
+        <div className="wz-body">
+          <input className="wz-input" value={title} onChange={(e) => setTitle(e.target.value)}
+            maxLength={80} placeholder={t.fNamePh} autoFocus />
 
-        <div className="wiz-sep" />
+          {!title.trim() && sugestoes.length > 0 && (
+            <div className="wz-sugs">
+              {sugestoes.map((sg, i) => (
+                <button type="button" key={i} className="wz-sug" onClick={() => setTitle(sg)}>{sg}</button>
+              ))}
+            </div>
+          )}
 
-        <div className="field-label">{t.fDuration}</div>
-        <div className="dur-chips">
-          {[['7', t.dur7], ['30', t.dur30], ['60', t.dur60], ['100', t.dur100], ['other', t.durCustom]].map(([v, l]) => (
-            <button type="button" key={v} className={`dur-chip${dur === v ? ' on' : ''}`} onClick={() => setDur(v)}>{l}</button>
-          ))}
-        </div>
-        {dur === 'other' && (
-          <div className="dur-custom">
-            <input type="number" min="1" max="730" value={customDur} onChange={e => setCustomDur(e.target.value)} placeholder={t.durCustomPh} />
-            <span>{t.durDaysWord}</span>
+          <div className="wz-field">
+            <span className="wz-label">{t.fDuration}</span>
+            <div className="wz-chips">
+              {DURS.map(([v, l]) => (
+                <button type="button" key={v} className={`wz-chip${dur === v ? ' on' : ''}`} onClick={() => setDur(v)}>{l}</button>
+              ))}
+            </div>
+            {dur === 'other' && (
+              <div className="wz-num">
+                <input type="number" min="1" max="730" value={customDur}
+                  onChange={(e) => setCustomDur(e.target.value)} placeholder={t.durCustomPh} />
+                <span>{t.durDaysWord}</span>
+              </div>
+            )}
+            <p className="wz-hint">{t.durHint}</p>
           </div>
-        )}
-        <p className="dur-hint">{t.durHint}</p>
-      </div>
-
-      {/* ---------- 2. Por que isso importa ---------- */}
-      <div className="wiz-step" style={{ display: step === 1 ? 'block' : 'none' }}>
-        <div className="why-field big">
-          <textarea value={goal} onChange={e => setGoal(e.target.value)} maxLength={300} placeholder={t.fWhyPh} rows={5} />
-          <span className="why-count">{goal.length}/300</span>
         </div>
-        <p className="why-note">{t.wizWhyNote}</p>
+      )}
 
-        <div className="wiz-sep" />
+      {/* ---------------- 2 · por que importa ---------------- */}
+      {step === 1 && (
+        <div className="wz-body">
+          <div className="wz-area">
+            <textarea value={goal} onChange={(e) => setGoal(e.target.value)}
+              maxLength={300} rows={5} placeholder={t.fWhyPh} autoFocus />
+            <span className="wz-inline-count">{goal.length}/300</span>
+          </div>
+          <p className="wz-hint">{t.wizWhyNote}</p>
 
-        <div className="field-label soft">{t.fCategory}</div>
-        <div className="cat-pick compact">
-          {CATS.map(([v, l]) => (
-            <button key={v} type="button" className={`chip${cat === v ? ' on' : ''}`}
-              onClick={() => { setCat(v); setCatTocada(true); }}>{l}</button>
-          ))}
-          <button type="button" className={`chip${cat === 'other' ? ' on' : ''}`}
-            onClick={() => { setCat('other'); setCatTocada(true); }}>+ {t.catOther}</button>
+          <div className="wz-field">
+            <span className="wz-label">{t.fCategory}</span>
+            <div className="wz-chips">
+              {CATS.map(([v, l]) => (
+                <button type="button" key={v} className={`wz-chip${cat === v ? ' on' : ''}`}
+                  onClick={() => { setCat(v); setCatTocada(true); }}>{l}</button>
+              ))}
+              <button type="button" className={`wz-chip${cat === 'other' ? ' on' : ''}`}
+                onClick={() => { setCat('other'); setCatTocada(true); }}>{t.catOther}</button>
+            </div>
+            {cat === 'other' && (
+              <input className="wz-input small" value={customCat} onChange={(e) => setCustomCat(e.target.value)}
+                maxLength={24} placeholder={t.customCatPh} />
+            )}
+          </div>
         </div>
-        {cat === 'other' && <input ref={customRef} className="custom-cat" maxLength={24} placeholder={t.customCatPh} />}
-      </div>
+      )}
 
-      {/* ---------- 3. Seu primeiro dia ---------- */}
-      <div className="wiz-step" style={{ display: step === 2 ? 'block' : 'none' }}>
-        <label>
-          <textarea ref={firstRef} maxLength={500} placeholder={t.fFirstPh} rows={4} />
-        </label>
-        {photoUrl && <div className="photo-preview"><img src={photoUrl} alt="" /></div>}
-        {videoUrl && <div className="photo-preview"><video src={videoUrl} controls playsInline /></div>}
-        <div className="media-row">
-          <button type="button" className="chip photo" onClick={() => photoRef.current?.click()} disabled={uploading}>
-            {uploading ? t.uploading : (photoUrl ? t.photoAdded : t.addPhoto)}
-          </button>
-          <button type="button" className="chip photo" onClick={() => videoRef.current?.click()} disabled={uploading}>
-            {uploading ? t.uploading : (videoUrl ? t.videoAdded : t.addVideo)}
-          </button>
-          <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPhoto} />
-          <input ref={videoRef} type="file" accept="video/*" hidden onChange={onVideo} />
-        </div>
+      {/* ---------------- 3 · o primeiro dia ---------------- */}
+      {step === 2 && (
+        <div className="wz-body">
+          <div className="wz-area">
+            <textarea value={first} onChange={(e) => setFirst(e.target.value)}
+              maxLength={500} rows={4} placeholder={t.fFirstPh} autoFocus />
+          </div>
 
-        <div className="wiz-sep" />
+          {photoUrl && <div className="wz-media"><img src={photoUrl} alt="" /></div>}
+          {videoUrl && <div className="wz-media"><video src={videoUrl} controls playsInline /></div>}
 
-        <div className="field-label soft">{t.wizTpriv}</div>
-        <div className="vis-pick row">
-          {[['public', t.pubPublic, t.pubPublicSub], ['followers', t.pubFollowers, t.pubFollowersSub], ['private', t.pubPrivate, t.pubPrivateSub]].map(([v, l, sub]) => (
-            <button key={v} type="button" className={`vis-opt${visibility === v ? ' on' : ''}`} onClick={() => setVisibility(v)}>
-              <b>{l}</b><span>{sub}</span>
+          <div className="wz-chips">
+            <button type="button" className={`wz-chip${photoUrl ? ' on' : ''}`}
+              onClick={() => photoRef.current?.click()} disabled={uploading}>
+              {uploading ? t.uploading : (photoUrl ? t.photoAdded : t.addPhoto)}
             </button>
-          ))}
-        </div>
-      </div>
+            <button type="button" className={`wz-chip${videoUrl ? ' on' : ''}`}
+              onClick={() => videoRef.current?.click()} disabled={uploading}>
+              {uploading ? t.uploading : (videoUrl ? t.videoAdded : t.addVideo)}
+            </button>
+            <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPhoto} />
+            <input ref={videoRef} type="file" accept="video/*" hidden onChange={onVideo} />
+          </div>
 
-      <div className="wiz-nav">
-        {step > 0
-          ? <button type="button" className="ghost-btn" onClick={back}>{t.wizBack}</button>
-          : <span />}
-        {step < STEPS - 1
-          ? <button type="button" className="cta grow" onClick={next} disabled={!canNext}>{t.wizNext}</button>
-          : <button type="submit" className="cta grow" disabled={saving || uploading}>{saving ? t.creating : t.createBtn}</button>}
+          <div className="wz-field">
+            <span className="wz-label">{t.wizTpriv}</span>
+            <div className="wz-vis">
+              {VIS.map(([v, l, sub]) => (
+                <button type="button" key={v} className={`wz-opt${visibility === v ? ' on' : ''}`} onClick={() => setVisibility(v)}>
+                  <i aria-hidden="true" />
+                  <span><b>{l}</b><em>{sub}</em></span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {erro && <p className="wz-erro" role="alert">{erro}</p>}
+
+      <div className="wz-nav">
+        <button type="button" className="wz-back" onClick={voltar} disabled={step === 0 || saving}>
+          {t.wizBack}
+        </button>
+        {step < STEPS - 1 ? (
+          <button type="button" className="wz-go" onClick={avancar} disabled={!podeAvancar}>
+            {t.wizNext}
+          </button>
+        ) : (
+          <button type="button" className="wz-go" onClick={criar} disabled={saving || uploading}>
+            {saving ? t.creating : t.createBtn}
+          </button>
+        )}
       </div>
-    </form>
+    </div>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '../lib/supabase/client';
 
 export default function DeleteJourney({ journeyId, title, labels }) {
   const L = labels || {};
@@ -12,10 +11,15 @@ export default function DeleteJourney({ journeyId, title, labels }) {
     if (busy) return;
     if (!window.confirm((L.confirm || '').replace('{title}', title))) return;
     setBusy(true);
-    const sb = createClient();
-    const { error } = await sb.from('journeys').delete().eq('id', journeyId);
+    // pelo servidor: o delete pelo navegador podia apagar zero linhas
+    // sem devolver erro nenhum — a pessoa clicava e nada acontecia
+    const r = await fetch('/api/journey/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: journeyId }),
+    }).catch(() => null);
     setBusy(false);
-    if (error) { alert(L.error); return; }
+    if (!r || !r.ok) { alert(L.error || 'Não foi possível excluir. Tente de novo.'); return; }
     router.refresh();
   }
 
