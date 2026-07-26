@@ -4092,3 +4092,38 @@ h1 { letter-spacing: -0.03em; }
   .land-hero h1.land-brand{font-size:13px;letter-spacing:.16em;margin-bottom:12px}
   .land-hero .land-headline{font-size:30px;line-height:1.12}
 }
+
+/* ============================================================
+   ENTRAR COM E-MAIL — codigo de 6 digitos
+   Segunda porta ao lado do Google. Codigo em vez de link magico:
+   dentro do app instalado, link de e-mail abre o navegador e a
+   pessoa termina logada fora do app.
+   ============================================================ */
+.auth-or{display:flex;align-items:center;gap:12px;margin:16px 0 14px;color:var(--muted)}
+.auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:var(--line)}
+.auth-or span{
+  font-family:var(--display);font-weight:800;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;
+}
+
+.elog{display:flex;flex-direction:column;gap:10px;text-align:left}
+.elog-mail,.elog-code{
+  width:100%;padding:14px 16px;border:1px solid var(--line);background:#fffdf9;
+  font-size:16px;color:var(--ink);   /* 16px evita o zoom automatico do iOS */
+}
+.elog-mail:focus,.elog-code:focus{outline:2px solid var(--sage);outline-offset:-1px}
+.elog-code{
+  text-align:center;font-family:var(--display);font-weight:800;
+  font-size:30px;letter-spacing:.42em;text-indent:.42em;padding:16px 12px;
+}
+.elog-go{min-height:48px;width:100%}
+.elog-sent{margin:0 0 2px;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.elog-erro{margin:0;font-size:13px;line-height:1.5;color:#b3564a}
+.elog-links{display:flex;justify-content:space-between;gap:10px;margin-top:2px}
+.elog-links button{
+  border:0;background:none;padding:6px 0;cursor:pointer;min-height:32px;
+  font-family:var(--display);font-weight:800;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);
+}
+.elog-links button:hover:not(:disabled){color:var(--ink)}
+.elog-links button:disabled{opacity:.45;cursor:default}
