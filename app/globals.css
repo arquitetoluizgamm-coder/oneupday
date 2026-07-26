@@ -3206,3 +3206,27 @@ h1 { letter-spacing: -0.03em; }
 .pq-eyebrow{display:block;font-family:var(--display);font-weight:800;font-size:9.5px;
   letter-spacing:.12em;text-transform:uppercase;color:#6f7c66;margin-bottom:5px}
 .pq-text{font-size:15px;line-height:1.5;color:var(--ink);quotes:'“' '”'}
+
+/* ============================================================
+   CAPACIDADES EM CONSTRUCAO
+   O que a pessoa aprendeu a fazer — vale para jornada com
+   numero e para jornada que nao tem numero nenhum.
+   ============================================================ */
+.cap-block{margin:16px 0 0}
+.cap-title{margin:0 0 10px;font-family:var(--display);font-weight:800;font-size:10px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.cap-card{display:flex;gap:12px;align-items:flex-start;padding:14px;margin-bottom:8px;
+  background:var(--surface);border:1px solid var(--line);border-left:3px solid #84917A}
+.cap-card.cap-voltar{border-left-color:#E8A64C}
+.cap-card.cap-dificil{border-left-color:#C16F54}
+.cap-mark{flex:0 0 auto;width:30px;height:30px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:800;color:#84917A;border:1.5px solid currentColor;border-radius:50%}
+.cap-voltar .cap-mark{color:#E8A64C}
+.cap-dificil .cap-mark{color:#C16F54}
+.cap-body{min-width:0;flex:1}
+.cap-body b{display:block;font-size:15px;line-height:1.35;letter-spacing:-.01em;margin-bottom:7px}
+.cap-body ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.cap-body li{font-size:13px;line-height:1.45;color:var(--muted);padding-left:12px;position:relative}
+.cap-body li::before{content:'';position:absolute;left:0;top:8px;width:4px;height:4px;
+  border-radius:50%;background:currentColor;opacity:.45}
+.cap-note{margin:6px 0 0;font-size:11px;line-height:1.45;color:var(--muted);opacity:.8}

@@ -16,6 +16,8 @@ import Track from '../../components/Track';
 import AppTop from '../../components/AppTop';
 import NextChapter from '../../components/NextChapter';
 import Espelho, { PorQue } from '../../components/Espelho';
+import Capacidades from '../../components/Capacidades';
+import { analisarCapacidades } from '../../lib/capacidades';
 import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
 import ProfileTabs from '../../components/ProfileTabs';
 import EditProfileInfo from '../../components/EditProfileInfo';
@@ -111,6 +113,18 @@ export default async function Perfil() {
         .eq('journey_id', primary.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
       const parou = last ? (Date.now() - new Date(last.created_at).getTime()) / 86400000 >= 2 : false;
       if (parou || last?.kind === 'setback') porque = primary.goal;
+    }
+  } catch {}
+
+  // ---- Capacidades em construção: o que ela aprendeu a fazer ----
+  // Roda sobre os registros que já existem. Nenhum dado novo é pedido.
+  let capacidades = [];
+  try {
+    if (jIds.length) {
+      const { data: todos } = await supabase.from('updates')
+        .select('day_number, kind, created_at').in('journey_id', jIds)
+        .order('created_at', { ascending: true }).limit(400);
+      capacidades = analisarCapacidades(todos || []);
     }
   } catch {}
 
@@ -354,6 +368,10 @@ export default async function Perfil() {
         {nc.mode && (
           <div className="nc-neutral">
             {porque && <PorQue texto={porque} labels={{ eyebrow: t.pqEyebrow }} />}
+            <Capacidades lista={capacidades} labels={{ title: t.capTitle, note: t.capNote,
+              voltarTitulo: t.capVoltar, voltarAntes: t.capVoltarAntes, voltarAgora: t.capVoltarAgora, voltarMaior: t.capVoltarMaior,
+              dificilTitulo: t.capDificil, dificilProva: t.capDificilProva,
+              presencaTitulo: t.capPresenca, presencaProva: t.capPresencaProva }} />
             <Espelho labels={{ teaser: t.espTeaser, eyebrow: t.espEyebrow, dayFmt: t.dayShort, palavra: t.espPalavra, tempo: t.espTempo, tom: t.espTom, ritmo: t.espRitmo, close: t.espClose }} />
             <NextChapter mode={nc.mode} line={nc.line} env={nc.env} labels={ncLabels(t, nc)} />
           </div>
