@@ -4168,119 +4168,96 @@ h1 { letter-spacing: -0.03em; }
 @media(max-width:640px){ .jd-perigo{margin:30px 16px 30px} }
 
 /* ============================================================
-   PERFIL — o Upi ganha a linha inteira
-   Ele dividia a linha com o + e a engrenagem. Sobravam ~190px
-   para o balao no celular, e a frase caia uma palavra por linha,
-   esticando o bloco. Agora os botoes ficam na primeira linha e o
-   Upi ocupa a segunda, inteira.
+   PERFIL — o card, os botoes e o Upi
+   Bloco unico. Isto aqui foi construido em tres patches (50, 51
+   e 52) e virou tres blocos empilhados se sobrescrevendo: o
+   boneco do Upi tinha tamanho declarado em tres lugares e valia
+   o ultimo. Consolidado, cada coisa e' dita uma vez so.
    ============================================================ */
-.pc-bar{
-  display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;
-  gap:10px;
-}
-.pf-add{order:1}
-.pm-gear{order:1}
-.pc-bar-upi{order:2;flex:0 0 100%;min-width:0}
-.pc-bar-upi:empty{display:none}          /* sem mensagem, sem linha vazia */
-.pc-bar .upi{margin:2px 0 0}
 
-/* o balao precisa parecer que sai do Upi, nao ficar solto ao lado */
-.pc-bar .upi{align-items:flex-start;gap:8px}
-.pc-bar .upi-char{width:44px;height:44px}
-.pc-bar .upi-bubble{
-  flex:1 1 auto;min-width:0;max-width:none;
-  position:relative;border-radius:14px;
-  margin-top:6px;
-}
-/* biquinho apontando para o Upi */
-.pc-bar .upi-bubble::before,
-.pc-bar .upi-bubble::after{
-  content:'';position:absolute;left:-7px;top:14px;
-  width:0;height:0;
-  border-top:7px solid transparent;
-  border-bottom:7px solid transparent;
-  border-right:7px solid var(--line);
-}
-.pc-bar .upi-bubble::after{
-  left:-6px;border-right-color:var(--surface);
-}
-.pc-bar .upi-bubble p{overflow-wrap:break-word}
-
-@media(max-width:640px){
-  .pc-bar .upi-char{width:40px;height:40px}
-  .pc-bar .upi-bubble{padding:9px 12px 10px}
-  .pc-bar .upi-bubble p{font-size:14px;line-height:1.5}
-}
-
-/* ============================================================
-   PERFIL — nome e @ como um bloco so
-   O nome tinha entrelinha 1.1 (colada) e o @ vinha com margem
-   propria: as duas linhas ficavam com respiros diferentes, e o
-   conjunto parecia empurrado para cima. Agora as duas usam a
-   mesma entrelinha e nenhuma margem — o espaco entre elas passa
-   a ser so a entrelinha, igual em cima e embaixo.
-   ============================================================ */
-.pc-meta{display:flex;flex-direction:column;justify-content:center}
-.pc-meta h1{line-height:1.34}
-.pc-meta .pc-sub{margin-top:0;line-height:1.34}
-.pc-meta .pc-sub span{line-height:1.34}
-.pc-meta .pc-consistency{margin-top:7px}
-
-/* ============================================================
-   PERFIL — os dois botoes entraram no card
-   Fora do card, o + e a engrenagem dividiam a linha com o Upi:
-   o resultado era 44+44+gap comendo a largura da fala dele, que
-   quebrava a cada palavra. Agora eles moram no canto do card, na
-   linha do nome, e o Upi fica com a linha inteira embaixo.
-   ============================================================ */
-.pc-info{
+/* ---- o card: avatar e nome a esquerda, acoes no canto ----
+   O seletor tem que ser `.profile-card .pc-info`, e nao so `.pc-info`.
+   Existe um `.profile-card .pc-info{display:flex}` la em cima no arquivo,
+   com especificidade maior — enquanto esta regra foi escrita com uma
+   classe so, a grade NUNCA valeu, e o layout continuou flex com
+   `align-items:flex-start`. Era por isso que o + e a engrenagem
+   apareciam no alto do card em vez de na base. */
+.profile-card .pc-info{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
   grid-template-areas:'ava acoes-topo' 'meta acoes';
   align-items:end;
   column-gap:12px;row-gap:0;
 }
-.pc-info > .pc-avatar{grid-area:ava;justify-self:start}
-.pc-info > .pc-meta{grid-area:meta}
-.pc-acoes{
-  grid-area:acoes;
-  align-self:end;          /* colados na base do card, nao na linha do nome */
+.profile-card .pc-info > .pc-avatar{grid-area:ava;justify-self:start}
+.profile-card .pc-info > .pc-meta{grid-area:meta}
+
+/* + e engrenagem colados na base do card.
+   -3px porque o texto reserva espaco abaixo da linha de base para a
+   perna do "g" e do "p"; sem isso os botoes parecem altos demais. */
+.profile-card .pc-acoes{
+  grid-area:acoes;align-self:end;
   display:flex;align-items:center;gap:8px;
-  /* -3px: o texto tem espaco para as pernas do "g" e do "p" abaixo da
-     linha de base. Sem isso os botoes parecem 3px altos demais. */
   margin-bottom:-3px;
 }
 
-/* o Upi sozinho na linha: nada mais disputa a largura com ele */
-.pc-bar{display:block;flex-wrap:nowrap}
-.pc-bar-upi{flex:none;width:100%}
+/* nome e @ com o mesmo respiro: mesma entrelinha, nenhuma margem,
+   entao o espaco entre as duas linhas e' so a entrelinha. */
+.pc-meta{display:flex;flex-direction:column;justify-content:center}
+.pc-meta h1{line-height:1.34}
+.pc-meta .pc-sub{margin-top:0;line-height:1.34}
+.pc-meta .pc-sub span{line-height:1.34}
+.pc-meta .pc-consistency{margin-top:7px}
 
-@media(max-width:339px){
-  /* so nos aparelhos muito estreitos (iPhone SE 1a geracao e afins):
-     ali os 96px dos botoes deixariam menos de 130px para o nome. Eles
-     descem para a direita, abaixo do nome. Num celular de 390px eles
-     continuam na linha do nome, com 218px sobrando para ele. */
-  .pc-info{grid-template-columns:100%;grid-template-areas:'ava' 'meta' 'acoes'}
-  .pc-acoes{justify-content:flex-end;padding-top:12px;padding-bottom:0}
+.pc-banner .edit-banner{display:none}    /* nada flutua na capa */
+
+/* ---- a linha do Upi: ele sozinho, largura inteira ---- */
+.pc-bar{
+  --upi-tam:80px;                        /* <<< o tamanho do boneco */
+  display:block;margin:12px 2px 0;
 }
+@media(max-width:640px){ .pc-bar{margin:12px 16px 0} }
 
-/* ============================================================
-   PERFIL — o Upi voltou ao tamanho de gente
-   Eu tinha encolhido ele para 44px quando dividia a linha com o
-   + e a engrenagem: era largura roubada do recado. Os botoes
-   foram para dentro do card, o motivo acabou, e o boneco ficou
-   pequeno ao lado de um balao de duas linhas (63px de altura).
-   Agora ele e' maior que o proprio balao de uma linha — quem
-   fala tem que ter o tamanho da fala.
-   ============================================================ */
-.pc-bar .upi{gap:10px}
-.pc-bar .upi-char{width:60px;height:60px}
-.pc-bar .upi-bubble{margin-top:8px}
-/* o biquinho desce junto, para apontar para o meio do boneco */
+.pc-bar-upi{width:100%;min-width:0}
+.pc-bar-upi:empty{display:none}          /* sem fala, sem linha vazia */
+.pc-bar-upi > *{margin:0!important}
+
+.pc-bar .upi{display:flex;align-items:flex-start;gap:10px;margin:2px 0 0}
+.pc-bar .upi-char{width:var(--upi-tam);height:var(--upi-tam)}
+
+.pc-bar .upi-bubble{
+  flex:1 1 auto;min-width:0;max-width:none;
+  position:relative;border-radius:14px;margin-top:8px;
+}
+.pc-bar .upi-bubble p{overflow-wrap:break-word}
+
+/* biquinho: duas setas sobrepostas, porque triangulo em CSS nao
+   aceita borda — a de tras faz o contorno, a da frente o preenchimento.
+   A altura sai do tamanho do boneco, entao aponta para o rosto
+   sozinha quando --upi-tam muda. */
 .pc-bar .upi-bubble::before,
-.pc-bar .upi-bubble::after{top:17px}
+.pc-bar .upi-bubble::after{
+  content:'';position:absolute;left:-7px;
+  top:calc(var(--upi-tam) * .26);
+  width:0;height:0;
+  border-top:7px solid transparent;
+  border-bottom:7px solid transparent;
+  border-right:7px solid var(--line);
+}
+.pc-bar .upi-bubble::after{left:-6px;border-right-color:var(--surface)}
 
 @media(max-width:640px){
-  .pc-bar .upi-char{width:54px;height:54px}
+  .pc-bar{--upi-tam:72px}
   .pc-bar .upi{gap:9px}
+  .pc-bar .upi-bubble{padding:9px 12px 10px}
+  .pc-bar .upi-bubble p{font-size:14px;line-height:1.5}
+}
+
+/* ---- telas muito estreitas (ate 339px: iPhone SE 1a geracao) ----
+   ali os 96px dos botoes deixariam menos de 130px para o nome, entao
+   eles descem para uma linha propria. Num celular de 390px continuam
+   na linha do nome, com 218px sobrando para ele. */
+@media(max-width:339px){
+  .profile-card .pc-info{grid-template-columns:100%;grid-template-areas:'ava' 'meta' 'acoes'}
+  .profile-card .pc-acoes{justify-content:flex-end;padding-top:12px;padding-bottom:0}
 }
