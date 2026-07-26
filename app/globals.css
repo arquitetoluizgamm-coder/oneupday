@@ -3842,3 +3842,89 @@ h1 { letter-spacing: -0.03em; }
   border-bottom:1.5px solid currentColor;padding-bottom:3px;
 }
 .hist-reveal:hover em{color:#f0b767}
+
+/* ============================================================
+   PERFIL — capa limpa, ajustes atras da engrenagem
+   A capa tinha tres botoes flutuando sobre a foto. Sairam todos.
+   Abaixo do card ficou uma barra: Upi na esquerda, engrenagem na
+   direita.
+   ============================================================ */
+.pc-banner .pc-tools,
+.pc-banner .edit-banner{display:none}    /* nada mais flutua na capa */
+
+.pc-bar{
+  display:flex;align-items:center;gap:12px;
+  margin:12px 2px 0;
+}
+@media(max-width:640px){ .pc-bar{margin:12px 16px 0} }
+.pc-bar-upi{flex:1 1 auto;min-width:0}
+.pc-bar-upi > *{margin:0!important}
+
+.pm-gear{
+  flex:0 0 auto;width:44px;height:44px;display:grid;place-items:center;
+  border:1px solid var(--line);background:#fffdf9;color:var(--ink);
+  border-radius:50%;cursor:pointer;transition:background .15s ease;
+}
+.pm-gear:hover{background:#f6f2ea}
+
+/* ---- painel ---- */
+.pm-back{
+  position:fixed;inset:0;z-index:80;background:rgba(16,19,45,.42);
+  display:flex;align-items:flex-end;justify-content:center;
+  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+}
+@media(min-width:641px){ .pm-back{align-items:center} }
+
+.pm-sheet{
+  width:100%;max-width:460px;max-height:86svh;
+  display:flex;flex-direction:column;
+  background:var(--bg,#FAF7F2);
+  border-radius:20px 20px 0 0;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+@media(min-width:641px){ .pm-sheet{border-radius:18px} }
+
+.pm-head{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 12px;border-bottom:1px solid var(--line);
+}
+.pm-head b{font-family:var(--display);font-weight:800;font-size:15px;color:var(--ink)}
+.pm-x{
+  width:36px;height:36px;display:grid;place-items:center;
+  border:0;background:none;color:var(--muted);cursor:pointer;
+}
+.pm-x:hover{color:var(--ink)}
+
+.pm-body{
+  flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  padding:14px 20px 6px;
+}
+
+/* os botoes soltos viram uma lista de linhas, todas do mesmo peso */
+.pm-linhas{display:flex;flex-direction:column;gap:2px;margin-bottom:14px}
+.pm-linhas .ghost-btn,
+.pm-linhas .edit-banner{
+  display:flex!important;align-items:center;width:100%;
+  position:static!important;
+  min-height:48px;padding:0 4px;
+  border:0!important;background:none!important;box-shadow:none!important;
+  font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:0;
+  text-transform:none;color:var(--ink);text-align:left;text-decoration:none;
+  border-bottom:1px solid var(--line)!important;border-radius:0!important;
+}
+.pm-linhas .ghost-btn:hover,
+.pm-linhas .edit-banner:hover{background:#f6f2ea!important}
+
+/* push e primeiro eco entram como blocos, ja tem titulo e explicacao */
+.pm-body .push-row{margin:0 0 10px;padding:14px 0;border-top:1px solid var(--line)}
+.pm-body .push-row:first-of-type{border-top:0}
+
+/* sair: separado, e a unica coisa daqui que nao se desfaz num toque */
+.pm-sair{flex:0 0 auto;padding:12px 20px 18px;border-top:1px solid var(--line)}
+.pm-sair-btn{
+  width:100%;min-height:46px;cursor:pointer;
+  border:1px solid var(--line);background:none;color:#b3564a;
+  font-family:var(--display);font-weight:800;font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;
+}
+.pm-sair-btn:hover{background:#fbeeeb}

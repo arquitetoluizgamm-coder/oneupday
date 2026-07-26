@@ -21,6 +21,7 @@ import { analisarCapacidades } from '../../lib/capacidades';
 import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
 import ProfileTabs from '../../components/ProfileTabs';
 import EditProfileInfo from '../../components/EditProfileInfo';
+import ProfileMenu from '../../components/ProfileMenu';
 import DeleteJourney from '../../components/DeleteJourney';
 import EditJourney from '../../components/EditJourney';
 import JourneyDays from '../../components/JourneyDays';
@@ -199,14 +200,7 @@ export default async function Perfil() {
       <Track type="visit" meta={{ page: "perfil" }} />
       <main className="wrap">
         <section className="profile-card">
-          <div className="pc-banner" style={profile.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : undefined}>
-            <EditBanner userId={user.id} label={t.editBanner} uploadingLabel={t.uploading} cropLabels={{ cover: t.cropCover, use: t.cropUse, cancel: t.cropCancel, hint: t.cropHint, zoom: t.cropZoom }} />
-            <div className="pc-tools">
-              <EditProfileInfo userId={user.id} initialName={profile.name} initialHandle={profile.handle} labels={{ btn: t.epBtn, title: t.epTitle, name: t.epName, handle: t.epHandle, hint: t.epHint, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errName: t.epErrName, errHandle: t.epErrHandle, errTaken: t.epErrTaken, errSave: t.epErrSave }} />
-              <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
-              <form action="/auth/signout" method="post"><button className="ghost-btn" type="submit">{t.signOut}</button></form>
-            </div>
-          </div>
+          <div className="pc-banner" style={profile.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : undefined} />
           <div className="pc-info">
             <div className="pc-avatar" style={{ background: profile.avatar_color || 'var(--orange)' }}>
               {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : profile.name[0]}
@@ -223,15 +217,33 @@ export default async function Perfil() {
           </div>
         </section>
 
-        <PushToggle vapidKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''}
-          labels={{ title: t.pushTitle, onSub: t.pushOnSub, offSub: t.pushOffSub, denied: t.pushDenied, turnOn: t.pushTurnOn, turnOff: t.pushTurnOff, wait: t.pushWait, test: t.pushTest, testSent: t.pushTestSent, testFail: t.pushTestFail }} />
+        {/* Upi de um lado, ajustes do outro. Tudo que era botao solto
+            na capa mora agora atras da engrenagem. */}
+        <div className="pc-bar">
+          <div className="pc-bar-upi">
+            {upi?.line && (
+              <UpiGreeting line={upi.line} cat={upi.cat}
+                msgKey={`${new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10)}:${upi.cat}`} />
+            )}
+          </div>
 
-        <EcoToggle inicial={profile.eco_on !== false} labels={{ title: t.ecoTitle, sub: t.ecoSub, on: t.ecoOn, off: t.ecoOff }} />
+          <ProfileMenu
+            label={t.settings}
+            closeLabel={t.epCancel}
+            sair={<form action="/auth/signout" method="post"><button className="pm-sair-btn" type="submit">{t.signOut}</button></form>}
+          >
+            <div className="pm-linhas">
+              <EditBanner userId={user.id} label={t.editBanner} uploadingLabel={t.uploading} cropLabels={{ cover: t.cropCover, use: t.cropUse, cancel: t.cropCancel, hint: t.cropHint, zoom: t.cropZoom }} />
+              <EditProfileInfo userId={user.id} initialName={profile.name} initialHandle={profile.handle} labels={{ btn: t.epBtn, title: t.epTitle, name: t.epName, handle: t.epHandle, hint: t.epHint, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errName: t.epErrName, errHandle: t.epErrHandle, errTaken: t.epErrTaken, errSave: t.epErrSave }} />
+              <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
+            </div>
 
-        {upi?.line && (
-          <UpiGreeting line={upi.line} cat={upi.cat}
-            msgKey={`${new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10)}:${upi.cat}`} />
-        )}
+            <PushToggle vapidKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''}
+              labels={{ title: t.pushTitle, onSub: t.pushOnSub, offSub: t.pushOffSub, denied: t.pushDenied, turnOn: t.pushTurnOn, turnOff: t.pushTurnOff, wait: t.pushWait, test: t.pushTest, testSent: t.pushTestSent, testFail: t.pushTestFail }} />
+
+            <EcoToggle inicial={profile.eco_on !== false} labels={{ title: t.ecoTitle, sub: t.ecoSub, on: t.ecoOn, off: t.ecoOff }} />
+          </ProfileMenu>
+        </div>
 
         <section className="ch-block">
             <p className="eyebrow">{t.chTitle}</p>
