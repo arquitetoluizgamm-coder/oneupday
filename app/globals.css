@@ -3173,3 +3173,36 @@ h1 { letter-spacing: -0.03em; }
 .sr-step{margin:4px 0 8px;font-size:14.5px;line-height:1.4;color:rgba(250,247,242,.9);font-style:italic}
 .sr-tag{display:inline-block;font-family:var(--display);font-weight:800;font-size:9.5px;
   letter-spacing:.12em;text-transform:uppercase;color:#10132D;background:#E8A64C;padding:3px 9px}
+
+/* ============================================================
+   O ESPELHO — o Upi aponta, a pessoa conclui
+   ============================================================ */
+.esp-teaser{display:flex;align-items:center;gap:10px;width:100%;margin:14px 0 0;padding:12px 14px;
+  border:1.5px dashed #E8A64C;background:#fffdf9;cursor:pointer;text-align:left;
+  font-size:14px;color:var(--ink);animation:espIn .3s ease}
+.esp-teaser:hover{background:#fffaf2}
+@keyframes espIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.esp-card{margin:14px 0 0;padding:18px;background:var(--night);color:#FAF7F2;animation:espIn .3s ease}
+.esp-head{display:flex;align-items:center;gap:9px;margin-bottom:14px;
+  font-family:var(--display);font-weight:800;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:#E8A64C}
+.esp-par{display:flex;flex-direction:column;gap:12px}
+.esp-linha{display:flex;flex-direction:column;gap:4px;padding-left:12px;border-left:2px solid rgba(255,255,255,.18)}
+.esp-linha.now{border-left-color:#E8A64C}
+.esp-linha em{font-style:normal;font-family:var(--display);font-weight:800;font-size:9.5px;
+  letter-spacing:.13em;text-transform:uppercase;color:rgba(250,247,242,.5)}
+.esp-linha.now em{color:#E8A64C}
+.esp-linha q{font-size:15px;line-height:1.45;quotes:'“' '”';color:rgba(250,247,242,.92)}
+.esp-fato{margin:16px 0 0;padding-top:14px;border-top:1px solid rgba(255,255,255,.12);
+  font-size:14px;line-height:1.5;color:#FAF7F2}
+.esp-acts{display:flex;justify-content:flex-end;margin-top:14px}
+.esp-acts .ghost-btn{border-color:rgba(255,255,255,.25);color:rgba(250,247,242,.75);background:none}
+.esp-acts .ghost-btn:hover{border-color:#E8A64C;color:#E8A64C}
+
+/* --- o porquê resgatado --- */
+.pq-card{display:flex;gap:11px;align-items:flex-start;margin:14px 0 0;padding:14px;
+  background:#fffdf9;border-left:3px solid #84917A}
+.pq-eyebrow{display:block;font-family:var(--display);font-weight:800;font-size:9.5px;
+  letter-spacing:.12em;text-transform:uppercase;color:#6f7c66;margin-bottom:5px}
+.pq-text{font-size:15px;line-height:1.5;color:var(--ink);quotes:'“' '”'}

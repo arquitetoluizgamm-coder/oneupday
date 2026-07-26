@@ -15,6 +15,7 @@ import MediaGallery from '../../components/MediaGallery';
 import Track from '../../components/Track';
 import AppTop from '../../components/AppTop';
 import NextChapter from '../../components/NextChapter';
+import Espelho, { PorQue } from '../../components/Espelho';
 import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
 import ProfileTabs from '../../components/ProfileTabs';
 import EditProfileInfo from '../../components/EditProfileInfo';
@@ -100,6 +101,18 @@ export default async function Perfil() {
   // ---- Próximo Capítulo (casa fixa: sempre disponível aqui) ----
   const primary = list[0] || null;
   const nc = await computeNextChapter(supabase, user.id, primary, t);
+
+  // O porquê resgatado: aparece no dia difícil e na volta — nunca sempre.
+  // É o que a própria pessoa escreveu ao criar a jornada, guardado sem uso até agora.
+  let porque = '';
+  try {
+    if (primary?.goal && (nc.mode === 'return' || nc.mode === 'reveal')) {
+      const { data: last } = await supabase.from('updates').select('kind, created_at')
+        .eq('journey_id', primary.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
+      const parou = last ? (Date.now() - new Date(last.created_at).getTime()) / 86400000 >= 2 : false;
+      if (parou || last?.kind === 'setback') porque = primary.goal;
+    }
+  } catch {}
 
   // ---- Upi: o pingo que acompanha ----
   let upi = null;
@@ -187,7 +200,7 @@ export default async function Perfil() {
         </section>
 
         <PushToggle vapidKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''}
-          labels={{ title: t.pushTitle, onSub: t.pushOnSub, offSub: t.pushOffSub, denied: t.pushDenied, turnOn: t.pushTurnOn, turnOff: t.pushTurnOff, wait: t.pushWait }} />
+          labels={{ title: t.pushTitle, onSub: t.pushOnSub, offSub: t.pushOffSub, denied: t.pushDenied, turnOn: t.pushTurnOn, turnOff: t.pushTurnOff, wait: t.pushWait, test: t.pushTest, testSent: t.pushTestSent, testFail: t.pushTestFail }} />
 
         {upi?.line && (
           <UpiGreeting line={upi.line} cat={upi.cat}
@@ -340,6 +353,8 @@ export default async function Perfil() {
 
         {nc.mode && (
           <div className="nc-neutral">
+            {porque && <PorQue texto={porque} labels={{ eyebrow: t.pqEyebrow }} />}
+            <Espelho labels={{ teaser: t.espTeaser, eyebrow: t.espEyebrow, dayFmt: t.dayShort, palavra: t.espPalavra, tempo: t.espTempo, tom: t.espTom, ritmo: t.espRitmo, close: t.espClose }} />
             <NextChapter mode={nc.mode} line={nc.line} env={nc.env} labels={ncLabels(t, nc)} />
           </div>
         )}
