@@ -3030,3 +3030,19 @@ h1 { letter-spacing: -0.03em; }
   transition:width .5s cubic-bezier(.22,1,.36,1);
 }
 .progress-under .mp-meta{margin-top:5px}
+
+/* ============================================================
+   CORRECAO: sobra antes da barra
+   .dp-text carregava min-height de 72px do layout antigo
+   (3 linhas fixas). Com 1 linha de texto, sobrava o resto.
+   ============================================================ */
+.dp-text.under{
+  min-height:0!important;
+  margin:9px 2px 0!important;
+  padding:0!important;
+}
+@media(max-width:640px){
+  .dp-text.under{margin:9px 16px 0!important}
+}
+.dp-text.under .entry-text{margin:0!important}
+.dp-text.under + .progress-under{margin-top:9px!important}
