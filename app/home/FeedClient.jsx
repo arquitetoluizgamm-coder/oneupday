@@ -17,6 +17,7 @@ import Andamento, { Hoje } from '../../components/Andamento';
 import Espelho from '../../components/Espelho';
 import LoopMarca from '../../components/LoopMarca';
 import { MOODS, moodGlow } from '../../lib/moods';
+import { comCapa } from '../../lib/media';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
 
@@ -87,10 +88,14 @@ function Media({ photo, video, href, labels, children }) {
 
   const conteudo = video ? (
     <video
-      src={video} controls playsInline preload="metadata"
+      src={comCapa(video)} controls playsInline preload="metadata"
       onLoadedMetadata={(e) => {
-        const w = e.target.videoWidth, h = e.target.videoHeight;
+        const el = e.target;
+        const w = el.videoWidth, h = el.videoHeight;
         if (w && h) setNat(w / h);
+        // rede de segurança: se o #t=0.1 não pegou (servidor sem range),
+        // um seek manual força o navegador a pintar o primeiro quadro
+        try { if (el.currentTime === 0 && el.duration > 0.2) el.currentTime = 0.1; } catch {}
       }}
     />
   ) : (

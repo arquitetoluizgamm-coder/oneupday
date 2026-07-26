@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { createClient } from '../lib/supabase/client';
+import { comCapa } from '../lib/media';
 
 // Foto/vídeo de um post da jornada, com remoção visível para o dono.
 export default function OwnerMedia({ updateId, url, kind, labels }) {
@@ -24,7 +25,7 @@ export default function OwnerMedia({ updateId, url, kind, labels }) {
   return (
     <div className="update-photo owner-media">
       {kind === 'video'
-        ? <video src={url} controls playsInline preload="metadata" />
+        ? <video src={comCapa(url)} controls playsInline preload="metadata" />
         : <img src={url} alt="" />}
       <button type="button" className="om-x" onClick={remove} disabled={busy} aria-label={L.remove} title={L.remove}>
         {busy ? '…' : '✕'}

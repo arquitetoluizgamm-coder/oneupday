@@ -2,6 +2,7 @@ import { createClient } from '../../lib/supabase/server';
 import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
 import { getDemoStory } from '../../lib/demoStories';
+import { comCapa } from '../../lib/media';
 import Logo from '../../components/Logo';
 import ShareButton from './ShareButton';
 import Dia1Card from './Dia1Card';
@@ -404,7 +405,7 @@ export default async function JourneyPage({ params, searchParams }) {
                   : <div className="update-photo"><img src={u.photo_url} alt="" /></div>)}
                 {u.video_url && (isOwner
                   ? <OwnerMedia updateId={u.id} url={u.video_url} kind="video" labels={{ remove: t.mediaRemove, confirm: t.mediaRemoveConfirm, error: t.postError }} />
-                  : <div className="update-photo"><video src={u.video_url} controls playsInline preload="metadata" /></div>)}
+                  : <div className="update-photo"><video src={comCapa(u.video_url)} controls playsInline preload="metadata" /></div>)}
                 {u.text && u.text !== '📷' && u.text !== '🎥' && <p>{u.text}</p>}
                 {isOwner && (meTooByUpdate[u.id] || []).length > 0 && (
                   <div className="metoo-author">

@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { createClient } from '../lib/supabase/client';
+import { comCapa } from '../lib/media';
 
 export default function MediaGallery({ items, showVis, visLabels, own, deleteLabel, deleteConfirm }) {
   const [list, setList] = useState(items || []);
@@ -30,7 +31,7 @@ export default function MediaGallery({ items, showVis, visLabels, own, deleteLab
       <div className="album-grid">
         {list.map((m, i) => (
           <button type="button" className="album-item" key={m.id} onClick={() => setOpen(i)}>
-            {m.kind === 'video' ? <video src={m.url} muted playsInline /> : <img src={m.url} alt="" />}
+            {m.kind === 'video' ? <video src={comCapa(m.url)} muted playsInline preload="metadata" /> : <img src={m.url} alt="" />}
             {m.kind === 'video' && <span className="album-play">▶</span>}
             {showVis && <span className={`album-vis vis-${m.visibility}`}>{V[m.visibility] || ''}</span>}
           </button>
@@ -42,7 +43,7 @@ export default function MediaGallery({ items, showVis, visLabels, own, deleteLab
           {own && <button className="lb-del" onClick={(e) => { e.stopPropagation(); remove(list[open]); }} disabled={busy} aria-label={deleteLabel}>🗑 {deleteLabel}</button>}
           <div className="lb-inner" onClick={(e) => e.stopPropagation()}>
             {list[open].kind === 'video'
-              ? <video src={list[open].url} controls autoPlay playsInline />
+              ? <video src={comCapa(list[open].url)} controls autoPlay playsInline />
               : <img src={list[open].url} alt="" />}
           </div>
           {list.length > 1 && (
