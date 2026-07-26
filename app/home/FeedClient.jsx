@@ -74,12 +74,6 @@ function DayPager({ item, labels, dayLabel, dark }) {
 
   return (
     <>
-      {hasMedia && cleanText && (
-        <div className="dp-text">
-          <EntryText key={'x' + d.id} text={cleanText} labels={labels} limit={100} />
-        </div>
-      )}
-
       <div className={`dp-stage${hasMedia ? '' : ' is-text'}`}>
         <div className="dp-slide" key={d.id}>
           {hasMedia ? (
@@ -95,6 +89,12 @@ function DayPager({ item, labels, dayLabel, dark }) {
           )}
         </div>
       </div>
+
+      {hasMedia && cleanText && (
+        <div className="dp-text under">
+          <EntryText key={'x' + d.id} text={cleanText} labels={labels} limit={100} />
+        </div>
+      )}
 
       {total > 0 && (
         <div className="progress-under" aria-hidden="true">
@@ -114,8 +114,8 @@ function DayPager({ item, labels, dayLabel, dark }) {
         {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
         {item.own && <EditUpdate key={'ed' + d.id} update={{ id: d.id, text: d.text, photo_url: d.photo_url, day: d.day_number }} labels={labels.editUpdate}
           onChanged={(patch) => setDays((prev) => patch === null ? prev.filter((x) => x.id !== d.id) : prev.map((x) => x.id === d.id ? { ...x, ...patch } : x))} />}
-        <SupportStrip inline people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
       </div>
+      <SupportStrip people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
     </>
   );
 }
@@ -156,12 +156,7 @@ function DemoActions({ item, labels }) {
     <>
     <div className="entry-actions feed-acts">
       <button type="button" className={`support-pill${liked ? ' on' : ''}`} onClick={() => setLiked((v) => !v)} aria-label={labels.supportIdle}>
-        <svg className="sp-heart" viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M11 14h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16" />
-          <path d="m7 20 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9" />
-          <path d="m2 15 6 6" />
-          <path d="M19.5 8.5c.7-.7 1.5-1.6 1.5-2.7A2.73 2.73 0 0 0 16 4a2.78 2.78 0 0 0-5 1.8c0 1.2.8 2 1.5 2.8L16 12Z" />
-        </svg>
+        <svg className="sp-heart" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1 7.8 7.8 7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
         <span className="action-label">{labels.supportIdle}</span>
       </button>
       <button type="button" className="comment-toggle" aria-label={labels.comments.comment} onClick={() => setShowC((v) => !v)}>
@@ -169,8 +164,8 @@ function DemoActions({ item, labels }) {
         <span className="action-label">{labels.comments.comment}</span>
       </button>
       <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
-      <SupportStrip inline people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
     </div>
+    <SupportStrip people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
     {showC && (
       <div className="comment-panel">
         {commenters.length ? commenters.map((p, i) => (
@@ -294,10 +289,10 @@ export default function FeedClient({ labels }) {
               </span>
               <span className="entry-id"><b>{item.owner.name}</b></span>
             </a>
-            {item.caption && <p className="entry-text">{item.caption}</p>}
             <div className="entry-media">
               {item.kind === 'video' ? <video src={item.url} controls playsInline preload="metadata" /> : <img src={item.url} alt="" />}
             </div>
+            {item.caption && <div className="dp-text under"><EntryText text={item.caption} labels={labels} limit={100} /></div>}
             <div className="entry-actions feed-acts">
               <EncourageBar mediaId={item.mediaId} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
               <Comments mediaId={item.mediaId} labels={labels.comments} />
@@ -362,10 +357,10 @@ export default function FeedClient({ labels }) {
               }
               return (
                 <>
-                  {cleanText && <div className="dp-text"><EntryText text={cleanText} labels={labels} limit={100} /></div>}
                   {item.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={item.photo_url} alt="" />{trackFloat}</a>}
                   {item.video_url && !item.photo_url && <div className="entry-media"><video src={item.video_url} controls playsInline preload="metadata" />{trackFloat}</div>}
                   {!hasMedia && !cleanText && item.track && <TrackTag track={item.track} />}
+                  {cleanText && <div className="dp-text under"><EntryText text={cleanText} labels={labels} limit={100} /></div>}
                   {progressEl}
                 </>
               );
@@ -380,8 +375,10 @@ export default function FeedClient({ labels }) {
                 <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
                 {(item.kind === 'setback' || item.comeback) && !item.demo && !item.own && <MeTooButton updateId={item.id} labels={labels.metoo} />}
                 {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
-                <SupportStrip inline people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
               </div>
+            )}
+            {!item.demo && (
+              <SupportStrip people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
             )}
             </>
             )}

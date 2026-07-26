@@ -2858,3 +2858,50 @@ h1 { letter-spacing: -0.03em; }
 }
 .entry-more-inline:hover{color:var(--ink)}
 .dp-text .entry-text.expanded{display:block;-webkit-line-clamp:none;overflow:visible}
+
+/* ============================================================
+   LINHA "APOIANDO" — texto discreto, avatares so ao clicar
+   ============================================================ */
+.support-strip.inline{display:none!important}   /* estrutura antiga */
+
+.support-line{margin:2px 2px 0}
+@media(max-width:640px){ .support-line{margin:2px 16px 0} }
+.sl-title{
+  border:0;background:none;padding:4px 0;cursor:pointer;
+  font-family:var(--display);font-weight:800;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);
+  display:inline-flex;align-items:center;gap:7px;min-height:32px;
+}
+.sl-title:hover,.sl-title.on{color:var(--ink)}
+.sl-count{
+  font-size:9.5px;letter-spacing:0;padding:1px 6px;
+  border:1.5px solid currentColor;line-height:1.5;
+}
+.sl-people{
+  display:flex;flex-wrap:wrap;gap:8px 14px;padding:8px 0 4px;
+  animation:slFade .18s ease;
+}
+@keyframes slFade{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+.sl-person{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--ink)}
+.sl-ava{
+  width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;
+  color:#fff;font-size:11px;font-weight:700;overflow:hidden;flex:0 0 auto;
+}
+.sl-ava img{width:100%;height:100%;object-fit:cover;display:block}
+.sl-name{font-size:13px}
+
+/* ============================================================
+   TEXTO ABAIXO DA IMAGEM (estilo feed visual)
+   Sem sobra em cima: o card comeca sempre na mesma altura.
+   ============================================================ */
+.dp-text.under{margin:11px 2px 0;padding:0}
+@media(max-width:640px){ .dp-text.under{margin:11px 16px 0} }
+.dp-text.under .entry-text{font-size:15px;line-height:1.5;color:var(--ink)}
+/* expandir empurra o card, sem cortar nada */
+.dp-text.under .entry-text.expanded{display:block;-webkit-line-clamp:none;overflow:visible}
+.dp-text.under .entry-expand{
+  border:0;background:none;padding:2px 0 0;cursor:pointer;
+  font-family:var(--display);font-weight:800;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);min-height:32px;
+}
+.dp-text.under .entry-expand:hover{color:var(--ink)}
