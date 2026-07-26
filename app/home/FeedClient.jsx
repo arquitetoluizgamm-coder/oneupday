@@ -3,7 +3,6 @@ import { useEffect, useRef, useState, Fragment } from 'react';
 import EncourageBar from '../[slug]/EncourageBar';
 import FeedShare from './FeedShare';
 import Comments from '../../components/Comments';
-import SupportStrip from '../../components/SupportStrip';
 import SuggestionCard from '../../components/SuggestionCard';
 import NeedsSupport from '../../components/NeedsSupport';
 import MeTooButton from '../../components/MeTooButton';
@@ -83,7 +82,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
             </>
           ) : (
             <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}`}>
-              <p className={`dpc-text${(cleanText || '').length > 140 ? ' long' : ((cleanText || '').length < 70 ? ' short' : '')}`}>{cleanText}</p>
+              <CardText text={cleanText} labels={labels} />
               {trackEl}
             </a>
           )}
@@ -106,7 +105,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
         </div>
       )}
 
-      <div className="entry-actions feed-acts">
+      <ActionsRow people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])}>
         <EncourageBar key={'e' + d.id} updateId={d.id} initialActive={d.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
         <Comments key={'c' + d.id} updateId={d.id} labels={labels.comments} />
         <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
@@ -114,8 +113,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
         {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
         {item.own && <EditUpdate key={'ed' + d.id} update={{ id: d.id, text: d.text, photo_url: d.photo_url, day: d.day_number }} labels={labels.editUpdate}
           onChanged={(patch) => setDays((prev) => patch === null ? prev.filter((x) => x.id !== d.id) : prev.map((x) => x.id === d.id ? { ...x, ...patch } : x))} />}
-      </div>
-      <SupportStrip people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
+      </ActionsRow>
     </>
   );
 }
@@ -124,23 +122,79 @@ function EntryText({ text, labels, limit = 180 }) {
   const [expanded, setExpanded] = useState(false);
   const compact = text.length > limit;
 
-  // 2 linhas no máximo; o "ler mais" fica no fim da 2ª linha
+  // O "ler mais" flutua no fim da 2ª linha. Precisa ficar FORA do
+  // bloco recortado — senão o próprio recorte o esconde junto do texto.
   if (compact && !expanded) {
     return (
-      <p className="entry-text clamp2">
-        {text}
-        <button type="button" className="entry-more-inline" onClick={() => setExpanded(true)}>
+      <div className="etx">
+        <p className="entry-text clamp2">{text}</p>
+        <button type="button" className="etx-more" onClick={() => setExpanded(true)}>
           {labels.moreText}
         </button>
-      </p>
+      </div>
     );
   }
   return (
-    <>
+    <div className="etx">
       <p className="entry-text expanded">{text}</p>
       {compact && (
         <button type="button" className="entry-expand" onClick={() => setExpanded(false)}>
           {labels.lessText}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ---- Fileira de ações + "Apoiando Fulano" no fim da mesma linha ----
+function ActionsRow({ children, people, title }) {
+  const [open, setOpen] = useState(false);
+  const has = !!(people && people.length);
+  return (
+    <>
+      <div className="entry-actions feed-acts">
+        {children}
+        {has && (
+          <button type="button" className={`sl-title${open ? ' on' : ''}`} onClick={() => setOpen((v) => !v)} aria-expanded={open}>
+            {title}
+            <span className="sl-count">{people.length}</span>
+          </button>
+        )}
+      </div>
+      {has && open && (
+        <div className="sl-people">
+          {people.map((p, idx) => {
+            const first = (p.name || '?').split(' ')[0];
+            const inner = (
+              <>
+                <span className="sl-ava" style={{ background: p.avatar_color || 'var(--muted)' }}>
+                  {p.avatar_url ? <img src={p.avatar_url} alt="" draggable="false" /> : first[0]}
+                </span>
+                <span className="sl-name">{first}</span>
+              </>
+            );
+            return p.handle
+              ? <a key={idx} href={`/${p.handle}`} className="sl-person" title={p.name}>{inner}</a>
+              : <span key={idx} className="sl-person" title={p.name}>{inner}</span>;
+          })}
+        </div>
+      )}
+    </>
+  );
+}
+
+// ---- Texto do card sem foto: recorta e deixa abrir por inteiro ----
+function CardText({ text, labels }) {
+  const [open, setOpen] = useState(false);
+  const long = text.length > 260;
+  const cls = text.length > 140 ? ' long' : (text.length < 70 ? ' short' : '');
+  return (
+    <>
+      <p className={`dpc-text${cls}${open ? ' open' : ''}`}>{text}</p>
+      {long && (
+        <button type="button" className="dpc-more"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((v) => !v); }}>
+          {open ? labels.lessText : labels.moreText}
         </button>
       )}
     </>
@@ -165,7 +219,6 @@ function DemoActions({ item, labels }) {
       </button>
       <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
     </div>
-    <SupportStrip people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
     {showC && (
       <div className="comment-panel">
         {commenters.length ? commenters.map((p, i) => (
@@ -347,8 +400,8 @@ export default function FeedClient({ labels }) {
               if (!hasMedia && cleanText) {
                 return (
                   <>
-                    <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText.length > 140 ? ' long' : ''}`}>
-                      <p className={`dpc-text${cleanText.length > 140 ? ' long' : (cleanText.length < 70 ? ' short' : '')}`}>{cleanText}</p>
+                    <a href={`/${item.journey.slug}`} className="entry-textcard dp-card">
+                      <CardText text={cleanText} labels={labels} />
                       {trackFloat}
                     </a>
                     {progressEl}
@@ -369,16 +422,13 @@ export default function FeedClient({ labels }) {
             {item.demo ? (
               <DemoActions item={item} labels={labels} />
             ) : (
-              <div className="entry-actions feed-acts">
+              <ActionsRow people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])}>
                 <EncourageBar updateId={item.id} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
                 <Comments updateId={item.id} labels={labels.comments} />
                 <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
                 {(item.kind === 'setback' || item.comeback) && !item.demo && !item.own && <MeTooButton updateId={item.id} labels={labels.metoo} />}
                 {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
-              </div>
-            )}
-            {!item.demo && (
-              <SupportStrip people={item.supporters} title={(labels.supporting || '').replace('{name}', (item.owner.name || '').split(' ')[0])} />
+              </ActionsRow>
             )}
             </>
             )}

@@ -2905,3 +2905,59 @@ h1 { letter-spacing: -0.03em; }
   text-transform:uppercase;color:var(--muted);min-height:32px;
 }
 .dp-text.under .entry-expand:hover{color:var(--ink)}
+
+/* ============================================================
+   "LER MAIS" NO FIM DA 2a LINHA
+   O botao nao pode ficar DENTRO do bloco recortado: o recorte
+   esconderia ele junto com o texto que sobra. Fica por cima,
+   ancorado no canto, com o fundo cobrindo o texto atras.
+   ============================================================ */
+.etx{position:relative}
+.etx .entry-text.clamp2{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;margin:0;
+}
+.etx-more{
+  position:absolute;right:0;bottom:0;z-index:2;
+  border:0;cursor:pointer;padding:0 0 0 30px;
+  font:inherit;font-weight:750;color:var(--muted);white-space:nowrap;
+  background:linear-gradient(90deg,rgba(250,247,242,0) 0,var(--bg) 26px);
+}
+.etx-more:hover{color:var(--ink)}
+.etx .entry-text.expanded{display:block;-webkit-line-clamp:none;overflow:visible;margin:0}
+
+/* ============================================================
+   "APOIANDO FULANO" NA MESMA LINHA DOS ICONES
+   ============================================================ */
+.feed-acts .sl-title{margin-left:auto;flex:0 1 auto;min-width:0;max-width:58%}
+.feed-acts .sl-title > span.sl-count{flex:0 0 auto}
+.support-line{display:none!important}       /* estrutura anterior */
+.sl-people{margin:0 2px 2px}
+@media(max-width:640px){ .sl-people{margin:0 16px 2px} }
+
+/* ============================================================
+   TEXTO GRANDE DENTRO DO CARD SEM FOTO
+   ============================================================ */
+.dpc-more{
+  margin-top:12px;align-self:flex-start;
+  border:1.5px solid currentColor;background:none;cursor:pointer;
+  padding:5px 12px;font-family:var(--display);font-weight:800;font-size:10px;
+  letter-spacing:.12em;text-transform:uppercase;color:inherit;opacity:.75;
+  position:relative;z-index:2;
+}
+.dpc-more:hover{opacity:1}
+/* aberto: o card cresce para caber o texto inteiro */
+.dp-card:has(.dpc-text.open){aspect-ratio:auto!important;min-height:0}
+.dpc-text.open{-webkit-line-clamp:unset!important;display:block!important;overflow:visible!important}
+
+/* ============================================================
+   TITULO DA JORNADA EM 2 LINHAS NO CELULAR
+   ============================================================ */
+@media(max-width:640px){
+  .entry-id small{
+    white-space:normal;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden;text-overflow:clip;
+  }
+  .entry-head{align-items:flex-start}
+}
