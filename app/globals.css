@@ -4263,3 +4263,24 @@ h1 { letter-spacing: -0.03em; }
   .pc-info{grid-template-columns:100%;grid-template-areas:'ava' 'meta' 'acoes'}
   .pc-acoes{justify-content:flex-end;padding-top:12px;padding-bottom:0}
 }
+
+/* ============================================================
+   PERFIL — o Upi voltou ao tamanho de gente
+   Eu tinha encolhido ele para 44px quando dividia a linha com o
+   + e a engrenagem: era largura roubada do recado. Os botoes
+   foram para dentro do card, o motivo acabou, e o boneco ficou
+   pequeno ao lado de um balao de duas linhas (63px de altura).
+   Agora ele e' maior que o proprio balao de uma linha — quem
+   fala tem que ter o tamanho da fala.
+   ============================================================ */
+.pc-bar .upi{gap:10px}
+.pc-bar .upi-char{width:60px;height:60px}
+.pc-bar .upi-bubble{margin-top:8px}
+/* o biquinho desce junto, para apontar para o meio do boneco */
+.pc-bar .upi-bubble::before,
+.pc-bar .upi-bubble::after{top:17px}
+
+@media(max-width:640px){
+  .pc-bar .upi-char{width:54px;height:54px}
+  .pc-bar .upi{gap:9px}
+}
