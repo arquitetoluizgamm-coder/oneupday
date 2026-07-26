@@ -6,6 +6,7 @@ import Logo, { Symbol } from '../../../components/Logo';
 import ShareButton from '../../[slug]/ShareButton';
 import Dia1Card from '../../[slug]/Dia1Card';
 import ChallengeButton from '../../[slug]/ChallengeButton';
+import EscolherMomento from '../../../components/EscolherMomento';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,6 +47,12 @@ export default async function Created({ params }) {
               label={t.challengeBtn} copiedLabel={t.linkCopied} message={t.challengeMsg} />
             <a className="ghost-btn wide" href={`/${journey.slug}`}>{t.successContinue}</a>
           </div>
+          {!journey.moment && (
+            <EscolherMomento journeyId={journey.id}
+              momentos={[['starting', t.mStarting], ['notgiveup', t.mNotgiveup], ['rebuilding', t.mRebuilding],
+                ['health', t.mHealth], ['courage', t.mCourage], ['hardphase', t.mHardphase], ['building', t.mBuilding]]}
+              labels={{ title: t.momInviteTitle, sub: t.momInviteSub, done: t.momInviteDone, see: t.momInviteSee }} />
+          )}
         </section>
       </main>
     </>

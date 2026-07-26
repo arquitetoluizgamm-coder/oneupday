@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 import { track } from '../../lib/track';
@@ -10,7 +10,7 @@ const COLORS = {
   relationship: '#f02f87', habit: '#ff7a45', creative: '#a855f7',
 };
 const MAX_VIDEO = 60 * 1024 * 1024;
-const STEPS = 6;
+const STEPS = 3;
 
 function slugify(title) {
   const base = title.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -48,13 +48,41 @@ export default function NewJourneyForm({ userId, t }) {
     ['starting', t.mStarting], ['notgiveup', t.mNotgiveup], ['rebuilding', t.mRebuilding],
     ['health', t.mHealth], ['courage', t.mCourage], ['hardphase', t.mHardphase], ['building', t.mBuilding],
   ];
+  // Adivinha a categoria pelo que a pessoa escreveu. Ela pode trocar,
+  // mas não precisa decidir nada se o palpite estiver certo.
+  const PISTAS = {
+    body: ['academia', 'treino', 'malhar', 'correr', 'corrida', 'caminhar', 'caminhada', 'peso', 'emagrecer', 'muscul', 'gym', 'run', 'walk', 'workout'],
+    health: ['saude', 'saúde', 'agua', 'água', 'dormir', 'sono', 'parar de fumar', 'beber', 'alcool', 'álcool', 'remedio', 'terapia', 'health', 'sleep', 'quit'],
+    study: ['estudar', 'estudo', 'ingles', 'inglês', 'faculdade', 'prova', 'concurso', 'curso', 'aula', 'ler', 'livro', 'study', 'read', 'course', 'english'],
+    work: ['trabalho', 'emprego', 'carreira', 'curriculo', 'currículo', 'negocio', 'negócio', 'cliente', 'vender', 'work', 'job', 'career'],
+    money: ['dinheiro', 'divida', 'dívida', 'economizar', 'poupar', 'gastar', 'financ', 'money', 'debt', 'save'],
+    mind: ['ansiedade', 'meditar', 'meditacao', 'meditação', 'calma', 'mente', 'terapia', 'respirar', 'mind', 'anxiety', 'meditate'],
+    creative: ['desenhar', 'desenho', 'pintar', 'escrever', 'musica', 'música', 'tocar', 'violao', 'violão', 'foto', 'draw', 'paint', 'write', 'music'],
+    relationship: ['familia', 'família', 'pai', 'mae', 'mãe', 'filho', 'filha', 'amigo', 'namoro', 'casamento', 'conversar', 'family', 'friend'],
+    home: ['casa', 'organizar', 'arrumar', 'limpar', 'quarto', 'cozinha', 'home', 'clean', 'organize'],
+    habit: ['habito', 'hábito', 'rotina', 'todo dia', 'celular', 'tela', 'habit', 'routine', 'screen'],
+  };
+  function adivinhar(txt) {
+    const t2 = (txt || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    for (const [c, palavras] of Object.entries(PISTAS)) {
+      for (const p of palavras) {
+        const pn = p.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (t2.includes(pn)) return c;
+      }
+    }
+    return '';
+  }
+  const [catTocada, setCatTocada] = useState(false);
+  useEffect(() => {
+    if (catTocada) return;
+    const g = adivinhar(title);
+    if (g) setCat(g);
+  }, [title, catTocada]);
+
   const heads = [
-    [t.wizT1, t.wizS1],       // Nome
-    [t.wizTcat, t.wizScat],   // Categoria
-    [t.wizTmom, t.wizSmom],   // Momento
-    [t.wizTpriv, t.wizSpriv], // Privacidade
-    [t.wizT3, t.wizS3],       // Meta
-    [t.wizT4, t.wizS4],       // Primeiro dia
+    [t.wizT1, t.wizS1],   // O que você vai continuar + por quanto tempo
+    [t.wizT3, t.wizS3],   // Por que isso importa
+    [t.wizT4, t.wizS4],   // Seu primeiro dia
   ];
 
   async function upload(file) {
@@ -79,7 +107,7 @@ export default function NewJourneyForm({ userId, t }) {
     setVideoUrl(url); setPhotoUrl(null); if (photoRef.current) photoRef.current.value = '';
   }
 
-  const canNext = (step === 0 && !!title.trim()) || step === 1 || step === 2 || step === 3 || (step === 4 && !!goal.trim()) || step === 5;
+  const canNext = (step === 0 && !!title.trim()) || (step === 1 && !!goal.trim()) || step === 2;
   function next() { if (canNext && step < STEPS - 1) setStep(step + 1); }
   function back() { if (step > 0) setStep(step - 1); }
 
@@ -143,7 +171,7 @@ export default function NewJourneyForm({ userId, t }) {
         <p>{heads[step][1]}</p>
       </div>
 
-      {/* Step 0 — Nome */}
+      {/* ---------- 1. O que você vai continuar ---------- */}
       <div className="wiz-step" style={{ display: step === 0 ? 'block' : 'none' }}>
         <input className="wiz-title" value={title} onChange={e => setTitle(e.target.value)}
           maxLength={80} placeholder={t.fNamePh} autoFocus />
@@ -152,41 +180,9 @@ export default function NewJourneyForm({ userId, t }) {
             <button key={i} type="button" className="sug-pill" onClick={() => setTitle(sg)}>{sg}</button>
           ))}
         </div>
-      </div>
 
-      {/* Step 1 — Categoria */}
-      <div className="wiz-step" style={{ display: step === 1 ? 'block' : 'none' }}>
-        <div className="cat-pick">
-          {CATS.map(([v, l]) => (
-            <button key={v} type="button" className={`chip${cat === v ? ' on' : ''}`} onClick={() => setCat(v)}>{l}</button>
-          ))}
-          <button type="button" className={`chip${cat === 'other' ? ' on' : ''}`} onClick={() => setCat('other')}>+ {t.catOther}</button>
-        </div>
-        {cat === 'other' && <input ref={customRef} className="custom-cat" maxLength={24} placeholder={t.customCatPh} />}
-      </div>
+        <div className="wiz-sep" />
 
-      {/* Step 2 — Momento */}
-      <div className="wiz-step" style={{ display: step === 2 ? 'block' : 'none' }}>
-        <div className="cat-pick">
-          {MOMENTS.map(([v, l]) => (
-            <button key={v} type="button" className={`chip moment${moment === v ? ' on' : ''}`} onClick={() => setMoment(moment === v ? '' : v)}>{l}</button>
-          ))}
-        </div>
-      </div>
-
-      {/* Step 3 — Privacidade */}
-      <div className="wiz-step" style={{ display: step === 3 ? 'block' : 'none' }}>
-        <div className="vis-pick">
-          {[['public', t.pubPublic, t.pubPublicSub], ['followers', t.pubFollowers, t.pubFollowersSub], ['private', t.pubPrivate, t.pubPrivateSub]].map(([v, l, sub]) => (
-            <button key={v} type="button" className={`vis-opt${visibility === v ? ' on' : ''}`} onClick={() => setVisibility(v)}>
-              <b>{l}</b><span>{sub}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Step 4 — Duração + porquê */}
-      <div className="wiz-step" style={{ display: step === 4 ? 'block' : 'none' }}>
         <div className="field-label">{t.fDuration}</div>
         <div className="dur-chips">
           {[['7', t.dur7], ['30', t.dur30], ['60', t.dur60], ['100', t.dur100], ['other', t.durCustom]].map(([v, l]) => (
@@ -195,22 +191,39 @@ export default function NewJourneyForm({ userId, t }) {
         </div>
         {dur === 'other' && (
           <div className="dur-custom">
-            <input type="number" min="1" max="730" value={customDur} onChange={e => setCustomDur(e.target.value)} placeholder={t.durCustomPh} autoFocus />
+            <input type="number" min="1" max="730" value={customDur} onChange={e => setCustomDur(e.target.value)} placeholder={t.durCustomPh} />
             <span>{t.durDaysWord}</span>
           </div>
         )}
         <p className="dur-hint">{t.durHint}</p>
-        <div className="field-label" style={{ marginTop: 22 }}>{t.fWhy}</div>
-        <div className="why-field">
-          <textarea value={goal} onChange={e => setGoal(e.target.value)} maxLength={300} placeholder={t.fWhyPh} rows={4} />
-          <span className="why-count">{goal.length}/300</span>
-        </div>
       </div>
 
-      {/* Step 5 — Primeiro dia */}
-      <div className="wiz-step" style={{ display: step === 5 ? 'block' : 'none' }}>
-        <label>{t.fFirst}
-          <textarea ref={firstRef} maxLength={500} placeholder={t.fFirstPh} />
+      {/* ---------- 2. Por que isso importa ---------- */}
+      <div className="wiz-step" style={{ display: step === 1 ? 'block' : 'none' }}>
+        <div className="why-field big">
+          <textarea value={goal} onChange={e => setGoal(e.target.value)} maxLength={300} placeholder={t.fWhyPh} rows={5} />
+          <span className="why-count">{goal.length}/300</span>
+        </div>
+        <p className="why-note">{t.wizWhyNote}</p>
+
+        <div className="wiz-sep" />
+
+        <div className="field-label soft">{t.fCategory}</div>
+        <div className="cat-pick compact">
+          {CATS.map(([v, l]) => (
+            <button key={v} type="button" className={`chip${cat === v ? ' on' : ''}`}
+              onClick={() => { setCat(v); setCatTocada(true); }}>{l}</button>
+          ))}
+          <button type="button" className={`chip${cat === 'other' ? ' on' : ''}`}
+            onClick={() => { setCat('other'); setCatTocada(true); }}>+ {t.catOther}</button>
+        </div>
+        {cat === 'other' && <input ref={customRef} className="custom-cat" maxLength={24} placeholder={t.customCatPh} />}
+      </div>
+
+      {/* ---------- 3. Seu primeiro dia ---------- */}
+      <div className="wiz-step" style={{ display: step === 2 ? 'block' : 'none' }}>
+        <label>
+          <textarea ref={firstRef} maxLength={500} placeholder={t.fFirstPh} rows={4} />
         </label>
         {photoUrl && <div className="photo-preview"><img src={photoUrl} alt="" /></div>}
         {videoUrl && <div className="photo-preview"><video src={videoUrl} controls playsInline /></div>}
@@ -223,6 +236,17 @@ export default function NewJourneyForm({ userId, t }) {
           </button>
           <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPhoto} />
           <input ref={videoRef} type="file" accept="video/*" hidden onChange={onVideo} />
+        </div>
+
+        <div className="wiz-sep" />
+
+        <div className="field-label soft">{t.wizTpriv}</div>
+        <div className="vis-pick row">
+          {[['public', t.pubPublic, t.pubPublicSub], ['followers', t.pubFollowers, t.pubFollowersSub], ['private', t.pubPrivate, t.pubPrivateSub]].map(([v, l, sub]) => (
+            <button key={v} type="button" className={`vis-opt${visibility === v ? ' on' : ''}`} onClick={() => setVisibility(v)}>
+              <b>{l}</b><span>{sub}</span>
+            </button>
+          ))}
         </div>
       </div>
 
