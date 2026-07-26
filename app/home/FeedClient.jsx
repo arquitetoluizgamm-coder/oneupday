@@ -156,8 +156,8 @@ function ActionsRow({ children, people, title }) {
         {children}
         {has && (
           <button type="button" className={`sl-title${open ? ' on' : ''}`} onClick={() => setOpen((v) => !v)} aria-expanded={open}>
-            {title}
-            <span className="sl-count">{people.length}</span>
+            <span className="sl-text">{title}</span>
+            <svg className="sl-chev" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="butt" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
           </button>
         )}
       </div>
@@ -170,7 +170,7 @@ function ActionsRow({ children, people, title }) {
                 <span className="sl-ava" style={{ background: p.avatar_color || 'var(--muted)' }}>
                   {p.avatar_url ? <img src={p.avatar_url} alt="" draggable="false" /> : first[0]}
                 </span>
-                <span className="sl-name">{first}</span>
+                <span className="sl-name" title={p.name}>{first}</span>
               </>
             );
             return p.handle

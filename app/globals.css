@@ -2961,3 +2961,48 @@ h1 { letter-spacing: -0.03em; }
   }
   .entry-head{align-items:flex-start}
 }
+
+/* ============================================================
+   APOIANDO — chevron no lugar do numero
+   ============================================================ */
+.feed-acts .sl-title{display:inline-flex;align-items:center;gap:6px}
+.sl-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.sl-chev{flex:0 0 auto;transition:transform .22s cubic-bezier(.22,1,.36,1)}
+.sl-title.on .sl-chev{transform:rotate(180deg)}
+.sl-count{display:none!important}
+
+/* ============================================================
+   AVATARES — redondos, maiores, 4 por tela, rolagem lateral
+   ============================================================ */
+.sl-people{
+  display:flex;flex-wrap:nowrap;gap:0;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x proximity;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;-ms-overflow-style:none;
+  padding:10px 0 4px;
+}
+.sl-people::-webkit-scrollbar{display:none}
+.sl-person{
+  flex:0 0 25%;                 /* exatamente 4 por tela */
+  min-width:76px;
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  text-decoration:none;color:var(--ink);scroll-snap-align:start;
+  padding:0 4px;
+}
+.sl-ava{
+  width:58px;height:58px;border-radius:50%!important;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:var(--display);font-weight:800;font-size:21px;
+  overflow:hidden;flex:0 0 auto;
+}
+.sl-ava img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
+.sl-name{
+  font-size:12px;line-height:1.2;text-align:center;color:var(--muted);
+  max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sl-person:hover .sl-name{color:var(--ink)}
+@media(min-width:641px){
+  .sl-person{flex:0 0 auto;width:84px}
+  .sl-ava{width:62px;height:62px;font-size:23px}
+}
