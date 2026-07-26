@@ -13,6 +13,7 @@ import BlockButton from './BlockButton';
 import ProgressBar from '../../components/ProgressBar';
 import ReportButton from './ReportButton';
 import MediaGallery from '../../components/MediaGallery';
+import ProfileTabs from '../../components/ProfileTabs';
 import FollowUserButton from './FollowUserButton';
 import DuoChallengeButton from '../../components/ChallengeButton';
 import OwnerMedia from '../../components/OwnerMedia';
@@ -163,32 +164,39 @@ async function ProfilePage({ handle }) {
           </section>
         )}
 
-        <section className="home-head"><div><p className="eyebrow">{t.profileJourneys}</p></div></section>
-        {journeys.length === 0 && <div className="empty"><b>{t.noPublicJourneys}</b></div>}
-        <div className="pj-grid">
-          {journeys.map(j => {
-            const st = statsById[j.id] || {};
-            const pct = Math.min(100, st.progress_pct || 0);
-            return (
-              <a className="pj-card" key={j.id} href={`/${j.slug}`}>
-                <div className="pj-thumb" style={(j.cover_url || photoBy[j.id]) ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.1), rgba(9,12,42,.5)), url(${j.cover_url || photoBy[j.id]})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: `linear-gradient(135deg, var(--night), ${j.cover_color})` }}>
-                  <span>{fill(t.dayShort, { d: st.current_day || 0 })}</span>
-                </div>
-                <div className="pj-body">
-                  <b>{j.title}</b>
-                  <div className="bar"><span style={{ width: (pct > 0 ? Math.max(pct, 6) : 0) + '%' }} /></div>
-                  <small>{fill(t.dayOf, { d: st.current_day || 0, t: j.total_days, s: st.streak || 0 })}</small>
-                </div>
-              </a>
-            );
-          })}
-        </div>
-        {media && media.length > 0 && (
-          <section className="album">
-            <p className="eyebrow">{t.albumTitle}</p>
-            <MediaGallery items={media} />
-          </section>
-        )}
+        {/* Jornadas e album em abas, como no perfil de casa. Antes o album
+            ficava depois de todas as jornadas: quem quisesse ver as fotos
+            de alguem com cinco jornadas rolava a pagina inteira — e quem
+            nao sabia que existia album nunca chegava la. */}
+        <ProfileTabs
+          labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum }}
+          journeys={(
+            <>
+              {journeys.length === 0 && <div className="empty"><b>{t.noPublicJourneys}</b></div>}
+              <div className="pj-grid">
+                {journeys.map(j => {
+                  const st = statsById[j.id] || {};
+                  const pct = Math.min(100, st.progress_pct || 0);
+                  return (
+                    <a className="pj-card" key={j.id} href={`/${j.slug}`}>
+                      <div className="pj-thumb" style={(j.cover_url || photoBy[j.id]) ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.1), rgba(9,12,42,.5)), url(${j.cover_url || photoBy[j.id]})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: `linear-gradient(135deg, var(--night), ${j.cover_color})` }}>
+                        <span>{fill(t.dayShort, { d: st.current_day || 0 })}</span>
+                      </div>
+                      <div className="pj-body">
+                        <b>{j.title}</b>
+                        <div className="bar"><span style={{ width: (pct > 0 ? Math.max(pct, 6) : 0) + '%' }} /></div>
+                        <small>{fill(t.dayOf, { d: st.current_day || 0, t: j.total_days, s: st.streak || 0 })}</small>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            </>
+          )}
+          /* sem foto nenhuma, a aba nao existe — nao ha nada atras dela */
+          album={media && media.length > 0 ? <MediaGallery items={media} /> : null}
+          people={null}
+        />
       </main>
       <footer className="foot">One <b>Up</b> Day · {t.tagline} · oneupday.app/{profile.handle}</footer>
     </>
