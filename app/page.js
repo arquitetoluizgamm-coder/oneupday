@@ -63,7 +63,12 @@ export default async function Home() {
       <Track type="landing_view" />
       <main className="landing">
         <section className="land-hero">
-          <h1>{t.landHeadline}</h1>
+          {/* O h1 precisa ser o nome do app: a verificacao de marca do Google
+              compara o nome da tela de consentimento com o titulo principal
+              da pagina. A frase de marketing continua logo abaixo, no mesmo
+              tamanho de antes — muda a tag, nao o peso visual. */}
+          <h1 className="land-brand">One Up Day</h1>
+          <p className="land-headline">{t.landHeadline}</p>
           <p className="land-sub">{t.landSub}</p>
           <p className="land-identity"><span>{t.landIdentity1}</span><b>{t.landIdentity2}</b></p>
           <a className="cta grow land-cta" href="/login">{t.landCta}</a>

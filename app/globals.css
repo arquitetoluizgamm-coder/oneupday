@@ -4069,3 +4069,26 @@ h1 { letter-spacing: -0.03em; }
 /* o nome da marca no topo da landing, agora em texto */
 .land-top .oud-word{font-size:19px;letter-spacing:-.01em}
 @media(max-width:640px){ .land-top .oud-word{font-size:17px} }
+
+/* ============================================================
+   LANDING — o h1 virou o nome do app
+   A verificacao de marca do Google compara o nome configurado no
+   consentimento com o titulo principal da pagina. O h1 era a frase
+   de marketing, entao o nome nunca batia. Agora o h1 e "One Up Day"
+   e a frase desceu para um <p> com o MESMO tamanho que tinha antes.
+   ============================================================ */
+.land-hero h1.land-brand{
+  font-family:var(--display);
+  font-size:15px;line-height:1.2;letter-spacing:.18em;text-transform:uppercase;
+  font-weight:800;color:var(--muted);
+  margin:0 auto 16px;max-width:none;
+}
+.land-hero .land-headline{
+  font-size:46px;line-height:1.05;letter-spacing:-.045em;font-weight:900;
+  margin:0 auto 14px;max-width:14ch;color:var(--ink);
+}
+@media(max-width:900px){ .land-hero .land-headline{font-size:36px} }
+@media(max-width:640px){
+  .land-hero h1.land-brand{font-size:13px;letter-spacing:.16em;margin-bottom:12px}
+  .land-hero .land-headline{font-size:30px;line-height:1.12}
+}
