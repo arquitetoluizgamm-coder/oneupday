@@ -3055,3 +3055,9 @@ h1 { letter-spacing: -0.03em; }
 .heart-btn{width:44px;height:44px}
 .heart-btn svg{width:27px;height:27px}
 .heart-btn .heart-dot{top:8px;right:9px}
+
+/* desafio no feed: só o mistério — sem título e sem "acompanhar" */
+.ch-sbody{display:flex;align-items:center;min-width:0}
+.ch-stitle{display:none!important}
+.ch-ssee{margin-left:auto;font-size:16px;opacity:.5;letter-spacing:0}
+.ch-stag{white-space:nowrap}

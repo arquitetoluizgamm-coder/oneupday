@@ -17,9 +17,8 @@ export default function ChallengeStrip({ challenge, labels }) {
       <Ava p={c.to} />
       <span className="ch-sbody">
         <span className="ch-stag">{L.stripTag || 'Desafio'}</span>
-        <span className="ch-stitle">{c.title}</span>
       </span>
-      <span className="ch-ssee">{L.stripSee || ''} ›</span>
+      <span className="ch-ssee" aria-hidden="true">›</span>
     </a>
   );
 }
