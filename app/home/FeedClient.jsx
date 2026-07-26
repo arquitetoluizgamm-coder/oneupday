@@ -60,14 +60,11 @@ function TrackTag({ track, float, hasBar }) {
   );
 }
 
-// ---- A jornada é um post só: dias navegáveis dentro do card ----
+// ---- Um card por jornada: mostra o dia mais recente. Sem slides. ----
 function DayPager({ item, labels, dayLabel, dark }) {
   const [days, setDays] = useState(item.days || []);
-  const [idx, setIdx] = useState((item.days || []).length - 1);
-  const touch = useRef(null);
   if (!days.length) return null;
-  const i = Math.max(0, Math.min(idx, days.length - 1));
-  const d = days[i];
+  const d = days[days.length - 1];
   const total = item.journey.total_days || 0;
   const pct = total ? Math.min(100, Math.max(3, Math.round(((d.day_number || 0) / total) * 100))) : 0;
   const left = Math.max(0, total - (d.day_number || 0));
@@ -75,63 +72,28 @@ function DayPager({ item, labels, dayLabel, dark }) {
   const hasMedia = !!(d.photo_url || d.video_url);
   const trackEl = d.track ? <TrackTag key={'t' + d.id} track={d.track} float hasBar={false} /> : null;
 
-  function go(next, e) { if (e) { e.preventDefault(); e.stopPropagation(); } setIdx(next); }
-  function onTS(e) { touch.current = e.touches[0].clientX; }
-  function onTE(e) {
-    if (touch.current == null) return;
-    const dx = e.changedTouches[0].clientX - touch.current;
-    touch.current = null;
-    if (dx > 44 && i > 0) setIdx(i - 1);
-    else if (dx < -44 && i < days.length - 1) setIdx(i + 1);
-  }
-
   return (
     <>
-      <div className={`dp-stage${hasMedia ? '' : ' is-text'}`} onTouchStart={onTS} onTouchEnd={onTE}>
-        {/* pontinhos de slide no topo da imagem, estilo Instagram, com o dia atual */}
-        <div className="slide-top" aria-hidden="true">
-          {days.length > 1 && (
-            <div className="st-dots">
-              {(() => {
-                const max = 7;
-                const start = Math.max(0, Math.min(i - 3, days.length - max));
-                return days.slice(start, start + max).map((x, k) => (
-                  <i key={x.id} className={start + k === i ? 'on' : ''} />
-                ));
-              })()}
-            </div>
-          )}
-          <span className="st-day">{dayLabel(d.day_number)}</span>
+      {hasMedia && cleanText && (
+        <div className="dp-text">
+          <EntryText key={'x' + d.id} text={cleanText} labels={labels} limit={100} />
         </div>
+      )}
+
+      <div className={`dp-stage${hasMedia ? '' : ' is-text'}`}>
         <div className="dp-slide" key={d.id}>
           {hasMedia ? (
             <>
-              <div className="dp-text">
-                {cleanText && <EntryText key={'x' + d.id} text={cleanText} labels={labels} limit={100} />}
-              </div>
               {d.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={d.photo_url} alt="" />{trackEl}</a>}
               {d.video_url && !d.photo_url && <div className="entry-media"><video src={d.video_url} controls playsInline preload="metadata" />{trackEl}</div>}
             </>
           ) : (
-            // sem foto: o texto mora dentro do card, como no carrossel
             <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}`}>
               <p className={`dpc-text${(cleanText || '').length > 140 ? ' long' : ((cleanText || '').length < 70 ? ' short' : '')}`}>{cleanText}</p>
               {trackEl}
             </a>
           )}
         </div>
-        {i > 0 && (
-          <button type="button" className="dp-nav left" onClick={(e) => go(i - 1, e)} aria-label={(labels.dp || {}).prev || ''}>
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="butt"><path d="M15 5l-7 7 7 7" /></svg>
-            <span>{dayLabel(days[i - 1].day_number)}</span>
-          </button>
-        )}
-        {i < days.length - 1 && (
-          <button type="button" className="dp-nav right" onClick={(e) => go(i + 1, e)} aria-label={(labels.dp || {}).next || ''}>
-            <span>{dayLabel(days[i + 1].day_number)}</span>
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="butt"><path d="M9 5l7 7-7 7" /></svg>
-          </button>
-        )}
       </div>
 
       {total > 0 && (
@@ -162,12 +124,23 @@ function EntryText({ text, labels, limit = 180 }) {
   const [expanded, setExpanded] = useState(false);
   const compact = text.length > limit;
 
+  // 2 linhas no máximo; o "ler mais" fica no fim da 2ª linha
+  if (compact && !expanded) {
+    return (
+      <p className="entry-text clamp2">
+        {text}
+        <button type="button" className="entry-more-inline" onClick={() => setExpanded(true)}>
+          {labels.moreText}
+        </button>
+      </p>
+    );
+  }
   return (
     <>
-      <p className={`entry-text${expanded ? ' expanded' : ''}`}>{text}</p>
+      <p className="entry-text expanded">{text}</p>
       {compact && (
-        <button type="button" className="entry-expand" onClick={() => setExpanded((value) => !value)}>
-          {expanded ? labels.lessText : labels.moreText}
+        <button type="button" className="entry-expand" onClick={() => setExpanded(false)}>
+          {labels.lessText}
         </button>
       )}
     </>
@@ -365,29 +338,35 @@ export default function FeedClient({ labels }) {
               const day = item.journey.current_day || 0;
               const pct = total ? Math.min(100, Math.max(3, item.journey.progress_pct || Math.round((day / total) * 100))) : 0;
               const left = Math.max(0, total - day);
+              // a barra vive FORA do card, entre ele e os ícones
               const progressEl = total > 0 ? (
-                <div className="media-progress" aria-hidden="true">
+                <div className="progress-under" aria-hidden="true">
                   <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
-                  <span className="mp-label">{(labels.progressFmt || '').replace('{d}', day).replace('{r}', left)}</span>
+                  <div className="mp-meta">
+                    <span>{(labels.progressFmt || '').replace('{d}', day).replace('{r}', left)}</span>
+                    <span className="mp-pct">{pct}%</span>
+                  </div>
                 </div>
               ) : null;
-              const trackFloat = item.track ? <TrackTag track={item.track} float hasBar={total > 0} /> : null;
+              const trackFloat = item.track ? <TrackTag track={item.track} float hasBar={false} /> : null;
               if (!hasMedia && cleanText) {
                 return (
-                  <a href={`/${item.journey.slug}`} className={`entry-textcard${cleanText.length > 130 ? ' long' : ''}`}>
-                    <span className="etc-day">{dayLabel(item.day_number)}</span>
-                    <p>{cleanText}</p>
+                  <>
+                    <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText.length > 140 ? ' long' : ''}`}>
+                      <p className={`dpc-text${cleanText.length > 140 ? ' long' : (cleanText.length < 70 ? ' short' : '')}`}>{cleanText}</p>
+                      {trackFloat}
+                    </a>
                     {progressEl}
-                    {trackFloat}
-                  </a>
+                  </>
                 );
               }
               return (
                 <>
-                  {cleanText && <EntryText text={cleanText} labels={labels} />}
-                  {item.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={item.photo_url} alt="" />{progressEl}{trackFloat}</a>}
-                  {item.video_url && !item.photo_url && <div className="entry-media"><video src={item.video_url} controls playsInline preload="metadata" />{progressEl}{trackFloat}</div>}
+                  {cleanText && <div className="dp-text"><EntryText text={cleanText} labels={labels} limit={100} /></div>}
+                  {item.photo_url && <a href={`/${item.journey.slug}`} className="entry-media"><img src={item.photo_url} alt="" />{trackFloat}</a>}
+                  {item.video_url && !item.photo_url && <div className="entry-media"><video src={item.video_url} controls playsInline preload="metadata" />{trackFloat}</div>}
                   {!hasMedia && !cleanText && item.track && <TrackTag track={item.track} />}
+                  {progressEl}
                 </>
               );
             })()}
