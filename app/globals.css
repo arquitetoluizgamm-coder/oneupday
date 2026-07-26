@@ -4166,3 +4166,48 @@ h1 { letter-spacing: -0.03em; }
   margin:30px 2px 30px;padding-top:18px;border-top:1px solid var(--line);text-align:center;
 }
 @media(max-width:640px){ .jd-perigo{margin:30px 16px 30px} }
+
+/* ============================================================
+   PERFIL — o Upi ganha a linha inteira
+   Ele dividia a linha com o + e a engrenagem. Sobravam ~190px
+   para o balao no celular, e a frase caia uma palavra por linha,
+   esticando o bloco. Agora os botoes ficam na primeira linha e o
+   Upi ocupa a segunda, inteira.
+   ============================================================ */
+.pc-bar{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;
+  gap:10px;
+}
+.pf-add{order:1}
+.pm-gear{order:1}
+.pc-bar-upi{order:2;flex:0 0 100%;min-width:0}
+.pc-bar-upi:empty{display:none}          /* sem mensagem, sem linha vazia */
+.pc-bar .upi{margin:2px 0 0}
+
+/* o balao precisa parecer que sai do Upi, nao ficar solto ao lado */
+.pc-bar .upi{align-items:flex-start;gap:8px}
+.pc-bar .upi-char{width:44px;height:44px}
+.pc-bar .upi-bubble{
+  flex:1 1 auto;min-width:0;max-width:none;
+  position:relative;border-radius:14px;
+  margin-top:6px;
+}
+/* biquinho apontando para o Upi */
+.pc-bar .upi-bubble::before,
+.pc-bar .upi-bubble::after{
+  content:'';position:absolute;left:-7px;top:14px;
+  width:0;height:0;
+  border-top:7px solid transparent;
+  border-bottom:7px solid transparent;
+  border-right:7px solid var(--line);
+}
+.pc-bar .upi-bubble::after{
+  left:-6px;border-right-color:var(--surface);
+}
+.pc-bar .upi-bubble p{overflow-wrap:break-word}
+
+@media(max-width:640px){
+  .pc-bar .upi-char{width:40px;height:40px}
+  .pc-bar .upi-bubble{padding:9px 12px 10px}
+  .pc-bar .upi-bubble p{font-size:14px;line-height:1.5}
+}
