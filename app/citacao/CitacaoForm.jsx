@@ -32,39 +32,60 @@ function quebrar(ctx, texto, larg) {
   return linhas;
 }
 
+// A aspa é decorativa, não pontuação: fica maior que o texto e mais
+// apagada, para marcar "isto é uma frase" sem disputar a leitura.
+const ASPA_ESCALA = 3.2;   // em relação ao corpo do texto
+const ASPA_ALTURA = 0.56;  // altura visual da aspa dentro do seu em
+const ASPA_OPACIDADE = 0.26;
+
 function desenhar(ctx, img, fundo, texto, autor) {
   ctx.clearRect(0, 0, LARG, ALT);
   ctx.drawImage(img, 0, 0, LARG, ALT);
 
   const c = fundo.caixa;
   let corpo = corpoPara(fundo, texto);
-  let linhas, altura;
+  let linhas, altura, entre, aspa, aspaAlt, respiro, bloco;
 
-  // encolhe até caber: o limite de caracteres é uma estimativa,
-  // a medida real depende das palavras que a pessoa escreveu
+  // encolhe até caber. O limite por caracteres é só uma estimativa: quem
+  // decide é a medida real das palavras — e a aspa também ocupa altura.
   for (;;) {
     ctx.font = `500 ${corpo}px ${FONTE}`;
     linhas = quebrar(ctx, texto, c.w);
-    const entre = corpo >= 66 ? 1.20 : corpo >= 52 ? 1.25 : 1.30;
+    entre = corpo >= 66 ? 1.20 : corpo >= 52 ? 1.25 : 1.30;
     altura = linhas.length * corpo * entre;
-    if (altura <= c.h || corpo <= 26) break;
+    aspa = Math.round(corpo * ASPA_ESCALA);
+    aspaAlt = aspa * ASPA_ALTURA;
+    respiro = Math.round(corpo * 0.30);
+    bloco = aspaAlt + respiro + altura;
+    if (bloco <= c.h || corpo <= 26) break;
     corpo -= 2;
   }
 
-  const entre = corpo >= 66 ? 1.20 : corpo >= 52 ? 1.25 : 1.30;
+  const meio = c.x + c.w / 2;
+  let y = c.y + (c.h - bloco) / 2;
+
   ctx.fillStyle = fundo.corTexto;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  let y = c.y + (c.h - altura) / 2;
+
+  // aspa de abertura, centralizada acima do texto
+  ctx.save();
+  ctx.globalAlpha = ASPA_OPACIDADE;
+  ctx.font = `700 ${aspa}px ${FONTE}`;
+  ctx.fillText('“', meio, y - aspa * 0.14);
+  ctx.restore();
+
+  y += aspaAlt + respiro;
+  ctx.font = `500 ${corpo}px ${FONTE}`;
   for (const ln of linhas) {
-    ctx.fillText(ln, c.x + c.w / 2, y);
+    ctx.fillText(ln, meio, y);
     y += corpo * entre;
   }
 
   if (autor && autor.trim()) {
     ctx.font = `700 26px 'Montserrat', system-ui, sans-serif`;
     ctx.globalAlpha = 0.7;
-    ctx.fillText(autor.trim(), c.x + c.w / 2, Math.min(y + 22, c.y + c.h + 30));
+    ctx.fillText(autor.trim(), meio, Math.min(y + 22, c.y + c.h + 30));
     ctx.globalAlpha = 1;
   }
 }
