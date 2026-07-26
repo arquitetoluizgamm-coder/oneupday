@@ -22,6 +22,7 @@ import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
 import ProfileTabs from '../../components/ProfileTabs';
 import EditProfileInfo from '../../components/EditProfileInfo';
 import ProfileMenu from '../../components/ProfileMenu';
+import CriarMenu from '../../components/CriarMenu';
 import DeleteJourney from '../../components/DeleteJourney';
 import EditJourney from '../../components/EditJourney';
 import JourneyDays from '../../components/JourneyDays';
@@ -226,6 +227,8 @@ export default async function Perfil() {
                 msgKey={`${new Date(Date.now() - 3 * 3600 * 1000).toISOString().slice(0, 10)}:${upi.cat}`} />
             )}
           </div>
+
+          <CriarMenu t={t} className="pf-add" tamanho={21} rotulo={t.navCreate} />
 
           <ProfileMenu
             label={t.settings}
