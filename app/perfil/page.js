@@ -289,10 +289,6 @@ export default async function Perfil() {
         {list.length > 0 && (
           <ProfileTabs
             labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, people: t.profTabPeople }}
-            actions={(<>
-              <a className="ghost-btn" href="/midia"><span className="al-full">{t.mediaAdd}</span><span className="al-short">{t.mediaAddShort}</span></a>
-              <a className="cta" href="/new"><span className="al-full">{t.newJourney}</span><span className="al-short">{t.newJourneyShort}</span></a>
-            </>)}
             journeys={(
               <>
                 {list.map(j => {
