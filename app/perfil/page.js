@@ -275,11 +275,18 @@ export default async function Perfil() {
             ); })}
         </section>
 
-        {list.length > 0 && (
-          <ProfileTabs
+        {/* as abas existem sempre: sem jornada, a pessoa ainda tem álbum
+            e pessoas para explorar — e o vazio precisa de uma saída */}
+        <ProfileTabs
             labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, people: t.profTabPeople }}
             journeys={(
               <>
+                {list.length === 0 && (
+                  <div className="tab-empty">
+                    <p>{t.obSub}</p>
+                    <a className="cta" href="/new">{t.newJourney}</a>
+                  </div>
+                )}
                 {list.map(j => {
                   const s = statsById[j.id] || {};
                   const day = s.current_day || 0;
@@ -356,7 +363,7 @@ export default async function Perfil() {
               </>
             )}
           />
-        )}
+
 
         {nc.mode && (
           <div className="nc-neutral">
