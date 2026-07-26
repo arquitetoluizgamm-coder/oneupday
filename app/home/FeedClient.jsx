@@ -5,7 +5,6 @@ import FeedShare from './FeedShare';
 import Comments from '../../components/Comments';
 import SuggestionCard from '../../components/SuggestionCard';
 import NeedsSupport from '../../components/NeedsSupport';
-import MeTooButton from '../../components/MeTooButton';
 import EditUpdate from '../../components/EditUpdate';
 import ChallengeStrip from '../../components/ChallengeStrip';
 import ChallengeButton from '../../components/ChallengeButton';
@@ -109,7 +108,6 @@ function DayPager({ item, labels, dayLabel, dark }) {
         <EncourageBar key={'e' + d.id} updateId={d.id} initialActive={d.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
         <Comments key={'c' + d.id} updateId={d.id} labels={labels.comments} />
         <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
-        {(d.kind === 'setback' || d.comeback) && !item.own && <MeTooButton key={'m' + d.id} updateId={d.id} labels={labels.metoo} />}
         {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
         {item.own && <EditUpdate key={'ed' + d.id} update={{ id: d.id, text: d.text, photo_url: d.photo_url, day: d.day_number }} labels={labels.editUpdate}
           onChanged={(patch) => setDays((prev) => patch === null ? prev.filter((x) => x.id !== d.id) : prev.map((x) => x.id === d.id ? { ...x, ...patch } : x))} />}
@@ -426,7 +424,6 @@ export default function FeedClient({ labels }) {
                 <EncourageBar updateId={item.id} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} />
                 <Comments updateId={item.id} labels={labels.comments} />
                 <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
-                {(item.kind === 'setback' || item.comeback) && !item.demo && !item.own && <MeTooButton updateId={item.id} labels={labels.metoo} />}
                 {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
               </ActionsRow>
             )}

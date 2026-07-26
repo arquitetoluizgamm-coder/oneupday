@@ -3046,3 +3046,7 @@ h1 { letter-spacing: -0.03em; }
 }
 .dp-text.under .entry-text{margin:0!important}
 .dp-text.under + .progress-under{margin-top:9px!important}
+
+/* contagem de apoio/seguidores no topo: sem negrito */
+.heart-pop .hp-stat{font-weight:500;font-size:15px}
+.heart-pop{cursor:pointer}
