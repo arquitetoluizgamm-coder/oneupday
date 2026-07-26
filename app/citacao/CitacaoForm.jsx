@@ -96,6 +96,8 @@ export default function CitacaoForm({ t, autorPadrao }) {
   const [escolhido, setEscolhido] = useState(FUNDOS[0].arquivo);
   const [pronto, setPronto] = useState(false);
   const [baixando, setBaixando] = useState(false);
+  const [imagem, setImagem] = useState(null);   // { url, blob } da imagem pronta
+  const [erro, setErro] = useState('');
   const canvas = useRef(null);
   const imgs = useRef({});
 
@@ -130,23 +132,63 @@ export default function CitacaoForm({ t, autorPadrao }) {
     return () => { vivo = false; };
   }, [fundo, texto, autor]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function baixar() {
+  // ------------------------------------------------------------
+  // Salvar
+  //
+  // Dentro do app instalado (TWA) o truque do <a download> costuma
+  // ser bloqueado: o clique acontece, nada baixa, e a pessoa acha
+  // que o app quebrou. Por isso a imagem SEMPRE aparece numa tela
+  // final, onde dá para segurar o dedo e salvar — esse caminho
+  // funciona em qualquer lugar. Compartilhar e baixar são atalhos
+  // por cima disso, nunca a única saída.
+  // ------------------------------------------------------------
+  async function gerarBlob(cv) {
+    if (cv.toBlob) {
+      const b = await new Promise((r) => cv.toBlob(r, 'image/png'));
+      if (b) return b;
+    }
+    // WebView antiga sem toBlob: converte o dataURL na mão
+    const dados = cv.toDataURL('image/png');
+    const bin = atob(dados.split(',')[1]);
+    const buf = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    return new Blob([buf], { type: 'image/png' });
+  }
+
+  async function salvar() {
     const cv = canvas.current;
     if (!cv || baixando) return;
     setBaixando(true);
-    const blob = await new Promise((r) => cv.toBlob(r, 'image/png', 0.95));
+    setErro('');
+    try {
+      const blob = await gerarBlob(cv);
+      if (!blob) throw new Error('sem blob');
+      const url = URL.createObjectURL(blob);
+      setImagem({ url, blob });
+    } catch (e) {
+      setErro(t.citError);
+    }
     setBaixando(false);
-    if (!blob) return;
+  }
 
-    const arquivo = new File([blob], 'oneupday.png', { type: 'image/png' });
-    // no celular, compartilhar direto vale mais que baixar e procurar depois
+  async function compartilhar() {
+    if (!imagem) return;
+    const arquivo = new File([imagem.blob], 'oneupday.png', { type: 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
       try { await navigator.share({ files: [arquivo] }); return; } catch {}
     }
-    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'oneupday.png'; a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    a.href = imagem.url;
+    a.download = 'oneupday.png';
+    a.style.display = 'none';
+    document.body.appendChild(a);   // âncora solta é ignorada em alguns navegadores
+    a.click();
+    a.remove();
+  }
+
+  function fechar() {
+    if (imagem) URL.revokeObjectURL(imagem.url);
+    setImagem(null);
   }
 
   return (
@@ -195,9 +237,24 @@ export default function CitacaoForm({ t, autorPadrao }) {
         <input value={autor} onChange={(e) => setAutor(e.target.value.slice(0, 30))} maxLength={30} placeholder={t.citAuthorPh} />
       </label>
 
-      <button type="button" className="cta grow cit-go" onClick={baixar} disabled={!texto.trim() || baixando}>
+      {erro && <p className="ep-err" role="alert">{erro}</p>}
+
+      <button type="button" className="cta grow cit-go" onClick={salvar} disabled={!texto.trim() || baixando}>
         {baixando ? t.citSaving : t.citSave}
       </button>
+
+      {imagem && (
+        <div className="cit-final" role="dialog" aria-modal="true" onClick={fechar}>
+          <div className="cit-final-card" onClick={(e) => e.stopPropagation()}>
+            <img src={imagem.url} alt="" />
+            <p className="cit-final-dica">{t.citHold}</p>
+            <div className="cit-final-acts">
+              <button type="button" className="ghost-btn" onClick={fechar}>{t.epCancel}</button>
+              <button type="button" className="cta grow" onClick={compartilhar}>{t.citShare}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

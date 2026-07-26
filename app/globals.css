@@ -3987,3 +3987,25 @@ h1 { letter-spacing: -0.03em; }
   border-radius:50%;cursor:pointer;transition:background .15s ease;
 }
 .pf-add:hover{background:#171d4d}
+
+/* tela final da citacao: a imagem pronta, sempre visivel.
+   Dentro do app instalado o <a download> costuma ser bloqueado —
+   segurar o dedo na imagem funciona em qualquer lugar. */
+.cit-final{
+  position:fixed;inset:0;z-index:95;background:rgba(16,19,45,.62);
+  display:flex;align-items:center;justify-content:center;padding:18px;
+  -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+}
+.cit-final-card{
+  width:min(420px,100%);max-height:92svh;overflow-y:auto;
+  background:var(--bg,#FAF7F2);padding:14px;border-radius:16px;
+}
+.cit-final-card img{
+  display:block;width:100%;height:auto;aspect-ratio:4/5;
+  -webkit-touch-callout:default;user-select:none;
+}
+.cit-final-dica{
+  margin:10px 2px 12px;font-size:12.5px;line-height:1.5;color:var(--muted);text-align:center;
+}
+.cit-final-acts{display:flex;gap:8px}
+.cit-final-acts .cta{min-height:46px}
