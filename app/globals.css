@@ -4684,3 +4684,10 @@ h1 { letter-spacing: -0.03em; }
 /* na lista de edicao, a linha seguinte do mesmo dia perde o rotulo */
 .jdays-row.mesmo-dia{border-top:0;padding-top:2px;margin-top:-4px}
 .jdays-row.mesmo-dia .jdays-day{visibility:hidden}
+
+/* a captura real da jornada, na secao "Veja uma jornada acontecendo" */
+.acao-tela img{
+  display:block;width:100%;height:auto;
+  border:1px solid var(--line);border-radius:16px;
+  box-shadow:var(--shadow-md);
+}

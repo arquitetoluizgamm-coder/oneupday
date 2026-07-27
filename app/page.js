@@ -102,33 +102,13 @@ export default async function Home() {
           <h2 className="sec-titulo">{t.acaoT}</h2>
 
           <div className="acao-palco">
-            {/* QUANDO A CAPTURA REAL EXISTIR:
-                troque este bloco inteiro por
-                  <div className="acao-tela"><img src="/tela-jornada.png" alt="" /></div>
-                e apague o `demo` lá em cima.
-
-                Até lá fica o card de demonstração que já existia. Não é a
-                tela real que a página merece, mas é melhor do que uma caixa
-                vazia dizendo "imagem aqui" — isso, sim, quebraria a página
-                no ar. */}
+            {/* A captura real: a jornada do Diego Prado, 7 de 7, com a
+                recaída do Dia 4 marcada como "ainda conta" e a vitória no
+                Dia 7. É ficção — uma das histórias do app — então não há
+                pessoa real exposta, e ela já vem rotulada como exemplo
+                dentro do próprio produto. */}
             <div className="acao-tela">
-              <a className="demo-card" href="/login">
-                <div className="demo-cover" style={{ backgroundImage: 'linear-gradient(180deg, rgba(9,12,42,.05), rgba(9,12,42,.55)), url(/demo-cover.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                  <span className="demo-day">{t.cardDay} {demo.day}</span>
-                  <span className="demo-example">{t.demoExample}</span>
-                </div>
-                <div className="demo-body">
-                  <div className="demo-who">
-                    <span className="demo-ava" style={{ background: 'var(--orange)' }}>
-                      <img src="/demo-avatar.jpg" alt="" />
-                    </span>
-                    <b>{demo.title}</b>
-                    <span className="demo-flag">{demo.badge}</span>
-                  </div>
-                  <p className="demo-update">{demo.update}</p>
-                  <ProgressBar day={demo.day} total={demo.total} dayTpl={t.dayXofY} goalWord={t.goalWord} />
-                </div>
-              </a>
+              <img src="/tela-jornada.png" alt="Uma jornada de 7 dias concluída, com os capítulos de cada dia" />
             </div>
             <ul className="acao-chamadas">
               <li>{t.acao1}</li>
