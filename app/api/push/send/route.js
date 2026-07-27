@@ -11,54 +11,107 @@ export const dynamic = 'force-dynamic';
 // md5() é nativa e o sha256 precisaria do pgcrypto.
 const marca = (v) => (v ? crypto.createHash('md5').update(v).digest('hex').slice(0, 12) : '(vazio)');
 
-// Despachante: roda no cron da Vercel.
-// 1) manda push das notificações novas (curtida, comentário, seguir, abraço, desafio)
-// 2) manda o lembrete diário do Upi na hora escolhida por cada pessoa
+// ============================================================
+// COMO ESTA ROTA SE PROTEGE
+//
+// Duas portas, e elas existem por motivos diferentes.
+//
+// 1) SENHA (CRON_SECRET) — usada pelo cron diário da Vercel.
+//    Aqui não há risco de dessincronizar: a Vercel manda no
+//    cabeçalho o valor da MESMA variável que este código lê.
+//    Por construção, os dois são sempre iguais.
+//
+// 2) BILHETE (push_tickets) — usada pelo gatilho do banco.
+//    Esta é a novidade, e ela existe porque o esquema anterior
+//    era frágil por desenho: a chave ficava escrita à mão em
+//    DOIS lugares (variável da Vercel e função SQL). Bastava um
+//    redeploy esquecido para os dois valores divergirem — e o
+//    push morria em silêncio, com 403, sem nada apontar qual dos
+//    lados estava velho.
+//
+//    Agora o banco não guarda senha nenhuma. Ele cria um bilhete
+//    de uso único na tabela push_tickets e manda o número. Esta
+//    rota, que já fala com o banco com a chave de serviço,
+//    pergunta se o bilhete existe, apaga e segue. Não há segredo
+//    compartilhado: não há o que sair de sincronia, e nenhum
+//    redeploy é necessário quando algo muda.
+//
+//    O bilhete vale 2 minutos e só serve uma vez.
+// ============================================================
 async function handler(req) {
-  const secret = process.env.CRON_SECRET;
-  if (secret) {
-    // aceita a chave de três formas: cabeçalho (cron da Vercel),
-    // corpo JSON (gatilho do banco) ou query (teste manual)
-    const auth = req.headers.get('authorization') || '';
-    const url = new URL(req.url);
-    let bodyKey = '';
-    if (req.method === 'POST') {
-      try { bodyKey = (await req.json().catch(() => ({})))?.key || ''; } catch {}
-    }
-    const recebida = bodyKey || url.searchParams.get('key') || auth.replace(/^Bearer /, '');
-    const ok = auth === `Bearer ${secret}`
-      || url.searchParams.get('key') === secret
-      || bodyKey === secret;
-
-    // O 403 agora se explica. Antes dizia só "forbidden", e descobrir
-    // qual dos dois lados estava desatualizado exigia comparar valores
-    // à mão em dois painéis diferentes. Estas marcas são hashes curtos:
-    // não revelam chave nenhuma, e a resposta fica gravada em
-    // net._http_response — dá para ler direto do banco.
-    if (!ok) {
-      return NextResponse.json({
-        error: 'forbidden',
-        motivo: !recebida
-          ? 'nenhuma chave chegou na requisicao'
-          : 'a chave recebida nao bate com a CRON_SECRET deste deploy',
-        marca_esperada_pelo_servidor: marca(secret),
-        marca_recebida: marca(recebida),
-        tamanho_esperado: secret.length,
-        tamanho_recebido: recebida ? recebida.length : 0,
-        deploy: process.env.VERCEL_GIT_COMMIT_SHA
-          ? process.env.VERCEL_GIT_COMMIT_SHA.slice(0, 7)
-          : 'desconhecido',
-        dica: 'Compare marca_esperada com: select left(md5((select decrypted_secret from vault.decrypted_secrets where name=\'cron_secret\')),12); Se forem iguais e ainda der 403, o deploy da Vercel e antigo — refaca o Redeploy.',
-      }, { status: 403 });
-    }
-  }
-  if (!pushReady()) return NextResponse.json({ error: 'no-vapid' }, { status: 500 });
-
   const sb = createAdmin(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY,
     { auth: { persistSession: false } }
   );
+
+  const auth = req.headers.get('authorization') || '';
+  const url = new URL(req.url);
+  let bodyKey = '';
+  let bilhete = '';
+  if (req.method === 'POST') {
+    try {
+      const b = (await req.json().catch(() => ({}))) || {};
+      bodyKey = b.key || '';
+      bilhete = b.ticket || b.bilhete || '';
+    } catch { }
+  }
+
+  const secret = process.env.CRON_SECRET;
+  let ok = !secret;   // sem senha configurada, a porta 1 não existe
+
+  if (secret) {
+    ok = auth === `Bearer ${secret}`
+      || url.searchParams.get('key') === secret
+      || bodyKey === secret;
+  }
+
+  // porta 2: bilhete de uso único emitido pelo próprio banco
+  let bilheteInfo = 'nao veio bilhete';
+  if (!ok && bilhete) {
+    const { data, error } = await sb
+      .from('push_tickets')
+      .select('token, criado')
+      .eq('token', bilhete)
+      .maybeSingle();
+
+    if (error) {
+      bilheteInfo = /does not exist|schema cache/i.test(error.message || '')
+        ? 'a tabela push_tickets nao existe — rode supabase/push-bilhete.sql'
+        : `erro ao ler o bilhete: ${error.message}`;
+    } else if (!data) {
+      bilheteInfo = 'bilhete nao encontrado (ja usado ou invalido)';
+    } else if (Date.now() - new Date(data.criado).getTime() > 120000) {
+      bilheteInfo = 'bilhete expirado (vale 2 minutos)';
+      await sb.from('push_tickets').delete().eq('token', bilhete);
+    } else {
+      await sb.from('push_tickets').delete().eq('token', bilhete);
+      ok = true;
+      bilheteInfo = 'ok';
+    }
+  }
+
+  if (!ok) {
+    const recebida = bodyKey || url.searchParams.get('key') || auth.replace(/^Bearer /, '');
+    return NextResponse.json({
+      error: 'forbidden',
+      bilhete: bilheteInfo,
+      marca_esperada_pelo_servidor: marca(secret),
+      marca_recebida: marca(recebida),
+      deploy: process.env.VERCEL_GIT_COMMIT_SHA
+        ? process.env.VERCEL_GIT_COMMIT_SHA.slice(0, 7)
+        : 'desconhecido',
+      dica: 'Se o campo bilhete disser que a tabela nao existe, rode supabase/push-bilhete.sql. Se disser "nao veio bilhete", o gatilho do banco ainda e o antigo — rode o mesmo arquivo.',
+    }, { status: 403 });
+  }
+
+  if (!pushReady()) return NextResponse.json({ error: 'no-vapid' }, { status: 500 });
+
+  // faxina: bilhetes velhos não servem para nada
+  try {
+    await sb.from('push_tickets').delete()
+      .lt('criado', new Date(Date.now() - 3600000).toISOString());
+  } catch { }
 
   const TXT = {
     encourage: (n) => ({ title: 'Alguém apoiou seu dia', body: `${n} apoiou o que você registrou.` }),
