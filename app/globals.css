@@ -4978,3 +4978,50 @@ h1 { letter-spacing: -0.03em; }
   .asc{margin:26px 16px 0;padding:16px}
   .asc-btn{width:100%;text-align:center}
 }
+
+/* ============================================================
+   PONTA A PONTA (Android 15+)
+   A partir do Android 15, app com targetSdk 35 ou mais e' desenhado
+   POR BAIXO das barras do sistema. Num TWA isso significa que a
+   pagina web ocupa a tela inteira — inclusive o espaco da barra de
+   status em cima e da barra de gestos embaixo.
+   Sem tratar isso: o topo do app fica atras do relogio, e a barra
+   de navegacao de baixo fica atras da barrinha de gesto.
+
+   O `viewport-fit=cover` ja estava no layout.js. Faltava a outra
+   metade: reservar o espaco com env(safe-area-inset-*).
+
+   Em navegador normal os valores sao 0, entao nada muda fora do app.
+   ============================================================ */
+:root{
+  --sa-top:env(safe-area-inset-top,0px);
+  --sa-bottom:env(safe-area-inset-bottom,0px);
+  --sa-left:env(safe-area-inset-left,0px);
+  --sa-right:env(safe-area-inset-right,0px);
+}
+
+/* o topo fixo desce abaixo do relogio e da bateria */
+.top{padding-top:calc(16px + var(--sa-top))}
+.land-top{padding-top:calc(26px + var(--sa-top))}
+@media(max-width:640px){ .land-top{padding-top:calc(18px + var(--sa-top))} }
+
+/* a barra de baixo sobe acima da barrinha de gesto */
+@media(max-width:640px){
+  .bottom-nav{padding-bottom:var(--sa-bottom)}
+  body{padding-bottom:calc(74px + var(--sa-bottom))}
+}
+
+/* telas cheias e sobreposicoes tambem respeitam as bordas */
+.pm-back,.create-backdrop,.crop-modal{
+  padding-bottom:var(--sa-bottom);
+  padding-left:var(--sa-left);padding-right:var(--sa-right);
+}
+.create-menu{margin-bottom:var(--sa-bottom)}
+
+/* em paisagem, o entalhe fica na lateral */
+@media(orientation:landscape){
+  .wrap,.landing{
+    padding-left:calc(20px + var(--sa-left));
+    padding-right:calc(20px + var(--sa-right));
+  }
+}
