@@ -2090,6 +2090,25 @@ html.chrome-scrolling .top{box-shadow:none!important}
   --gold:#E8A64C;               /* dourado do recomeço */
   --sky:#9FC3DE; --rose:#D493A6;
   --display:'Montserrat','Century Gothic',ui-sans-serif,sans-serif;
+
+  /* --------------------------------------------------------
+     CONTRASTE — medido, não estimado
+     Sobre o fundo #FAF7F2, o mínimo AA para texto normal é 4,5.
+
+       --muted  #687386 dava 4,48   → reprovava por 0,02
+                #646E80 dá   4,81   ✓
+
+     Parece nada. Mas --muted é usado 256 vezes: é a cor de toda
+     legenda, subtítulo, metadado e "há 3 dias" do app inteiro.
+     Um valor conserta todos.
+
+       --orange #C16F54 dá 3,47 → passa em título, reprova em
+                texto miúdo. O terracota da MARCA continua igual;
+                o que entra é uma variação só para texto pequeno.
+     -------------------------------------------------------- */
+  --muted:#646E80;
+  --terracota-txt:#A85941;      /* 4,71 — terracota legível em 11-14px */
+  --dourado-txt:#8F6A33;        /* 4,59 — dourado legível em selo */
 }
 /* display: Montserrat nos títulos e CTAs (ecoa a geometria do logo) */
 h1, h2, .cta, .post-btn { font-family: var(--display); }
@@ -5242,3 +5261,57 @@ h1 { letter-spacing: -0.03em; }
 
 /* patch 70 · o bloco de estatísticas passou de três colunas para duas */
 .stats.stats-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+
+/* ============================================================
+   PATCH 71 · CONTRASTE E ÁREA DE TOQUE
+   Achados medindo o app no ar, não olhando. Cada regra tem o
+   número que a justifica.
+   ============================================================ */
+
+/* ---- texto pequeno em terracota: 3,47 → 4,71 ----
+   A cor da marca não muda. Muda a cor DESTES TRÊS TEXTOS, que
+   têm 11, 13 e 14px — tamanhos em que 3,47 reprova. */
+.needs-send{color:var(--terracota-txt)!important}
+.ai-write{color:var(--terracota-txt)!important}
+.feed-enc{color:var(--terracota-txt)!important}
+
+/* ---- selo "história": 8,5px e 3,03 de contraste ----
+   Nenhuma cor salva 8,5px. Sobe para 11 e escurece o dourado. */
+.hist-selo{font-size:11px!important;color:var(--dourado-txt)!important;letter-spacing:.10em}
+
+/* ============================================================
+   ÁREA DE TOQUE
+   O desenho não muda: o traço continua do tamanho que é. O que
+   cresce é a área invisível que recebe o dedo — mesma técnica da
+   tira de dias.
+   Medido: 19px de altura nos dois. O mínimo é 44.
+   ============================================================ */
+
+/* "Seguindo" e "mandar apoio" são os dois gestos que o produto
+   mais quer que aconteçam — e eram os dois mais difíceis de
+   acertar com o polegar. */
+.follow-btn{position:relative;min-height:32px}
+.follow-btn::after{content:"";position:absolute;left:0;right:0;
+  top:50%;transform:translateY(-50%);height:44px;min-width:44px}
+
+.needs-send{position:relative;min-height:32px}
+.needs-send::after{content:"";position:absolute;left:-6px;right:-6px;
+  top:50%;transform:translateY(-50%);height:44px}
+
+/* Chips de categoria: 33 → 44 de alvo, sem engordar a pílula. */
+.chip{position:relative}
+.chip::after{content:"";position:absolute;left:0;right:0;
+  top:50%;transform:translateY(-50%);height:44px}
+
+/* A marca no topo tinha 26px de altura de toque. */
+.top-brand{position:relative;display:inline-flex;align-items:center;min-height:44px}
+
+/* ============================================================
+   REGRAS MORTAS
+   .fj-eyebrow era definida três vezes — amarelo neon, depois
+   rosa, depois terracota. As duas primeiras nunca chegaram a
+   pintar nada: perdiam por ordem de linha. Ficavam no arquivo
+   como armadilha para quem viesse depois procurar de onde vem
+   a cor. Aqui elas são explicitamente encerradas.
+   ============================================================ */
+.first-journey .fj-eyebrow{color:var(--terracota-txt)}
