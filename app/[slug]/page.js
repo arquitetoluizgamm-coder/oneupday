@@ -31,6 +31,11 @@ import TiraDeDias from '../../components/TiraDeDias';
 // avatar de uma pessoa para outra. Agora esta declarado.
 export const dynamic = 'force-dynamic';
 
+// "1 dias postados" é o tipo de detalhe que faz o produto parecer
+// descuidado justamente na tela em que a pessoa está mostrando o
+// próprio esforço.
+const plural = (n, um, muitos) => (Number(n) === 1 ? (um || muitos) : muitos);
+
 async function loadJourney(slug) {
   try {
   const sb = createClient();
@@ -242,10 +247,13 @@ function DemoJourneyPage({ story, t, locale }) {
           <a className="follow-btn" href="/login">{t.follow}</a>
         </div>
 
-        <div className="stats">
-          <article><b>{story.stats.days_posted || 0}</b><span>{t.daysPosted}</span></article>
-          <article><b>{story.stats.streak || 0}</b><span>{t.dayStreakLabel}</span></article>
-          <article><b>{pct}%</b><span>{t.progress}</span></article>
+        {/* Mesma limpeza da jornada real: o progresso sai daqui porque a
+            barra logo abaixo já o mostra. Esta é a página que o visitante
+            novo vê primeiro — se o exemplo for descuidado, ele decide o
+            que esperar do resto. */}
+        <div className="stats stats-2">
+          <article><b>{story.stats.days_posted || 0}</b><span>{plural(story.stats.days_posted || 0, t.daysPostedOne, t.daysPosted)}</span></article>
+          <article><b>{story.stats.streak || 0}</b><span>{plural(story.stats.streak || 0, t.dayStreakLabelOne, t.dayStreakLabel)}</span></article>
         </div>
         <ProgressBar day={story.stats.current_day || 0} total={story.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
 
@@ -298,8 +306,12 @@ export async function generateMetadata({ params }) {
     return { title: 'One Up Day' };
   }
   const { journey, stats } = data;
+  // Estava com "Day X of Y" cravado em inglês. Isso aparece na aba do
+  // navegador e, pior, na prévia de todo link de jornada compartilhado —
+  // que é justamente o que as pessoas mandam no WhatsApp.
+  const td = getDict(getLocale());
   return {
-    title: `${journey.title} — Day ${stats.current_day || 0} of ${journey.total_days} · One Up Day`,
+    title: `${journey.title} — ${fill(td.dayXofY, { d: stats.current_day || 0, t: journey.total_days })} · One Up Day`,
     description: journey.goal || '',
     twitter: { card: 'summary_large_image' },
   };
@@ -411,10 +423,13 @@ export default async function JourneyPage({ params, searchParams }) {
         </div>
         <div className="who-tools"><BlockButton ownerId={journey.owner_id} label={t.blockUser} /></div>
 
-        <div className="stats">
-          <article><b>{stats.days_posted || 0}</b><span>{t.daysPosted}</span></article>
-          <article><b>{stats.streak || 0}</b><span>{t.dayStreakLabel}</span></article>
-          <article><b>{pct}%</b><span>{t.progress}</span></article>
+        {/* O "progresso %" saiu daqui: a barra logo abaixo já mostra o
+            mesmo número, e a repetição em 200px de tela fazia a pessoa
+            conferir se eram coisas diferentes. Ficam os dois que só
+            existem aqui. */}
+        <div className="stats stats-2">
+          <article><b>{stats.days_posted || 0}</b><span>{plural(stats.days_posted || 0, t.daysPostedOne, t.daysPosted)}</span></article>
+          <article><b>{stats.streak || 0}</b><span>{plural(stats.streak || 0, t.dayStreakLabelOne, t.dayStreakLabel)}</span></article>
         </div>
         <ProgressBar day={stats.current_day || 0} total={journey.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
 
@@ -431,7 +446,10 @@ export default async function JourneyPage({ params, searchParams }) {
           </section>
         )}
 
-        <TiraDeDias dias={dias} hoje={hoje} total={journey.total_days} labels={stripLabels} />
+        {/* Piso: abaixo de 5 dias não há o que navegar, e a tira ficava
+            mais alta que a própria linha do tempo. Navegação maior que
+            conteúdo é ruído com cara de recurso. */}
+        {hoje >= 5 && <TiraDeDias dias={dias} hoje={hoje} total={journey.total_days} labels={stripLabels} />}
 
         <section className="timeline">
           {porDia.slice().reverse().map((g, gi, garr) => {

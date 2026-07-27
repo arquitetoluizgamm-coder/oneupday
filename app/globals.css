@@ -5239,3 +5239,6 @@ h1 { letter-spacing: -0.03em; }
 .adm-tab th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line)}
 .adm-tab td{padding:11px 10px;border-bottom:1px solid var(--line)}
 .adm-taxa{font-weight:700;color:var(--orange,#C16F54);text-align:right}
+
+/* patch 70 · o bloco de estatísticas passou de três colunas para duas */
+.stats.stats-2{grid-template-columns:repeat(2,minmax(0,1fr))}
