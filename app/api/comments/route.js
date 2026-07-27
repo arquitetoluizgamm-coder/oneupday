@@ -12,19 +12,44 @@ function locallyUnsafe(text) {
   return BLOCKED.some(word => value.includes(word));
 }
 
+// ============================================================
+// MODERAÇÃO POR IA — e o que fazer quando ela não responde
+//
+// Antes esta função devolvia `false` em TRÊS situações diferentes:
+// sem chave configurada, resposta com erro, e exceção de rede.
+// As duas últimas são falha — e devolver `false` nelas significa
+// FALHAR ABERTO: com a OpenAI fora do ar, qualquer comentário
+// passava, protegido apenas pela lista local de 13 palavras.
+//
+// Num produto onde as pessoas escrevem sobre o próprio pior dia,
+// o custo de um comentário agressivo passar é muito maior que o
+// de um comentário gentil esperar meia hora.
+//
+// Agora ela distingue os três casos:
+//   'ok'           → analisado, e está limpo
+//   'inseguro'     → analisado, e foi sinalizado
+//   'indisponivel' → NÃO foi analisado (erro, rede, tempo esgotado)
+//
+// Sem chave configurada continua sendo 'ok': aí a moderação por IA
+// simplesmente não faz parte da instalação, e não há falha nenhuma.
+// ============================================================
 async function aiUnsafe(text) {
   const key = process.env.OPENAI_API_KEY;
-  if (!key) return false;
+  if (!key) return 'ok';   // recurso não configurado — não é falha
   try {
+    // teto de 6s: sem isso, uma API lenta trava o envio do comentário
+    const corte = AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined;
     const response = await fetch('https://api.openai.com/v1/moderations', {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'omni-moderation-latest', input: text }),
+      signal: corte,
     });
-    if (!response.ok) return false;
+    if (!response.ok) return 'indisponivel';
     const data = await response.json();
-    return !!data.results?.[0]?.flagged;
-  } catch { return false; }
+    if (!data?.results?.[0]) return 'indisponivel';
+    return data.results[0].flagged ? 'inseguro' : 'ok';
+  } catch { return 'indisponivel'; }
 }
 
 export async function GET(req) {
@@ -77,11 +102,20 @@ export async function POST(req) {
     const { data: parent } = await supabase.from('comments').select('id').eq('id', parentId).eq(col, val).eq('status', 'published').maybeSingle();
     if (!parent) return NextResponse.json({ error: 'invalid_parent' }, { status: 400 });
   }
-  if (locallyUnsafe(text) || await aiUnsafe(text)) return NextResponse.json({ error: 'unsafe' }, { status: 422 });
+  // a lista local pega ataque direto a outra pessoa e não depende de rede
+  if (locallyUnsafe(text)) return NextResponse.json({ error: 'unsafe' }, { status: 422 });
+
+  // Se a IA não conseguiu analisar, o comentário NÃO é recusado nem
+  // publicado: entra como pendente. Ele existe, o autor sabe, e some
+  // da tela pública até ser revisto — a política de leitura do banco
+  // só mostra o que está com status 'published'.
+  const veredito = await aiUnsafe(text);
+  if (veredito === 'inseguro') return NextResponse.json({ error: 'unsafe' }, { status: 422 });
+  const status = veredito === 'indisponivel' ? 'pending' : 'published';
 
   const { data: comment, error } = await supabase.from('comments').insert({
-    [col]: val, user_id: user.id, parent_id: parentId, body: text, status: 'published',
+    [col]: val, user_id: user.id, parent_id: parentId, body: text, status,
   }).select('id, user_id, parent_id, body, created_at').single();
   if (error) return NextResponse.json({ error: 'save' }, { status: 500 });
-  return NextResponse.json({ comment });
+  return NextResponse.json({ comment, pendente: status === 'pending' });
 }

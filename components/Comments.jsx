@@ -41,7 +41,13 @@ export default function Comments({ updateId, mediaId, challengeId, labels, own }
     if (response.status === 401) { window.location.href = '/login'; return; }
     if (response.status === 422) setMessage(L.unsafe);
     else if (!response.ok) setMessage(L.error);
-    else { setText(''); setReplyTo(null); await load(); }
+    else {
+      setText(''); setReplyTo(null); await load();
+      // Ficou pendente: a checagem de segurança não conseguiu rodar.
+      // O comentário existe, mas ainda não aparece — e a pessoa precisa
+      // saber disso, senão escreve de novo achando que se perdeu.
+      if (data?.pendente) setMessage(L.pendente || '');
+    }
     setBusy(false);
   }
   return (
