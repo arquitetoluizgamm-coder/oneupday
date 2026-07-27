@@ -5315,3 +5315,54 @@ h1 { letter-spacing: -0.03em; }
    a cor. Aqui elas são explicitamente encerradas.
    ============================================================ */
 .first-journey .fj-eyebrow{color:var(--terracota-txt)}
+
+/* ============================================================
+   PATCH 74 · CAPA LIMPA, TEXTO EMBAIXO
+   A foto fica inteira, sem véu escuro por cima. O texto vive
+   abaixo dela, em tinta sobre creme.
+   ============================================================ */
+
+/* A foto: sem gradiente, sem sombra pesada. Ela é o assunto. */
+.jcover-media{
+  aspect-ratio:16/10;border-radius:20px;background-size:cover;background-position:center;
+  box-shadow:0 10px 30px rgba(16,19,45,.08);margin-top:4px;
+}
+/* Sem foto, é um campo de cor — e campo de cor não pede a mesma
+   presença que uma fotografia. Fica mais baixo. */
+.jcover-media.jcm-cor{aspect-ratio:auto;height:132px}
+
+/* ---- o bloco de texto ---- */
+.jcover-text{padding:22px 4px 2px}
+
+/* A linha de cima: rótulo e categoria dividem a mesma altura, para
+   o título começar sem degrau. */
+.jcover-text .eyebrow{
+  display:inline-block;vertical-align:middle;margin:0 10px 0 0;
+  font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--terracota-txt);opacity:1;
+}
+.jcover-text .jt-moment{
+  display:inline-block;vertical-align:middle;padding:3px 11px;border-radius:999px;
+  font-size:12px;font-weight:700;text-decoration:none;
+  background:var(--sage-soft);color:var(--sage-deep);
+}
+
+.jcover-text h1{
+  margin:12px 0 10px;font-family:var(--display);color:var(--ink);
+  font-size:32px;line-height:1.1;letter-spacing:-.035em;
+  text-wrap:balance;
+}
+/* 34rem é a medida de leitura confortável: acima disso o olho perde
+   a linha ao voltar para a esquerda. */
+.jcover-text p{
+  margin:0;max-width:34rem;color:var(--muted);
+  font-size:16px;line-height:1.6;
+}
+
+@media(max-width:640px){
+  .jcover-media{border-radius:16px}
+  .jcover-media.jcm-cor{height:112px}
+  .jcover-text{padding:18px 2px 2px}
+  .jcover-text h1{font-size:26px}
+  .jcover-text p{font-size:15px}
+}

@@ -225,9 +225,13 @@ function DemoJourneyPage({ story, t, locale }) {
 
       <Track type="demo_journey_view" meta={{ slug: story.slug }} />
       <main className="wrap">
-        <section className="cover" style={{ background: `linear-gradient(135deg, var(--night), ${story.cover_color})` }}>
+        {/* Mesmo padrão da jornada real. Esta é a página que o visitante
+            sem conta vê primeiro — se ela usar um layout diferente, o
+            produto parece dois produtos. */}
+        <div className="jcover-media jcm-cor" style={{ background: `linear-gradient(135deg, var(--night), ${story.cover_color})` }} />
+        <section className="jcover-text">
           <p className="eyebrow">{t.demoLabelDemo}</p>
-          {momentLabel && <a className="moment-tag" href={`/grupo/${story.moment}`}>{momentLabel}</a>}
+          {momentLabel && <a className="moment-tag jt-moment" href={`/grupo/${story.moment}`}>{momentLabel}</a>}
           <h1>{story.title}</h1>
           <p>{story.goal}</p>
         </section>
@@ -403,14 +407,38 @@ export default async function JourneyPage({ params, searchParams }) {
             </section>
           </>
         ) : (
-        <section className={`cover${owner?.banner_url ? ' has-banner' : ''}`} style={owner?.banner_url
-          ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.25), rgba(9,12,42,.82)), url(${owner.banner_url})` }
-          : { background: `linear-gradient(135deg, var(--night), ${journey.cover_color})` }}>
-          <p className="eyebrow">{t.publicJourney}</p>
-          {momentLabel && <a className="moment-tag" href={`/grupo/${journey.moment}`}>{momentLabel}</a>}
-          <h1>{journey.title}</h1>
-          <p>{journey.goal}</p>
-        </section>
+        <>
+          {/* ============================================================
+              CAPA LIMPA, TEXTO EMBAIXO
+
+              Antes, quando não havia capa própria da jornada, o título
+              e o objetivo eram empilhados SOBRE a foto de banner. Para
+              o texto sobreviver, era preciso um gradiente escuro de 82%
+              por cima — ou seja, a imagem que a pessoa escolheu virava
+              um fundo abafado a serviço da tipografia.
+
+              Este layout já existia no app, no caminho de quem tem capa
+              própria. Agora os dois caminhos usam o mesmo: a foto fica
+              inteira e sem véu, e o texto vive embaixo, em tinta sobre
+              creme, onde não precisa competir com nada.
+
+              Sem foto nenhuma, a faixa vira um campo de cor da jornada —
+              mais baixa, porque campo de cor não pede a mesma presença
+              que uma fotografia.
+              ============================================================ */}
+          <div
+            className={`jcover-media${owner?.banner_url ? '' : ' jcm-cor'}`}
+            style={owner?.banner_url
+              ? { backgroundImage: `url(${owner.banner_url})` }
+              : { background: `linear-gradient(135deg, var(--night), ${journey.cover_color})` }}
+          />
+          <section className="jcover-text">
+            <p className="eyebrow">{t.publicJourney}</p>
+            {momentLabel && <a className="moment-tag jt-moment" href={`/grupo/${journey.moment}`}>{momentLabel}</a>}
+            <h1>{journey.title}</h1>
+            {journey.goal && <p>{journey.goal}</p>}
+          </section>
+        </>
         )}
 
         <div className="who">
