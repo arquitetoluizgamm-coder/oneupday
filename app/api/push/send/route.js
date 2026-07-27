@@ -301,7 +301,54 @@ async function handler(req) {
     }
   } catch {}
 
-  return NextResponse.json({ ok: true, sentNotif, sentReminder, sentEspelho });
+  // ---- 4. quem acompanha uma jornada SEM CONTA ----
+  // Capítulo novo numa jornada pública com seguidores anônimos: avisa.
+  // Esta é a ponta do ciclo de crescimento — a pessoa chegou por um
+  // link, pediu para ser avisada, e volta sozinha quando a história
+  // continua. Sem conta, sem e-mail, sem convite artificial.
+  let sentJornada = 0;
+  try {
+    const { data: caps } = await sb.from('updates')
+      .select('id, journey_id, day_number, text')
+      .eq('avisado', false)
+      .order('created_at', { ascending: true })
+      .limit(40);
+
+    for (const cap of (caps || [])) {
+      const { data: segs } = await sb.from('jornada_seguidores')
+        .select('id, endpoint, p256dh, auth')
+        .eq('journey_id', cap.journey_id);
+
+      if (segs && segs.length) {
+        const { data: j } = await sb.from('journeys')
+          .select('title, slug, visibility').eq('id', cap.journey_id).maybeSingle();
+
+        // se a jornada deixou de ser pública, ninguém mais é avisado —
+        // e os seguidores anônimos saem. Privacidade vence audiência.
+        if (!j || j.visibility !== 'public') {
+          await sb.from('jornada_seguidores').delete().eq('journey_id', cap.journey_id);
+        } else {
+          const corpo = (cap.text || '').replace(/\s+/g, ' ').trim().slice(0, 90);
+          for (const s of segs) {
+            const r = await sendPush(s, {
+              title: `${j.title} · Dia ${cap.day_number}`,
+              body: corpo || 'Um novo capítulo foi escrito.',
+              url: `/${j.slug}`,
+              tag: 'oud-jornada-' + j.slug,
+            });
+            if (r.ok) sentJornada++;
+            // inscrição morta: limpa. Ninguém fica na lista para sempre.
+            if (r.status === 404 || r.status === 410) {
+              await sb.from('jornada_seguidores').delete().eq('id', s.id);
+            }
+          }
+        }
+      }
+      await sb.from('updates').update({ avisado: true }).eq('id', cap.id);
+    }
+  } catch (e) { }
+
+  return NextResponse.json({ ok: true, sentNotif, sentReminder, sentEspelho, sentJornada });
 }
 
 // GET  -> usado pelo cron da Vercel

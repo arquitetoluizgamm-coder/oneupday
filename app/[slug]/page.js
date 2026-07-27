@@ -12,6 +12,7 @@ import FollowButton from './FollowButton';
 import BlockButton from './BlockButton';
 import ProgressBar from '../../components/ProgressBar';
 import ReportButton from './ReportButton';
+import AcompanharSemConta from '../../components/AcompanharSemConta';
 import MediaGallery from '../../components/MediaGallery';
 import ProfileTabs from '../../components/ProfileTabs';
 import FollowUserButton from './FollowUserButton';
@@ -459,6 +460,12 @@ export default async function JourneyPage({ params, searchParams }) {
             );
           })}
         </section>
+
+        {/* Acompanhar sem criar conta — só para quem NAO esta logado e
+            só em jornada publica. Quem tem conta ja segue de verdade. */}
+        {!viewerId && journey.visibility === 'public' && (
+          <AcompanharSemConta slug={journey.slug} t={t} />
+        )}
 
         <section className="share-card-section">
           <div className="share-copy">

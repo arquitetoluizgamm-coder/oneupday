@@ -4939,3 +4939,42 @@ h1 { letter-spacing: -0.03em; }
   .acao-chamadas{grid-template-columns:1fr;gap:8px}
   .acao-chamadas li{font-size:13.5px}
 }
+
+/* ============================================================
+   ACOMPANHAR SEM CRIAR CONTA
+   Aparece na jornada publica, para quem nao esta logado. E' a
+   porta com menos atrito entre "li a historia de alguem" e
+   "quero saber como termina".
+   ============================================================ */
+.asc{
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  max-width:640px;margin:34px auto 0;padding:18px 20px;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:16px;box-shadow:var(--shadow-sm);
+}
+.asc > div{flex:1 1 240px;min-width:0}
+.asc b{display:block;font-family:var(--display);font-weight:600;font-size:15.5px;
+  letter-spacing:-.015em;color:var(--ink);margin-bottom:3px}
+.asc p{margin:0;font-size:13px;line-height:1.45;color:var(--muted)}
+.asc-btn{
+  flex:0 0 auto;border:0;cursor:pointer;
+  background:var(--night);color:#FAF7F2;
+  font-family:var(--display);font-weight:600;font-size:14px;
+  padding:12px 20px;border-radius:999px;transition:background .15s;
+}
+.asc-btn:hover{background:#171d4d}
+.asc-btn:disabled{opacity:.6}
+
+/* ja acompanhando: some o convite, fica o estado — e a saida */
+.asc-on{background:var(--sage-soft,#DDE3D6);border-color:transparent}
+.asc-on b{color:var(--sage-deep,#5E6B55)}
+.asc-on p{color:#5E6B55;opacity:.85}
+.asc-on button{
+  flex:0 0 auto;border:1px solid rgba(94,107,85,.35);background:transparent;
+  color:var(--sage-deep,#5E6B55);font-size:13px;font-weight:700;
+  padding:9px 16px;border-radius:999px;cursor:pointer;
+}
+@media(max-width:640px){
+  .asc{margin:26px 16px 0;padding:16px}
+  .asc-btn{width:100%;text-align:center}
+}
