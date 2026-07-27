@@ -4903,3 +4903,39 @@ h1 { letter-spacing: -0.03em; }
 @media(min-width:861px){
   .land-acao .sec-titulo{max-width:772px;margin-left:auto;margin-right:auto}
 }
+
+/* ============================================================
+   LANDING — a secao do produto vira UMA coluna, tambem no desktop
+   Em duas colunas as tres chamadas ficavam ao lado do card, e o
+   olho tinha que escolher por onde comecar: a jornada da esquerda
+   ou a lista da direita. Numa secao cujo trabalho e' fazer a
+   pessoa LER a historia, dividir a atencao e' o erro.
+   Agora: o card no centro, as chamadas embaixo — a mesma ordem
+   que o celular ja usava, e que funcionava.
+   ============================================================ */
+.acao-palco{
+  display:block!important;
+  max-width:420px;margin:22px auto 0;
+}
+.acao-tela{justify-content:center}
+.acao-chamadas{
+  display:grid!important;grid-template-columns:repeat(3,1fr);
+  gap:10px;margin-top:20px;padding:0;
+}
+.acao-chamadas li{
+  padding:0 0 0 14px;font-size:12.5px;line-height:1.35;font-weight:600;
+}
+.acao-chamadas li::before{width:6px;height:6px;top:6px}
+
+@media(min-width:861px){
+  /* no desktop o bloco pode respirar um pouco mais, mas continua UMA coluna */
+  .acao-palco{max-width:460px}
+  .acao-chamadas{gap:12px}
+  .acao-chamadas li{font-size:13px}
+  .jex{max-width:460px}
+  .land-acao .sec-titulo{max-width:none}
+}
+@media(max-width:400px){
+  .acao-chamadas{grid-template-columns:1fr;gap:8px}
+  .acao-chamadas li{font-size:13.5px}
+}
