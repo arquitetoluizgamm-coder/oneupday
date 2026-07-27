@@ -271,7 +271,9 @@ function DemoJourneyPage({ story, t, locale }) {
                 {i < arr.length - 1 && <div className="line" />}
               </div>
               <div className="body">
-                <span className="day">{fill(t.dayShort, { d: u.day_number })}</span>
+                {/* Mesmo título semântico da jornada real: o visitante sem
+                    conta não pode encontrar uma estrutura diferente aqui. */}
+                <h2 className="day">{fill(t.dayShort, { d: u.day_number })}</h2>
                 {tagFor(u.kind) && <span className={`tag ${u.kind}`}>{tagFor(u.kind)}</span>}
                 <p>{u.text}</p>
               </div>
@@ -543,8 +545,27 @@ export default async function JourneyPage({ params, searchParams }) {
                 {gi < garr.length - 1 && <div className="line" />}
               </div>
               <div className="body">
-                <span className="day">{fill(t.dayShort, { d: g.dia })}</span>
-                {g.itens.length > 1 && <span className="day-n">{g.itens.length}</span>}
+                {/* ============================================================
+                    O CAPÍTULO É UM TÍTULO, NÃO UM TEXTO EM NEGRITO
+
+                    Quem lê com leitor de tela navega por títulos. Com
+                    <span>, os dias não existiam como estrutura: a pessoa
+                    ouvia trinta registros seguidos sem nenhuma marca de
+                    onde um dia termina e o outro começa.
+
+                    O contador também era mudo — "5" sozinho não diz nada.
+                    Agora o número aparece para o olho e a frase inteira
+                    para o ouvido.
+                    ============================================================ */}
+                <h2 className="day">
+                  {fill(t.dayShort, { d: g.dia })}
+                  {g.itens.length > 1 && (
+                    <span className="day-n">
+                      <span aria-hidden="true">{g.itens.length}</span>
+                      <span className="sr-only">{fill(t.recordsFmt, { n: g.itens.length })}</span>
+                    </span>
+                  )}
+                </h2>
 
                 {g.itens.map((u, ii) => (
                 <div className={`dia-item${ii > 0 ? ' extra' : ''}`} key={u.id}>
