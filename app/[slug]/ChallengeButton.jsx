@@ -29,7 +29,7 @@ export default function ChallengeButton({ slug, theme, label, copiedLabel, messa
     else { window.prompt(copiedLabel, text); }
   }
   return (
-    <button className="challenge-btn" onClick={go}>
+    <button className="challenge-btn card-acao" onClick={go}>
       <span aria-hidden="true">🔥</span> {copied ? copiedLabel : label}
     </button>
   );

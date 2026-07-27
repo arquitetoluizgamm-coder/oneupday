@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { track } from '../../lib/track';
+import { entregarImagem } from '../../lib/compartilhar';
 
 function wrap(ctx, text, x, y, maxW, lh, maxLines = 3) {
   const words = String(text).split(' ');
@@ -99,17 +100,17 @@ export default function ShareButton({ journey, owner, stats, latest, label, down
     const link = `oneupday.app/${journey.slug}`;
     ctx.fillText(link, W - 90 - ctx.measureText(link).width, barY + 95);
 
-    canvas.toBlob(blob => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `one-up-day-${journey.slug}.png`; a.click();
-      track('card_generated', { kind: 'progress', slug: journey.slug });
-      URL.revokeObjectURL(url); setBusy(false);
+    canvas.toBlob(async (blob) => {
+      const r = await entregarImagem(blob, `one-up-day-${journey.slug}.png`, journey.title);
+      // 'cancelado' também entra: a pessoa abriu o menu de compartilhar,
+      // e saber que ela chegou até ali vale mais que saber se concluiu.
+      if (r !== 'erro') track('card_generated', { kind: 'progress', slug: journey.slug, via: r });
+      setBusy(false);
     }, 'image/png');
   }
 
   return (
-    <button className="share-button" onClick={make} disabled={busy}>
+    <button className="share-button card-acao" onClick={make} disabled={busy}>
       {busy ? downloading : label}
     </button>
   );

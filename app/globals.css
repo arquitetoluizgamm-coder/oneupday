@@ -917,8 +917,9 @@ main.wrap > section{margin-bottom:16px}
 .dia1-card-btn:disabled{opacity:.6}
 .challenge-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%;border:1.5px solid var(--night,#0b1030);background:#fff;color:var(--night,#0b1030);border-radius:14px;padding:12px 20px;font-weight:800;font-size:15px;cursor:pointer;transition:background .15s}
 .challenge-btn:hover{background:var(--soft,#f7f6fb)}
-.movement-actions{display:flex;flex-direction:column;gap:10px;margin-top:14px}
-@media(min-width:560px){.movement-actions{flex-direction:row}.movement-actions>*{flex:1}}
+/* .movement-actions: aposentada no patch 84. Os três botões de card
+   viraram uma grade só (.acoes-card) e ninguém mais usa esta classe.
+   Regra morta é a coisa que eu mesmo já critiquei duas vezes aqui. */
 /* Onboarding 1º fluxo */
 .first-journey{background:linear-gradient(135deg,#0b1030,#26134d);color:#fff;border-radius:22px;padding:28px 24px;margin:6px 0 18px;text-align:center}
 .first-journey .fj-eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;color:#ffd33d}
@@ -5734,4 +5735,57 @@ h1 { letter-spacing: -0.03em; }
 .jcover-plano{
   margin:6px 0 0;font-size:14px;line-height:1.5;color:var(--muted);
   max-width:34rem;
+}
+
+/* ============================================================
+   PATCH 84 · TRÊS AÇÕES DE CARD, UMA LINHA
+
+   Antes: um botão largo em cima e dois embaixo — três pesos
+   visuais para três coisas que fazem o mesmo, levar a jornada
+   para fora do app.
+
+   O rótulo vem partido em duas linhas por medida, não por gosto.
+   Medido num celular de 360px: a caixa tem 240px úteis, ou 73px
+   por botão em três colunas, e a palavra "Compartilhar" sozinha
+   ocupa 87px. Em uma linha não cabe. Em duas cabe com folga — e
+   ainda lê melhor, porque o verbo se repete nos três e o olho vai
+   direto ao que muda.
+
+   O padding da seção cai de 22 para 14 no celular: aqueles 16px
+   a mais por lado são a diferença entre caber e não caber.
+   ============================================================ */
+/* minmax(0,1fr) e não 1fr: com `1fr` o mínimo é o conteúdo, e a
+   palavra "Compartilhar" — que não quebra — empurrava a grade para
+   fora da caixa. Medido: estourava. Com minmax(0,...) as três
+   colunas ficam iguais e o texto se acomoda dentro. */
+.acoes-card{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px;
+}
+.acoes-card > .card-acao{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  width:100%;min-height:60px;padding:10px 8px;border-radius:12px;
+  text-align:center;line-height:1.25;cursor:pointer;
+}
+.ca-verbo{
+  display:block;font-size:11px;font-weight:600;letter-spacing:.02em;opacity:.72;
+}
+.ca-obj{
+  display:block;font-size:12.5px;font-weight:800;letter-spacing:-.01em;
+  text-wrap:balance;
+}
+/* O ⋯ do desafio tinha um emoji solto antes do rótulo; num botão
+   de três linhas ele empurrava tudo. Fica fora do fluxo do texto. */
+.acoes-card .challenge-btn > [aria-hidden="true"]{display:none}
+
+/* Números medidos no navegador, num celular de 360px, não estimados.
+   Com estes valores cada botão fica com 82px, o interior com 72px, e
+   "Compartilhar" ocupa 65px — sobram 7px. "card da jornada" quebra em
+   duas linhas, que é o desejado. Altura final: 64px, acima dos 44
+   mínimos de área de toque. */
+@media(max-width:640px){
+  .share-card-section{padding-left:12px;padding-right:12px}
+  .acoes-card{gap:6px}
+  .acoes-card > .card-acao{padding:10px 5px}
+  .ca-verbo{font-size:10.5px;white-space:nowrap}
+  .ca-obj{font-size:11.5px}
 }

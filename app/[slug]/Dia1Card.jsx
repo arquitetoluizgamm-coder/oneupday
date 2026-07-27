@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { track } from '../../lib/track';
+import { entregarImagem } from '../../lib/compartilhar';
 
 function wrap(ctx, text, x, y, maxW, lh, maxLines = 2) {
   const words = String(text).split(' ');
@@ -66,16 +67,14 @@ export default function Dia1Card({ journey, owner, theme, label, downloading, te
     ctx.fillStyle = 'rgba(255,255,255,.5)';
     ctx.fillText(`oneupday.app/${journey.slug}`, 90, H - 110);
 
-    canvas.toBlob(blob => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `meu-dia-1-${journey.slug}.png`; a.click();
-      track('card_generated', { kind: 'dia1', slug: journey.slug });
-      URL.revokeObjectURL(url); setBusy(false);
+    canvas.toBlob(async (blob) => {
+      const r = await entregarImagem(blob, `meu-dia-1-${journey.slug}.png`, journey.title);
+      if (r !== 'erro') track('card_generated', { kind: 'dia1', slug: journey.slug, via: r });
+      setBusy(false);
     }, 'image/png');
   }
   return (
-    <button className="dia1-card-btn" onClick={make} disabled={busy}>
+    <button className="dia1-card-btn card-acao" onClick={make} disabled={busy}>
       {busy ? downloading : label}
     </button>
   );

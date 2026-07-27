@@ -272,7 +272,7 @@ async function ProfilePage({ handle }) {
   );
 }
 
-function DemoJourneyPage({ story, t, locale }) {
+function DemoJourneyPage({ story, t, locale, viewerId }) {
   const pct = Math.min(100, story.stats.progress_pct || 0);
   const momentLabels = { starting: t.mStarting, notgiveup: t.mNotgiveup, rebuilding: t.mRebuilding, health: t.mHealth, courage: t.mCourage, hardphase: t.mHardphase, building: t.mBuilding };
   const momentLabel = momentLabels[story.moment];
@@ -343,11 +343,13 @@ function DemoJourneyPage({ story, t, locale }) {
           ))}
         </section>
 
-        <section className="encourage">
-          <h3>{t.joinTitle}</h3>
-          <p>{t.joinSub}</p>
-          <a className="cta grow" href="/login">{t.encourageJoin}</a>
-        </section>
+        {!viewerId && (
+          <section className="encourage">
+            <h3>{t.joinTitle}</h3>
+            <p>{t.joinSub}</p>
+            <a className="cta grow" href="/login">{t.encourageJoin}</a>
+          </section>
+        )}
       </main>
 
       <footer className="foot">One <b>Up</b> Day · {t.tagline} · oneupday.app/{story.slug}</footer>
@@ -393,7 +395,12 @@ export default async function JourneyPage({ params, searchParams }) {
   const locale = getLocale();
   const t = getDict(locale);
   const demo = getDemoStory(slug, locale);
-  if (demo) return <DemoJourneyPage story={demo} t={t} locale={locale} />;
+  if (demo) {
+    // A demonstração era devolvida antes de o app saber quem está
+    // olhando — por isso ela convidava a entrar até quem já entrou.
+    const { data: { user: quemOlha } } = await createClient().auth.getUser();
+    return <DemoJourneyPage story={demo} t={t} locale={locale} viewerId={quemOlha?.id || null} />;
+  }
   const data = await loadJourney(slug);
   if (!data) {
     const prof = await loadProfile(slug);
@@ -545,10 +552,17 @@ export default async function JourneyPage({ params, searchParams }) {
             moram as ações que a pessoa procura quando precisa, e não
             as que o app oferece sem ser perguntado.
             ============================================================ */}
-        <details className="mais-menu who-mais">
-          <summary aria-label={t.moreOptions || 'Mais opções'}>⋯</summary>
-          <div className="mais-lista"><BlockButton ownerId={journey.owner_id} label={t.blockUser} /></div>
-        </details>
+        {/* Só para quem NÃO é o dono, e só para quem tem conta.
+            Um menu "Bloquear" na própria jornada não é apenas inútil: é
+            o app oferecendo, para a pessoa, a opção de bloquear ela
+            mesma. E para visitante sem conta o bloqueio não existe —
+            o botão levaria a um login para uma ação que ela não pediu. */}
+        {viewerId && !isOwner && (
+          <details className="mais-menu who-mais">
+            <summary aria-label={t.moreOptions || 'Mais opções'}>⋯</summary>
+            <div className="mais-lista"><BlockButton ownerId={journey.owner_id} label={t.blockUser} /></div>
+          </details>
+        )}
 
         {/* O "progresso %" saiu daqui: a barra logo abaixo já mostra o
             mesmo número, e a repetição em 200px de tela fazia a pessoa
@@ -690,23 +704,45 @@ export default async function JourneyPage({ params, searchParams }) {
             <h3>{t.shareTitle}</h3>
             <p>{t.shareSub}</p>
           </div>
-          <ShareButton journey={journey} owner={owner} stats={stats} latest={latest}
-            label={t.shareCard} downloading={t.shareDownloading}
-            card={{ day: t.cardDay, of: t.cardOf, streak: t.cardStreak, setback: t.cardSetback }} />
-          <div className="movement-actions">
+          {/* ============================================================
+              TRÊS AÇÕES, UMA LINHA
+
+              Antes eram um botão largo em cima e dois embaixo — três
+              pesos diferentes para três coisas que fazem o mesmo:
+              levar esta jornada para fora do app.
+
+              O rótulo vem partido em duas linhas de propósito. Medido
+              num celular de 360px: a caixa tem 240px úteis, ou 73px por
+              botão, e a palavra "Compartilhar" sozinha ocupa 87px. Em
+              uma linha só, não cabe. Em duas, cabe com folga — e ainda
+              fica mais fácil de ler, porque o verbo se repete e o olho
+              vai direto ao que muda.
+              ============================================================ */}
+          <div className="acoes-card">
+            <ShareButton journey={journey} owner={owner} stats={stats} latest={latest}
+              label={<><span className="ca-verbo">{t.caVerbo}</span><span className="ca-obj">{t.caJornada}</span></>}
+              downloading={t.shareDownloading}
+              card={{ day: t.cardDay, of: t.cardOf, streak: t.cardStreak, setback: t.cardSetback }} />
             <Dia1Card journey={journey} owner={owner} theme={journey.title}
-              label={t.dia1CardBtn} downloading={t.shareDownloading}
+              label={<><span className="ca-verbo">{t.caVerbo}</span><span className="ca-obj">{t.caDia}</span></>}
+              downloading={t.shareDownloading}
               texts={{ eyebrow: t.dia1Eyebrow, big: t.dia1Big, invite: t.dia1Invite, by: t.dia1By }} />
             <ChallengeButton slug={journey.slug} theme={journey.title}
-              label={t.challengeBtn} copiedLabel={t.linkCopied} message={t.challengeMsg} />
+              label={<><span className="ca-verbo">{t.caChamarVerbo}</span><span className="ca-obj">{t.caChamarObj}</span></>}
+              copiedLabel={t.linkCopied} message={t.challengeMsg} />
           </div>
         </section>
 
-        <section className="encourage">
-          <h3>{t.joinTitle}</h3>
-          <p>{t.joinSub}</p>
-          <a className="cta grow" href="/login">{t.encourageJoin}</a>
-        </section>
+        {/* "Qual seria o seu Dia 1?" é pergunta para quem ainda não tem
+            uma. Para quem já entrou, é o app convidando a fazer o que ela
+            já fez — e mandando para o login de onde ela já está logada. */}
+        {!viewerId && (
+          <section className="encourage">
+            <h3>{t.joinTitle}</h3>
+            <p>{t.joinSub}</p>
+            <a className="cta grow" href="/login">{t.encourageJoin}</a>
+          </section>
+        )}
       </main>
 
       <footer className="foot">One <b>Up</b> Day · {t.tagline} · oneupday.app/{journey.slug}</footer>
