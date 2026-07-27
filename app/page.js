@@ -63,18 +63,15 @@ export default async function Home() {
 
   return (
     <>
-      {/* A marca completa — O, U, pingo e D.
-          Aqui estava o componente `Logo`, que usa `logo-symbol.png`. Só que
-          esse arquivo NÃO é o símbolo da marca: é apenas o D com o pingo, em
-          terracota, feito para ícone de aplicativo. Ao lado da palavra
-          escrita ele funciona; sozinho no topo da página, lia como um
-          desenho cortado pela metade.
-          O arquivo certo é `logo-name.png`, o mesmo que o topo do app usa. */}
+      {/* A marca completa: ONE, com "ONE UP DAY" escrito embaixo.
+          Esta é a landing — a tela de quem talvez nunca tenha ouvido falar
+          do app. A abreviação sozinha não serve aqui: ela precisa vir
+          acompanhada do que abrevia. */}
       <header className="top land-top">
-        {/* O logo que se desenha: O -> U -> pingo -> D, uma vez só.
-            O componente já existia (feito para a tela de login) e termina
-            exatamente igual ao logo estático — então, se a animação falhar,
-            o que fica na tela é o desenho correto, e não um pedaço. */}
+        {/* O logo que se desenha: O -> N -> bojo de cima do E -> bojo de
+            baixo, uma vez só. Se a animação falhar ou o aparelho pedir
+            menos movimento, o que fica na tela é a marca inteira e
+            correta — nunca um pedaço. */}
         <a className="land-mark" href="/" aria-label="One Up Day">
           <AnimatedLogo />
         </a>

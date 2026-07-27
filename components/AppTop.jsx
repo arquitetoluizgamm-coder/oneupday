@@ -3,7 +3,7 @@ import { getLocale } from '../lib/locale';
 import { getDict } from '../lib/i18n';
 import HeaderHeart from './HeaderHeart';
 import BackBtn from './BackBtn';
-import Logo from './Logo';
+import Logo, { Wordmark } from './Logo';
 
 // ============================================================
 // TOPO — um só, para todo o app
@@ -105,8 +105,10 @@ export default async function AppTop({
           : <BackBtn fallback={backHref} label={backLabel || t.back} />}
       </div>
 
+      {/* ONE, a abreviação. Este cabeçalho só existe para quem está
+          logado — quem está aqui já sabe o que ONE abrevia. */}
       <a className="top-brand" href="/home" aria-label="One Up Day">
-        <img src="/logo-name.png" alt="One Up Day" />
+        <Wordmark height={26} />
       </a>
 
       <div className="top-right">
