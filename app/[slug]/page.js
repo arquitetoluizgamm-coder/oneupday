@@ -45,6 +45,31 @@ const plural = (n, um, muitos) => (Number(n) === 1 ? (um || muitos) : muitos);
 // para o mesmo fato, uma embaixo da outra, viram ruído.
 const soSelo = (u) => !u.photo_url && !u.video_url && !textoDaPessoa(u.text);
 
+// ============================================================
+// O PLANO DA JORNADA — prática e ritmo, numa linha
+//
+// O wizard passou a perguntar as duas coisas. Guardar e não
+// mostrar seria pedir informação à toa: o motivo de perguntar é
+// justamente que quem chega de fora entenda a jornada sem ler
+// trinta registros.
+//
+// Jornada antiga não tem nenhum dos dois, e a linha simplesmente
+// não aparece. Nada de "não informado" — campo vazio anunciado é
+// pior que campo ausente.
+// ============================================================
+function planoDaJornada(journey, t) {
+  const partes = [];
+  if (journey.pratica) partes.push(String(journey.pratica).trim());
+  const r = journey.ritmo;
+  if (r) {
+    const nomes = { diario: t.ritmoDiario, '3x': t.ritmo3x, fds: t.ritmoFds };
+    // Chave conhecida vira rótulo traduzido; o resto é o texto que a
+    // própria pessoa escreveu em "personalizado" e vai como está.
+    partes.push(nomes[r] || String(r).trim());
+  }
+  return partes.filter(Boolean).join(' \u00b7 ');
+}
+
 async function loadJourney(slug) {
   try {
   const sb = createClient();
@@ -418,6 +443,7 @@ export default async function JourneyPage({ params, searchParams }) {
               {momentLabel && <a className="moment-tag jt-moment" href={`/grupo/${journey.moment}`}>{momentLabel}</a>}
               <h1>{journey.title}</h1>
               {journey.goal && <p>{journey.goal}</p>}
+              {planoDaJornada(journey, t) && <p className="jcover-plano">{planoDaJornada(journey, t)}</p>}
             </section>
           </>
         ) : (
@@ -451,6 +477,7 @@ export default async function JourneyPage({ params, searchParams }) {
             {momentLabel && <a className="moment-tag jt-moment" href={`/grupo/${journey.moment}`}>{momentLabel}</a>}
             <h1>{journey.title}</h1>
             {journey.goal && <p>{journey.goal}</p>}
+            {planoDaJornada(journey, t) && <p className="jcover-plano">{planoDaJornada(journey, t)}</p>}
           </section>
         </>
         )}

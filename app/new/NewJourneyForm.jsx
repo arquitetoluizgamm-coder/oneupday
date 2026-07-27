@@ -5,7 +5,25 @@ import { createClient } from '../../lib/supabase/client';
 import { track } from '../../lib/track';
 
 const MAX_VIDEO = 60 * 1024 * 1024;
-const STEPS = 3;
+
+// ============================================================
+// UMA PERGUNTA POR TELA
+//
+// Sete telas, e cada uma tem UMA pergunta. Não é enfeite: um
+// formulário com seis campos faz a pessoa decidir seis coisas ao
+// mesmo tempo, e ela responde todas mal. Uma pergunta por vez ela
+// responde de verdade.
+//
+// O preço disso é o funil: cada tela é um lugar para desistir. Por
+// isso só a PRIMEIRA é obrigatória. Todas as outras têm "Pular
+// esta", e a jornada nasce igual sem elas.
+//
+// A IA aparece em quatro das sete, sempre do mesmo jeito: a pessoa
+// escreve, ela dá forma, a pessoa edita. Nenhuma tela depende de
+// IA para funcionar — sem chave, tudo continua sendo campo livre.
+// ============================================================
+const STEPS = 7;
+const S_TITULO = 0, S_PORQUE = 1, S_PRATICA = 2, S_RITMO = 3, S_TEMPO = 4, S_HOJE = 5, S_REV = 6;
 
 const COLORS = {
   art: '#8A6A9B', body: '#5E6B55', health: '#6E8168', mind: '#5B7189',
@@ -14,7 +32,7 @@ const COLORS = {
   other: '#7A7A72',
 };
 
-// Adivinha a categoria pelo título. A pessoa pode trocar,
+// Adivinha a categoria pelo título. A pessoa pode trocar na revisão,
 // mas não precisa decidir nada se o palpite estiver certo.
 const PISTAS = {
   body: ['academia', 'treino', 'malhar', 'correr', 'corrida', 'caminhar', 'caminhada', 'emagrecer', 'muscul', 'gym', 'run', 'walk', 'workout'],
@@ -49,25 +67,29 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   const [erro, setErro] = useState('');
 
   const [title, setTitle] = useState('');
-  // Ajuda com o título: a IA devolve UMA pergunta, a pessoa responde,
-  // e o título é montado com a resposta dela. Nunca um cardápio de
-  // títulos prontos — cardápio parecido produz feed parecido.
-  const [ajPergunta, setAjPergunta] = useState('');
-  const [ajResposta, setAjResposta] = useState('');
-  const [ajBusy, setAjBusy] = useState('');
-  const [ajErro, setAjErro] = useState('');
+  const [goal, setGoal] = useState('');
+  const [pratica, setPratica] = useState('');
+  const [ritmo, setRitmo] = useState('');
+  const [ritmoOutro, setRitmoOutro] = useState('');
   const [dur, setDur] = useState('30');
   const [customDur, setCustomDur] = useState('');
-  const [goal, setGoal] = useState('');
+  const [hoje, setHoje] = useState('');
+  const [first, setFirst] = useState('');
   const [cat, setCat] = useState('');
   const [catTocada, setCatTocada] = useState(false);
   const [customCat, setCustomCat] = useState('');
-  const [first, setFirst] = useState('');
   const [visibility, setVisibility] = useState('public');
   const [privAberta, setPrivAberta] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
+
+  // ---- estado da ajuda da IA, um por tela ----
+  const [ajPergunta, setAjPergunta] = useState('');
+  const [ajResposta, setAjResposta] = useState('');
+  const [ajItens, setAjItens] = useState([]);
+  const [ajBusy, setAjBusy] = useState('');
+  const [ajErro, setAjErro] = useState('');
 
   const photoRef = useRef(null);
   const videoRef = useRef(null);
@@ -80,6 +102,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   ];
   const sugestoes = [t.ex1, t.ex2, t.ex3, t.ex4, t.ex5].filter(Boolean);
   const DURS = [['7', t.dur7], ['30', t.dur30], ['60', t.dur60], ['100', t.dur100], ['other', t.durCustom]];
+  const RITMOS = [['diario', t.ritmoDiario], ['3x', t.ritmo3x], ['fds', t.ritmoFds], ['outro', t.ritmoOutro]];
   const VIS = [
     ['public', t.pubPublic, t.pubPublicSub],
     ['followers', t.pubFollowers, t.pubFollowersSub],
@@ -88,56 +111,109 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
   useEffect(() => {
     if (catTocada) return;
-    const g = adivinhar(title);
+    const g = adivinhar(title + ' ' + pratica);
     if (g) setCat(g);
-  }, [title, catTocada]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [title, pratica, catTocada]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Trocar de tela limpa a ajuda: sugestão de uma pergunta aparecendo
+  // embaixo de outra é o tipo de coisa que faz a pessoa desconfiar do app.
+  useEffect(() => { setAjPergunta(''); setAjResposta(''); setAjItens([]); setAjErro(''); }, [step]);
 
   const heads = [
     [t.wizT1, t.wizS1],
     [t.wizT3, t.wizS3],
-    [t.wizT4, t.wizS4],
+    [t.wzTPratica, t.wzSPratica],
+    [t.wzTRitmo, t.wzSRitmo],
+    [t.wzTTempo, t.wzSTempo],
+    [t.wzTHoje, t.wzSHoje],
+    [t.wzTRev, t.wzSRev],
   ];
 
-  // O motivo deixa de ser obrigatorio. Quem chega com pressa nao sabe
-  // responder "por que isso importa" — e travar aqui perde a pessoa
-  // justamente no momento em que ela decidiu comecar.
+  // ============================================================
+  // A IA. Sempre o mesmo contrato: ela recebe o que a pessoa
+  // escreveu e devolve forma. Se falhar, o campo continua lá,
+  // livre, e nada no wizard depende dela.
+  // ============================================================
+  async function pedir(modo, corpo) {
+    setAjBusy(modo); setAjErro('');
+    try {
+      const r = await fetch('/api/titulo', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ modo, ...corpo }),
+      });
+      const d = await r.json().catch(() => ({}));
+      setAjBusy('');
+      if (r.ok) return d;
+    } catch {}
+    setAjBusy(''); setAjErro(t.ajErro || '');
+    return null;
+  }
+
   async function pedirPergunta() {
     if (ajBusy || title.trim().length < 2) return;
-    setAjBusy('pergunta'); setAjErro('');
-    try {
-      const r = await fetch('/api/titulo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rascunho: title.trim() }) });
-      const d = await r.json().catch(() => ({}));
-      if (d.pergunta) setAjPergunta(d.pergunta); else setAjErro(t.ajErro || '');
-    } catch { setAjErro(t.ajErro || ''); }
-    setAjBusy('');
+    const d = await pedir('pergunta', { rascunho: title.trim() });
+    if (d?.pergunta) setAjPergunta(d.pergunta);
   }
 
   async function montarTitulo() {
     if (ajBusy || !ajResposta.trim()) return;
-    setAjBusy('titulo'); setAjErro('');
-    try {
-      const r = await fetch('/api/titulo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rascunho: title.trim(), resposta: ajResposta.trim() }) });
-      const d = await r.json().catch(() => ({}));
-      if (d.titulo) {
-        setTitle(d.titulo);
-        // Se a resposta dela trouxe um prazo, a duração já vai marcada.
-        // É informação que ela deu — não é o app decidindo por ela.
-        const m = ajResposta.match(/(\d{1,3})\s*(dias?|days?)/i);
-        if (m) {
-          const n = String(parseInt(m[1], 10));
-          setDur(DURS.some(([v]) => v === n) ? n : 'other');
-          if (!DURS.some(([v]) => v === n)) setCustomDur(n);
-        }
-        setAjPergunta(''); setAjResposta('');
-      } else setAjErro(t.ajErro || '');
-    } catch { setAjErro(t.ajErro || ''); }
-    setAjBusy('');
+    const d = await pedir('titulo', { rascunho: title.trim(), resposta: ajResposta.trim() });
+    if (!d?.titulo) return;
+    setTitle(d.titulo);
+    // Se a resposta dela trouxe um prazo, a duração já vai marcada.
+    // É informação que ela deu — não é o app decidindo por ela.
+    const m = ajResposta.match(/(\d{1,3})\s*(dias?|days?)/i);
+    if (m) {
+      const n = String(parseInt(m[1], 10));
+      const conhecido = DURS.some(([v]) => v === n);
+      setDur(conhecido ? n : 'other');
+      if (!conhecido) setCustomDur(n);
+    }
+    setAjPergunta(''); setAjResposta('');
   }
 
+  async function pedirPorques() {
+    if (ajBusy || !title.trim()) return;
+    const d = await pedir('porque', { titulo: title.trim() });
+    if (d?.itens?.length) setAjItens(d.itens);
+  }
+
+  async function pedirPraticas() {
+    if (ajBusy || !title.trim()) return;
+    const d = await pedir('pratica', { titulo: title.trim(), rascunho: pratica.trim() });
+    if (d?.itens?.length) setAjItens(d.itens);
+  }
+
+  async function montarPrimeiro() {
+    if (ajBusy || !hoje.trim()) return;
+    const d = await pedir('primeiro', {
+      titulo: title.trim(), porque: goal.trim(), pratica: pratica.trim(),
+      ritmo: ritmoTexto(), dias: totalDias(), resposta: hoje.trim(),
+    });
+    if (d?.texto) setFirst(d.texto);
+  }
+
+  // ---- valores derivados ----
+  function totalDias() {
+    return dur === 'other'
+      ? Math.min(730, Math.max(1, parseInt(customDur || '30', 10) || 30))
+      : parseInt(dur, 10);
+  }
+  function ritmoTexto() {
+    if (ritmo === 'outro') return ritmoOutro.trim();
+    return (RITMOS.find(([v]) => v === ritmo) || [])[1] || '';
+  }
+  // No banco vai a CHAVE ('diario', '3x', 'fds'), não o rótulo traduzido —
+  // senão a mesma jornada teria ritmo diferente em cada idioma.
+  function ritmoValor() {
+    if (!ritmo) return null;
+    return ritmo === 'outro' ? (ritmoOutro.trim().slice(0, 60) || null) : ritmo;
+  }
+
+  // Só a primeira tela prende. As outras seguem em branco.
   const podeAvancar =
-    (step === 0 && title.trim().length >= 2 && (dur !== 'other' || parseInt(customDur || '0', 10) > 0)) ||
-    step === 1 ||
-    step === 2;
+    step !== S_TITULO ||
+    (title.trim().length >= 2);
 
   function irPara(n) {
     setErro('');
@@ -169,28 +245,40 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     setVideoUrl(url); setPhotoUrl(null); if (photoRef.current) photoRef.current.value = '';
   }
 
+  // ============================================================
   // Só cria quando a pessoa toca no botão da última tela.
   // Não existe <form>: nada aqui pode enviar sozinho.
+  // ============================================================
   async function criar() {
-    if (saving || uploading || step !== STEPS - 1) return;
+    if (saving || uploading || step !== S_REV) return;
     setSaving(true); setErro('');
 
     const category = cat === 'other'
       ? (customCat.trim().toLowerCase() || 'other').slice(0, 24)
       : (cat || 'life');
-    const total_days = dur === 'other'
-      ? Math.min(730, Math.max(1, parseInt(customDur || '30', 10) || 30))
-      : parseInt(dur, 10);
+    const total_days = totalDias();
 
     const supabase = createClient();
     const slug = slugify(title);
     const payload = {
       owner_id: userId, slug, title: title.trim(), category, goal: goal.trim(), total_days,
       cover_color: COLORS[category] || '#ff7a45', is_public: visibility === 'public', visibility,
+      pratica: pratica.trim() || null, ritmo: ritmoValor(),
     };
 
+    // Rede de segurança em duas camadas. Criar a jornada é a ação mais
+    // importante do app: ela não pode morrer porque um SQL opcional não
+    // foi rodado. Tira primeiro os campos novos, depois a visibilidade.
     let { data: journey, error } = await supabase.from('journeys').insert(payload).select().single();
-    if (error && /visibility|column/i.test(error.message || '')) {
+    if (error && /pratica|ritmo|column/i.test(error.message || '')) {
+      console.warn('[wizard] colunas ausentes — rode supabase/jornada-wizard.sql');
+      const { pratica: _p, ritmo: _r, ...semNovos } = payload;
+      ({ data: journey, error } = await supabase.from('journeys').insert(semNovos).select().single());
+      if (error && /visibility|column/i.test(error.message || '')) {
+        const { visibility: _v, ...semVis } = semNovos;
+        ({ data: journey, error } = await supabase.from('journeys').insert(semVis).select().single());
+      }
+    } else if (error && /visibility|column/i.test(error.message || '')) {
       const { visibility: _v, ...semVis } = payload;
       ({ data: journey, error } = await supabase.from('journeys').insert(semVis).select().single());
     }
@@ -198,11 +286,9 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
     // O dia 1 nunca pode faltar: sem ele a jornada não aparece no feed.
     //
-    // Mas ele não precisa de FRASE para existir. Antes, quem pulava o
-    // primeiro registro tinha "Comecei." publicado em seu nome — e no
-    // feed que eu contei, essa frase aparecia duas vezes, com dois
-    // rostos diferentes. O registro agora nasce vazio e o feed mostra
-    // um selo COMECEI, que é marca e não voz.
+    // Mas ele não precisa de FRASE para existir. Quem pula esta parte
+    // tem o registro criado vazio, e o feed mostra um selo COMECEI —
+    // marca, e não voz. O app não escreve no lugar de ninguém.
     const texto = first.trim() || (photoUrl ? '\u{1F4F7}' : (videoUrl ? '\u{1F3A5}' : ''));
     let { error: upErr } = await supabase.from('updates').insert({
       journey_id: journey.id, day_number: 1, kind: 'step', text: texto,
@@ -230,11 +316,27 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     if (step < STEPS - 1) avancar();
   }
 
-  // Prévia: a jornada vai se montando à medida que a pessoa escreve.
   const totalPreview = dur === 'other' ? (parseInt(customDur || '0', 10) || 0) : parseInt(dur, 10);
   const catLabel = cat === 'other'
     ? (customCat.trim() || t.catOther)
     : (CATS.find(([v]) => v === cat) || [])[1];
+
+  // Bloco de ajuda em lista, usado pelo porquê e pela prática.
+  const listaDeAjuda = (aoEscolher) => (
+    ajItens.length > 0 && (
+      <div className="wz-sugs wz-sugs-ia">
+        {ajItens.map((it, i) => (
+          <button type="button" key={i} className="wz-sug" onClick={() => { aoEscolher(it); setAjItens([]); }}>{it}</button>
+        ))}
+      </div>
+    )
+  );
+
+  const botaoIA = (rotulo, acao, modo) => aiOn && (
+    <button type="button" className="wz-ajuda" onClick={acao} disabled={!!ajBusy}>
+      {ajBusy === modo ? (t.ajPensando || '') : rotulo}
+    </button>
+  );
 
   return (
     <div className="wz" onKeyDown={onKeyDown}>
@@ -251,7 +353,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       </div>
 
       {/* a jornada nascendo — cresce a cada tela */}
-      {title.trim() && (
+      {title.trim() && step !== S_REV && (
         <aside className="wz-prev" aria-hidden="true">
           <span className="wz-prev-tag">{t.wizPreview}</span>
           <b className="wz-prev-title">{title.trim()}</b>
@@ -265,19 +367,13 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
               <em>{(t.dayXofY || 'Dia {d} de {t}').replace('{d}', 1).replace('{t}', totalPreview)}</em>
             </div>
           )}
-          {step >= 1 && goal.trim() && <q className="wz-prev-why">{goal.trim()}</q>}
-          {step >= 1 && catLabel && <span className="wz-prev-cat">{catLabel}</span>}
-          {step >= 2 && (first.trim() || photoUrl) && (
-            <div className="wz-prev-day">
-              {photoUrl && <img src={photoUrl} alt="" />}
-              {first.trim() && <p>{first.trim()}</p>}
-            </div>
-          )}
+          {goal.trim() && <q className="wz-prev-why">{goal.trim()}</q>}
+          {catLabel && <span className="wz-prev-cat">{catLabel}</span>}
         </aside>
       )}
 
-      {/* ---------------- 1 · o que e por quanto tempo ---------------- */}
-      {step === 0 && (
+      {/* ---------------- 1 · o que ---------------- */}
+      {step === S_TITULO && (
         <div className="wz-body">
           <input className="wz-input" value={title} onChange={(e) => setTitle(e.target.value)}
             maxLength={80} placeholder={t.fNamePh} autoFocus />
@@ -290,15 +386,10 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
             </div>
           )}
 
-          {/* AJUDA COM O TÍTULO — dois tempos.
-              A IA pergunta o que falta ser concreto; a pessoa responde; o
-              título sai das palavras dela. Nada disso é obrigatório: quem
-              já sabe o que quer escrever ignora e segue. */}
-          {aiOn && title.trim().length >= 2 && !ajPergunta && (
-            <button type="button" className="wz-ajuda" onClick={pedirPergunta} disabled={!!ajBusy}>
-              {ajBusy === 'pergunta' ? (t.ajPensando || '') : (t.ajBtn || '')}
-            </button>
-          )}
+          {/* A IA pergunta o que falta ser concreto; a pessoa responde; o
+              título sai das palavras dela. Nunca um cardápio de títulos
+              prontos — cardápio parecido produz feed parecido. */}
+          {title.trim().length >= 2 && !ajPergunta && botaoIA(t.ajBtn, pedirPergunta, 'pergunta')}
 
           {ajPergunta && (
             <div className="wz-aj">
@@ -316,29 +407,11 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
               </div>
             </div>
           )}
-          {ajErro && <p className="wz-aj-err">{ajErro}</p>}
-
-          <div className="wz-field">
-            <span className="wz-label">{t.fDuration}</span>
-            <div className="wz-chips">
-              {DURS.map(([v, l]) => (
-                <button type="button" key={v} className={`wz-chip${dur === v ? ' on' : ''}`} onClick={() => setDur(v)}>{l}</button>
-              ))}
-            </div>
-            {dur === 'other' && (
-              <div className="wz-num">
-                <input type="number" min="1" max="730" value={customDur}
-                  onChange={(e) => setCustomDur(e.target.value)} placeholder={t.durCustomPh} />
-                <span>{t.durDaysWord}</span>
-              </div>
-            )}
-            <p className="wz-hint">{t.durHint}</p>
-          </div>
         </div>
       )}
 
       {/* ---------------- 2 · por que importa ---------------- */}
-      {step === 1 && (
+      {step === S_PORQUE && (
         <div className="wz-body">
           <div className="wz-area">
             <textarea value={goal} onChange={(e) => setGoal(e.target.value)}
@@ -346,10 +419,133 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
             <span className="wz-opcional">{t.wizWhyOptional}</span>
             <span className="wz-inline-count">{goal.length}/300</span>
           </div>
+          {/* Pontos de partida, não motivos prontos. A IA nunca afirma o
+              que a pessoa sente — ela oferece começos de frase amplos
+              para a pessoa completar com a própria história. */}
+          {!goal.trim() && botaoIA(t.ajOpcoes, pedirPorques, 'porque')}
+          {listaDeAjuda((it) => setGoal(it + ' '))}
           <p className="wz-hint">{t.wizWhyNote}</p>
+        </div>
+      )}
+
+      {/* ---------------- 3 · como praticar ---------------- */}
+      {step === S_PRATICA && (
+        <div className="wz-body">
+          <input className="wz-input" value={pratica} onChange={(e) => setPratica(e.target.value)}
+            maxLength={120} placeholder={t.wzPraticaPh} autoFocus />
+          {pratica.trim().length >= 2 && botaoIA(t.ajObservavel, pedirPraticas, 'pratica')}
+          {listaDeAjuda((it) => setPratica(it))}
+        </div>
+      )}
+
+      {/* ---------------- 4 · ritmo ---------------- */}
+      {step === S_RITMO && (
+        <div className="wz-body">
+          <div className="wz-chips">
+            {RITMOS.map(([v, l]) => (
+              <button type="button" key={v} className={`wz-chip${ritmo === v ? ' on' : ''}`}
+                onClick={() => setRitmo(ritmo === v ? '' : v)}>{l}</button>
+            ))}
+          </div>
+          {ritmo === 'outro' && (
+            <input className="wz-input small" value={ritmoOutro} maxLength={60}
+              placeholder={t.ritmoOutroPh} onChange={(e) => setRitmoOutro(e.target.value)} />
+          )}
+        </div>
+      )}
+
+      {/* ---------------- 5 · por quanto tempo ---------------- */}
+      {step === S_TEMPO && (
+        <div className="wz-body">
+          <div className="wz-chips">
+            {DURS.map(([v, l]) => (
+              <button type="button" key={v} className={`wz-chip${dur === v ? ' on' : ''}`} onClick={() => setDur(v)}>{l}</button>
+            ))}
+          </div>
+          {dur === 'other' && (
+            <div className="wz-num">
+              <input type="number" min="1" max="730" value={customDur}
+                onChange={(e) => setCustomDur(e.target.value)} placeholder={t.durCustomPh} />
+              <span>{t.durDaysWord}</span>
+            </div>
+          )}
+          <p className="wz-hint">{t.durHint}</p>
+        </div>
+      )}
+
+      {/* ---------------- 6 · o dia 1 ---------------- */}
+      {step === S_HOJE && (
+        <div className="wz-body">
+          <div className="wz-area">
+            <textarea value={hoje} onChange={(e) => setHoje(e.target.value)}
+              maxLength={400} rows={4} placeholder={t.wzHojePh} autoFocus />
+          </div>
+          {/* A única parte que a IA não pode inventar: por que HOJE. O
+              título e o motivo já estão na página; se o dia 1 repetisse
+              os dois, o feed ficaria com trinta posts iguais. */}
+          {hoje.trim().length >= 8 && botaoIA(t.ajPrimeiro, montarPrimeiro, 'primeiro')}
+          {first.trim() && (
+            <div className="wz-aj">
+              <p className="wz-aj-q">{t.wzRevDia1}</p>
+              <textarea className="wz-aj-txt" value={first} maxLength={500} rows={3}
+                onChange={(e) => setFirst(e.target.value)} />
+            </div>
+          )}
+
+          {photoUrl && <div className="wz-media"><img src={photoUrl} alt="" /></div>}
+          {videoUrl && <div className="wz-media"><video src={videoUrl} controls playsInline /></div>}
+          <div className="wz-chips">
+            <button type="button" className={`wz-chip${photoUrl ? ' on' : ''}`}
+              onClick={() => photoRef.current?.click()} disabled={uploading}>
+              {uploading ? t.uploading : (photoUrl ? t.photoAdded : t.addPhoto)}
+            </button>
+            <button type="button" className={`wz-chip${videoUrl ? ' on' : ''}`}
+              onClick={() => videoRef.current?.click()} disabled={uploading}>
+              {uploading ? t.uploading : (videoUrl ? t.videoAdded : t.addVideo)}
+            </button>
+            <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPhoto} />
+            <input ref={videoRef} type="file" accept="video/*" hidden onChange={onVideo} />
+          </div>
+        </div>
+      )}
+
+      {/* ---------------- 7 · revisão ----------------
+          Tudo editável, no lugar. Se a pessoa precisar voltar quatro
+          telas para trocar uma palavra, ela publica errado ou desiste. */}
+      {step === S_REV && (
+        <div className="wz-body wz-rev">
+          <label className="wz-rev-campo">
+            <span>{t.wzRevTitulo}</span>
+            <input className="wz-input" value={title} maxLength={80} onChange={(e) => setTitle(e.target.value)} />
+          </label>
+
+          <label className="wz-rev-campo">
+            <span>{t.wzRevPorque}</span>
+            <textarea value={goal} maxLength={300} rows={3} onChange={(e) => setGoal(e.target.value)} />
+          </label>
+
+          <label className="wz-rev-campo">
+            <span>{t.wzRevPratica}</span>
+            <input className="wz-input" value={pratica} maxLength={120} onChange={(e) => setPratica(e.target.value)} />
+          </label>
+
+          <div className="wz-rev-linha">
+            <span className="wz-rev-par"><b>{t.wzRevRitmo}</b> {ritmoTexto() || '—'}</span>
+            <span className="wz-rev-par"><b>{t.wzRevTempo}</b> {totalDias()} {t.durDaysWord}</span>
+          </div>
+
+          <label className="wz-rev-campo">
+            <span>{t.wzRevDia1}</span>
+            <textarea value={first} maxLength={500} rows={3} onChange={(e) => setFirst(e.target.value)} />
+          </label>
+          {(photoUrl || videoUrl) && (
+            <div className="wz-media">
+              {photoUrl ? <img src={photoUrl} alt="" /> : <video src={videoUrl} controls playsInline />}
+            </div>
+          )}
 
           <div className="wz-field">
-            <span className="wz-label">{t.fCategory}</span>
+            <span className="wz-label">{t.wzRevCat}</span>
             <div className="wz-chips">
               {CATS.map(([v, l]) => (
                 <button type="button" key={v} className={`wz-chip${cat === v ? ' on' : ''}`}
@@ -366,37 +562,9 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         </div>
       )}
 
-      {/* ---------------- 3 · o primeiro dia ---------------- */}
-      {step === 2 && (
-        <div className="wz-body">
-          <div className="wz-area">
-            <textarea value={first} onChange={(e) => setFirst(e.target.value)}
-              maxLength={500} rows={4} placeholder={t.fFirstPh} autoFocus />
-          </div>
-
-          {photoUrl && <div className="wz-media"><img src={photoUrl} alt="" /></div>}
-          {videoUrl && <div className="wz-media"><video src={videoUrl} controls playsInline /></div>}
-
-          <div className="wz-chips">
-            <button type="button" className={`wz-chip${photoUrl ? ' on' : ''}`}
-              onClick={() => photoRef.current?.click()} disabled={uploading}>
-              {uploading ? t.uploading : (photoUrl ? t.photoAdded : t.addPhoto)}
-            </button>
-            <button type="button" className={`wz-chip${videoUrl ? ' on' : ''}`}
-              onClick={() => videoRef.current?.click()} disabled={uploading}>
-              {uploading ? t.uploading : (videoUrl ? t.videoAdded : t.addVideo)}
-            </button>
-            <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPhoto} />
-            <input ref={videoRef} type="file" accept="video/*" hidden onChange={onVideo} />
-          </div>
-
-        </div>
-      )}
-
-      {/* Privacidade: nao e uma decisao do fluxo, mas ninguem pode ser
-          publicado sem saber. Uma linha declara o que vai acontecer e
-          abre as tres opcoes so para quem quiser mexer. */}
-      {step === STEPS - 1 && (
+      {/* Privacidade: não é decisão do fluxo, mas ninguém pode ser
+          publicado sem saber. Uma linha declara o que vai acontecer. */}
+      {step === S_REV && (
         <div className={`wz-priv${privAberta ? ' aberta' : ''}`}>
           <div className="wz-priv-line">
             <span>{(t.wizPrivShort || '').replace('{v}', (VIS.find(([v]) => v === visibility) || [])[1] || '')}</span>
@@ -416,6 +584,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         </div>
       )}
 
+      {ajErro && <p className="wz-aj-err">{ajErro}</p>}
       {erro && <p className="wz-erro" role="alert">{erro}</p>}
 
       <div className="wz-nav">
@@ -423,9 +592,16 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
           {t.wizBack}
         </button>
         {step < STEPS - 1 ? (
-          <button type="button" className="wz-go" onClick={avancar} disabled={!podeAvancar}>
-            {t.wizNext}
-          </button>
+          <>
+            {/* Pular fica ao lado de Avançar, e não escondido: cada tela
+                destas é um lugar onde alguém pode desistir do app inteiro. */}
+            {step !== S_TITULO && (
+              <button type="button" className="wz-skip" onClick={avancar}>{t.wzPular}</button>
+            )}
+            <button type="button" className="wz-go" onClick={avancar} disabled={!podeAvancar}>
+              {t.wizNext}
+            </button>
+          </>
         ) : (
           <button type="button" className="wz-go" onClick={criar} disabled={saving || uploading}>
             {saving ? t.creating : t.createBtn}

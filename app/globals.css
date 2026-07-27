@@ -5680,3 +5680,58 @@ h1 { letter-spacing: -0.03em; }
 .wz-aj-use{background:var(--ink);border:1px solid var(--ink);color:#fff}
 .wz-aj-use:disabled{opacity:.45;cursor:default}
 .wz-aj-err{margin:6px 0 0;font-size:13px;color:var(--terracota-txt)}
+
+/* ============================================================
+   PATCH 82 · O WIZARD DE SETE TELAS
+
+   Uma pergunta por tela. O que isso cobra é funil: cada tela é um
+   lugar para desistir. Por isso "Pular esta" fica AO LADO de
+   "Avançar", visível, e não escondido — só a primeira tela prende.
+
+   O botão de pular é discreto mas não é escondido. Esconder saída
+   é o desenho de quem quer aprisionar; mostrar saída é o de quem
+   confia que a tela vale a pena.
+   ============================================================ */
+.wz-skip{
+  background:none;border:0;cursor:pointer;padding:12px 10px;min-height:44px;
+  font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;
+}
+.wz-skip:hover,.wz-skip:focus-visible{color:var(--ink)}
+
+/* Sugestões vindas da IA: mesma forma das de exemplo, para não
+   parecerem uma categoria diferente de conteúdo. */
+.wz-sugs-ia{margin-top:2px}
+
+/* Campo de texto dentro do quadro de ajuda (o rascunho do dia 1). */
+.wz-aj-txt{
+  width:100%;resize:vertical;font:inherit;font-size:15px;line-height:1.5;
+  color:var(--ink);background:var(--bg);border:1px solid var(--line);
+  border-radius:12px;padding:10px 12px;
+}
+.wz-aj-txt:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+
+/* ---- a revisão ---- */
+.wz-rev{gap:16px}
+.wz-rev-campo{display:flex;flex-direction:column;gap:6px}
+.wz-rev-campo > span{
+  font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+}
+.wz-rev-campo textarea{
+  width:100%;resize:vertical;font:inherit;font-size:15px;line-height:1.5;color:var(--ink);
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+}
+.wz-rev-campo textarea:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+.wz-rev-linha{display:flex;flex-wrap:wrap;gap:18px}
+.wz-rev-par{font-size:14px;color:var(--ink)}
+.wz-rev-par b{
+  font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin-right:6px;
+}
+
+/* A linha de plano: prática · ritmo. Fica abaixo do objetivo, em
+   corpo menor, porque é informação de apoio — quem chega quer ler
+   o título e o motivo primeiro. */
+.jcover-plano{
+  margin:6px 0 0;font-size:14px;line-height:1.5;color:var(--muted);
+  max-width:34rem;
+}
