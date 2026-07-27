@@ -4,6 +4,8 @@ import { createClient } from '../lib/supabase/server';
 import { redirect } from 'next/navigation';
 import ProgressBar from '../components/ProgressBar';
 import Track from '../components/Track';
+import Motion from '../components/Motion';
+import AnimatedLogo from '../components/AnimatedLogo';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,12 +67,17 @@ export default async function Home() {
           desenho cortado pela metade.
           O arquivo certo é `logo-name.png`, o mesmo que o topo do app usa. */}
       <header className="top land-top">
+        {/* O logo que se desenha: O -> U -> pingo -> D, uma vez só.
+            O componente já existia (feito para a tela de login) e termina
+            exatamente igual ao logo estático — então, se a animação falhar,
+            o que fica na tela é o desenho correto, e não um pedaço. */}
         <a className="land-mark" href="/" aria-label="One Up Day">
-          <img src="/logo-name.png" alt="" />
+          <AnimatedLogo />
         </a>
       </header>
 
       <Track type="landing_view" />
+      <Motion />
       <main className="landing">
 
         {/* ═══ 1 · HERO ═══════════════════════════════════════════ */}
@@ -141,8 +148,8 @@ export default async function Home() {
             {[[t.passo1T, t.passo1D, 'M12 5v14M5 12h14'],
               [t.passo2T, t.passo2D, 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z'],
               [t.passo3T, t.passo3D, 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1 7.8 7.8 7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z'],
-              [t.passo4T, t.passo4D, 'M3 12a9 9 0 1 0 3-6.7M3 4v5h5']].map(([tt, dd, path]) => (
-              <div className="passo" key={tt}>
+              [t.passo4T, t.passo4D, 'M3 12a9 9 0 1 0 3-6.7M3 4v5h5']].map(([tt, dd, path], i) => (
+              <div className="passo reveal" key={tt} data-atraso={i * 90}>
                 <span className="passo-ico">
                   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
                     strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={path} /></svg>
@@ -161,6 +168,17 @@ export default async function Home() {
           <ul className="dif-lista">
             {(t.dif || []).map((d) => <li key={d}>{d}</li>)}
           </ul>
+        </section>
+
+        {/* ═══ 4b · A LINHA QUE PAUSA E CONTINUA ══════════════════
+            A tese da marca virando comportamento: o progresso avança,
+            para, e recomeça DO MESMO PONTO — nunca do zero.
+            Uma execução só. Não reinicia ao subir e descer a página. */}
+        <section className="land-tese">
+          <div className="linha-tese" aria-hidden="true">
+            <span className="lt-trilho"><i className="lt-barra" /></span>
+          </div>
+          <p className="tese-frase">{t.tesePausa}</p>
         </section>
 
         {/* ═══ 5 · SEGURANÇA E CONFIANÇA ══════════════════════════

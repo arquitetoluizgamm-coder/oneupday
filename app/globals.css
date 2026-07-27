@@ -4511,3 +4511,69 @@ h1 { letter-spacing: -0.03em; }
   .passo b{margin-bottom:1px}
   .acao-chamadas{grid-template-columns:1fr}
 }
+
+/* ============================================================
+   MOTION — a regra de ouro
+   Nada aqui esconde conteudo por padrao. As classes so passam a
+   valer depois que o <html> recebe `motion-ready`, e quem poe
+   essa marca e' o componentes/Motion.jsx, ja no navegador.
+   Sem JavaScript, sem observador, ou com movimento reduzido:
+   a pagina inteira aparece normalmente.
+   ============================================================ */
+.motion-ready .reveal{
+  opacity:0; transform:translateY(12px);
+  transition:opacity .4s cubic-bezier(.22,1,.36,1),
+             transform .4s cubic-bezier(.22,1,.36,1);
+  will-change:opacity,transform;
+}
+.motion-ready .reveal.is-visible{opacity:1;transform:none}
+
+/* ---- a linha que avanca, pausa e continua ----
+   3 segundos ao todo: 1,14s subindo ate 55% · 840ms parada ·
+   1,02s ate o fim. Uma execucao, e fica concluida.
+   scaleX em vez de width: transform nao recalcula layout, entao
+   nao ha risco de deslocar nada durante o movimento (CLS zero). */
+.land-tese{
+  max-width:520px;margin:56px auto 0!important;text-align:center;
+}
+.linha-tese{padding:0 4px}
+.lt-trilho{
+  display:block;height:8px;border-radius:999px;
+  background:var(--sand,#EFEAE2);overflow:hidden;
+}
+.lt-barra{
+  display:block;height:100%;width:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--sage,#84917A),var(--orange,#C16F54));
+  transform:scaleX(1);transform-origin:left center;   /* estado final por padrao */
+}
+.motion-ready .linha-tese .lt-barra{transform:scaleX(0)}
+.motion-ready .linha-tese.is-visible .lt-barra{
+  animation:teseAvanca 3s cubic-bezier(.33,0,.2,1) forwards;
+}
+@keyframes teseAvanca{
+  0%   { transform:scaleX(0) }
+  38%  { transform:scaleX(.55) }   /* chega na metade */
+  66%  { transform:scaleX(.55) }   /* PARA — 840ms de pausa */
+  100% { transform:scaleX(1) }     /* continua DO MESMO PONTO */
+}
+.tese-frase{
+  margin:16px 0 0;font-family:var(--voice,Georgia),serif;font-style:italic;
+  font-size:17px;line-height:1.45;color:var(--ink);
+}
+@media(max-width:640px){
+  .land-tese{margin-top:42px!important}
+  .tese-frase{font-size:15.5px}
+}
+
+/* ---- o logo do topo, quando e' o SVG que se desenha ---- */
+.land-mark .oud-anim{height:52px;width:auto;display:block;overflow:visible}
+@media(max-width:640px){ .land-mark .oud-anim{height:42px} }
+
+/* ---- quem pediu menos movimento recebe o estado final ---- */
+@media(prefers-reduced-motion:reduce){
+  .reveal{opacity:1!important;transform:none!important;transition:none!important}
+  .lt-barra{transform:scaleX(1)!important;animation:none!important}
+  .oud-anim .oa-o,.oud-anim .oa-u,.oud-anim .oa-dot,.oud-anim .oa-d{
+    stroke-dashoffset:0!important;animation:none!important}
+  .oud-anim .oa-word{opacity:1!important;transform:none!important;animation:none!important}
+}
