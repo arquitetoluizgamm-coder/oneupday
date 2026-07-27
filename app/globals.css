@@ -5025,3 +5025,79 @@ h1 { letter-spacing: -0.03em; }
     padding-right:calc(20px + var(--sa-right));
   }
 }
+
+/* ============================================================
+   HOME NO CELULAR — quatro consertos, todos com causa localizada
+   ============================================================ */
+
+/* ---- 1 · o texto colado na borda ----------------------------
+   A midia do feed e' edge-to-edge de proposito. Para isso, o
+   `.wrap.feed-page` tem padding lateral ZERO no celular — e cada
+   pedaco que precisa de respiro recebe o seu de volta, um por um:
+   entry-head, entry-text, entry-actions, feed-tabs, feed-invite.
+
+   O bloco do heroi (`.first-journey`) e o Proximo Capitulo nunca
+   entraram nessa lista. Perderam o padding e ninguem devolveu —
+   por isso "SUA VEZ", o titulo e o botao nasciam em x=0.
+
+   A correcao nao e' padding global (isso mataria o edge-to-edge
+   da foto): e' devolver a quem faltou.
+   ============================================================ */
+@media(max-width:640px){
+  .feed-page > .first-journey,
+  .feed-page > .nc,
+  .feed-page > .today,
+  .feed-page > .home-head,
+  .feed-page > .feed-lead,
+  .feed-page > .care-box,
+  .feed-page > .companion,
+  .feed-page > .esp-teaser,
+  .feed-page > section:not(.entry){
+    padding-left:16px;padding-right:16px;
+  }
+  /* o botao do heroi ocupa a linha: meio-botao parece corte */
+  .first-journey .cta{width:100%;justify-content:center;text-align:center}
+}
+
+/* ---- 2 · o brilho laranja atras do botao --------------------
+   `.cta.grow` tinha box-shadow em rgba(255,122,69) — o laranja da
+   paleta ANTIGA, cravado. Depois do rebrand o fundo virou
+   salvia->terracota->dourado e a sombra continuou laranja neon:
+   parecia defeito, nao intencao.
+   ============================================================ */
+.cta.grow{box-shadow:0 8px 22px rgba(193,111,84,.22)!important}
+.cta.grow:hover{box-shadow:0 12px 28px rgba(193,111,84,.28)!important}
+.post-btn{box-shadow:0 6px 16px rgba(193,111,84,.20)}
+.bar span{box-shadow:none!important}
+
+/* ---- 3 · a barra de baixo cobrindo o conteudo ---------------
+   No celular a barra flutua: bottom:14px, altura ~56. O corpo
+   reservava 74px — menos que os 70 da barra mais os 14 de folga
+   mais a area de gesto. Faltavam ~20px, e era exatamente o que
+   cobria a ultima linha do card.
+   ============================================================ */
+@media(max-width:640px){
+  body{padding-bottom:calc(96px + var(--sa-bottom))}
+}
+
+/* ---- 4 · o bloco vazio gigante no card de texto -------------
+   Nao era imagem carregando. O card de citacao tem proporcao 4:5
+   e `justify-content:flex-end` — o texto era empurrado para a
+   BASE, deixando ~300px de creme vazio em cima. Num card de 4:5
+   no celular isso e' quase dois tercos da altura.
+   Centralizado, o card volta a parecer uma pagina de diario.
+   ============================================================ */
+.entry-textcard{justify-content:center!important}
+.feed-page .entry-textcard{min-height:0}
+
+/* ---- 5 · a aba ativa parecia campo desabilitado -------------
+   Caixa branca com borda e sombra le como input inativo. O
+   sublinhado ja existia no arquivo (linha ~1038) e foi
+   sobrescrito por uma regra posterior. Restaurado.
+   ============================================================ */
+.feed-tabs{background:transparent!important;border:0!important;padding-top:0;padding-bottom:0}
+.feed-tabs button{border-radius:0!important;background:transparent!important;padding:8px 0!important;margin-right:22px}
+.feed-tabs button.on{
+  background:transparent!important;box-shadow:inset 0 -2px 0 var(--orange,#C16F54)!important;
+  color:var(--ink)!important;font-weight:800;
+}
