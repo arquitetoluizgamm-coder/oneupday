@@ -1,56 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '../../../lib/supabase/server';
 import { rateLimit } from '../../../lib/ratelimit';
-
-const BLOCKED = [
-  'vai se matar', 'se mata', 'idiota', 'imbecil', 'retardado', 'lixo', 'fracassado',
-  'loser', 'idiot', 'stupid', 'kill yourself', 'go die', 'you are worthless',
-];
-
-function locallyUnsafe(text) {
-  const value = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  return BLOCKED.some(word => value.includes(word));
-}
-
-// ============================================================
-// MODERAÇÃO POR IA — e o que fazer quando ela não responde
-//
-// Antes esta função devolvia `false` em TRÊS situações diferentes:
-// sem chave configurada, resposta com erro, e exceção de rede.
-// As duas últimas são falha — e devolver `false` nelas significa
-// FALHAR ABERTO: com a OpenAI fora do ar, qualquer comentário
-// passava, protegido apenas pela lista local de 13 palavras.
-//
-// Num produto onde as pessoas escrevem sobre o próprio pior dia,
-// o custo de um comentário agressivo passar é muito maior que o
-// de um comentário gentil esperar meia hora.
-//
-// Agora ela distingue os três casos:
-//   'ok'           → analisado, e está limpo
-//   'inseguro'     → analisado, e foi sinalizado
-//   'indisponivel' → NÃO foi analisado (erro, rede, tempo esgotado)
-//
-// Sem chave configurada continua sendo 'ok': aí a moderação por IA
-// simplesmente não faz parte da instalação, e não há falha nenhuma.
-// ============================================================
-async function aiUnsafe(text) {
-  const key = process.env.OPENAI_API_KEY;
-  if (!key) return 'ok';   // recurso não configurado — não é falha
-  try {
-    // teto de 6s: sem isso, uma API lenta trava o envio do comentário
-    const corte = AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined;
-    const response = await fetch('https://api.openai.com/v1/moderations', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'omni-moderation-latest', input: text }),
-      signal: corte,
-    });
-    if (!response.ok) return 'indisponivel';
-    const data = await response.json();
-    if (!data?.results?.[0]) return 'indisponivel';
-    return data.results[0].flagged ? 'inseguro' : 'ok';
-  } catch { return 'indisponivel'; }
-}
+import { locallyUnsafe, moderarTexto, reprocessarPendentes } from '../../../lib/moderacao';
+import { clienteServico } from '../../../lib/dono';
 
 export async function GET(req) {
   const url = new URL(req.url);
@@ -109,7 +61,7 @@ export async function POST(req) {
   // publicado: entra como pendente. Ele existe, o autor sabe, e some
   // da tela pública até ser revisto — a política de leitura do banco
   // só mostra o que está com status 'published'.
-  const veredito = await aiUnsafe(text);
+  const veredito = await moderarTexto(text);
   if (veredito === 'inseguro') return NextResponse.json({ error: 'unsafe' }, { status: 422 });
   const status = veredito === 'indisponivel' ? 'pending' : 'published';
 
@@ -117,5 +69,22 @@ export async function POST(req) {
     [col]: val, user_id: user.id, parent_id: parentId, body: text, status,
   }).select('id, user_id, parent_id, body, created_at').single();
   if (error) return NextResponse.json({ error: 'save' }, { status: 500 });
+
+  // ============================================================
+  // A FILA SE ESVAZIA SOZINHA
+  //
+  // Se chegamos aqui com veredito 'ok', a IA acabou de responder —
+  // ou seja, ela está de pé AGORA. Este é o melhor momento possível
+  // para reprocessar o que ficou preso durante a queda, e é de graça:
+  // já estamos numa requisição quente, com a rede aquecida.
+  //
+  // Três por vez, em paralelo (~300ms). Não trava o envio de quem
+  // está escrevendo, e uma indisponibilidade curta se resolve sem
+  // ninguém precisar abrir a fila de revisão.
+  // ============================================================
+  if (veredito === 'ok') {
+    try { await reprocessarPendentes(clienteServico(), 3); } catch { }
+  }
+
   return NextResponse.json({ comment, pendente: status === 'pending' });
 }
