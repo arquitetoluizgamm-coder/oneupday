@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 import { ALT_MAX } from '../../lib/alt';
+import { perguntasDoDia } from '../../lib/perguntas';
 import TrackPicker from './TrackPicker';
 import ImageCropper from '../../components/ImageCropper';
 import { track as trackEvent } from '../../lib/track';
@@ -42,6 +43,12 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   // decisão da pessoa: o campo abre preenchido e editável.
   const [alt, setAlt] = useState('');
   const [altBusy, setAltBusy] = useState(false);
+  // A pergunta acima do campo. `situacao` vem do banco (último
+  // registro e passo em aberto); `daIA` é a camada de assunto, que
+  // pode simplesmente não chegar.
+  const [situacao, setSituacao] = useState({});
+  const [daIA, setDaIA] = useState([]);
+  const [qi, setQi] = useState(0);
   const [track, setTrack] = useState(null);
   const [aiErr, setAiErr] = useState('');
   const [posted, setPosted] = useState(false);
@@ -61,6 +68,51 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     const el = inputRef.current;
     if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 220) + 'px'; }
   }, [text]);
+
+  // ============================================================
+  // DE ONDE VEM A PERGUNTA
+  //
+  // Uma consulta só, no carregamento: o último registro desta
+  // jornada. Dele saem as duas coisas que tornam a pergunta
+  // específica — se ontem foi um dia difícil, e se ficou um passo
+  // combinado sem resposta.
+  //
+  // A camada de assunto (a IA) vem em seguida e é opcional. Ela
+  // roda uma vez por montagem, não a cada tecla.
+  // ============================================================
+  useEffect(() => {
+    let vivo = true;
+    (async () => {
+      try {
+        const sb = createClient();
+        const { data: ultimo } = await sb.from('updates')
+          .select('kind, next_step, closed_by')
+          .eq('journey_id', journeyId)
+          .order('created_at', { ascending: false }).limit(1).maybeSingle();
+        if (!vivo || !ultimo) return;
+        setSituacao({
+          ultimoKind: ultimo.kind,
+          // só conta como aberto o passo que ainda não foi fechado
+          passoAberto: ultimo.closed_by ? '' : (ultimo.next_step || ''),
+        });
+      } catch {}
+    })();
+    return () => { vivo = false; };
+  }, [journeyId]);
+
+  useEffect(() => {
+    if (!aiOn) return;
+    let vivo = true;
+    (async () => {
+      try {
+        const r = await fetch('/api/perguntas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ journeyId }) });
+        if (!r.ok) return;
+        const d = await r.json();
+        if (vivo && Array.isArray(d.perguntas) && d.perguntas.length) setDaIA(d.perguntas);
+      } catch {}
+    })();
+    return () => { vivo = false; };
+  }, [journeyId, aiOn]);
 
 
   async function upload(file, extOverride) {
@@ -222,7 +274,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     if (novo?.id) { setLastId(novo.id); await fecharCapituloAnterior(supabase, novo.id); }
     trackEvent('update_posted', { journeyId, kind });
     setPostedKind(kind);
-    setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null); setAlt('');
+    setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null); setAlt(''); setQi(0);
     if (photoRef.current) photoRef.current.value = '';
     if (videoRef.current) videoRef.current.value = '';
     setPosted(true);
@@ -249,6 +301,10 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
 
   const showCare = looksRisky(text);
   const dayNumber = Math.max(1, Math.floor((Date.now() - new Date(startDate).getTime()) / 86400000) + 1);
+  // situação primeiro, assunto depois: "você conseguiu comprar a
+  // garrafa que combinou ontem?" ganha de qualquer pergunta sobre água.
+  const perguntas = [...perguntasDoDia({ dia: dayNumber, ...situacao }, t), ...daIA];
+  const pergunta = perguntas.length ? perguntas[qi % perguntas.length] : '';
   const ph = t.placeholder.replace('{n}', dayNumber);
 
   if (posted) {
@@ -294,16 +350,24 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           <p>{t.crisisText}</p>
         </div>
       )}
-      <textarea ref={inputRef} className="composer2-input" value={text} onChange={e => setText(e.target.value)}
-        maxLength={500} placeholder={ph} rows={1}
-        onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); post(); } }} />
-      {!text.trim() && Array.isArray(t.prompts) && t.prompts.length > 0 && (
-        <div className="composer-prompts">
-          {t.prompts.map((pr, i) => (
-            <button type="button" key={i} className="prompt-chip" onClick={() => { setText(pr + ' '); inputRef.current?.focus(); }}>{pr}</button>
-          ))}
+      {/* A PERGUNTA FICA ACIMA E NUNCA ENTRA NO CAMPO.
+          Os chips antigos faziam setText(chip + ' '): a frase do app ia
+          publicada como se fosse o começo da frase da pessoa. Aqui ela é
+          pergunta — quem responde é ela, com as palavras dela. */}
+      {pergunta && (
+        <div className="perg-linha">
+          <p className="perg-texto" id="perg-do-dia">{pergunta}</p>
+          {perguntas.length > 1 && (
+            <button type="button" className="perg-outra" onClick={() => { setQi((v) => v + 1); inputRef.current?.focus(); }}>
+              {t.pergOutra}
+            </button>
+          )}
         </div>
       )}
+      <textarea ref={inputRef} className="composer2-input" value={text} onChange={e => setText(e.target.value)}
+        maxLength={500} placeholder={pergunta || ph} rows={1}
+        aria-describedby={pergunta ? 'perg-do-dia' : undefined}
+        onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); post(); } }} />
       {photoUrl && (
         <div className="photo-preview">
           <img src={photoUrl} alt={alt} />

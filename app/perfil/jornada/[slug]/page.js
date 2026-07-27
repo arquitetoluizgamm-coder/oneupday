@@ -80,7 +80,12 @@ export default async function JornadaDoDono({ params }) {
             musicAdd: t.musicAdd, musicTitle: t.musicTitle, musicUse: t.musicUse, musicRemove: t.musicRemove,
             musicEmpty: t.musicEmpty, musicSearchPh: t.musicSearchPh, musicKeyNeeded: t.musicKeyNeeded,
             aiErr: t.aiErr, aiRateErr: t.aiRateErr,
-            moodQ: t.moodQ, prompts: t.prompts,
+            moodQ: t.moodQ,
+            // A pergunta do dia. `prompts` saiu: os quatro chips fixos
+            // viraram uma pergunta só, escolhida pela situação da jornada.
+            pergPasso: t.pergPasso, pergDia1: t.pergDia1,
+            pergDepoisDeDificil: t.pergDepoisDeDificil, pergMarco: t.pergMarco,
+            pergGerais: t.pergGerais, pergOutra: t.pergOutra,
             moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful },
             crop: { original: t.cropOriginal, square: t.cropSquare, portrait: t.cropPortrait, landscape: t.cropLandscape, use: t.cropUse, edit: t.cropEdit, cancel: t.cropCancel, hint: t.cropHint, hintOriginal: t.cropHintOriginal, zoom: t.cropZoom },
             env: { q: t.envQ, ph: t.envPh, save: t.envSave, skip: t.envSkip },

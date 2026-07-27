@@ -5605,3 +5605,36 @@ h1 { letter-spacing: -0.03em; }
 }
 .alt-campo textarea:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
 .alt-dica{font-size:12px;line-height:1.4;color:var(--muted)}
+
+/* ============================================================
+   PATCH 81 · A PERGUNTA DO DIA
+
+   Substitui os quatro chips fixos. E não é só quantidade: os
+   chips faziam `setText(chip + ' ')` — a frase do app entrava
+   dentro do texto da pessoa e era publicada assim. A mesma
+   doença do patch 78, dentro do compositor.
+
+   Agora a pergunta fica ACIMA do campo e nunca entra nele.
+   Precisa parecer pergunta, não rótulo de formulário: serifada,
+   tamanho de leitura, na cor da tinta. É o convite; o campo
+   embaixo é a resposta.
+
+   "outra pergunta" fica discreto e ao lado — trocar de pergunta
+   é escape, não a ação principal. Quatro chips davam quatro
+   decisões antes de escrever uma palavra.
+   ============================================================ */
+.perg-linha{
+  display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+  margin:2px 0 8px;
+}
+.perg-texto{
+  margin:0;font-family:var(--serif,var(--display));font-size:17px;line-height:1.35;
+  color:var(--ink);letter-spacing:-.01em;text-wrap:balance;
+}
+.perg-outra{
+  flex:0 0 auto;background:none;border:0;padding:6px 2px;cursor:pointer;
+  font-size:12px;color:var(--muted);text-decoration:underline;
+  text-underline-offset:3px;min-height:44px;
+}
+.perg-outra:hover,.perg-outra:focus-visible{color:var(--ink)}
+@media(max-width:640px){ .perg-texto{font-size:16px} }

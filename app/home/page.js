@@ -5,7 +5,6 @@ import { getDict } from '../../lib/i18n';
 import AppTop from '../../components/AppTop';
 import BottomNav from '../../components/BottomNav';
 import FeedClient from './FeedClient';
-import Composer from './Composer';
 import NextStep from './NextStep';
 import ProgressBar from '../../components/ProgressBar';
 import Track from '../../components/Track';
@@ -78,19 +77,6 @@ export default async function Home() {
   const nc = await computeNextChapter(supabase, user.id, primary, t);
 
   const kindLabels = { step: t.kindStep, win: t.kindWin, setback: t.kindSetback, learned: t.kindLearned };
-  const composerT = {
-    placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
-    addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded, addVideo: t.addVideo, videoAdded: t.videoAdded, videoTooBig: t.videoTooBig,
-    crisisTitle: t.crisisTitle, crisisText: t.crisisText, ritualQ: t.ritualQ, rDid: t.rDid, rTried: t.rTried, rPaused: t.rPaused,
-    aiWrite: t.aiWrite,
-    musicAdd: t.musicAdd, musicTitle: t.musicTitle, musicUse: t.musicUse, musicRemove: t.musicRemove, musicEmpty: t.musicEmpty, musicSearchPh: t.musicSearchPh, musicKeyNeeded: t.musicKeyNeeded,
-    aiErr: t.aiErr, aiRateErr: t.aiRateErr,
-    moodQ: t.moodQ, prompts: t.prompts, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful },
-    crop: { original: t.cropOriginal, square: t.cropSquare, portrait: t.cropPortrait, landscape: t.cropLandscape, use: t.cropUse, edit: t.cropEdit, cancel: t.cropCancel, hint: t.cropHint, hintOriginal: t.cropHintOriginal, zoom: t.cropZoom },
-    env: { q: t.envQ, ph: t.envPh, save: t.envSave, skip: t.envSkip },
-    step: { q: t.stepQ, ph: t.stepPh, whenQ: t.stepWhenQ, whens: t.stepWhens, save: t.stepSave, note: t.stepNote },
-    meaning: { step: t.meaningStep, setback: t.meaningSetback, first: t.meaningFirst },
-  };
 
   const feedLabels = {
     dayShort: t.dayShort, tagSetback: t.tagSetback, tagWin: t.tagWin,

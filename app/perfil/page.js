@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 import { createClient } from '../../lib/supabase/server';
 import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
-import Composer from '../home/Composer';
 import NewJourneyForm from '../new/NewJourneyForm';
 import EditBanner from '../../components/EditBanner';
 import BottomNav from '../../components/BottomNav';
