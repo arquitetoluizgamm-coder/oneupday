@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '../../../lib/supabase/server';
 import { createClient as createAdmin } from '@supabase/supabase-js';
 import { getLocale } from '../../../lib/locale';
-import { detectarFato, fraseBase, instrucao, temaSensivel } from '../../../lib/eco';
+import { detectarFato, fraseBase, perguntaBase, instrucao, temaSensivel } from '../../../lib/eco';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -111,15 +111,30 @@ export async function POST() {
             const jr = await r.json();
             const t = (jr.choices?.[0]?.message?.content || '').trim().replace(/^["“]|["”]$/g, '');
             // valida: tamanho, sem elogio, sem emoji, sem exclamação
-            const ruim = /parab|congrat|orgulh|guerreir|voc[êe] consegue|continue assim|[!🎉💪🔥👏✨]/i.test(t);
+            // e sem pergunta — a pergunta é nossa, não do modelo
+            const ruim = /parab|congrat|orgulh|guerreir|voc[êe] consegue|continue assim|\?|[!🎉💪🔥👏✨]/i.test(t);
             if (t.length >= 20 && t.length <= 240 && !ruim) frase = t;
           }
         } catch {}
       }
 
+      // ============================================================
+      // A PERGUNTA VEM DEPOIS DA OBSERVAÇÃO
+      //
+      // Ela é escolhida em lib/eco.js, nunca pelo modelo, e some
+      // em dois casos: nos fatos 'retorno' e 'seguiu' (a própria
+      // perguntaBase devolve vazio) e sempre que o post é um dia
+      // difícil — aí a pessoa não está contando o que funcionou,
+      // está dizendo que hoje não deu.
+      //
+      // Sem pergunta, o Eco volta a ser exatamente o que era.
+      // ============================================================
+      const pergunta = u.kind === 'setback' ? '' : perguntaBase(fato, locale);
+      const corpo = (pergunta ? `${frase} ${pergunta}` : frase).slice(0, 400);
+
       const { error } = await db.from('comments').insert({
         update_id: u.id, user_id: null, eco: true, eco_tipo: fato.tipo,
-        body: frase.slice(0, 400), status: 'published',
+        body: corpo, status: 'published',
       });
       if (!error) {
         criados++;

@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
+import { ALT_MAX } from '../../lib/alt';
 import TrackPicker from './TrackPicker';
 import ImageCropper from '../../components/ImageCropper';
 import { track as trackEvent } from '../../lib/track';
@@ -37,6 +38,10 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [photoUrl, setPhotoUrl] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
+  // Descrição da foto para quem não enxerga. Rascunho da IA,
+  // decisão da pessoa: o campo abre preenchido e editável.
+  const [alt, setAlt] = useState('');
+  const [altBusy, setAltBusy] = useState(false);
   const [track, setTrack] = useState(null);
   const [aiErr, setAiErr] = useState('');
   const [posted, setPosted] = useState(false);
@@ -87,7 +92,21 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     if (!url) { alert(t.error); return; }
     setPhotoUrl(url); setVideoUrl(null);
     if (videoRef.current) videoRef.current.value = '';
+    descrever(url);
   }
+  // O rascunho da descrição. Falhar aqui não custa nada: sem
+  // chave, sem rede ou com o modelo fora do ar, o campo fica
+  // vazio e a exibição usa a reserva factual de lib/alt.js.
+  async function descrever(url) {
+    setAlt('');
+    setAltBusy(true);
+    try {
+      const r = await fetch('/api/alt', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) });
+      if (r.ok) { const d = await r.json(); if (d.alt) setAlt(d.alt); }
+    } catch {}
+    setAltBusy(false);
+  }
+
   function onCropCancel() {
     if (rawUrl) URL.revokeObjectURL(rawUrl);
     setRawUrl('');
@@ -103,7 +122,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     const url = await upload(file);
     setUploading(false);
     if (!url) { alert(t.error); return; }
-    setVideoUrl(url); setPhotoUrl(null);
+    setVideoUrl(url); setPhotoUrl(null); setAlt('');
     if (photoRef.current) photoRef.current.value = '';
   }
 
@@ -186,14 +205,24 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       journey_id: journeyId, day_number: dayNumber, kind,
       text: value || fallback, photo_url: photoUrl, video_url: videoUrl,
     };
+    if (photoUrl && alt.trim()) row.alt = alt.trim().slice(0, ALT_MAX);
     if (track) { row.track_title = track.title; row.track_artist = track.artist; row.track_audio_url = track.audio_url; }
-    const { data: novo, error } = await supabase.from('updates').insert(row).select('id').maybeSingle();
+    let { data: novo, error } = await supabase.from('updates').insert(row).select('id').maybeSingle();
+    // Se o supabase/alt-imagem.sql ainda não foi rodado, a coluna não
+    // existe e o insert falha inteiro. Publicar é a ação central do app:
+    // ela não pode morrer por causa de um campo de acessibilidade.
+    // Tenta de novo sem a descrição e avisa no console, não na cara da pessoa.
+    if (error && /alt/.test(error.message || '') && row.alt) {
+      console.warn('[alt] coluna ausente — rode supabase/alt-imagem.sql');
+      const semAlt = { ...row }; delete semAlt.alt;
+      ({ data: novo, error } = await supabase.from('updates').insert(semAlt).select('id').maybeSingle());
+    }
     setSaving(false);
     if (error) { alert(t.error); return; }
     if (novo?.id) { setLastId(novo.id); await fecharCapituloAnterior(supabase, novo.id); }
     trackEvent('update_posted', { journeyId, kind });
     setPostedKind(kind);
-    setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null);
+    setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null); setAlt('');
     if (photoRef.current) photoRef.current.value = '';
     if (videoRef.current) videoRef.current.value = '';
     setPosted(true);
@@ -277,8 +306,20 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       )}
       {photoUrl && (
         <div className="photo-preview">
-          <img src={photoUrl} alt="" />
+          <img src={photoUrl} alt={alt} />
           {rawFile && <button type="button" className="tiny-link" onClick={reframe}>{(t.crop || {}).edit || 'Editar enquadramento'}</button>}
+        </div>
+      )}
+      {/* A descrição fica VISÍVEL, não escondida atrás de um botão
+          "acessibilidade". Quem publica precisa ver o que vai ser dito
+          sobre a foto dela — inclusive para discordar. */}
+      {photoUrl && (
+        <div className="alt-campo">
+          <label htmlFor="alt-foto">{t.altLabel}</label>
+          <textarea id="alt-foto" value={alt} maxLength={ALT_MAX} rows={2}
+            placeholder={altBusy ? t.altPensando : t.altPh}
+            onChange={(e) => setAlt(e.target.value)} />
+          <span className="alt-dica">{alt.trim() ? t.altOk : t.altVazio}</span>
         </div>
       )}
       {videoUrl && <div className="photo-preview"><video src={videoUrl} controls playsInline /></div>}

@@ -12,6 +12,7 @@ import Transformacao from '../../components/Transformacao';
 import Amanha from '../../components/Amanha';
 import SeloDoDia from '../../components/SeloDoDia';
 import { textoDaPessoa } from '../../lib/registro';
+import { textoAlternativo } from '../../lib/alt';
 import Retornos from '../../components/Retornos';
 import { StepOpen, StepResult } from '../../components/StepChapter';
 import Percepcao from '../../components/Percepcao';
@@ -92,7 +93,7 @@ const LIMITE_VERTICAL = 0.85;     // abaixo disso é "vertical" para a legenda
 
 const ehVertical = (r) => r !== null && r !== undefined && r < LIMITE_VERTICAL;
 
-function Media({ photo, video, href, labels, caption, onRatio, children }) {
+function Media({ photo, video, href, labels, caption, onRatio, children, alt = '' }) {
   // começa em 4:3 (o padrão do CSS) e ajusta assim que sabe o tamanho real
   const [nat, setNat] = useState(null);   // proporção real do arquivo
   const [inteiro, setInteiro] = useState(false); // ver o quadro todo (contain)
@@ -120,7 +121,7 @@ function Media({ photo, video, href, labels, caption, onRatio, children }) {
     />
   ) : (
     <img
-      src={photo} alt=""
+      src={photo} alt={alt}
       // Imagem que já está em cache termina de carregar ANTES do React
       // pendurar o onLoad — o evento nunca dispara e a foto fica presa na
       // proporção padrão. O ref confere isso no momento em que a tag nasce.
@@ -203,7 +204,7 @@ function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat }) {
 
   return (
     <>
-      {item.photo_url && <Media photo={item.photo_url} href={`/${item.journey.slug}`}>{trackFloat}</Media>}
+      {item.photo_url && <Media photo={item.photo_url} alt={textoAlternativo(item.alt, { dia: item.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackFloat}</Media>}
       {item.video_url && !item.photo_url && (
         <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackFloat}</Media>
       )}
@@ -258,7 +259,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
         <div className="dp-slide" key={d.id}>
           {hasMedia ? (
             <>
-              {d.photo_url && <Media photo={d.photo_url} href={`/${item.journey.slug}`}>{trackEl}</Media>}
+              {d.photo_url && <Media photo={d.photo_url} alt={textoAlternativo(d.alt, { dia: d.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackEl}</Media>}
               {d.video_url && !d.photo_url && <Media video={d.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackEl}</Media>}
             </>
           ) : (
@@ -299,7 +300,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
         <Percepcao updateId={d.id} toId={item.owner.id} own={item.own} labels={labels.pc} />
         <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
         {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
-        {item.own && <EditUpdate key={'ed' + d.id} update={{ id: d.id, text: d.text, photo_url: d.photo_url, day: d.day_number }} labels={labels.editUpdate}
+        {item.own && <EditUpdate key={'ed' + d.id} update={{ id: d.id, text: d.text, alt: d.alt, photo_url: d.photo_url, day: d.day_number }} labels={labels.editUpdate}
           onChanged={(patch) => setDays((prev) => patch === null ? prev.filter((x) => x.id !== d.id) : prev.map((x) => x.id === d.id ? { ...x, ...patch } : x))} />}
       </ActionsRow>
     </>
@@ -565,7 +566,7 @@ export default function FeedClient({ labels }) {
                 </span>
               </a>
               {item.owner.id && !item.own && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
-              {item.own && !item.demo && !item.days && <EditUpdate update={{ id: item.id, text: item.text, photo_url: item.photo_url, day: item.day_number }} labels={labels.editUpdate}
+              {item.own && !item.demo && !item.days && <EditUpdate update={{ id: item.id, text: item.text, alt: item.alt, photo_url: item.photo_url, day: item.day_number }} labels={labels.editUpdate}
                 onChanged={(patch) => setItems((prev) => patch === null ? prev.filter((x) => x.id !== item.id) : prev.map((x) => x.id === item.id ? { ...x, ...patch } : x))} />}
             </div>
             {item.days && !item.demo ? (

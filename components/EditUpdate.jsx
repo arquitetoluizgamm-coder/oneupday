@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '../lib/supabase/client';
 import ImageCropper from './ImageCropper';
 import { textoDaPessoa } from '../lib/registro';
+import { ALT_MAX } from '../lib/alt';
 
 // Editar um dia da jornada: texto + foto (adicionar/trocar/remover) + excluir post.
 export default function EditUpdate({ update, labels, onChanged }) {
@@ -13,6 +14,9 @@ export default function EditUpdate({ update, labels, onChanged }) {
   // abre VAZIO — senão a pessoa editaria uma frase que não escreveu.
   const [text, setText] = useState(textoDaPessoa(update.text));
   const [photoUrl, setPhotoUrl] = useState(update.photo_url || '');
+  // A descrição da foto também se edita aqui. Quem publicou às pressas
+  // com o rascunho da IA precisa de um lugar para corrigir depois.
+  const [alt, setAlt] = useState(update.alt || '');
   const [rawUrl, setRawUrl] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -45,13 +49,20 @@ export default function EditUpdate({ update, labels, onChanged }) {
     if (!value && !photoUrl) { setErr(L.errEmpty); return; }
     setBusy(true);
     const sb = createClient();
-    const { error } = await sb.from('updates')
-      .update({ text: value || '📷', photo_url: photoUrl || null })
-      .eq('id', update.id);
+    const campos = { text: value || '📷', photo_url: photoUrl || null };
+    if (photoUrl) campos.alt = alt.trim().slice(0, ALT_MAX) || null;
+    let { error } = await sb.from('updates').update(campos).eq('id', update.id);
+    // Mesma rede do compositor: sem o supabase/alt-imagem.sql a coluna não
+    // existe e a edição inteira falharia por causa de um campo opcional.
+    if (error && /alt/.test(error.message || '') && 'alt' in campos) {
+      console.warn('[alt] coluna ausente — rode supabase/alt-imagem.sql');
+      const semAlt = { ...campos }; delete semAlt.alt;
+      ({ error } = await sb.from('updates').update(semAlt).eq('id', update.id));
+    }
     setBusy(false);
     if (error) { setErr(L.errSave); return; }
     setOpen(false);
-    if (onChanged) onChanged({ text: value || '📷', photo_url: photoUrl || null });
+    if (onChanged) onChanged({ text: value || '📷', photo_url: photoUrl || null, alt: alt.trim() });
     router.refresh();
   }
 
@@ -98,6 +109,13 @@ export default function EditUpdate({ update, labels, onChanged }) {
                   )}
                   <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPick} />
                 </div>
+                {photoUrl && (
+                  <label className="ep-field">{L.altLabel}
+                    <textarea className="ej-goal" value={alt} maxLength={ALT_MAX} rows={2}
+                      placeholder={L.altPh} onChange={(e) => setAlt(e.target.value)} />
+                    <span className="alt-dica">{alt.trim() ? L.altOk : L.altVazio}</span>
+                  </label>
+                )}
                 {err && <p className="ep-err">{err}</p>}
                 <div className="crop-actions">
                   <button type="button" className="ghost-btn" onClick={() => setOpen(false)} disabled={busy}>{L.cancel}</button>

@@ -1,0 +1,15 @@
+-- ============================================================
+-- One Up Day — Descrição da imagem (texto alternativo)
+-- Rode no Supabase: SQL Editor > New query > Run
+--
+-- Guarda a descrição que o leitor de tela lê no lugar da foto.
+-- Sem esta coluna, o app continua funcionando: ele cai na
+-- reserva factual de lib/alt.js ("Foto do dia 3 da jornada
+-- Água."). Com ela, a pessoa que publicou decide o que se diz
+-- sobre a própria imagem.
+--
+-- Nada de RLS novo: a coluna vive na tabela updates e herda as
+-- políticas que já existem lá. Quem pode ler o post lê a
+-- descrição; quem pode editar o post edita a descrição.
+-- ============================================================
+alter table public.updates add column if not exists alt text;

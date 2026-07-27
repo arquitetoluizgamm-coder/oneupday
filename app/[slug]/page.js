@@ -26,6 +26,7 @@ import TiraDeDias from '../../components/TiraDeDias';
 import FechaMenus from '../../components/FechaMenus';
 import SeloDoDia from '../../components/SeloDoDia';
 import { textoDaPessoa } from '../../lib/registro';
+import { textoAlternativo } from '../../lib/alt';
 
 // O topo agora mostra avatar e sino de quem esta olhando, ou seja a
 // pagina depende da sessao. Ela ja era dinamica de fato (o codigo le
@@ -512,11 +513,11 @@ export default async function JourneyPage({ params, searchParams }) {
         {showBeforeNow && (
           <section className="before-now">
             <figure>
-              <img src={beforePhoto.photo_url} alt="" />
+              <img src={beforePhoto.photo_url} alt={textoAlternativo(beforePhoto.alt, { dia: beforePhoto.day_number, titulo: journey.title }, t)} />
               <figcaption><span>{t.before}</span><small>{fill(t.dayShort, { d: beforePhoto.day_number })}</small></figcaption>
             </figure>
             <figure>
-              <img src={nowPhoto.photo_url} alt="" />
+              <img src={nowPhoto.photo_url} alt={textoAlternativo(nowPhoto.alt, { dia: nowPhoto.day_number, titulo: journey.title }, t)} />
               <figcaption><span>{t.now}</span><small>{fill(t.dayShort, { d: nowPhoto.day_number })}</small></figcaption>
             </figure>
           </section>
@@ -580,8 +581,8 @@ export default async function JourneyPage({ params, searchParams }) {
                 <div className={`dia-item${ii > 0 ? ' extra' : ''}`} key={u.id}>
                 {tagFor(u.kind) && !soSelo(u) && <span className={`tag ${u.kind}`}>{tagFor(u.kind)}</span>}
                 {u.photo_url && (isOwner
-                  ? <OwnerMedia updateId={u.id} url={u.photo_url} kind="photo" labels={{ remove: t.mediaRemove, confirm: t.mediaRemoveConfirm, error: t.postError }} />
-                  : <div className="update-photo"><img src={u.photo_url} alt="" /></div>)}
+                  ? <OwnerMedia updateId={u.id} url={u.photo_url} kind="photo" alt={textoAlternativo(u.alt, { dia: u.day_number, titulo: journey.title }, t)} labels={{ remove: t.mediaRemove, confirm: t.mediaRemoveConfirm, error: t.postError }} />
+                  : <div className="update-photo"><img src={u.photo_url} alt={textoAlternativo(u.alt, { dia: u.day_number, titulo: journey.title }, t)} /></div>)}
                 {u.video_url && (isOwner
                   ? <OwnerMedia updateId={u.id} url={u.video_url} kind="video" labels={{ remove: t.mediaRemove, confirm: t.mediaRemoveConfirm, error: t.postError }} />
                   : <div className="update-photo"><video src={comCapa(u.video_url)} controls playsInline preload="metadata" /></div>)}
@@ -602,7 +603,7 @@ export default async function JourneyPage({ params, searchParams }) {
                   <EncourageBar updateId={u.id} initialActive={myEncSet.has(u.id)} labelIdle={t.withYouIdle} labelActive={t.withYouActive} supportersLabel={t.supporters} supportersLoading={t.supportersLoading} supportersEmpty={t.supportersEmpty} />
                   <Comments updateId={u.id} labels={{ comment: t.comment, close: t.commentClose, empty: t.commentEmpty, placeholder: t.commentPlaceholder, send: t.commentSend, sending: t.commentSending, unsafe: t.commentUnsafe, pendente: t.commentPendente, error: t.commentError, someone: t.commentSomeone, reply: t.commentReply, more: t.commentMore, less: t.commentLess, replying: t.commentReplying, cancel: t.commentCancel }} />
                   {isOwner
-                    ? <EditUpdate update={{ id: u.id, text: u.text, photo_url: u.photo_url, day: u.day_number }} labels={{ btn: t.euBtn, title: t.euTitle, text: t.euText, photo: t.euPhoto, photoAdd: t.ejCoverAdd, photoChange: t.ejCoverChange, photoRemove: t.ejCoverRemove, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errSave: t.epErrSave, errEmpty: t.euErrEmpty, deletePost: t.euDeletePost, deleteConfirm: t.postDeleteConfirm, cropOriginal: t.cropOriginal, cropSquare: t.cropSquare, cropPortrait: t.cropPortrait, cropLandscape: t.cropLandscape, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropHintOriginal: t.cropHintOriginal, cropZoom: t.cropZoom }} />
+                    ? <EditUpdate update={{ id: u.id, text: u.text, alt: u.alt, photo_url: u.photo_url, day: u.day_number }} labels={{ altLabel: t.altLabel, altPh: t.altPh, altOk: t.altOk, altVazio: t.altVazio, btn: t.euBtn, title: t.euTitle, text: t.euText, photo: t.euPhoto, photoAdd: t.ejCoverAdd, photoChange: t.ejCoverChange, photoRemove: t.ejCoverRemove, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errSave: t.epErrSave, errEmpty: t.euErrEmpty, deletePost: t.euDeletePost, deleteConfirm: t.postDeleteConfirm, cropOriginal: t.cropOriginal, cropSquare: t.cropSquare, cropPortrait: t.cropPortrait, cropLandscape: t.cropLandscape, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropHintOriginal: t.cropHintOriginal, cropZoom: t.cropZoom }} />
                     : (
                       /* Dez posts com quatro controles cada davam quarenta
                          botões numa página de três dias. Ficam visíveis os

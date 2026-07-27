@@ -71,7 +71,7 @@ export async function GET(req) {
   let updates = [];
   if (targetIds.length) {
     let updatesQuery = supabase.from('updates')
-      .select('id, day_number, kind, text, photo_url, video_url, journey_id, created_at, next_step, next_when, closed_by')
+      .select('id, day_number, kind, text, alt, photo_url, video_url, journey_id, created_at, next_step, next_when, closed_by')
       .in('journey_id', targetIds);
 
     if (VALID_KINDS.has(kind)) updatesQuery = updatesQuery.eq('kind', kind);
@@ -117,7 +117,7 @@ export async function GET(req) {
     updates.length ? guard(supabase.from('encouragements').select('update_id, user_id').in('update_id', uids)) : { data: [] },
     journeyIds.length ? guard(supabase.from('journey_stats').select('journey_id, current_day, progress_pct').in('journey_id', journeyIds)) : { data: [] },
     ownerIds.length ? guard(supabase.from('profiles').select('id, mood, mood_at').in('id', ownerIds).not('mood', 'is', null)) : { data: [] },
-    journeyIds.length ? guard(supabase.from('updates').select('id, journey_id, day_number, kind, text, photo_url, video_url, created_at').in('journey_id', journeyIds)) : { data: [] },
+    journeyIds.length ? guard(supabase.from('updates').select('id, journey_id, day_number, kind, text, alt, photo_url, video_url, created_at').in('journey_id', journeyIds)) : { data: [] },
     scope === 'all' ? guard(supabase.from('media').select('*').eq('visibility', 'public').order('created_at', { ascending: false }).limit(60)) : { data: [] },
   ]);
 
@@ -250,7 +250,7 @@ export async function GET(req) {
     const journey = journeyMap[item.journey_id];
     if (!journey) return null;
     const daysArr = (fullDaysByJourney[item.journey_id] || []).slice(-60).map((u) => ({
-      id: u.id, day_number: u.day_number, kind: u.kind, text: u.text, photo_url: u.photo_url, video_url: u.video_url, created_at: u.created_at,
+      id: u.id, day_number: u.day_number, kind: u.kind, text: u.text, alt: u.alt || '', photo_url: u.photo_url, video_url: u.video_url, created_at: u.created_at,
       encouraged: myEncAll.has(u.id), track: trackByUpdate[u.id] || null, comeback: comebackByUpdate[u.id] || null,
       nextStep: u.closed_by ? null : (u.next_step || null), nextWhen: u.next_when || null,
       stepFollowing: meusPassos.has(u.id), closes: passoFechadoPor[u.id] || null,

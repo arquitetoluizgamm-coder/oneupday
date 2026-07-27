@@ -5576,3 +5576,32 @@ h1 { letter-spacing: -0.03em; }
     min-height:0;margin-inline:0;border-radius:var(--r-card,16px);padding:14px 18px;
   }
 }
+
+/* ============================================================
+   PATCH 80 · A DESCRIÇÃO DA FOTO
+
+   Medido no feed no ar: 6 de 6 fotos com alt vazio. Para quem
+   usa leitor de tela, a publicação era "imagem" e nada mais.
+
+   O campo fica VISÍVEL, embaixo da prévia, e não escondido
+   atrás de um botão "acessibilidade". Duas razões: quem publica
+   precisa poder discordar do que a máquina disse sobre a foto
+   dela; e um campo escondido é um campo que ninguém preenche.
+
+   A dica embaixo muda de texto conforme o campo esteja cheio ou
+   vazio — e nunca acusa. Ela explica a consequência ("quem não
+   enxerga só ouve 'imagem'"), que é o que faz alguém escrever.
+   ============================================================ */
+.alt-campo{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.alt-campo label{
+  font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);
+}
+.alt-campo textarea{
+  width:100%;resize:vertical;min-height:52px;
+  font:inherit;font-size:14px;line-height:1.45;color:var(--ink);
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:10px 12px;
+}
+.alt-campo textarea:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+.alt-dica{font-size:12px;line-height:1.4;color:var(--muted)}

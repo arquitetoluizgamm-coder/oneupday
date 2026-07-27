@@ -16,7 +16,7 @@ export default function JourneyDays({ journeyId, labels, editLabels }) {
     try {
       const sb = createClient();
       const { data } = await sb.from('updates')
-        .select('id, day_number, kind, text, photo_url')
+        .select('id, day_number, kind, text, alt, photo_url')
         .eq('journey_id', journeyId)
         .order('day_number', { ascending: false })
         .order('id', { ascending: false });
@@ -58,7 +58,7 @@ export default function JourneyDays({ journeyId, labels, editLabels }) {
               </span>
               {u.photo_url && <span className="jdays-thumb" style={{ backgroundImage: `url(${u.photo_url})` }} />}
               <span className="jdays-text">{clean(u.text) || (u.photo_url ? '📷' : selo(u))}</span>
-              <EditUpdate update={{ id: u.id, text: u.text, photo_url: u.photo_url, day: u.day_number }} labels={editLabels} onChanged={load} />
+              <EditUpdate update={{ id: u.id, text: u.text, alt: u.alt, photo_url: u.photo_url, day: u.day_number }} labels={editLabels} onChanged={load} />
             </div>
           ))}
         </div>

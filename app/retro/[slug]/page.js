@@ -3,6 +3,7 @@ import { createClient } from '../../../lib/supabase/server';
 import { getLocale } from '../../../lib/locale';
 import { getDict, fill } from '../../../lib/i18n';
 import { textoDaPessoa } from '../../../lib/registro';
+import { textoAlternativo } from '../../../lib/alt';
 import AppTop from '../../../components/AppTop';
 import ShareButton from '../../[slug]/ShareButton';
 
@@ -56,8 +57,8 @@ export default async function Retro({ params }) {
 
         {showBN && (
           <section className="before-now">
-            <figure><img src={before.photo_url} alt="" /><figcaption><span>{t.before}</span></figcaption></figure>
-            <figure><img src={now.photo_url} alt="" /><figcaption><span>{t.now}</span></figcaption></figure>
+            <figure><img src={before.photo_url} alt={textoAlternativo(before.alt, { dia: before.day_number, titulo: journey.title }, t)} /><figcaption><span>{t.before}</span></figcaption></figure>
+            <figure><img src={now.photo_url} alt={textoAlternativo(now.alt, { dia: now.day_number, titulo: journey.title }, t)} /><figcaption><span>{t.now}</span></figcaption></figure>
           </section>
         )}
 
