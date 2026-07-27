@@ -22,9 +22,13 @@ export async function generateMetadata() {
     // com o nome da página inicial — e até aqui a página inicial só dizia o
     // nome dentro do <title>, junto com o slogan.
     applicationName: 'One Up Day',
-    // www, porque o apex redireciona para ele. Canônica que redireciona é
-    // canônica que alguns verificadores não seguem.
-    metadataBase: new URL('https://www.oneupday.app'),
+    // O canônico do projeto é o apex, sem www. Ele é o que está no
+    // sitemap, no robots, nos gatilhos do banco, nas imagens de
+    // compartilhamento, nos rodapés — e, o que mais pesa, é o host
+    // do app Android. Mudar isso significaria republicar o pacote e
+    // revalidar o assetlinks. O que precisa mudar é o redirecionamento
+    // da Vercel, que hoje empurra o apex para o www: inverta lá.
+    metadataBase: new URL('https://oneupday.app'),
     alternates: { canonical: '/' },
     manifest: '/site.webmanifest',
     icons: {
@@ -50,7 +54,7 @@ export default function RootLayout({ children }) {
             '@type': 'WebSite',
             name: 'One Up Day',
             alternateName: 'One Up Day',
-            url: 'https://www.oneupday.app',
+            url: 'https://oneupday.app',
           }) }}
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
