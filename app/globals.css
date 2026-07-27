@@ -5480,3 +5480,37 @@ h1 { letter-spacing: -0.03em; }
   position:absolute;width:1px;height:1px;padding:0;margin:-1px;
   overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
 }
+
+/* ============================================================
+   PATCH 77 · A ÁREA DE TOQUE QUE A ESCALA COMIA
+
+   No patch 76 dei ao ícone `min-width:44px;min-height:44px` e
+   dei por conferido LENDO o CSS. Medido no navegador, a caixa
+   real é de 37,4px.
+
+   O motivo: `transform: scale(.85)` está no BOTÃO, e o teste de
+   toque acontece no espaço já transformado. 44 × 0,85 = 37,4.
+   `offsetHeight` responde 44 — o layout diz uma coisa, a mão
+   encontra outra.
+
+   Medido: um toque a 21px do centro ERRA o botão; a 18px acerta.
+   Depois desta correção, 21px acerta em todas as direções.
+
+   A escala desce para o SVG. O botão volta a medir 44 de
+   verdade e o desenho continua do mesmo tamanho na tela — quem
+   encolhe é o traço, não a área.
+
+   O ⋯ não tinha esse problema: ele não tem transform, e o
+   ::after de 44px vale como está (conferido: 21px acerta,
+   23px erra).
+   ============================================================ */
+.update-foot .supporters-icon{transform:none}
+.update-foot .supporters-icon svg{transform:scale(.85)}
+.update-foot .supporters-icon:hover,
+.update-foot .supporters-icon:focus-visible,
+.update-foot .supporters-icon:active,
+.update-foot .supporters-icon[aria-expanded="true"]{transform:none}
+.update-foot .supporters-icon:hover svg,
+.update-foot .supporters-icon:focus-visible svg,
+.update-foot .supporters-icon:active svg,
+.update-foot .supporters-icon[aria-expanded="true"] svg{transform:scale(1)}
