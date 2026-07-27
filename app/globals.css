@@ -4286,3 +4286,84 @@ h1 { letter-spacing: -0.03em; }
   .land-hero .land-identity{ margin-bottom:24px; padding-top:16px; font-size:15.5px }
   .land-top{ padding-top:18px }
 }
+
+/* ============================================================
+   LANDING — cards de ideias cortando texto no celular
+   Duas regras se atropelavam. Em ate 600px, `.land-ideas > div`
+   virava linha (icone AO LADO do texto), desenhado para UMA
+   coluna. Mas `.ideas-4` forcava DUAS colunas ate 640px.
+   Resultado num celular de 390px: coluna de ~180px, menos o
+   icone de 42px e o vao, sobravam ~124px para a frase — que
+   quebrava letra a letra e estourava a altura do card.
+   Agora, com duas colunas, o icone volta para cima do texto.
+   ============================================================ */
+@media(max-width:640px){
+  .land-ideas.ideas-4 > div{
+    display:block;text-align:center;padding:0;
+  }
+  .land-ideas.ideas-4 .idea-ico{margin:0 auto 8px}
+  .land-ideas.ideas-4 b{font-size:15px;margin-bottom:3px}
+  .land-ideas.ideas-4 .idea-l{
+    font-size:12.5px;line-height:1.45;
+    overflow-wrap:break-word;hyphens:none;
+  }
+  .land-ideas.ideas-4{gap:22px 12px}
+}
+
+/* ============================================================
+   LANDING — a seção "O que é" virou peça, não texto colado
+   ============================================================ */
+.land-about{max-width:680px;margin:44px auto 8px;padding:0 20px;text-align:left}
+.about-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:26px 28px 24px;
+  box-shadow:var(--shadow-sm);
+}
+.about-card h2{
+  font-family:var(--display);font-weight:600;
+  font-size:19px;letter-spacing:-.025em;color:var(--ink);
+  margin:0 0 14px;
+}
+/* a primeira frase define o que o produto e': merece corpo maior */
+.about-lead{
+  font-size:18px;line-height:1.45;letter-spacing:-.015em;
+  color:var(--ink);font-weight:600;margin:0 0 10px;
+}
+.about-body{font-size:15px;line-height:1.6;color:#4A4A4A;margin:0 0 14px}
+
+/* os exemplos eram uma lista dentro de um travessao no meio da frase.
+   Como etiqueta, cada um vira uma jornada possivel — e a pessoa se
+   reconhece em uma delas sem precisar ler o paragrafo inteiro. */
+.about-chips{
+  display:flex;flex-wrap:wrap;gap:7px;
+  list-style:none;margin:0 0 16px;padding:0;
+}
+.about-chips li{
+  font-size:13px;font-weight:600;color:var(--sage-deep,#5E6B55);
+  background:var(--sage-soft,#DDE3D6);
+  border-radius:999px;padding:5px 12px;line-height:1.3;
+}
+.about-chips li::marker{content:none}
+
+/* a regra da casa: fio a esquerda, porque e' o que diferencia o produto */
+.about-rule{
+  font-size:14.5px;line-height:1.55;color:var(--ink);
+  border-left:2px solid var(--orange,#C16F54);
+  padding:2px 0 2px 14px;margin:0 0 16px;
+}
+/* privacidade: rodape do card, tom menor, separado por um fio */
+.about-data{
+  font-size:13px;line-height:1.55;color:var(--muted);
+  border-top:1px solid var(--line);padding-top:14px;margin:0;
+}
+
+@media(max-width:640px){
+  .land-about{margin-top:34px;padding:0 16px}
+  .about-card{padding:20px 18px 18px;border-radius:16px}
+  .about-card h2{font-size:17px}
+  .about-lead{font-size:16.5px}
+  .about-body{font-size:14.5px}
+  .about-rule{font-size:14px}
+}

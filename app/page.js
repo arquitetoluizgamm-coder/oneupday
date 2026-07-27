@@ -86,10 +86,24 @@ export default async function Home() {
 
         {/* Exigido pela verificação de marca do Google: a página inicial
             precisa dizer, em texto, o nome do app e para que ele serve. */}
+        {/* Era um parágrafo único de 70 palavras, alinhado à esquerda, entre
+            duas seções desenhadas — lia como texto colado de um documento.
+            As frases são as MESMAS (a verificação de marca do Google lê esta
+            seção); o que mudou é que cada uma virou um elemento com peso
+            próprio, e os exemplos viraram etiquetas. */}
         <section className="land-about">
-          <h2>{t.aboutTitle}</h2>
-          <p>{t.aboutText}</p>
-          <p className="land-about-data">{t.aboutData}</p>
+          <div className="about-card">
+            <h2>{t.aboutTitle}</h2>
+            <p className="about-lead">{t.aboutLead}</p>
+            <p className="about-body">{t.aboutBody}</p>
+
+            <ul className="about-chips">
+              {(t.aboutExamples || []).map((e) => <li key={e}>{e}</li>)}
+            </ul>
+
+            <p className="about-rule">{t.aboutRule}</p>
+            <p className="about-data">{t.aboutData}</p>
+          </div>
         </section>
 
         <section className="land-see">
