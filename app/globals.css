@@ -4577,3 +4577,39 @@ h1 { letter-spacing: -0.03em; }
     stroke-dashoffset:0!important;animation:none!important}
   .oud-anim .oa-word{opacity:1!important;transform:none!important;animation:none!important}
 }
+
+/* ============================================================
+   MOTION — mais devagar, e ajustavel num lugar so
+   A primeira versao estava no limite rapido do que foi
+   combinado (400ms, 90ms de cascata) e a curva `.22,1,.36,1`
+   e' uma desaceleracao forte: comeca muito rapido e freia de
+   supetao. Isso le como pressa, e pressa e' o oposto do que a
+   marca diz.
+   Agora: mais tempo, e uma curva com aceleracao suave nas duas
+   pontas. O movimento parece decidido, nao apressado.
+
+   PARA AJUSTAR: mexa so nos numeros deste bloco.
+   ============================================================ */
+:root{
+  --mo-entrada:560ms;     /* duracao da entrada de cada bloco */
+  --mo-cascata:140ms;     /* intervalo entre um cartao e o proximo */
+  --mo-curva:cubic-bezier(.32,.72,.3,1);
+  --mo-linha:4200ms;      /* a linha inteira: avanca + pausa + continua */
+}
+
+.motion-ready .reveal{
+  transform:translateY(14px);
+  transition:opacity var(--mo-entrada) var(--mo-curva),
+             transform var(--mo-entrada) var(--mo-curva);
+}
+
+.motion-ready .linha-tese.is-visible .lt-barra{
+  animation:teseAvanca var(--mo-linha) cubic-bezier(.4,0,.25,1) forwards;
+}
+
+/* o logo do topo tambem estava rapido: 2s no total, com o pingo
+   entrando em 1,05s. Alongado para ~2,9s, com o mesmo desenho. */
+.land-mark .oud-anim .oa-o  { animation-duration:1.3s; animation-delay:.15s }
+.land-mark .oud-anim .oa-u  { animation-duration:1.2s; animation-delay:.70s }
+.land-mark .oud-anim .oa-dot{ animation-duration:.45s; animation-delay:1.60s }
+.land-mark .oud-anim .oa-d  { animation-duration:1.3s; animation-delay:1.75s }

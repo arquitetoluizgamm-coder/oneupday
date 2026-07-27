@@ -149,7 +149,7 @@ export default async function Home() {
               [t.passo2T, t.passo2D, 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z'],
               [t.passo3T, t.passo3D, 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1 7.8 7.8 7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z'],
               [t.passo4T, t.passo4D, 'M3 12a9 9 0 1 0 3-6.7M3 4v5h5']].map(([tt, dd, path], i) => (
-              <div className="passo reveal" key={tt} data-atraso={i * 90}>
+              <div className="passo reveal" key={tt} data-atraso={i * 140}>
                 <span className="passo-ico">
                   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
                     strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={path} /></svg>
