@@ -5420,12 +5420,6 @@ h1 { letter-spacing: -0.03em; }
 /* entre DIAS: o dobro do respiro */
 .timeline .body{padding-bottom:38px}
 
-/* ---- o rodapé do post, mais quieto ---- */
-/* O ícone de "quem está com você" continua ali, mas para de
-   competir com as duas ações que a pessoa veio fazer. */
-.update-foot .supporters-icon{opacity:.45;transform:scale(.9)}
-.update-foot .supporters-icon:hover{opacity:1}
-
 /* ---- a linha de números, agora secundária ---- */
 .stats-linha{
   margin:10px 4px 22px;color:var(--muted);font-size:13px;text-align:center;
@@ -5450,11 +5444,29 @@ h1 { letter-spacing: -0.03em; }
    A subordinação passa a vir do TAMANHO, que não mexe em
    contraste. A opacidade fica em 80% (3,29:1) e volta a 100%
    no toque, no foco e no teclado. */
-.update-foot .supporters-icon{opacity:.8;transform:scale(.85)}
+/* SEM OPACIDADE. A opacidade era o problema, não o valor.
+ *
+ * Em 0,80 o ícone passava nos três fundos que ele ocupa hoje —
+ * mas com margem de 0,29. Sobre um fundo levemente mais escuro
+ * (#F2DED4, por exemplo) caía para 2,87 e reprovava. Contraste
+ * que depende de qual elemento está por baixo é contraste que
+ * quebra na próxima tela nova, em silêncio.
+ *
+ * Agora a cor é sólida — --muted, 4,81:1 sobre o creme e 5,14:1
+ * sobre branco — e a subordinação vem SÓ do tamanho, que não
+ * interage com fundo nenhum. O ícone continua recuado ao lado de
+ * dois botões rotulados, e passa em qualquer lugar onde caia. */
+.update-foot .supporters-icon{
+  color:var(--muted);opacity:1;transform:scale(.85);
+  /* O botão tem 28px de base — 24 depois da escala. A área de toque
+     sobe para 44 sem mexer no desenho: o `gap` da linha é 14px, e o
+     acréscimo de 8px por lado cabe sem encostar nos vizinhos. */
+  min-width:44px;min-height:44px;
+}
 .update-foot .supporters-icon:hover,
 .update-foot .supporters-icon:focus-visible,
 .update-foot .supporters-icon:active,
-.update-foot .supporters-icon[aria-expanded="true"]{opacity:1;transform:scale(1)}
+.update-foot .supporters-icon[aria-expanded="true"]{color:var(--ink);transform:scale(1)}
 
 /* ---- 3) o dia como título ---- */
 .timeline h2.day{
