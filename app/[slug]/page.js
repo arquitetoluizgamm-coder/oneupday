@@ -22,6 +22,7 @@ import EditUpdate from '../../components/EditUpdate';
 import Comments from '../../components/Comments';
 import { notFound } from 'next/navigation';
 import Track from '../../components/Track';
+import TiraDeDias from '../../components/TiraDeDias';
 
 // O topo agora mostra avatar e sino de quem esta olhando, ou seja a
 // pagina depende da sessao. Ela ja era dinamica de fato (o codigo le
@@ -351,8 +352,26 @@ export default async function JourneyPage({ params, searchParams }) {
       mapa.get(d).itens.push(u);
     }
     // dentro do dia, o mais antigo primeiro: le-se na ordem em que aconteceu
-    porDia.forEach((g) => g.itens.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+  porDia.forEach((g) => g.itens.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
   }
+
+  const recordedDay = porDia.reduce((max, group) => Math.max(max, Number(group.dia) || 0), 0);
+  const hoje = Math.min(Number(journey.total_days) || recordedDay, Math.max(Number(stats.current_day) || 0, recordedDay));
+  const dias = porDia.map((group) => ({
+    n: Number(group.dia),
+    tipo: group.itens.some((item) => item.kind === 'setback') ? 'f' : 'p',
+  }));
+  const stripLabels = locale === 'pt'
+    ? {
+        title: 'Navegação da jornada', day: 'Dia', of: 'de', published: 'Publicado', difficult: 'Dia difícil',
+        missed: 'Não deu', future: 'Ainda não veio', previous: 'Dia anterior', next: 'Próximo dia',
+        hint: 'Arraste para percorrer', release: 'Solte para ficar aqui', keyHint: '← → 1 dia · PageUp / PageDown 7 dias',
+      }
+    : {
+        title: 'Journey navigation', day: 'Day', of: 'of', published: 'Published', difficult: 'Hard day',
+        missed: 'Didn’t happen', future: 'Not yet', previous: 'Previous day', next: 'Next day',
+        hint: 'Drag to move through the journey', release: 'Release to stay here', keyHint: '← → 1 day · PageUp / PageDown 7 days',
+      };
 
   return (
     <>
@@ -412,13 +431,15 @@ export default async function JourneyPage({ params, searchParams }) {
           </section>
         )}
 
+        <TiraDeDias dias={dias} hoje={hoje} total={journey.total_days} labels={stripLabels} />
+
         <section className="timeline">
           {porDia.slice().reverse().map((g, gi, garr) => {
             // o dia herda o tom do registro mais forte: recaida vence, depois vitoria
             const tom = g.itens.some((x) => x.kind === 'setback') ? 'setback'
                       : g.itens.some((x) => x.kind === 'win') ? 'win' : '';
             return (
-            <article key={'d' + g.dia}>
+            <article id={`journey-day-${g.dia}`} key={'d' + g.dia}>
               <div className="rail">
                 <div className={`dot ${tom}`} />
                 {gi < garr.length - 1 && <div className="line" />}

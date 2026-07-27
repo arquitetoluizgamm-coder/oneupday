@@ -72,12 +72,12 @@ export default function TiraDeDias({ dias = [], hoje = 0, total = 0, labels = {}
     return clamp(Math.round(1 + ratio * (totalDays - 1)), 1, maxDay);
   };
 
-  const updatePreview = (day) => {
+  const updatePreview = (day, shouldVibrate = false) => {
     const next = clamp(day, 1, maxDay);
     // O toque marca a MUDANÇA de dia, não o fim do arraste. É o que
     // deixa a pessoa contar os dias sem olhar — e por isso não pode
     // repetir quando o dedo anda dentro da mesma marca.
-    if (next !== previewRef.current && navigator.vibrate) navigator.vibrate(6);
+    if (shouldVibrate && draggingRef.current && next !== previewRef.current && navigator.vibrate) navigator.vibrate(6);
     previewRef.current = next;
     setPreview(next);
   };
@@ -95,12 +95,12 @@ export default function TiraDeDias({ dias = [], hoje = 0, total = 0, labels = {}
     draggingRef.current = true;
     setDragging(true);
     event.currentTarget.setPointerCapture?.(event.pointerId);
-    updatePreview(dayFromPointer(event.clientX));
+    updatePreview(dayFromPointer(event.clientX), false);
   };
 
   const onPointerMove = (event) => {
     if (!draggingRef.current) return;
-    updatePreview(dayFromPointer(event.clientX));
+    updatePreview(dayFromPointer(event.clientX), true);
   };
 
   const onPointerUp = (event) => {
@@ -113,7 +113,6 @@ export default function TiraDeDias({ dias = [], hoje = 0, total = 0, labels = {}
 
   const step = (amount) => {
     const next = clamp((selected || 1) + amount, 1, maxDay);
-    if (next !== selected && navigator.vibrate) navigator.vibrate(6);
     commit(next);
   };
 
