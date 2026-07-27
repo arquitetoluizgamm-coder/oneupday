@@ -446,10 +446,25 @@ export default async function JourneyPage({ params, searchParams }) {
           </section>
         )}
 
-        {/* Piso: abaixo de 5 dias não há o que navegar, e a tira ficava
-            mais alta que a própria linha do tempo. Navegação maior que
-            conteúdo é ruído com cara de recurso. */}
-        {hoje >= 5 && <TiraDeDias dias={dias} hoje={hoje} total={journey.total_days} labels={stripLabels} />}
+        {/* ============================================================
+            O PISO É O TAMANHO DA JORNADA, NÃO O DIA DE HOJE
+
+            Eu tinha escrito `hoje >= 5`, e escondia a tira de todas as
+            jornadas reais — que estão no dia 1 ou 3. O raciocínio era
+            "abaixo de 5 dias não há o que navegar", e ele ignora a
+            segunda função da tira, que é mostrar o CAMINHO À FRENTE.
+
+            No dia 1 de 30, vinte e nove marcas cinzas adiante são
+            exatamente o sinal de que aquilo é uma jornada e não um post
+            avulso. É o momento em que a pessoa mais precisa ver isso —
+            e era justamente quando eu escondia.
+
+            O piso certo pergunta se a JORNADA é longa o bastante para
+            ter forma, não se a pessoa já andou o bastante.
+            ============================================================ */}
+        {Number(journey.total_days) >= 5 && (
+          <TiraDeDias dias={dias} hoje={hoje} total={journey.total_days} labels={stripLabels} />
+        )}
 
         <section className="timeline">
           {porDia.slice().reverse().map((g, gi, garr) => {
