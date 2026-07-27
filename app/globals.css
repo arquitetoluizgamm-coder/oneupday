@@ -4691,3 +4691,93 @@ h1 { letter-spacing: -0.03em; }
   border:1px solid var(--line);border-radius:16px;
   box-shadow:var(--shadow-md);
 }
+
+/* ============================================================
+   JORNADA DE EXEMPLO NA LANDING
+   Mesmo visual da pagina real, desenhado em HTML. O dia da
+   recaida ganha destaque de proposito: e' o argumento da marca,
+   e e' a linha que faz a pessoa reconhecer a propria vida.
+   ============================================================ */
+.jex{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:18px;overflow:hidden;box-shadow:var(--shadow-md);
+  text-align:left;
+}
+.jex-capa{
+  background:linear-gradient(135deg,#3B4A5C,#4A6076 60%,#5B7189);
+  color:#FAF7F2;padding:20px 20px 22px;
+}
+.jex-selo{
+  display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;background:rgba(250,247,242,.16);
+  padding:4px 9px;border-radius:999px;margin-bottom:10px;
+}
+.jex-capa h3{
+  font-family:var(--display);font-weight:600;font-size:21px;
+  letter-spacing:-.03em;line-height:1.15;margin:0 0 7px;color:#FAF7F2;
+}
+.jex-capa p{font-size:13px;line-height:1.5;color:rgba(250,247,242,.78);margin:0}
+
+.jex-autor{display:flex;align-items:center;gap:10px;padding:14px 20px 0}
+.jex-autor img{width:38px;height:38px;border-radius:50%;object-fit:cover;flex:0 0 auto}
+.jex-autor b{display:block;font-size:14px;letter-spacing:-.01em;color:var(--ink)}
+.jex-autor span{display:block;font-size:12px;color:var(--muted)}
+.jex-cat{
+  margin-left:auto;font-size:11px!important;font-weight:700;
+  background:var(--sage-soft,#DDE3D6);color:var(--sage-deep,#5E6B55)!important;
+  padding:4px 10px;border-radius:999px;
+}
+
+.jex-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 20px 0}
+.jex-nums > div{
+  border:1px solid var(--line);border-radius:12px;padding:9px 4px;text-align:center;
+}
+.jex-nums b{display:block;font-family:var(--display);font-weight:600;font-size:18px;color:var(--ink)}
+.jex-nums span{display:block;font-size:10.5px;color:var(--muted);margin-top:1px}
+
+.jex-barra{height:8px;border-radius:999px;background:var(--sand,#EFEAE2);margin:14px 20px 0;overflow:hidden}
+.jex-barra i{display:block;height:100%;width:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--sage,#84917A),var(--orange,#C16F54) 62%,var(--gold,#E8A64C))}
+.jex-barra-leg{display:flex;justify-content:space-between;padding:5px 20px 0;
+  font-size:11.5px;font-weight:700;color:var(--muted)}
+.jex-barra-leg b{color:var(--ink)}
+
+.jex-dias{list-style:none;margin:14px 0 0;padding:0 20px 20px}
+.jex-dias li{position:relative;padding:0 0 15px 20px}
+.jex-dias li:last-child{padding-bottom:0}
+.jex-dias li::before{                        /* a linha do tempo */
+  content:'';position:absolute;left:4.5px;top:12px;bottom:0;width:1px;background:var(--line);
+}
+.jex-dias li:last-child::before{display:none}
+.jex-ponto{
+  position:absolute;left:0;top:5px;width:10px;height:10px;border-radius:50%;
+  background:#CFC8BC;
+}
+.jex-dias li.setback .jex-ponto{background:var(--orange,#C16F54)}
+.jex-dias li.win .jex-ponto{background:var(--gold,#E8A64C)}
+.jex-cab{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.jex-cab b{font-size:12.5px;color:var(--ink);letter-spacing:-.01em}
+.jex-tag{
+  font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  padding:2.5px 7px;border-radius:999px;
+}
+.jex-tag.setback{background:var(--support-soft,#F2DED4);color:var(--terra-deep,#96523C)}
+.jex-tag.win{background:#F5E4C8;color:#8A6420}
+.jex-corpo p{font-size:13px;line-height:1.55;color:#4A4A4A;margin:0}
+.jex-foto{
+  display:block;width:100%;max-width:180px;height:auto;
+  border-radius:12px;margin:0 0 8px;
+}
+
+/* o dia da recaida: o unico com fundo. E' ele que prova a tese. */
+.jex-dias li.setback .jex-corpo{
+  background:#FDF6F2;border:1px solid var(--support-soft,#F2DED4);
+  border-radius:12px;padding:10px 12px;margin-left:-2px;
+}
+
+@media(max-width:640px){
+  .jex-capa h3{font-size:19px}
+  .jex-nums b{font-size:16px}
+  .jex-corpo p{font-size:12.5px}
+  .jex-foto{max-width:150px}
+}

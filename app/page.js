@@ -6,6 +6,8 @@ import ProgressBar from '../components/ProgressBar';
 import Track from '../components/Track';
 import Motion from '../components/Motion';
 import AnimatedLogo from '../components/AnimatedLogo';
+import JornadaExemplo from '../components/JornadaExemplo';
+import { exemploJornada } from '../lib/exemploJornada';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +40,7 @@ export default async function Home() {
   if (user) redirect('/home');
   const t = getDict(getLocale());
   const featured = await loadFeatured();
+  const exemplo = exemploJornada(getLocale());
 
   // Demonstração fixa e controlada — a primeira impressão da marca não
   // depende das fotos dos primeiros usuários.
@@ -102,13 +105,10 @@ export default async function Home() {
           <h2 className="sec-titulo">{t.acaoT}</h2>
 
           <div className="acao-palco">
-            {/* A captura real: a jornada do Diego Prado, 7 de 7, com a
-                recaída do Dia 4 marcada como "ainda conta" e a vitória no
-                Dia 7. É ficção — uma das histórias do app — então não há
-                pessoa real exposta, e ela já vem rotulada como exemplo
-                dentro do próprio produto. */}
+            {/* A jornada desenhada em HTML, não fotografada. Ver o
+                comentário em components/JornadaExemplo.jsx. */}
             <div className="acao-tela">
-              <img src="/tela-jornada.png" alt="Uma jornada de 7 dias concluída, com os capítulos de cada dia" />
+              <JornadaExemplo j={exemplo} t={t} />
             </div>
             <ul className="acao-chamadas">
               <li>{t.acao1}</li>
