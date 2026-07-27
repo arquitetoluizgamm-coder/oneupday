@@ -4261,3 +4261,28 @@ h1 { letter-spacing: -0.03em; }
   .profile-card .pc-info{grid-template-columns:100%;grid-template-areas:'ava' 'meta' 'acoes'}
   .profile-card .pc-acoes{justify-content:flex-end;padding-top:12px;padding-bottom:0}
 }
+
+/* ============================================================
+   LANDING — o herói respira
+   Eram quatro blocos de texto entre o nome e o botão, todos
+   dizendo coisas próximas. Com a linha explicativa fora (foi para
+   a seção "O que é"), sobraram três — e agora eles têm ritmo:
+   o nome pequeno, a frase grande, o complemento, o posicionamento.
+   ============================================================ */
+.land-hero h1.land-brand{ margin-bottom:20px }
+.land-hero .land-headline{ margin-bottom:10px }
+.land-hero .land-sub{ margin-bottom:22px }
+.land-hero .land-identity{
+  margin:0 auto 30px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
+  max-width:26rem;
+}
+/* o logo sozinho fica menos apertado contra o topo */
+.land-top{ padding-top:26px; padding-bottom:6px }
+
+@media(max-width:640px){
+  .land-hero h1.land-brand{ margin-bottom:16px }
+  .land-hero .land-identity{ margin-bottom:24px; padding-top:16px; font-size:15.5px }
+  .land-top{ padding-top:18px }
+}
