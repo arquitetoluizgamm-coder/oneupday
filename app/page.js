@@ -4,6 +4,7 @@ import { createClient } from '../lib/supabase/server';
 import { redirect } from 'next/navigation';
 import ProgressBar from '../components/ProgressBar';
 import Track from '../components/Track';
+import Origem from '../components/Origem';
 import Motion from '../components/Motion';
 import AnimatedLogo from '../components/AnimatedLogo';
 import JornadaExemplo from '../components/JornadaExemplo';
@@ -80,6 +81,7 @@ export default async function Home() {
       </header>
 
       <Track type="landing_view" />
+      <Origem />
       <Motion />
       <main className="landing">
 

@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
 import { createClient } from '../../../lib/supabase/server';
 import { clienteServico, ehDono } from '../../../lib/dono';
 import FilaClient from './FilaClient';
@@ -43,9 +42,8 @@ export default async function FilaComentarios() {
   }
 
   return (
-    <main className="wrap admin-fila">
-      <Link href="/home" className="admin-voltar">← voltar</Link>
-      <h1>Comentários esperando revisão</h1>
+    <div className="adm">
+      <h2 className="adm-titulo">Comentários esperando revisão</h2>
       <p className="admin-sub">
         Um comentário só cai aqui quando a moderação por IA <strong>não conseguiu rodar</strong> —
         API fora do ar, lenta ou sem resposta. Não é um comentário suspeito: é um comentário
@@ -68,6 +66,6 @@ export default async function FilaComentarios() {
       {semChave
         ? <p className="fila-vazia">Falta <code>SUPABASE_SERVICE_ROLE_KEY</code> nas variáveis da Vercel.</p>
         : <FilaClient itens={itens} semIA={semIA} />}
-    </main>
+    </div>
   );
 }

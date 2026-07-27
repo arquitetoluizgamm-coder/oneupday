@@ -9,6 +9,7 @@ import Composer from './Composer';
 import NextStep from './NextStep';
 import ProgressBar from '../../components/ProgressBar';
 import Track from '../../components/Track';
+import Origem from '../../components/Origem';
 import ScrollChrome from '../../components/ScrollChrome';
 import DailyMood from '../../components/DailyMood';
 import NextChapter from '../../components/NextChapter';
@@ -125,6 +126,7 @@ export default async function Home() {
         avatarStyle={myMood && MOODS[myMood] ? { boxShadow: moodGlow(MOODS[myMood]) } : undefined} />
 
       <Track type="visit" meta={{ page: "home" }} />
+      <Origem />
       <ScrollChrome />
       <DailyMood userId={user.id} answeredToday={moodToday} labels={{ title: t.dailyMoodTitle, sub: t.dailyMoodSub, skip: t.dailyMoodSkip, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful } }} />
       <main className="wrap feed-page">

@@ -5137,3 +5137,61 @@ h1 { letter-spacing: -0.03em; }
 .fila-aviso{background:#FFF8ED;border:1px solid #E8D9BE;border-radius:14px;
   padding:14px 16px;margin:0 0 16px;font-size:14px;line-height:1.55;color:var(--ink)}
 .fila-aviso code{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 5px;font-size:13px}
+
+/* ============================================================
+   PATCH 67 · PAINEL /admin
+   Tela interna. Densidade acima de beleza: o objetivo é decidir
+   rápido, não contemplar.
+   ============================================================ */
+.admin-wrap{max-width:900px;margin:0 auto;padding:calc(18px + var(--sa-top,0px)) 18px calc(90px + var(--sa-bottom,0px))}
+.admin-top{display:flex;align-items:baseline;gap:14px;margin-bottom:14px}
+.admin-marca{font-size:15px;letter-spacing:-.01em}
+.admin-abas{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:20px}
+.admin-abas a{padding:9px 14px;font-size:14px;font-weight:600;color:var(--muted);text-decoration:none;
+  border-bottom:2px solid transparent;margin-bottom:-1px}
+.admin-abas a.on{color:var(--ink);border-bottom-color:var(--orange,#C16F54)}
+
+.adm{display:block}
+.adm-titulo{font-size:18px;margin:0 0 12px}
+.adm-nota{color:var(--muted);font-size:13.5px;line-height:1.6;margin:14px 0}
+.adm-nota code{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 5px}
+.adm-recado{color:var(--orange,#C16F54);font-size:13.5px;font-weight:600;margin:10px 0}
+
+.adm-cartoes{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.adm-cartao{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;
+  display:flex;flex-direction:column;gap:3px}
+.adm-rot{font-size:12.5px;color:var(--muted);font-weight:600}
+.adm-num{font-size:28px;line-height:1.1;letter-spacing:-.02em}
+.adm-cartao small{font-size:12px;color:var(--muted)}
+
+.adm-barra{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.adm-busca{flex:1;min-width:200px;border:1px solid var(--line);border-radius:12px;padding:10px 13px;font:inherit;font-size:14px;background:#fff}
+.adm-sel{border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:14px;background:#fff}
+
+.adm-pessoa{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:10px}
+.adm-pessoa.susp{background:#FBF6F4;border-color:#E8D2C9}
+.adm-linha{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.adm-quem{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0}
+.adm-quem strong{font-size:15px}
+.adm-arroba{font-size:13px;color:var(--muted)}
+.adm-selo{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#F0E2DC;color:#8A4B36}
+.adm-selo.den{background:#FBE9E9;color:#9B3B3B}
+.adm-mais{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+
+.adm-dados{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.adm-dados a{color:var(--orange,#C16F54);font-weight:600;text-decoration:none}
+.adm-origem{font-weight:700;color:var(--ink)}
+.adm-motivo{margin:8px 0 0;font-size:13px;color:#8A4B36}
+
+.adm-acoes{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.adm-campo{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--muted)}
+.adm-campo input{border:1px solid var(--line);border-radius:11px;padding:9px 12px;font:inherit;font-size:14px;background:#fff;color:var(--ink)}
+.adm-perigo{border:1px solid #E8CFCB;background:#FDF7F6;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:11px}
+.adm-perigo p{margin:0;font-size:13px;line-height:1.55;color:#7A4438}
+.adm-excluir{background:#9B3B3B!important;color:#fff!important;border-color:#9B3B3B!important}
+.adm-excluir:disabled{background:#E3D3D0!important;border-color:#E3D3D0!important;color:#fff!important}
+
+.adm-tab{width:100%;border-collapse:collapse;font-size:14px}
+.adm-tab th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line)}
+.adm-tab td{padding:11px 10px;border-bottom:1px solid var(--line)}
+.adm-taxa{font-weight:700;color:var(--orange,#C16F54);text-align:right}
