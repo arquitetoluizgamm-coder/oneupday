@@ -1,9 +1,15 @@
+import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { createClient as createAdmin } from '@supabase/supabase-js';
 import { sendPush, pushReady } from '../../../../lib/push';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+// Impressão digital: 12 caracteres de md5. Serve para comparar dois
+// valores sem mostrar nenhum dos dois. md5 porque do lado do Postgres
+// md5() é nativa e o sha256 precisaria do pgcrypto.
+const marca = (v) => (v ? crypto.createHash('md5').update(v).digest('hex').slice(0, 12) : '(vazio)');
 
 // Despachante: roda no cron da Vercel.
 // 1) manda push das notificações novas (curtida, comentário, seguir, abraço, desafio)
@@ -19,10 +25,32 @@ async function handler(req) {
     if (req.method === 'POST') {
       try { bodyKey = (await req.json().catch(() => ({})))?.key || ''; } catch {}
     }
+    const recebida = bodyKey || url.searchParams.get('key') || auth.replace(/^Bearer /, '');
     const ok = auth === `Bearer ${secret}`
       || url.searchParams.get('key') === secret
       || bodyKey === secret;
-    if (!ok) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+
+    // O 403 agora se explica. Antes dizia só "forbidden", e descobrir
+    // qual dos dois lados estava desatualizado exigia comparar valores
+    // à mão em dois painéis diferentes. Estas marcas são hashes curtos:
+    // não revelam chave nenhuma, e a resposta fica gravada em
+    // net._http_response — dá para ler direto do banco.
+    if (!ok) {
+      return NextResponse.json({
+        error: 'forbidden',
+        motivo: !recebida
+          ? 'nenhuma chave chegou na requisicao'
+          : 'a chave recebida nao bate com a CRON_SECRET deste deploy',
+        marca_esperada_pelo_servidor: marca(secret),
+        marca_recebida: marca(recebida),
+        tamanho_esperado: secret.length,
+        tamanho_recebido: recebida ? recebida.length : 0,
+        deploy: process.env.VERCEL_GIT_COMMIT_SHA
+          ? process.env.VERCEL_GIT_COMMIT_SHA.slice(0, 7)
+          : 'desconhecido',
+        dica: 'Compare marca_esperada com: select left(md5((select decrypted_secret from vault.decrypted_secrets where name=\'cron_secret\')),12); Se forem iguais e ainda der 403, o deploy da Vercel e antigo — refaca o Redeploy.',
+      }, { status: 403 });
+    }
   }
   if (!pushReady()) return NextResponse.json({ error: 'no-vapid' }, { status: 500 });
 
@@ -86,18 +114,44 @@ async function handler(req) {
       const nameBy = {}; (actorProfiles || []).forEach((p) => { nameBy[p.id] = (p.name || '').split(' ')[0]; });
       await loadSubs(recipients);
 
-      // uma notificação por pessoa por rodada: nunca metralhar
+      // Uma notificação por pessoa por rodada: nunca metralhar.
+      //
+      // O que mudou aqui: antes, TODAS as notificações da lista eram
+      // marcadas como enviadas — inclusive as que esta rodada pulou por
+      // causa do limite de uma por pessoa. Elas nunca mais eram tentadas.
+      // Na prática: três pessoas apoiam ao mesmo tempo, chega uma, as
+      // outras duas somem para sempre.
+      //
+      // Agora só é marcada a que realmente saiu. As puladas ficam para a
+      // rodada seguinte — e o gatilho do banco dispara a cada notificação
+      // nova, então a próxima rodada vem em segundos.
+      //
+      // As bloqueadas por preferência (push desligado, notificações em
+      // pausa) são marcadas sim: para essas não há próxima tentativa,
+      // e deixá-las pendentes encheria a fila para sempre.
       const seen = new Set();
       for (const n of list) {
         const pref = prefBy[n.recipient_id] || {};
         const allowed = pref.push_on !== false && !pref.notif_paused;
-        if (allowed && !seen.has(n.recipient_id)) {
-          const make = TXT[n.type] || TXT.encourage;
-          const t = make(nameBy[n.actor_id] || 'Alguém');
-          const n2 = await deliver(n.recipient_id, { ...t, url: '/notifications', tag: 'oud-' + n.type });
-          if (n2) { sentNotif++; seen.add(n.recipient_id); }
+
+        if (!allowed) {
+          await sb.from('notifications').update({ pushed: true }).eq('id', n.id);
+          continue;
         }
-        await sb.from('notifications').update({ pushed: true }).eq('id', n.id);
+        if (seen.has(n.recipient_id)) continue;   // fica para a próxima rodada
+
+        const make = TXT[n.type] || TXT.encourage;
+        const t = make(nameBy[n.actor_id] || 'Alguém');
+        const entregues = await deliver(n.recipient_id, { ...t, url: '/notifications', tag: 'oud-' + n.type });
+
+        if (entregues) {
+          sentNotif++;
+          seen.add(n.recipient_id);
+          await sb.from('notifications').update({ pushed: true }).eq('id', n.id);
+        } else {
+          // sem aparelho inscrito: não há o que tentar de novo
+          await sb.from('notifications').update({ pushed: true }).eq('id', n.id);
+        }
       }
     }
   } catch (e) {}

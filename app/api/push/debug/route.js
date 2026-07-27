@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { createClient } from '../../../../lib/supabase/server';
 import { sendPush, pushReady } from '../../../../lib/push';
@@ -5,9 +6,26 @@ import { sendPush, pushReady } from '../../../../lib/push';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Diagnóstico do push. Abra logado: https://oneupday.app/api/push/debug
+// ============================================================
+// DIAGNÓSTICO DO PUSH — só o dono abre.
+//
+// Antes bastava estar logado, e a resposta trazia pedaços do
+// CRON_SECRET (primeiros e últimos caracteres) mais uma dica com
+// o começo e o fim do valor escrito à mão no código. Qualquer
+// testador com conta conseguia ler. Agora: mesma proteção por
+// e-mail que a /metricas, e nenhum pedaço de chave na resposta.
+// ============================================================
+const DONO = 'arquitetoluizgamm@gmail.com';
+
 export async function GET() {
   const out = { passos: {} };
+
+  const supabaseGuard = createClient();
+  const { data: { user: dono } } = await supabaseGuard.auth.getUser();
+  if (!dono) return NextResponse.json({ error: 'nao-logado' }, { status: 401 });
+  if ((dono.email || '').toLowerCase() !== DONO) {
+    return NextResponse.json({ error: 'nao-encontrado' }, { status: 404 });
+  }
 
   // 1. variáveis de ambiente
   const pub = process.env.VAPID_PUBLIC_KEY || '';
@@ -16,13 +34,19 @@ export async function GET() {
   const subj = process.env.VAPID_SUBJECT || '';
   const svc = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
   const cron = process.env.CRON_SECRET || '';
+  // impressão digital: confere se bate com o banco sem revelar o valor
+  // md5 porque do lado do banco md5() é nativa — o sha256 exigiria o
+  // pgcrypto, que não está no caminho de busca do editor do Supabase.
+  // Aqui serve só para comparar dois valores, não para proteger nada.
+  const digital = cron
+    ? crypto.createHash('md5').update(cron).digest('hex').slice(0, 12)
+    : '-';
   out.passos['0_cron_secret'] = {
     CRON_SECRET: cron ? `ok (${cron.length} caracteres)` : 'FALTANDO',
     tamanho_esperado: '32 caracteres',
     tem_espaco_ou_quebra_de_linha: cron !== cron.trim() ? 'SIM — apague os espacos/quebras no comeco ou fim' : 'nao',
-    primeiros_4: cron ? cron.slice(0, 4) : '-',
-    ultimos_4: cron ? cron.slice(-4) : '-',
-    dica: 'Compare com o valor do SQL: deve comecar com JVno e terminar com vRZX',
+    impressao_digital: digital,
+    como_comparar: 'Rode no Supabase: select left(md5(SEU_VALOR),12); os dois tem que dar igual.',
   };
   out.passos['1_variaveis'] = {
     VAPID_PUBLIC_KEY: pub ? `ok (${pub.length} caracteres)` : 'FALTANDO',
@@ -35,13 +59,9 @@ export async function GET() {
     tamanho_esperado_privada: '42 ou 43 caracteres',
   };
 
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    out.passos['2_login'] = 'NAO LOGADO — abra esta pagina logado no app';
-    return NextResponse.json(out);
-  }
-  out.passos['2_login'] = 'ok';
+  const supabase = supabaseGuard;
+  const user = dono;
+  out.passos['2_login'] = 'ok (dono)';
 
   // 3. tabela push_subs existe? tem inscricao deste usuario?
   const r = await supabase.from('push_subs').select('id, endpoint, created_at').eq('user_id', user.id);
