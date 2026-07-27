@@ -332,6 +332,27 @@ export default async function JourneyPage({ params, searchParams }) {
   const momentLabel = momentLabels[journey.moment];
   const tagFor = k => k === 'setback' ? t.tagSetback : k === 'win' ? t.tagWin : null;
 
+  // ---- Agrupar por dia ----
+  // O numero do dia vem da data de inicio da jornada, entao TODA
+  // publicacao feita no mesmo dia recebe o mesmo numero — o que esta
+  // certo. O que estava errado era listar cada registro como um bloco
+  // proprio: tres posts no dia 18 viravam tres blocos "Dia 18", um
+  // embaixo do outro. Quem chega de fora le isso como duplicata.
+  //
+  // Agora e' um bloco por dia, com os registros dentro. Nenhum dado
+  // muda; muda so o desenho.
+  const porDia = [];
+  {
+    const mapa = new Map();
+    for (const u of updates) {
+      const d = u.day_number;
+      if (!mapa.has(d)) { mapa.set(d, { dia: d, itens: [] }); porDia.push(mapa.get(d)); }
+      mapa.get(d).itens.push(u);
+    }
+    // dentro do dia, o mais antigo primeiro: le-se na ordem em que aconteceu
+    porDia.forEach((g) => g.itens.sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+  }
+
   return (
     <>
       <AppTop />
@@ -391,14 +412,22 @@ export default async function JourneyPage({ params, searchParams }) {
         )}
 
         <section className="timeline">
-          {updates.slice().reverse().map((u, i, arr) => (
-            <article key={u.id}>
+          {porDia.slice().reverse().map((g, gi, garr) => {
+            // o dia herda o tom do registro mais forte: recaida vence, depois vitoria
+            const tom = g.itens.some((x) => x.kind === 'setback') ? 'setback'
+                      : g.itens.some((x) => x.kind === 'win') ? 'win' : '';
+            return (
+            <article key={'d' + g.dia}>
               <div className="rail">
-                <div className={`dot ${u.kind === 'setback' ? 'setback' : u.kind === 'win' ? 'win' : ''}`} />
-                {i < arr.length - 1 && <div className="line" />}
+                <div className={`dot ${tom}`} />
+                {gi < garr.length - 1 && <div className="line" />}
               </div>
               <div className="body">
-                <span className="day">{fill(t.dayShort, { d: u.day_number })}</span>
+                <span className="day">{fill(t.dayShort, { d: g.dia })}</span>
+                {g.itens.length > 1 && <span className="day-n">{g.itens.length}</span>}
+
+                {g.itens.map((u, ii) => (
+                <div className={`dia-item${ii > 0 ? ' extra' : ''}`} key={u.id}>
                 {tagFor(u.kind) && <span className={`tag ${u.kind}`}>{tagFor(u.kind)}</span>}
                 {u.photo_url && (isOwner
                   ? <OwnerMedia updateId={u.id} url={u.photo_url} kind="photo" labels={{ remove: t.mediaRemove, confirm: t.mediaRemoveConfirm, error: t.postError }} />
@@ -423,9 +452,12 @@ export default async function JourneyPage({ params, searchParams }) {
                     ? <EditUpdate update={{ id: u.id, text: u.text, photo_url: u.photo_url, day: u.day_number }} labels={{ btn: t.euBtn, title: t.euTitle, text: t.euText, photo: t.euPhoto, photoAdd: t.ejCoverAdd, photoChange: t.ejCoverChange, photoRemove: t.ejCoverRemove, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errSave: t.epErrSave, errEmpty: t.euErrEmpty, deletePost: t.euDeletePost, deleteConfirm: t.postDeleteConfirm, cropOriginal: t.cropOriginal, cropSquare: t.cropSquare, cropPortrait: t.cropPortrait, cropLandscape: t.cropLandscape, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropHintOriginal: t.cropHintOriginal, cropZoom: t.cropZoom }} />
                     : <ReportButton updateId={u.id} label={t.report} doneLabel={t.reported} />}
                 </div>
+                </div>
+                ))}
               </div>
             </article>
-          ))}
+            );
+          })}
         </section>
 
         <section className="share-card-section">

@@ -42,9 +42,17 @@ export default function JourneyDays({ journeyId, labels, editLabels }) {
         <div className="jdays-list">
           {loading && <p className="jdays-note">{L.loading}</p>}
           {!loading && days && days.length === 0 && <p className="jdays-note">{L.empty}</p>}
-          {!loading && days && days.map((u) => (
-            <div className="jdays-row" key={u.id}>
-              <span className="jdays-day">{(L.dayFmt || 'Dia {d}').replace('{d}', u.day_number)}</span>
+          {/* Aqui a lista continua com uma linha por registro — e' onde se
+              edita, e cada registro precisa do proprio botao. O que muda e'
+              que o rotulo do dia so aparece na PRIMEIRA linha daquele dia:
+              tres posts no dia 18 nao viram tres "Dia 18" empilhados. */}
+          {!loading && days && days.map((u, i) => (
+            <div className={`jdays-row${i > 0 && days[i - 1].day_number === u.day_number ? ' mesmo-dia' : ''}`} key={u.id}>
+              <span className="jdays-day">
+                {i > 0 && days[i - 1].day_number === u.day_number
+                  ? ''
+                  : (L.dayFmt || 'Dia {d}').replace('{d}', u.day_number)}
+              </span>
               {u.photo_url && <span className="jdays-thumb" style={{ backgroundImage: `url(${u.photo_url})` }} />}
               <span className="jdays-text">{clean(u.text) || (u.photo_url ? '📷' : '—')}</span>
               <EditUpdate update={{ id: u.id, text: u.text, photo_url: u.photo_url, day: u.day_number }} labels={editLabels} onChanged={load} />

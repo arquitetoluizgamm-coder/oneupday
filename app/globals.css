@@ -4656,3 +4656,31 @@ h1 { letter-spacing: -0.03em; }
 
 /* links de texto herdavam o magenta */
 .link-btn{color:var(--orange,#C16F54)!important}
+
+/* ============================================================
+   JORNADA — um bloco por dia, nao um bloco por registro
+   O numero do dia vem da data de inicio, entao duas publicacoes
+   no mesmo dia recebem o mesmo numero (correto). O erro era
+   desenhar cada uma como um bloco proprio: tres posts no dia 18
+   viravam tres cabecalhos "Dia 18" empilhados, e quem chega de
+   fora le isso como o app duplicando a publicacao.
+   ============================================================ */
+.dia-item + .dia-item{
+  margin-top:14px;padding-top:14px;
+  border-top:1px dashed var(--line);
+}
+/* o segundo registro do dia entra recuado: e' continuacao, nao novidade */
+.dia-item.extra{padding-left:12px;border-left:2px solid var(--sand,#EFEAE2)}
+.dia-item.extra .update-photo{border-radius:12px}
+
+/* quantos registros teve aquele dia — so aparece quando ha mais de um */
+.day-n{
+  display:inline-grid;place-items:center;min-width:19px;height:19px;
+  margin-left:7px;padding:0 5px;border-radius:999px;
+  background:var(--sand,#EFEAE2);color:var(--muted);
+  font-size:11px;font-weight:800;vertical-align:middle;
+}
+
+/* na lista de edicao, a linha seguinte do mesmo dia perde o rotulo */
+.jdays-row.mesmo-dia{border-top:0;padding-top:2px;margin-top:-4px}
+.jdays-row.mesmo-dia .jdays-day{visibility:hidden}
