@@ -7,6 +7,7 @@ import AppTop from '../../components/AppTop';
 import ShareButton from './ShareButton';
 import Dia1Card from './Dia1Card';
 import ChallengeButton from './ChallengeButton';
+import ConviteCard from './ConviteCard';
 import EncourageBar from './EncourageBar';
 import FollowButton from './FollowButton';
 import BlockButton from './BlockButton';
@@ -722,14 +723,15 @@ export default async function JourneyPage({ params, searchParams }) {
             <ShareButton journey={journey} owner={owner} stats={stats} latest={latest}
               label={<><span className="ca-verbo">{t.caVerbo}</span><span className="ca-obj">{t.caJornada}</span></>}
               downloading={t.shareDownloading}
-              card={{ day: t.cardDay, of: t.cardOf, streak: t.cardStreak, setback: t.cardSetback }} />
+              card={{ day: t.cardDay, of: t.cardOf, streak: t.cardStreak, streakOne: t.cardStreakOne, setback: t.cardSetback }} />
             <Dia1Card journey={journey} owner={owner} theme={journey.title}
               label={<><span className="ca-verbo">{t.caVerbo}</span><span className="ca-obj">{t.caDia}</span></>}
               downloading={t.shareDownloading}
               texts={{ eyebrow: t.dia1Eyebrow, big: t.dia1Big, invite: t.dia1Invite, by: t.dia1By }} />
-            <ChallengeButton slug={journey.slug} theme={journey.title}
+            <ConviteCard journey={journey} owner={owner} stats={stats}
               label={<><span className="ca-verbo">{t.caChamarVerbo}</span><span className="ca-obj">{t.caChamarObj}</span></>}
-              copiedLabel={t.linkCopied} message={t.challengeMsg} />
+              downloading={t.shareDownloading} copiedLabel={t.convCopiado}
+              texts={{ eyebrow: t.convEyebrow, linha: t.convLinha, cta: t.convCta, by: t.dia1By, msg: t.challengeMsg }} />
           </div>
         </section>
 
