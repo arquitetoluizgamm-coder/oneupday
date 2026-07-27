@@ -23,6 +23,7 @@ import Comments from '../../components/Comments';
 import { notFound } from 'next/navigation';
 import Track from '../../components/Track';
 import TiraDeDias from '../../components/TiraDeDias';
+import FechaMenus from '../../components/FechaMenus';
 
 // O topo agora mostra avatar e sino de quem esta olhando, ou seja a
 // pagina depende da sessao. Ela ja era dinamica de fato (o codigo le
@@ -398,6 +399,7 @@ export default async function JourneyPage({ params, searchParams }) {
       <AppTop />
 
       <Track type="journey_view" meta={{ slug: journey.slug }} />
+      <FechaMenus />
       {fromShare && <Track type="card_clicked" meta={{ slug: journey.slug }} />}
       <main className="wrap">
         {journey.cover_url ? (
