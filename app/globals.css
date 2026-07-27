@@ -4863,3 +4863,43 @@ h1 { letter-spacing: -0.03em; }
   .passos-grade{gap:18px}
   .passo{min-height:158px}
 }
+
+/* ============================================================
+   LANDING — o cabecalho parou de flutuar
+   O `.top` do app e' fixo, translucido e tem 720px de largura.
+   Dentro do app isso funciona: a coluna de conteudo tem a mesma
+   largura, entao a barra cobre exatamente o que passa por baixo.
+   Na landing, que e' larga, o resultado era um retangulo borrado
+   de 720px pairando no meio da tela, com bordas visiveis — e o
+   texto do heroi passando por baixo, meio aparecendo.
+
+   Na landing ele nao precisa acompanhar a rolagem: e' uma pagina
+   curta, e o botao principal aparece duas vezes. Entao: estatico,
+   largura inteira, fundo solido, sem desfoque.
+   ============================================================ */
+.land-top{
+  position:static;max-width:none;width:100%;
+  background:var(--bg,#FAF7F2)!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  border-bottom:0;
+}
+
+/* ============================================================
+   LANDING — a secao do produto estava desequilibrada
+   A coluna da direita tinha ~536px para tres linhas curtas, e
+   sobravam quase 300px de vazio depois delas. As duas colunas
+   agora tem a largura do que carregam, e o conjunto e' centrado.
+   ============================================================ */
+@media(min-width:861px){
+  .acao-palco{
+    grid-template-columns:420px minmax(220px,300px);
+    justify-content:center;
+    gap:52px;
+  }
+  .acao-tela{justify-content:center}
+}
+
+/* o titulo da secao alinha com o bloco de 772px, nao com os 1000px */
+@media(min-width:861px){
+  .land-acao .sec-titulo{max-width:772px;margin-left:auto;margin-right:auto}
+}
