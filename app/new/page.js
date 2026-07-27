@@ -14,12 +14,15 @@ export default async function NewJourney() {
   if (!user) redirect('/login');
   const locale = getLocale();
   const t = getDict(locale);
+  // A ajuda com o título é opcional: sem chave, o wizard
+  // continua exatamente como era, com o campo livre.
+  const aiOn = !!process.env.OPENAI_API_KEY;
 
   return (
     <>
       <AppTop backLabel={t.back} />
       <main className="wrap wrap-wz">
-        <NewJourneyForm userId={user.id} t={t} />
+        <NewJourneyForm userId={user.id} t={t} aiOn={aiOn} />
       </main>
       <BottomNav active="create" t={t} />
     </>

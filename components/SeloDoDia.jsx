@@ -17,8 +17,8 @@ import { seloDe } from '../lib/registro';
 // marcou mas não contou. Ver isso no próprio perfil é o convite
 // mais natural que existe para voltar e escrever.
 // ============================================================
-export default function SeloDoDia({ kind, labels = {} }) {
-  const chave = seloDe(kind);
+export default function SeloDoDia({ kind, dia, labels = {} }) {
+  const chave = seloDe(kind, dia);
   const rotulo = labels[chave] || '';
   if (!rotulo) return null;
   return (

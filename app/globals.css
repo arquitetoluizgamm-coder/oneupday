@@ -5543,6 +5543,10 @@ h1 { letter-spacing: -0.03em; }
 .selo-dia::before,.selo-dia::after{content:"";height:1px;width:20px;background:var(--line)}
 /* Dia difícil ganha a cor que o app já usa para cuidado, não alarme. */
 .selo-parei{color:var(--terracota-txt)}
+/* COMECEI é o único selo com cor própria além do dia difícil: é o
+   primeiro dia da pessoa no app, e merece não ser cinza. Dourado de
+   texto, 4,59 sobre o creme — o mesmo token já auditado no patch 71. */
+.selo-comecei{color:var(--dourado-txt)}
 
 /* ---- dentro do feed: o cartão encolhe para caber o selo ----
 
@@ -5638,3 +5642,41 @@ h1 { letter-spacing: -0.03em; }
 }
 .perg-outra:hover,.perg-outra:focus-visible{color:var(--ink)}
 @media(max-width:640px){ .perg-texto{font-size:16px} }
+
+/* ============================================================
+   PATCH 81 · AJUDA COM O TÍTULO
+
+   Dois tempos: a IA pergunta, a pessoa responde, o título sai
+   das palavras dela. O desenho tem que deixar claro que isto é
+   OPCIONAL — quem já sabe o que quer escrever ignora e segue.
+
+   Por isso o gatilho é um link discreto embaixo do campo, e não
+   um botão cheio. E a resposta abre num quadro à parte, com
+   "Deixar como está" do mesmo tamanho de "Usar": recusar não
+   pode custar mais que aceitar.
+   ============================================================ */
+.wz-ajuda{
+  align-self:flex-start;background:none;border:0;cursor:pointer;
+  padding:10px 2px;min-height:44px;
+  font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;
+}
+.wz-ajuda:hover,.wz-ajuda:focus-visible{color:var(--ink)}
+.wz-aj{
+  margin-top:4px;padding:14px 16px;border:1px solid var(--line);
+  border-radius:14px;background:var(--surface);
+  display:flex;flex-direction:column;gap:10px;
+}
+.wz-aj-q{
+  margin:0;font-family:var(--serif,var(--display));font-size:16px;line-height:1.35;
+  color:var(--ink);text-wrap:balance;
+}
+.wz-aj-acts{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.wz-aj-skip,.wz-aj-use{
+  border-radius:999px;padding:10px 16px;min-height:44px;font-size:13.5px;
+  font-weight:700;cursor:pointer;
+}
+.wz-aj-skip{background:none;border:0;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.wz-aj-skip:hover,.wz-aj-skip:focus-visible{color:var(--ink)}
+.wz-aj-use{background:var(--ink);border:1px solid var(--ink);color:#fff}
+.wz-aj-use:disabled{opacity:.45;cursor:default}
+.wz-aj-err{margin:6px 0 0;font-size:13px;color:var(--terracota-txt)}

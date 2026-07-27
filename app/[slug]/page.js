@@ -589,7 +589,7 @@ export default async function JourneyPage({ params, searchParams }) {
                 {textoDaPessoa(u.text)
                   ? <p>{textoDaPessoa(u.text)}</p>
                   : (!u.photo_url && !u.video_url &&
-                      <SeloDoDia kind={u.kind} labels={{ fiz: t.seloFiz, tentei: t.seloTentei, parei: t.seloParei }} />)}
+                      <SeloDoDia kind={u.kind} dia={u.day_number} labels={{ fiz: t.seloFiz, tentei: t.seloTentei, parei: t.seloParei, comecei: t.seloComecei }} />)}
                 {isOwner && (meTooByUpdate[u.id] || []).length > 0 && (
                   <div className="metoo-author">
                     <b>{t.meTooAuthor}</b>

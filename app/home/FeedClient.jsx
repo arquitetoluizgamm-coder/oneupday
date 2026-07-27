@@ -266,7 +266,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
             <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}${cleanText ? '' : ' so-selo'}`}>
               {cleanText
                 ? <CardText text={cleanText} labels={labels} />
-                : <SeloDoDia kind={d.kind} labels={labels.selo} />}
+                : <SeloDoDia kind={d.kind} dia={d.day_number} labels={labels.selo} />}
               {trackEl}
             </a>
           )}
@@ -610,7 +610,7 @@ export default function FeedClient({ labels }) {
                     <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText ? '' : ' so-selo'}`}>
                       {cleanText
                         ? <CardText text={cleanText} labels={labels} />
-                        : <SeloDoDia kind={item.kind} labels={labels.selo} />}
+                        : <SeloDoDia kind={item.kind} dia={item.day_number} labels={labels.selo} />}
                       {trackFloat}
                     </a>
                     {progressEl}

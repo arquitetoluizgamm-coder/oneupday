@@ -80,7 +80,7 @@ export default async function Home() {
 
   const feedLabels = {
     dayShort: t.dayShort, tagSetback: t.tagSetback, tagWin: t.tagWin,
-    selo: { fiz: t.seloFiz, tentei: t.seloTentei, parei: t.seloParei },
+    selo: { fiz: t.seloFiz, tentei: t.seloTentei, parei: t.seloParei, comecei: t.seloComecei },
     altReserva: t.altReserva,
     viewPublic: t.viewPublic, muteTopic: t.muteTopic,
     inviteTitle: t.feedInviteTitle, inviteSub: t.feedInviteSub, inviteCta: t.feedInviteCta, loading: '',

@@ -43,12 +43,19 @@ function slugify(title) {
   return `${base}-${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
-export default function NewJourneyForm({ userId, t }) {
+export default function NewJourneyForm({ userId, t, aiOn }) {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [erro, setErro] = useState('');
 
   const [title, setTitle] = useState('');
+  // Ajuda com o título: a IA devolve UMA pergunta, a pessoa responde,
+  // e o título é montado com a resposta dela. Nunca um cardápio de
+  // títulos prontos — cardápio parecido produz feed parecido.
+  const [ajPergunta, setAjPergunta] = useState('');
+  const [ajResposta, setAjResposta] = useState('');
+  const [ajBusy, setAjBusy] = useState('');
+  const [ajErro, setAjErro] = useState('');
   const [dur, setDur] = useState('30');
   const [customDur, setCustomDur] = useState('');
   const [goal, setGoal] = useState('');
@@ -94,6 +101,39 @@ export default function NewJourneyForm({ userId, t }) {
   // O motivo deixa de ser obrigatorio. Quem chega com pressa nao sabe
   // responder "por que isso importa" — e travar aqui perde a pessoa
   // justamente no momento em que ela decidiu comecar.
+  async function pedirPergunta() {
+    if (ajBusy || title.trim().length < 2) return;
+    setAjBusy('pergunta'); setAjErro('');
+    try {
+      const r = await fetch('/api/titulo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rascunho: title.trim() }) });
+      const d = await r.json().catch(() => ({}));
+      if (d.pergunta) setAjPergunta(d.pergunta); else setAjErro(t.ajErro || '');
+    } catch { setAjErro(t.ajErro || ''); }
+    setAjBusy('');
+  }
+
+  async function montarTitulo() {
+    if (ajBusy || !ajResposta.trim()) return;
+    setAjBusy('titulo'); setAjErro('');
+    try {
+      const r = await fetch('/api/titulo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rascunho: title.trim(), resposta: ajResposta.trim() }) });
+      const d = await r.json().catch(() => ({}));
+      if (d.titulo) {
+        setTitle(d.titulo);
+        // Se a resposta dela trouxe um prazo, a duração já vai marcada.
+        // É informação que ela deu — não é o app decidindo por ela.
+        const m = ajResposta.match(/(\d{1,3})\s*(dias?|days?)/i);
+        if (m) {
+          const n = String(parseInt(m[1], 10));
+          setDur(DURS.some(([v]) => v === n) ? n : 'other');
+          if (!DURS.some(([v]) => v === n)) setCustomDur(n);
+        }
+        setAjPergunta(''); setAjResposta('');
+      } else setAjErro(t.ajErro || '');
+    } catch { setAjErro(t.ajErro || ''); }
+    setAjBusy('');
+  }
+
   const podeAvancar =
     (step === 0 && title.trim().length >= 2 && (dur !== 'other' || parseInt(customDur || '0', 10) > 0)) ||
     step === 1 ||
@@ -157,7 +197,13 @@ export default function NewJourneyForm({ userId, t }) {
     if (error || !journey) { setSaving(false); setErro(t.createError); return; }
 
     // O dia 1 nunca pode faltar: sem ele a jornada não aparece no feed.
-    const texto = first.trim() || (photoUrl ? '\u{1F4F7}' : (videoUrl ? '\u{1F3A5}' : (t.firstDayDefault || 'Comecei.')));
+    //
+    // Mas ele não precisa de FRASE para existir. Antes, quem pulava o
+    // primeiro registro tinha "Comecei." publicado em seu nome — e no
+    // feed que eu contei, essa frase aparecia duas vezes, com dois
+    // rostos diferentes. O registro agora nasce vazio e o feed mostra
+    // um selo COMECEI, que é marca e não voz.
+    const texto = first.trim() || (photoUrl ? '\u{1F4F7}' : (videoUrl ? '\u{1F3A5}' : ''));
     let { error: upErr } = await supabase.from('updates').insert({
       journey_id: journey.id, day_number: 1, kind: 'step', text: texto,
       photo_url: photoUrl, video_url: videoUrl,
@@ -243,6 +289,34 @@ export default function NewJourneyForm({ userId, t }) {
               ))}
             </div>
           )}
+
+          {/* AJUDA COM O TÍTULO — dois tempos.
+              A IA pergunta o que falta ser concreto; a pessoa responde; o
+              título sai das palavras dela. Nada disso é obrigatório: quem
+              já sabe o que quer escrever ignora e segue. */}
+          {aiOn && title.trim().length >= 2 && !ajPergunta && (
+            <button type="button" className="wz-ajuda" onClick={pedirPergunta} disabled={!!ajBusy}>
+              {ajBusy === 'pergunta' ? (t.ajPensando || '') : (t.ajBtn || '')}
+            </button>
+          )}
+
+          {ajPergunta && (
+            <div className="wz-aj">
+              <p className="wz-aj-q">{ajPergunta}</p>
+              <input className="wz-input" value={ajResposta} maxLength={200} autoFocus
+                placeholder={t.ajPh || ''} onChange={(e) => setAjResposta(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); montarTitulo(); } }} />
+              <div className="wz-aj-acts">
+                <button type="button" className="wz-aj-skip" onClick={() => { setAjPergunta(''); setAjResposta(''); }}>
+                  {t.ajPular || ''}
+                </button>
+                <button type="button" className="wz-aj-use" onClick={montarTitulo} disabled={!ajResposta.trim() || !!ajBusy}>
+                  {ajBusy === 'titulo' ? (t.ajPensando || '') : (t.ajUsar || '')}
+                </button>
+              </div>
+            </div>
+          )}
+          {ajErro && <p className="wz-aj-err">{ajErro}</p>}
 
           <div className="wz-field">
             <span className="wz-label">{t.fDuration}</span>
