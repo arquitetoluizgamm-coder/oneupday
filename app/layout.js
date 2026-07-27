@@ -35,7 +35,18 @@ export async function generateMetadata() {
       icon: [{ url: '/favicon-32.png', sizes: '32x32' }, { url: '/favicon-16.png', sizes: '16x16' }],
       apple: '/apple-touch-icon.png',
     },
-    openGraph: { title: 'One Up Day', siteName: 'One Up Day', url: '/', description: t.heroSub, type: 'website' },
+    // Sem uma imagem declarada, o Facebook varre a página e escolhe
+    // sozinho — e escolhia `ex-ana.jpg`, o rosto do exemplo, para
+    // representar o app inteiro. Cartão de link é a primeira coisa
+    // que a pessoa vê; não pode ser sorteado.
+    openGraph: {
+      title: 'One Up Day', siteName: 'One Up Day', url: '/',
+      description: t.heroSub, type: 'website', locale: 'pt_BR',
+      images: [{ url: '/og-capa.png', width: 1200, height: 630, alt: 'One Up Day — você não precisa vencer tudo hoje.' }],
+    },
+    // summary_large_image é o cartão grande. Sem isto o WhatsApp e o
+    // X mostram uma miniatura quadrada, e a frase não cabe.
+    twitter: { card: 'summary_large_image', title: 'One Up Day', description: t.heroSub, images: ['/og-capa.png'] },
   };
 }
 
