@@ -23,6 +23,9 @@ export default async function FilaComentarios() {
   const sb = clienteServico();
   let itens = [];
   let semChave = !sb;
+  // Sem OPENAI_API_KEY o reprocessamento automático não libera ninguém,
+  // de propósito. Se a tela não disser isso, a fila parada vira mistério.
+  const semIA = !process.env.OPENAI_API_KEY;
 
   if (sb) {
     const { data: pend } = await sb.from('comments')
@@ -53,9 +56,18 @@ export default async function FilaComentarios() {
         o app aproveita e reprocessa os pendentes mais antigos. O botão abaixo faz isso na hora.
       </p>
 
+      {semIA && !semChave && (
+        <p className="fila-aviso">
+          <strong>A moderação por IA não está configurada.</strong> Falta <code>OPENAI_API_KEY</code>.
+          Comentários novos são publicados direto — mas quem já está nesta fila
+          <strong> não sai daqui sozinho</strong>: ele foi retido justamente porque a IA
+          não conseguiu analisá-lo. Só a sua decisão libera.
+        </p>
+      )}
+
       {semChave
         ? <p className="fila-vazia">Falta <code>SUPABASE_SERVICE_ROLE_KEY</code> nas variáveis da Vercel.</p>
-        : <FilaClient itens={itens} />}
+        : <FilaClient itens={itens} semIA={semIA} />}
     </main>
   );
 }

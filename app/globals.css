@@ -5132,3 +5132,8 @@ h1 { letter-spacing: -0.03em; }
 .fila-btn-ok{background:var(--night);color:#fff;border-color:var(--night)}
 .fila-btn-no{color:var(--muted)}
 .fila-btn-ia{background:transparent;border-style:dashed}
+
+/* patch 64 · aviso de IA não configurada na fila de revisão */
+.fila-aviso{background:#FFF8ED;border:1px solid #E8D9BE;border-radius:14px;
+  padding:14px 16px;margin:0 0 16px;font-size:14px;line-height:1.55;color:var(--ink)}
+.fila-aviso code{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 5px;font-size:13px}

@@ -46,7 +46,6 @@ async function handler(req) {
   );
 
   const auth = req.headers.get('authorization') || '';
-  const url = new URL(req.url);
   let bodyKey = '';
   let bilhete = '';
   if (req.method === 'POST') {
@@ -61,8 +60,10 @@ async function handler(req) {
   let ok = !secret;   // sem senha configurada, a porta 1 não existe
 
   if (secret) {
+    // A porta pela URL (?key=) saiu: segredo em query string vaza para
+    // log de acesso e painel de monitoramento. Ninguém a usava — o cron
+    // da Vercel manda cabeçalho, e o gatilho do banco manda bilhete.
     ok = auth === `Bearer ${secret}`
-      || url.searchParams.get('key') === secret
       || bodyKey === secret;
   }
 
@@ -92,7 +93,10 @@ async function handler(req) {
   }
 
   if (!ok) {
-    const recebida = bodyKey || url.searchParams.get('key') || auth.replace(/^Bearer /, '');
+    // Só a impressão digital sai daqui, nunca o valor. E a URL não
+    // entra mais nem no diagnóstico: se ninguém autentica por ela,
+    // ninguém precisa ecoá-la de volta.
+    const recebida = bodyKey || auth.replace(/^Bearer /, '');
     return NextResponse.json({
       error: 'forbidden',
       bilhete: bilheteInfo,

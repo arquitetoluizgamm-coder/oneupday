@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 
-export default function FilaClient({ itens }) {
+export default function FilaClient({ itens, semIA = false }) {
   const [lista, setLista] = useState(itens || []);
   const [ocupado, setOcupado] = useState('');
   const [recado, setRecado] = useState('');
@@ -26,6 +26,7 @@ export default function FilaClient({ itens }) {
     const d = await r.json().catch(() => ({}));
     setOcupado('');
     if (!r.ok) { setRecado('Não deu certo. Tente de novo.'); return; }
+    if (d.semChave) { setRecado('Sem OPENAI_API_KEY não há o que reprocessar — nada foi liberado.'); return; }
     setRecado(`${d.publicados || 0} publicados · ${d.bloqueados || 0} bloqueados · ${d.pendentes || 0} continuam pendentes.`);
     if ((d.publicados || 0) + (d.bloqueados || 0) > 0) setTimeout(() => window.location.reload(), 900);
   }
@@ -33,7 +34,8 @@ export default function FilaClient({ itens }) {
   return (
     <div className="fila">
       <div className="fila-topo">
-        <button type="button" className="fila-btn fila-btn-ia" onClick={reprocessar} disabled={!!ocupado}>
+        <button type="button" className="fila-btn fila-btn-ia" onClick={reprocessar} disabled={!!ocupado || semIA}
+          title={semIA ? 'Sem OPENAI_API_KEY não há IA para consultar' : undefined}>
           {ocupado === 'tudo' ? 'Reprocessando…' : 'Reprocessar com a IA'}
         </button>
         {recado && <span className="fila-recado">{recado}</span>}

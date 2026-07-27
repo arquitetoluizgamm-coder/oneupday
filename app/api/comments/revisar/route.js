@@ -29,10 +29,12 @@ export async function POST(req) {
   const acao = String(body.acao || 'reprocessar');
 
   // porta 1 — cron
+  // Só pelo cabeçalho. Segredo em query string vaza para log de
+  // acesso, histórico do navegador, Referer e painel de monitoramento
+  // — e nenhum desses lugares foi feito para guardar segredo.
   const secret = process.env.CRON_SECRET;
   const auth = req.headers.get('authorization') || '';
-  const url = new URL(req.url);
-  const viaCron = !!secret && (auth === `Bearer ${secret}` || url.searchParams.get('key') === secret);
+  const viaCron = !!secret && auth === `Bearer ${secret}`;
 
   // porta 2 — dono logado
   let viaDono = false;
@@ -62,8 +64,7 @@ export async function POST(req) {
 export async function GET(req) {
   const secret = process.env.CRON_SECRET;
   const auth = req.headers.get('authorization') || '';
-  const url = new URL(req.url);
-  const viaCron = !!secret && (auth === `Bearer ${secret}` || url.searchParams.get('key') === secret);
+  const viaCron = !!secret && auth === `Bearer ${secret}`;
   if (!viaCron) return NextResponse.json({ error: 'sem permissao' }, { status: 403 });
   const sb = clienteServico();
   if (!sb) return NextResponse.json({ error: 'sem chave de servico' }, { status: 500 });
