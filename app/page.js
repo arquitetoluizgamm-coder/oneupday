@@ -1,6 +1,5 @@
 import { getLocale } from '../lib/locale';
 import { getDict } from '../lib/i18n';
-import Logo from '../components/Logo';
 import { createClient } from '../lib/supabase/server';
 import { redirect } from 'next/navigation';
 import ProgressBar from '../components/ProgressBar';
@@ -58,115 +57,128 @@ export default async function Home() {
 
   return (
     <>
-      {/* Só o símbolo. O `showText` fazia o nome aparecer aqui e de novo no
-          h1 logo abaixo — duas vezes na mesma dobra, com dois pesos
-          diferentes. O h1 continua sendo "One Up Day" por causa da
-          verificação de marca do Google; quem sai é a repetição. */}
-      <header className="top land-top"><Logo href="/" size={44} /></header>
+      {/* A marca completa — O, U, pingo e D.
+          Aqui estava o componente `Logo`, que usa `logo-symbol.png`. Só que
+          esse arquivo NÃO é o símbolo da marca: é apenas o D com o pingo, em
+          terracota, feito para ícone de aplicativo. Ao lado da palavra
+          escrita ele funciona; sozinho no topo da página, lia como um
+          desenho cortado pela metade.
+          O arquivo certo é `logo-name.png`, o mesmo que o topo do app usa. */}
+      <header className="top land-top">
+        <a className="land-mark" href="/" aria-label="One Up Day">
+          <img src="/logo-name.png" alt="" />
+        </a>
+      </header>
 
       <Track type="landing_view" />
       <main className="landing">
+
+        {/* ═══ 1 · HERO ═══════════════════════════════════════════ */}
         <section className="land-hero">
-          {/* O h1 precisa ser o nome do app: a verificacao de marca do Google
-              compara o nome da tela de consentimento com o titulo principal
-              da pagina. A frase de marketing continua logo abaixo, no mesmo
-              tamanho de antes — muda a tag, nao o peso visual. */}
+          {/* O h1 é o nome do app por exigência da verificação de marca do
+              Google: ele compara o nome da tela de consentimento com o
+              título principal da página. Não trocar. */}
           <h1 className="land-brand">One Up Day</h1>
           <p className="land-headline">{t.landHeadline}</p>
           <p className="land-sub">{t.landSub}</p>
-          <p className="land-identity"><span>{t.landIdentity1}</span><b>{t.landIdentity2}</b></p>
+          <p className="land-desc">{t.heroDesc}</p>
+
           <a className="cta grow land-cta" href="/login">{t.landCta}</a>
+          <p className="land-onde">{t.heroOnde}</p>
         </section>
 
-        {/* A linha explicativa que ficava solta DEPOIS do botão saiu daqui.
-            Ela dizia, em 13px e em cinza, quase o mesmo que a seção "O que é
-            o One Up Day" diz logo abaixo com espaço e clareza. Duas
-            explicações seguidas não explicam o dobro — competem. O herói
-            agora termina no botão, que é onde ele deve terminar. */}
+        {/* ═══ 2 · O PRODUTO, IMEDIATAMENTE ════════════════════════
+            Vem antes de qualquer explicação: a pessoa precisa ver como é
+            usar antes de ler por que importa. Tela real, não maquete
+            inventada. */}
+        <section className="land-acao">
+          <h2 className="sec-titulo">{t.acaoT}</h2>
 
-        {/* Exigido pela verificação de marca do Google: a página inicial
-            precisa dizer, em texto, o nome do app e para que ele serve. */}
-        {/* Era um parágrafo único de 70 palavras, alinhado à esquerda, entre
-            duas seções desenhadas — lia como texto colado de um documento.
-            As frases são as MESMAS (a verificação de marca do Google lê esta
-            seção); o que mudou é que cada uma virou um elemento com peso
-            próprio, e os exemplos viraram etiquetas. */}
-        <section className="land-about">
-          <div className="about-card">
-            <h2>{t.aboutTitle}</h2>
-            <p className="about-lead">{t.aboutLead}</p>
-            <p className="about-body">{t.aboutBody}</p>
+          <div className="acao-palco">
+            {/* QUANDO A CAPTURA REAL EXISTIR:
+                troque este bloco inteiro por
+                  <div className="acao-tela"><img src="/tela-jornada.png" alt="" /></div>
+                e apague o `demo` lá em cima.
 
-            <ul className="about-chips">
-              {(t.aboutExamples || []).map((e) => <li key={e}>{e}</li>)}
+                Até lá fica o card de demonstração que já existia. Não é a
+                tela real que a página merece, mas é melhor do que uma caixa
+                vazia dizendo "imagem aqui" — isso, sim, quebraria a página
+                no ar. */}
+            <div className="acao-tela">
+              <a className="demo-card" href="/login">
+                <div className="demo-cover" style={{ backgroundImage: 'linear-gradient(180deg, rgba(9,12,42,.05), rgba(9,12,42,.55)), url(/demo-cover.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                  <span className="demo-day">{t.cardDay} {demo.day}</span>
+                  <span className="demo-example">{t.demoExample}</span>
+                </div>
+                <div className="demo-body">
+                  <div className="demo-who">
+                    <span className="demo-ava" style={{ background: 'var(--orange)' }}>
+                      <img src="/demo-avatar.jpg" alt="" />
+                    </span>
+                    <b>{demo.title}</b>
+                    <span className="demo-flag">{demo.badge}</span>
+                  </div>
+                  <p className="demo-update">{demo.update}</p>
+                  <ProgressBar day={demo.day} total={demo.total} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+                </div>
+              </a>
+            </div>
+            <ul className="acao-chamadas">
+              <li>{t.acao1}</li>
+              <li>{t.acao2}</li>
+              <li>{t.acao3}</li>
             </ul>
-
-            <p className="about-rule">{t.aboutRule}</p>
-            <p className="about-data">{t.aboutData}</p>
           </div>
         </section>
 
-        <section className="land-see">
-          <p className="see-1">{t.landSeeTitle1}</p>
-          <p className="see-2">{t.landSeeTitle2}</p>
-        </section>
-
-        {featured ? (
-          <section className="land-demo">
-            <span className="land-demo-label">{t.demoLabel}</span>
-            <a className="demo-card" href={`/${featured.journey.slug}`}>
-              <div className="demo-cover" style={featured.photo
-                ? { backgroundImage: `linear-gradient(180deg, rgba(9,12,42,.05), rgba(9,12,42,.55)), url(${featured.photo})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-                : { background: `linear-gradient(135deg, var(--night), ${featured.journey.cover_color})` }}>
-                <span className="demo-day">{t.cardDay} {featured.stats.current_day || 0}</span>
-              </div>
-              <div className="demo-body">
-                <div className="demo-who">
-                  <span className="demo-ava" style={{ background: featured.owner.avatar_color || 'var(--orange)' }}>
-                    {featured.owner.avatar_url ? <img src={featured.owner.avatar_url} alt="" /> : (featured.owner.name || '?')[0]}
-                  </span>
-                  <b>{featured.journey.title}</b>
-                </div>
-                <ProgressBar day={featured.stats.current_day || 0} total={featured.journey.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
-              </div>
-            </a>
-          </section>
-        ) : (
-          <section className="land-demo">
-            <span className="land-demo-label">{t.demoLabelDemo}</span>
-            <a className="demo-card" href="/login">
-              <div className="demo-cover" style={{ backgroundImage: 'linear-gradient(180deg, rgba(9,12,42,.05), rgba(9,12,42,.55)), url(/demo-cover.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                <span className="demo-day">{t.cardDay} {demo.day}</span>
-                <span className="demo-example">{t.demoExample}</span>
-              </div>
-              <div className="demo-body">
-                <div className="demo-who">
-                  <span className="demo-ava" style={{ background: 'var(--orange)' }}>
-                    <img src="/demo-avatar.jpg" alt="" />
-                  </span>
-                  <b>{demo.title}</b>
-                  <span className="demo-flag">{demo.badge}</span>
-                </div>
-                <p className="demo-update">{demo.update}</p>
-                <ProgressBar day={demo.day} total={demo.total} dayTpl={t.dayXofY} goalWord={t.goalWord} />
-              </div>
-            </a>
-          </section>
-        )}
-
-        <section className="land-ideas-wrap">
-          <p className="ideas-intro">{t.landDemoCaption}</p>
-          <div className="land-ideas ideas-4">
-            {ideas.map(i => (
-              <div key={i.k}>
-                <span className="idea-ico">
-                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={i.d} /></svg>
+        {/* ═══ 3 · COMO FUNCIONA ══════════════════════════════════
+            Quatro cartões, textos de uma linha. O texto curto não é
+            economia: é o que impede a quebra feia em duas colunas no
+            celular — foi exatamente o que cortou os cards antes. */}
+        <section className="land-passos" id="como">
+          <h2 className="sec-titulo">{t.comoTitle}</h2>
+          <div className="passos-grade">
+            {[[t.passo1T, t.passo1D, 'M12 5v14M5 12h14'],
+              [t.passo2T, t.passo2D, 'M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z'],
+              [t.passo3T, t.passo3D, 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1 7.8 7.8 7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z'],
+              [t.passo4T, t.passo4D, 'M3 12a9 9 0 1 0 3-6.7M3 4v5h5']].map(([tt, dd, path]) => (
+              <div className="passo" key={tt}>
+                <span className="passo-ico">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={path} /></svg>
                 </span>
-                <b>{i.b}</b>
-                <span className="idea-l">{i.l}</span>
+                <b>{tt}</b>
+                <span>{dd}</span>
               </div>
             ))}
           </div>
+        </section>
+
+        {/* ═══ 4 · O DIFERENCIAL ══════════════════════════════════ */}
+        <section className="land-see">
+          <p className="see-1">{t.landSeeTitle1}</p>
+          <p className="see-2">{t.landSeeTitle2}</p>
+          <ul className="dif-lista">
+            {(t.dif || []).map((d) => <li key={d}>{d}</li>)}
+          </ul>
+        </section>
+
+        {/* ═══ 5 · SEGURANÇA E CONFIANÇA ══════════════════════════
+            A pergunta silenciosa de quem vai expor o que está tentando.
+            Cada linha aqui é regra que já está no código. */}
+        <section className="land-seg">
+          <h2 className="sec-titulo">{t.segTitle}</h2>
+          <ul className="seg-lista">
+            {(t.seg || []).map((c) => (
+              <li key={c}>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                  strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+                {c}
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section className="examples land-somewhere">
@@ -179,11 +191,24 @@ export default async function Home() {
           <p className="somewhere-note">{t.landExNote1}<b> {t.landExNote2}</b></p>
         </section>
 
+        {/* ═══ 6 · CTA FINAL ══════════════════════════════════════ */}
         <section className="land-close">
           <p className="close-1">{t.landClose1}</p>
           <p className="close-2">{t.landClose2}</p>
           <a className="cta grow land-cta" href="/login">{t.landCloseCta}</a>
         </section>
+
+        {/* ═══ 7 · DESCRIÇÃO EXIGIDA PELA VERIFICAÇÃO DO GOOGLE ═══
+            NÃO REMOVER e NÃO esconder em acordeão nem carregar por
+            JavaScript: o robô precisa ler isto no HTML, direto.
+            Fica no fim de propósito — cumpre a exigência sem atravessar
+            o caminho de quem está decidindo se cria a conta. */}
+        <section className="land-sobre">
+          <h2>{t.sobreTitle}</h2>
+          <p>{t.sobreTexto}</p>
+          <p className="sobre-dados">{t.aboutData}</p>
+        </section>
+
       </main>
 
       <footer className="foot"><p>One <b>Up</b> Day · {t.tagline} · <a href="/regras" style={{color:"inherit"}}>{t.rulesTitle}</a> · <a href="/privacidade" style={{color:"inherit"}}>{getLocale().startsWith('pt') ? 'Privacidade' : 'Privacy'}</a></p><p className="foot-care">{t.notTherapy}</p></footer>

@@ -4367,3 +4367,147 @@ h1 { letter-spacing: -0.03em; }
   .about-body{font-size:14.5px}
   .about-rule{font-size:14px}
 }
+
+/* ============================================================
+   LANDING — a marca do topo
+   Estava saindo o `logo-symbol.png`, que e' so o D com o pingo
+   (arquivo de icone de aplicativo). Sozinho parecia um desenho
+   cortado. Agora sai o `logo-name.png`, o simbolo inteiro.
+   Altura fixa e largura automatica: a proporcao e' 2,72:1 e
+   forcar largura achataria as letras.
+   ============================================================ */
+.land-mark{display:inline-block;line-height:0}
+.land-mark img{height:44px;width:auto;display:block}
+@media(max-width:640px){ .land-mark img{height:34px} }
+
+/* ============================================================
+   LANDING v2 — largura, ritmo e as secoes novas
+   A pagina inteira era uma coluna estreita pensada para celular.
+   No desktop sobrava metade da tela vazia e o conteudo perdia
+   presenca. Agora: 1100px de moldura, mas TEXTO nunca passa de
+   ~620px — linha longa demais cansa e derruba a leitura.
+   ============================================================ */
+.landing{max-width:1100px;margin:0 auto;padding:0 24px}
+.landing > section{margin:0 auto}
+
+.sec-titulo{
+  font-family:var(--display);font-weight:600;
+  font-size:26px;letter-spacing:-.03em;line-height:1.15;
+  color:var(--ink);margin:0 0 8px;text-align:center;
+}
+.sec-sub{text-align:center;color:var(--muted);font-size:15px;margin:0 0 22px}
+
+/* ---- 1 · hero ---- */
+.land-hero{max-width:720px}
+.land-desc{
+  max-width:34rem;margin:14px auto 26px;
+  font-size:16.5px;line-height:1.6;color:#4A4A4A;
+}
+.land-onde{margin:14px 0 0;font-size:13px;color:var(--muted);font-weight:600}
+
+/* ---- 2 · o produto em acao ---- */
+.land-acao{margin-top:56px!important}
+.acao-palco{
+  display:grid;grid-template-columns:minmax(0,1fr) 260px;
+  gap:34px;align-items:center;margin-top:22px;
+}
+.acao-tela{min-width:0}
+.acao-tela .demo-card{margin:0;width:100%}
+.acao-chamadas{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.acao-chamadas li{
+  position:relative;padding-left:20px;
+  font-size:15px;line-height:1.45;color:var(--ink);font-weight:600;
+}
+.acao-chamadas li::before{
+  content:'';position:absolute;left:0;top:8px;
+  width:8px;height:8px;border-radius:50%;background:var(--orange,#C16F54);
+}
+
+/* ---- 3 · como funciona: quatro cartoes ---- */
+.land-passos{margin-top:60px!important}
+.passos-grade{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px;
+}
+.passo{
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;
+  padding:20px 18px;text-align:center;
+  min-height:168px;                      /* altura igual nos quatro */
+  display:flex;flex-direction:column;align-items:center;
+}
+.passo-ico{
+  display:grid;place-items:center;width:42px;height:42px;border-radius:13px;
+  background:var(--sage-soft,#DDE3D6);color:var(--sage-deep,#5E6B55);
+  margin-bottom:12px;flex:0 0 auto;
+}
+.passo b{
+  display:block;font-family:var(--display);font-weight:600;
+  font-size:16px;letter-spacing:-.02em;color:var(--ink);margin-bottom:5px;
+}
+.passo > span:last-child{font-size:13.5px;line-height:1.45;color:#5C5C5C}
+
+/* ---- 4 · o diferencial ---- */
+.land-see{margin-top:60px!important;max-width:640px}
+.dif-lista{
+  list-style:none;margin:22px 0 0;padding:0;
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+}
+.dif-lista li{
+  font-size:13.5px;font-weight:600;color:var(--ink);
+  background:#FFFDF9;border:1px solid var(--line);
+  border-radius:999px;padding:7px 14px;
+}
+
+/* ---- 5 · seguranca ---- */
+.land-seg{margin-top:58px!important;max-width:620px}
+.seg-lista{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:11px}
+.seg-lista li{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:15px;line-height:1.5;color:var(--ink);
+}
+.seg-lista svg{flex:0 0 auto;margin-top:3px;color:var(--sage,#84917A)}
+
+/* ---- 7 · a descricao exigida pelo Google ---- */
+.land-sobre{
+  max-width:660px;margin:66px auto 0!important;
+  padding:22px 0 0;border-top:1px solid var(--line);
+}
+.land-sobre h2{
+  font-family:var(--display);font-weight:600;font-size:16px;
+  letter-spacing:-.015em;color:var(--muted);margin:0 0 10px;
+}
+.land-sobre p{font-size:14px;line-height:1.65;color:#5C5C5C;margin:0 0 8px}
+.sobre-dados{font-size:12.5px!important;color:var(--muted)!important}
+
+/* ============================================================
+   LANDING v2 — celular
+   ============================================================ */
+@media(max-width:860px){
+  .acao-palco{grid-template-columns:1fr;gap:22px}
+  .acao-chamadas{
+    grid-template-columns:repeat(3,1fr);gap:10px;
+  }
+  .acao-chamadas li{font-size:13px;padding-left:16px}
+  .acao-chamadas li::before{width:6px;height:6px;top:7px}
+  .passos-grade{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:640px){
+  .landing{padding:0 16px}
+  .sec-titulo{font-size:22px}
+  .land-desc{font-size:15.5px;margin-bottom:22px}
+  .land-acao,.land-passos,.land-see,.land-seg{margin-top:44px!important}
+  .passo{min-height:150px;padding:16px 12px}
+  .passo b{font-size:15px}
+  .passo > span:last-child{font-size:12.5px}
+  .land-sobre{margin-top:48px!important}
+}
+/* abaixo de 360px duas colunas nao cabem: uma so, e o cartao vira linha */
+@media(max-width:359px){
+  .passos-grade{grid-template-columns:1fr;gap:10px}
+  .passo{
+    min-height:0;flex-direction:row;align-items:center;
+    text-align:left;gap:12px;padding:12px 14px;
+  }
+  .passo-ico{margin-bottom:0;width:36px;height:36px}
+  .passo b{margin-bottom:1px}
+  .acao-chamadas{grid-template-columns:1fr}
+}
