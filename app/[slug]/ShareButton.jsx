@@ -177,15 +177,44 @@ export default function ShareButton({ journey, owner, stats, latest, label, down
     ctx.fillStyle = grad;
     ctx.beginPath(); ctx.roundRect(MARGEM, BARRA_Y, Math.max(28, barW * pct), 24, 12); ctx.fill();
 
+    // ============================================================
+    // O RODAPÉ TAMBÉM SE MEDE
+    //
+    // A sequência à esquerda e o link à direita eram escritos na MESMA
+    // linha de base, cada um ancorado no seu lado, sem ninguém perguntar
+    // se os dois cabiam. Com um slug longo eles se atropelavam:
+    //
+    //   "1 dia de presença" ... 374px
+    //   o link inteiro ........ 836px
+    //   disponível ............ 900px
+    //
+    // O link encurta para o domínio antes de brigar por espaço: ninguém
+    // digita uma URL de 43 caracteres olhando uma imagem. O endereço
+    // completo vai no texto do compartilhamento, onde é clicável.
+    //
+    // E se nem assim couber, o link desce uma linha em vez de invadir.
+    // ============================================================
+    const n = stats.streak || 0;
     // "1 dias de presença" é o tipo de detalhe que faz o card parecer
     // descuidado justamente na peça que a pessoa vai mostrar aos outros.
-    const n = stats.streak || 0;
     const molde = n === 1 ? (card.streakOne || card.streak) : card.streak;
+    const txtSeq = String(molde).replace('{n}', n);
+
+    ctx.font = '700 40px Inter, sans-serif';
+    const wSeq = ctx.measureText(txtSeq).width;
+
+    ctx.font = '600 38px Inter, sans-serif';
+    let link = `oneupday.app/${journey.slug}`;
+    const RESPIRO = 40;
+    if (wSeq + RESPIRO + ctx.measureText(link).width > maxW) link = 'oneupday.app';
+    const wLink = ctx.measureText(link).width;
+    const cabemJuntos = wSeq + RESPIRO + wLink <= maxW;
+
     ctx.font = '700 40px Inter, sans-serif'; ctx.fillStyle = '#fff';
-    ctx.fillText(String(molde).replace('{n}', n), MARGEM, BARRA_Y + 95);
+    ctx.fillText(txtSeq, MARGEM, BARRA_Y + 95);
     ctx.font = '600 38px Inter, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,.6)';
-    const link = `oneupday.app/${journey.slug}`;
-    ctx.fillText(link, W - MARGEM - ctx.measureText(link).width, BARRA_Y + 95);
+    if (cabemJuntos) ctx.fillText(link, W - MARGEM - wLink, BARRA_Y + 95);
+    else ctx.fillText(link, MARGEM, BARRA_Y + 150);
 
     canvas.toBlob(async (blob) => {
       const r = await entregarImagem(blob, `one-up-day-${journey.slug}.png`, journey.title, {

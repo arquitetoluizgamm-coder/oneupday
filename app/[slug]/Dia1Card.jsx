@@ -24,6 +24,7 @@ export default function Dia1Card({ journey, owner, theme, label, downloading, te
     const canvas = document.createElement('canvas');
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
+    const MAXW_LINK = W - 90 * 2;
 
     ctx.fillStyle = '#090c2a'; ctx.fillRect(0, 0, W, H);
     let g = ctx.createRadialGradient(W * .9, H * .08, 0, W * .9, H * .08, 640);
@@ -65,7 +66,12 @@ export default function Dia1Card({ journey, owner, theme, label, downloading, te
     ctx.font = '600 38px Inter, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,.6)';
     if (owner?.name) ctx.fillText(`${texts.by} ${owner.name}`, 90, H - 170);
     ctx.fillStyle = 'rgba(255,255,255,.5)';
-    ctx.fillText(`oneupday.app/${journey.slug}`, 90, H - 110);
+    // O mesmo cuidado do card da jornada: um slug longo faz a URL passar
+    // da margem direita. Se não couber, fica só o domínio — o endereço
+    // completo vai no texto do compartilhamento, onde é clicável.
+    let linkFim = `oneupday.app/${journey.slug}`;
+    if (ctx.measureText(linkFim).width > MAXW_LINK) linkFim = 'oneupday.app';
+    ctx.fillText(linkFim, 90, H - 110);
 
     canvas.toBlob(async (blob) => {
       const r = await entregarImagem(blob, `meu-dia-1-${journey.slug}.png`, journey.title);

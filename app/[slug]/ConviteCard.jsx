@@ -104,7 +104,12 @@ export default function ConviteCard({ journey, owner, stats, label, downloading,
     ctx.font = '600 38px Inter, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,.6)';
     if (owner?.name) ctx.fillText(`${texts.by} ${owner.name}`, MARGEM, H - 170);
     ctx.fillStyle = 'rgba(255,255,255,.5)';
-    ctx.fillText(`oneupday.app/${journey.slug}`, MARGEM, H - 110);
+    // O mesmo cuidado do card da jornada: um slug longo faz a URL passar
+    // da margem direita. Se não couber, fica só o domínio — o endereço
+    // completo vai no texto do compartilhamento, onde é clicável.
+    let linkFim = `oneupday.app/${journey.slug}`;
+    if (ctx.measureText(linkFim).width > maxW) linkFim = 'oneupday.app';
+    ctx.fillText(linkFim, MARGEM, H - 110);
 
     const url = `https://oneupday.app/${journey.slug}?r=s`;
     const texto = `${String(texts.msg).replace('{theme}', journey.title)} ${url}`;
