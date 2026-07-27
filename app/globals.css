@@ -4591,10 +4591,10 @@ h1 { letter-spacing: -0.03em; }
    PARA AJUSTAR: mexa so nos numeros deste bloco.
    ============================================================ */
 :root{
-  --mo-entrada:760ms;     /* duracao da entrada de cada bloco */
-  --mo-cascata:340ms;     /* intervalo entre um cartao e o proximo */
+  --mo-entrada:560ms;     /* duracao da entrada de cada bloco */
+  --mo-cascata:140ms;     /* intervalo entre um cartao e o proximo */
   --mo-curva:cubic-bezier(.32,.72,.3,1);
-  --mo-linha:6200ms;      /* a linha inteira: avanca + pausa + continua */
+  --mo-linha:4200ms;      /* a linha inteira: avanca + pausa + continua */
 }
 
 .motion-ready .reveal{
@@ -4613,3 +4613,46 @@ h1 { letter-spacing: -0.03em; }
 .land-mark .oud-anim .oa-u  { animation-duration:1.2s; animation-delay:.70s }
 .land-mark .oud-anim .oa-dot{ animation-duration:.45s; animation-delay:1.60s }
 .land-mark .oud-anim .oa-d  { animation-duration:1.3s; animation-delay:1.75s }
+
+/* ============================================================
+   REBRAND — a varredura que faltou (etapa 9b)
+   A etapa 9 trocou os TOKENS da marca, mas nao varreu os valores
+   escritos a mao. Resultado: os dois elementos mais visiveis do
+   app — a barra de progresso e a capa de cada jornada —
+   continuaram em magenta, laranja e amarelo.
+   Este bloco vence a cascata e recolore tudo que ficou para tras.
+
+   O gradiente da marca agora e' salvia -> terracota -> dourado:
+   sai do que ja esta estabelecido, passa pela acao, chega no
+   dourado, que e' a cor reservada para o recomeco.
+   ============================================================ */
+:root{
+  --up:linear-gradient(90deg,var(--sage,#84917A),var(--orange,#C16F54) 62%,var(--gold,#E8A64C));
+  --up-gradient:var(--up);
+  --violet:#8A6A9B;
+  --yellow:#E8A64C;      /* o amarelo neon virou o dourado da marca */
+}
+
+/* a barra de progresso: era o gradiente antigo cravado na regra */
+.progress-fill{
+  background:var(--up)!important;
+  box-shadow:0 2px 10px rgba(193,111,84,.28)!important;
+}
+.bar span,.metric-bar span{background:var(--up)!important}
+.bar span{box-shadow:none!important}
+
+/* pontos do wizard, selo do Dia 1, botao do Dia 1 */
+.wiz-dot.on{background:linear-gradient(90deg,var(--sage,#84917A),var(--orange,#C16F54))!important}
+.dia1-badge{background:linear-gradient(90deg,var(--orange,#C16F54),var(--gold,#E8A64C))!important}
+.dia1-card-btn{background:var(--up)!important}
+.first-journey .fj-eyebrow{color:var(--gold,#E8A64C)!important}
+
+/* musica: o roxo neon nao existe na marca */
+.kind.music,
+.feed-track-btn,
+.composer-toolbar .track-picker .kind.music{
+  background:linear-gradient(135deg,var(--sage-deep,#5E6B55),var(--violet,#8A6A9B))!important;
+}
+
+/* links de texto herdavam o magenta */
+.link-btn{color:var(--orange,#C16F54)!important}

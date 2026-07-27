@@ -34,7 +34,7 @@ import PushToggle from '../../components/PushToggle';
 import EcoToggle from '../../components/EcoToggle';
 
 export const dynamic = 'force-dynamic';
-const COLORS = ['#ff7a45', '#6c5ce7', '#2563eb', '#16a34a', '#0ea5e9', '#f02f87'];
+const COLORS = ['#C16F54', '#84917A', '#5B7189', '#96523C', '#B3874A', '#A8637A'];
 
 async function ensureProfile(supabase, user) {
   const meta = user.user_metadata || {};

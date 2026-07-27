@@ -13,9 +13,10 @@ import ImageCropper from './ImageCropper';
 // ============================================================
 
 const COLORS = {
-  art: '#6c5ce7', body: '#0ea5e9', home: '#ff7a45', work: '#111827', life: '#16a34a',
-  study: '#2563eb', health: '#16a34a', mind: '#6c5ce7', money: '#0e9f6e',
-  relationship: '#f02f87', habit: '#ff7a45', creative: '#a855f7', other: '#8a8a8a',
+  art: '#8A6A9B', body: '#5E6B55', health: '#6E8168', mind: '#5B7189',
+  study: '#4A6076', work: '#10132D', money: '#6B7F5E', relationship: '#A8637A',
+  creative: '#96523C', home: '#C16F54', habit: '#B3874A', life: '#84917A',
+  other: '#7A7A72',
 };
 const PADROES = ['7', '30', '60', '100'];
 
