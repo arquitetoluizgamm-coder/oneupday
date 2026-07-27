@@ -101,7 +101,46 @@ export default async function Perfil() {
   const aiConfigured = !!process.env.OPENAI_API_KEY && list.length > 0;
   const aiOn = aiConfigured && !aiPrefOff;
   let myMedia = [];
-  try { const { data: md } = await supabase.from('media').select('id, url, kind, visibility').eq('user_id', user.id).order('created_at', { ascending: false }); myMedia = md || []; } catch {}
+  // ============================================================
+  // LER MÍDIA SEM DEPENDER DE UMA COLUNA
+  //
+  // `caption` não existe em todo banco: o supabase/media.sql a
+  // declara, mas tabelas criadas antes daquela linha não a têm.
+  // E o Supabase não lança exceção — ele devolve { data: null },
+  // que o `|| []` transforma em lista vazia.
+  //
+  // Traduzindo: pedir uma coluna que não existe faz o ÁLBUM
+  // INTEIRO sumir da tela, sem erro nenhum aparecer. Por isso
+  // aqui se tenta com a legenda e, se ela faltar, se lê sem.
+  // Perde-se o texto da citação para o leitor de tela; não se
+  // perde o acervo da pessoa.
+  // ============================================================
+  try {
+    let { data: md, error } = await supabase.from('media')
+      .select('id, url, kind, visibility, caption').eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    if (error && /caption|column/i.test(error.message || '')) {
+      ({ data: md } = await supabase.from('media')
+        .select('id, url, kind, visibility').eq('user_id', user.id)
+        .order('created_at', { ascending: false }));
+    }
+    myMedia = md || [];
+  } catch {}
+  // ============================================================
+  // CITAÇÃO NÃO É FOTO DE ÁLBUM
+  //
+  // As duas moram na mesma tabela `media`, e até aqui a citação
+  // entrava como kind 'photo' — então uma frase desenhada aparecia
+  // no meio das fotos da pessoa, como se fosse mais uma.
+  //
+  // Agora a citação nasce com kind 'quote' e ganha aba própria. As
+  // publicadas ANTES desta mudança continuam no álbum: não dá para
+  // saber quais eram citações sem chutar, e chutar aqui significa
+  // mexer no acervo de alguém. Ver supabase/citacao-aba.sql.
+  // ============================================================
+  const ehCitacao = (m) => m.kind === 'quote';
+  const myQuotes = myMedia.filter(ehCitacao);
+  const myAlbum = myMedia.filter((m) => !ehCitacao(m));
 
   // ---- Próximo Capítulo (casa fixa: sempre disponível aqui) ----
   const primary = list[0] || null;
@@ -282,7 +321,7 @@ export default async function Perfil() {
         {/* as abas existem sempre: sem jornada, a pessoa ainda tem álbum
             e pessoas para explorar — e o vazio precisa de uma saída */}
         <ProfileTabs
-            labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, people: t.profTabPeople }}
+            labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, quotes: t.profTabQuotes, people: t.profTabPeople }}
             journeys={(
               <>
                 {list.length === 0 && (
@@ -313,12 +352,20 @@ export default async function Perfil() {
                 {aiConfigured && <CompanionCard userId={user.id} title={t.companionTitle} btn={t.companionBtn} loading={t.companionLoading} initialOff={aiPrefOff} labels={{ consent: t.aiConsent, off: t.aiOff, offState: t.aiOffState, reactivate: t.aiReactivate, err: t.aiErr, rateErr: t.aiRateErr }} />}
               </>
             )}
-            album={myMedia.length > 0 ? (
-              <MediaGallery items={myMedia} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} own deleteLabel={t.mediaDelete} deleteConfirm={t.mediaDeleteConfirm} />
+            album={myAlbum.length > 0 ? (
+              <MediaGallery items={myAlbum} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} own deleteLabel={t.mediaDelete} deleteConfirm={t.mediaDeleteConfirm} />
             ) : (
               <div className="tab-empty">
                 <p>{t.albumEmpty}</p>
                 <a className="cta" href="/midia">{t.albumEmptyCta}</a>
+              </div>
+            )}
+            quotes={myQuotes.length > 0 ? (
+              <MediaGallery items={myQuotes} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} own deleteLabel={t.mediaDelete} deleteConfirm={t.mediaDeleteConfirm} />
+            ) : (
+              <div className="tab-empty">
+                <p>{t.quotesEmpty}</p>
+                <a className="cta" href="/citacao">{t.quotesEmptyCta}</a>
               </div>
             )}
             people={(

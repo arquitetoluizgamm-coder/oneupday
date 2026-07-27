@@ -12,12 +12,15 @@ import { useState } from 'react';
 // Com um painel só, a barra de abas não aparece: uma aba sozinha
 // não é escolha, é enfeite.
 // ============================================================
-export default function ProfileTabs({ labels, journeys, album, people, actions }) {
+export default function ProfileTabs({ labels, journeys, album, quotes, people, actions }) {
   const L = labels || {};
 
+  // Citações vêm depois do álbum e antes de pessoas: as três primeiras
+  // são o que a pessoa FEZ; a última é quem está em volta.
   const abas = [
     ['journeys', L.journeys, journeys],
     ['album', L.album, album],
+    ['quotes', L.quotes, quotes],
     ['people', L.people, people],
   ].filter(([, , painel]) => painel !== null && painel !== undefined && painel !== false);
 

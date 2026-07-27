@@ -127,7 +127,31 @@ async function loadProfile(handle) {
     (ph || []).forEach(u => { if (!photoBy[u.journey_id]) photoBy[u.journey_id] = u.photo_url; });
   }
   let media = [];
-  try { const { data: md } = await sb.from('media').select('id, url, kind').eq('user_id', profile.id).order('created_at', { ascending: false }).limit(30); media = md || []; } catch {}
+  // ============================================================
+  // LER MÍDIA SEM DEPENDER DE UMA COLUNA
+  //
+  // `caption` não existe em todo banco: o supabase/media.sql a
+  // declara, mas tabelas criadas antes daquela linha não a têm.
+  // E o Supabase não lança exceção — ele devolve { data: null },
+  // que o `|| []` transforma em lista vazia.
+  //
+  // Traduzindo: pedir uma coluna que não existe faz o ÁLBUM
+  // INTEIRO sumir da tela, sem erro nenhum aparecer. Por isso
+  // aqui se tenta com a legenda e, se ela faltar, se lê sem.
+  // Perde-se o texto da citação para o leitor de tela; não se
+  // perde o acervo da pessoa.
+  // ============================================================
+  try {
+    let { data: md, error } = await sb.from('media')
+      .select('id, url, kind, caption').eq('user_id', profile.id)
+      .order('created_at', { ascending: false }).limit(60);
+    if (error && /caption|column/i.test(error.message || '')) {
+      ({ data: md } = await sb.from('media')
+        .select('id, url, kind').eq('user_id', profile.id)
+        .order('created_at', { ascending: false }).limit(60));
+    }
+    media = md || [];
+  } catch {}
   return { profile, journeys: js, statsById, photoBy, media };
   } catch (e) { return null; }
 }
@@ -136,6 +160,9 @@ async function ProfilePage({ handle }) {
   const data = await loadProfile(handle);
   if (!data) notFound();
   const { profile, journeys, statsById, photoBy, media } = data;
+  // Citação tem aba própria: ela é texto desenhado, não foto.
+  const citacoes = media.filter((m) => m.kind === 'quote');
+  const album = media.filter((m) => m.kind !== 'quote');
   const t = getDict(getLocale());
   const initial = (profile.name || '?')[0];
 
@@ -210,7 +237,7 @@ async function ProfilePage({ handle }) {
             de alguem com cinco jornadas rolava a pagina inteira — e quem
             nao sabia que existia album nunca chegava la. */}
         <ProfileTabs
-          labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum }}
+          labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, quotes: t.profTabQuotes }}
           journeys={(
             <>
               {journeys.length === 0 && <div className="empty"><b>{t.noPublicJourneys}</b></div>}
@@ -235,7 +262,8 @@ async function ProfilePage({ handle }) {
             </>
           )}
           /* sem foto nenhuma, a aba nao existe — nao ha nada atras dela */
-          album={media && media.length > 0 ? <MediaGallery items={media} /> : null}
+          album={album.length > 0 ? <MediaGallery items={album} /> : null}
+          quotes={citacoes.length > 0 ? <MediaGallery items={citacoes} /> : null}
           people={null}
         />
       </main>

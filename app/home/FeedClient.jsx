@@ -225,7 +225,7 @@ function MidiaGaleria({ item, labels }) {
     <>
       {item.kind === 'video'
         ? <Media video={item.url} labels={labels} caption={item.caption} onRatio={setProporcao} />
-        : <Media photo={item.url} />}
+        : <Media photo={item.url} alt={item.kind === 'quote' ? (item.caption || '') : ''} />}
       {item.caption && !legendaEmCima && (
         <div className="dp-text under"><EntryText text={item.caption} labels={labels} limit={100} /></div>
       )}

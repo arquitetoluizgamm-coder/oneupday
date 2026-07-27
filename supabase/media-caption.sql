@@ -1,0 +1,23 @@
+-- ============================================================
+-- One Up Day — A legenda da mídia (coluna que faltava)
+-- Rode no Supabase: SQL Editor > New query > Run
+--
+-- OBRIGATÓRIO. Rode este ANTES do citacao-aba.sql.
+--
+-- O supabase/media.sql declara `caption`, mas a tabela em
+-- produção foi criada antes dessa linha existir. Resultado: a
+-- coluna nunca esteve lá.
+--
+-- E isso não deu erro visível por causa de uma "gentileza" no
+-- código: tanto a citação quanto o álbum tinham um catch que,
+-- ao ver "column caption does not exist", regravava a linha SEM
+-- a legenda. A publicação dava certo, e o texto ia embora.
+--
+-- Ou seja: toda citação publicada até hoje teve a frase
+-- descartada. O texto sobreviveu como PIXEL, dentro do PNG —
+-- não como dado. Não há como recuperá-lo por SQL.
+--
+-- Depois de rodar isto, legenda de foto e texto de citação
+-- passam a ser gravados de verdade.
+-- ============================================================
+alter table public.media add column if not exists caption text;

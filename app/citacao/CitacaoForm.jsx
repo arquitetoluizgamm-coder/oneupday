@@ -178,11 +178,17 @@ export default function CitacaoForm({ t, userId, autorPadrao }) {
       if (eUp) throw eUp;
       const url = supabase.storage.from('photos').getPublicUrl(caminho).data.publicUrl;
 
-      const linha = { user_id: userId, url, kind: 'photo', visibility: visibilidade, caption: texto.trim() };
+      // kind 'quote' e não 'photo': é o que separa a citação do álbum.
+      // A coluna não tem CHECK, então o valor entra direto — mas se um
+      // dia tiver, a citação volta a ser foto em vez de não ser nada.
+      const linha = { user_id: userId, url, kind: 'quote', visibility: visibilidade, caption: texto.trim() };
       let { error } = await supabase.from('media').insert(linha);
       if (error && /caption|column/i.test(error.message || '')) {
         const { caption: _c, ...semCap } = linha;
         ({ error } = await supabase.from('media').insert(semCap));
+      }
+      if (error && /kind|check|constraint/i.test(error.message || '')) {
+        ({ error } = await supabase.from('media').insert({ ...linha, kind: 'photo' }));
       }
       if (error) throw error;
 
