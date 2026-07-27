@@ -4591,10 +4591,10 @@ h1 { letter-spacing: -0.03em; }
    PARA AJUSTAR: mexa so nos numeros deste bloco.
    ============================================================ */
 :root{
-  --mo-entrada:560ms;     /* duracao da entrada de cada bloco */
-  --mo-cascata:140ms;     /* intervalo entre um cartao e o proximo */
+  --mo-entrada:760ms;     /* duracao da entrada de cada bloco */
+  --mo-cascata:340ms;     /* intervalo entre um cartao e o proximo */
   --mo-curva:cubic-bezier(.32,.72,.3,1);
-  --mo-linha:4200ms;      /* a linha inteira: avanca + pausa + continua */
+  --mo-linha:6200ms;      /* a linha inteira: avanca + pausa + continua */
 }
 
 .motion-ready .reveal{
