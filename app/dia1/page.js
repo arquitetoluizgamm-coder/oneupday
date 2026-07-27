@@ -2,6 +2,7 @@ import { getSupabase } from '../../lib/supabase';
 import { getLocale } from '../../lib/locale';
 import { getDict } from '../../lib/i18n';
 import { looksRisky } from '../../lib/risky';
+import { textoDaPessoa } from '../../lib/registro';
 import Logo from '../../components/Logo';
 
 export const revalidate = 300;
@@ -36,7 +37,10 @@ async function loadWall() {
       const j = jMap[u.journey_id]; if (!j) return null;
       if (reported.has(u.id)) return null;
       if (looksRisky(u.text)) return null;
-      return { slug: j.slug, title: j.title, cover_color: j.cover_color, photo: u.photo_url, text: u.text, owner: pMap[j.owner_id] || {} };
+      // Cartão de Dia 1 é peça de compartilhamento: sem relato humano
+      // e sem foto não há o que mostrar — sairia um cartão em branco.
+      if (!textoDaPessoa(u.text) && !u.photo_url) return null;
+      return { slug: j.slug, title: j.title, cover_color: j.cover_color, photo: u.photo_url, text: textoDaPessoa(u.text), owner: pMap[j.owner_id] || {} };
     }).filter(Boolean);
     // fotos primeiro
     cards.sort((a, b) => (b.photo ? 1 : 0) - (a.photo ? 1 : 0));

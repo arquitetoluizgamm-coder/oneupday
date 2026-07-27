@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { textoDaPessoa } from '../../../lib/registro';
 import { createClient } from '../../../lib/supabase/server';
 
 export const runtime = 'nodejs';
@@ -118,7 +119,7 @@ export async function GET() {
       retornos.push({
         owner: p, journeySlug: j.slug, journeyTitle: j.title,
         dias, dia: ultimo.day_number || 0,
-        frase: txt && txt !== '📷' && txt !== '🎥' ? txt.slice(0, 120) : '',
+        frase: textoDaPessoa(txt).slice(0, 120),
         quando: ultimo.created_at,
       });
     }

@@ -1,6 +1,7 @@
 'use client';
 import { useState, useCallback } from 'react';
 import { createClient } from '../lib/supabase/client';
+import { textoDaPessoa, seloDe } from '../lib/registro';
 import EditUpdate from './EditUpdate';
 
 // Linha do tempo da jornada, editável direto no perfil.
@@ -30,7 +31,9 @@ export default function JourneyDays({ journeyId, labels, editLabels }) {
     if (next) load();
   }
 
-  const clean = (tx) => (tx === '📷' || tx === '🎥') ? '' : (tx || '');
+  // A regra de "isto foi o app que escreveu" mora em lib/registro.
+  const clean = textoDaPessoa;
+  const selo = (u) => L[seloDe(u.kind)] || '';
 
   return (
     <div className="jdays">
@@ -54,7 +57,7 @@ export default function JourneyDays({ journeyId, labels, editLabels }) {
                   : (L.dayFmt || 'Dia {d}').replace('{d}', u.day_number)}
               </span>
               {u.photo_url && <span className="jdays-thumb" style={{ backgroundImage: `url(${u.photo_url})` }} />}
-              <span className="jdays-text">{clean(u.text) || (u.photo_url ? '📷' : '—')}</span>
+              <span className="jdays-text">{clean(u.text) || (u.photo_url ? '📷' : selo(u))}</span>
               <EditUpdate update={{ id: u.id, text: u.text, photo_url: u.photo_url, day: u.day_number }} labels={editLabels} onChanged={load} />
             </div>
           ))}

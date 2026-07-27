@@ -24,6 +24,8 @@ import { notFound } from 'next/navigation';
 import Track from '../../components/Track';
 import TiraDeDias from '../../components/TiraDeDias';
 import FechaMenus from '../../components/FechaMenus';
+import SeloDoDia from '../../components/SeloDoDia';
+import { textoDaPessoa } from '../../lib/registro';
 
 // O topo agora mostra avatar e sino de quem esta olhando, ou seja a
 // pagina depende da sessao. Ela ja era dinamica de fato (o codigo le
@@ -36,6 +38,11 @@ export const dynamic = 'force-dynamic';
 // descuidado justamente na tela em que a pessoa está mostrando o
 // próprio esforço.
 const plural = (n, um, muitos) => (Number(n) === 1 ? (um || muitos) : muitos);
+
+// Dia marcado pelo botão Fiz/Tentei/Parei, sem foto e sem relato.
+// Nesses o selo já diz o que a etiqueta diria — duas etiquetas
+// para o mesmo fato, uma embaixo da outra, viram ruído.
+const soSelo = (u) => !u.photo_url && !u.video_url && !textoDaPessoa(u.text);
 
 async function loadJourney(slug) {
   try {
@@ -571,14 +578,17 @@ export default async function JourneyPage({ params, searchParams }) {
 
                 {g.itens.map((u, ii) => (
                 <div className={`dia-item${ii > 0 ? ' extra' : ''}`} key={u.id}>
-                {tagFor(u.kind) && <span className={`tag ${u.kind}`}>{tagFor(u.kind)}</span>}
+                {tagFor(u.kind) && !soSelo(u) && <span className={`tag ${u.kind}`}>{tagFor(u.kind)}</span>}
                 {u.photo_url && (isOwner
                   ? <OwnerMedia updateId={u.id} url={u.photo_url} kind="photo" labels={{ remove: t.mediaRemove, confirm: t.mediaRemoveConfirm, error: t.postError }} />
                   : <div className="update-photo"><img src={u.photo_url} alt="" /></div>)}
                 {u.video_url && (isOwner
                   ? <OwnerMedia updateId={u.id} url={u.video_url} kind="video" labels={{ remove: t.mediaRemove, confirm: t.mediaRemoveConfirm, error: t.postError }} />
                   : <div className="update-photo"><video src={comCapa(u.video_url)} controls playsInline preload="metadata" /></div>)}
-                {u.text && u.text !== '📷' && u.text !== '🎥' && <p>{u.text}</p>}
+                {textoDaPessoa(u.text)
+                  ? <p>{textoDaPessoa(u.text)}</p>
+                  : (!u.photo_url && !u.video_url &&
+                      <SeloDoDia kind={u.kind} labels={{ fiz: t.seloFiz, tentei: t.seloTentei, parei: t.seloParei }} />)}
                 {isOwner && (meTooByUpdate[u.id] || []).length > 0 && (
                   <div className="metoo-author">
                     <b>{t.meTooAuthor}</b>

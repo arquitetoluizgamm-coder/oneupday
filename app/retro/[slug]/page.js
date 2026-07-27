@@ -2,6 +2,7 @@ import { redirect, notFound } from 'next/navigation';
 import { createClient } from '../../../lib/supabase/server';
 import { getLocale } from '../../../lib/locale';
 import { getDict, fill } from '../../../lib/i18n';
+import { textoDaPessoa } from '../../../lib/registro';
 import AppTop from '../../../components/AppTop';
 import ShareButton from '../../[slug]/ShareButton';
 
@@ -67,7 +68,7 @@ export default async function Retro({ params }) {
               <article key={u.id} className={`retro-item ${u.kind}`}>
                 <span className="retro-day">{fill(t.dayShort, { d: u.day_number })}</span>
                 {u.kind === 'setback' ? <span className="post-tag setback">{t.tagSetback}</span> : <span className="post-tag win">{t.tagWin}</span>}
-                {u.text && u.text !== '\u{1F4F7}' && u.text !== '\u{1F3A5}' && <p>{u.text}</p>}
+                {textoDaPessoa(u.text) && <p>{textoDaPessoa(u.text)}</p>}
               </article>
             ))}
           </section>

@@ -5514,3 +5514,65 @@ h1 { letter-spacing: -0.03em; }
 .update-foot .supporters-icon:focus-visible svg,
 .update-foot .supporters-icon:active svg,
 .update-foot .supporters-icon[aria-expanded="true"] svg{transform:scale(1)}
+
+/* ============================================================
+   PATCH 78 · O SELO DE UM DIA SEM RELATO
+
+   Os botões Fiz / Tentei / Parei não gravam mais frase pronta.
+   Quando o dia não tem relato nem mídia, entra este selo.
+
+   Duas regras não negociáveis aqui:
+
+   1) NÃO PODE PARECER FRASE. Se parecer, volta a ser o app
+      fingindo ser a pessoa — que é exatamente o que o patch 78
+      existe para desfazer. Por isso: uma palavra, caixa alta,
+      entreletra larga, entre dois fios. Ninguém lê isso como
+      relato.
+
+   2) NÃO PODE OCUPAR ESPAÇO DE POST. O cartão de texto do feed
+      tem 300px de altura (340 no celular) porque ali mora o que
+      alguém escreveu. Um selo com essa altura faria o dia
+      MAIS vazio virar o bloco MAIS alto do feed — o contrário
+      do que se quer. Ele encolhe para a altura do que diz.
+   ============================================================ */
+.selo-dia{
+  margin:0;font-family:var(--display);font-size:12px;font-weight:800;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;gap:10px;
+}
+.selo-dia::before,.selo-dia::after{content:"";height:1px;width:20px;background:var(--line)}
+/* Dia difícil ganha a cor que o app já usa para cuidado, não alarme. */
+.selo-parei{color:var(--terracota-txt)}
+
+/* ---- dentro do feed: o cartão encolhe para caber o selo ----
+
+   O `!important` no aspect-ratio não é preguiça: a linha 3791
+   deste arquivo já declara `.feed-page .entry-textcard{
+   aspect-ratio:4/5!important}`. Sem importante aqui, o cartão
+   de selo continuaria com 695px de altura — medido no navegador,
+   com estilo em linha, que também perdia para aquele important.
+
+   Há precedente na própria folha: `.dp-card:has(.dpc-text.open)`
+   faz exatamente isto quando o texto longo se abre. */
+.entry-textcard.so-selo{
+  aspect-ratio:auto!important;
+  min-height:0;padding:14px 18px;gap:0;
+  background:transparent;border:1px dashed var(--line);
+  color:var(--muted);align-items:center;justify-content:center;
+}
+/* A ASPA TEM QUE SAIR. O `.dp-card.dark::before` desenha um “ de
+   64px atrás do texto — ela existe para emoldurar o que alguém
+   escreveu. Em cima de um selo ela faria a moldura dizer "isto é
+   uma citação da pessoa", que é exatamente a mentira que este
+   patch desfaz. Vista no navegador antes de eu notar. */
+.entry-textcard.so-selo::before{content:none}
+.entry-textcard.so-selo p.selo-dia{
+  font-size:12px;line-height:1;font-weight:800;letter-spacing:.16em;
+  display:flex;-webkit-line-clamp:none;overflow:visible;white-space:normal;
+}
+@media(max-width:640px){
+  .entry-textcard.so-selo{
+    aspect-ratio:auto!important;
+    min-height:0;margin-inline:0;border-radius:var(--r-card,16px);padding:14px 18px;
+  }
+}

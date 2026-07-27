@@ -10,6 +10,8 @@ import ChallengeStrip from '../../components/ChallengeStrip';
 import ChallengeButton from '../../components/ChallengeButton';
 import Transformacao from '../../components/Transformacao';
 import Amanha from '../../components/Amanha';
+import SeloDoDia from '../../components/SeloDoDia';
+import { textoDaPessoa } from '../../lib/registro';
 import Retornos from '../../components/Retornos';
 import { StepOpen, StepResult } from '../../components/StepChapter';
 import Percepcao from '../../components/Percepcao';
@@ -239,7 +241,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
   const total = item.journey.total_days || 0;
   const pct = total ? Math.min(100, Math.max(3, Math.round(((d.day_number || 0) / total) * 100))) : 0;
   const left = Math.max(0, total - (d.day_number || 0));
-  const cleanText = d.text && d.text !== '📷' && d.text !== '🎥' ? d.text : '';
+  const cleanText = textoDaPessoa(d.text);
   const hasMedia = !!(d.photo_url || d.video_url);
   const trackEl = d.track ? <TrackTag key={'t' + d.id} track={d.track} float hasBar={false} /> : null;
   // vídeo vertical leva a legenda por cima; nesse caso ela não se repete embaixo
@@ -260,8 +262,10 @@ function DayPager({ item, labels, dayLabel, dark }) {
               {d.video_url && !d.photo_url && <Media video={d.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackEl}</Media>}
             </>
           ) : (
-            <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}`}>
-              <CardText text={cleanText} labels={labels} />
+            <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}${cleanText ? '' : ' so-selo'}`}>
+              {cleanText
+                ? <CardText text={cleanText} labels={labels} />
+                : <SeloDoDia kind={d.kind} labels={labels.selo} />}
               {trackEl}
             </a>
           )}
@@ -301,6 +305,9 @@ function DayPager({ item, labels, dayLabel, dark }) {
     </>
   );
 }
+
+// Dia marcado por botão: sem mídia e sem relato humano.
+const soSelo = (x) => !x.photo_url && !x.video_url && !textoDaPessoa(x.text);
 
 function EntryText({ text, labels, limit = 180 }) {
   const [expanded, setExpanded] = useState(false);
@@ -569,13 +576,15 @@ export default function FeedClient({ labels }) {
               <StepResult decided={item.closes.step} name={(item.owner.name || '').split(' ')[0]} labels={labels.step} />
             )}
             {item.comeback && <div className="entry-comeback">{(labels.comebackFmt || '').replace('{d}', item.comeback)}</div>}
-            {item.kind === 'setback' && <div className="entry-kindline setback">{labels.tagSetback}</div>}
-            {item.kind === 'win' && <div className="entry-kindline win">{labels.tagWin}</div>}
+            {/* Quando o dia só tem selo, o selo já diz o que a linha diria.
+                Duas etiquetas para o mesmo fato, empilhadas, viram ruído. */}
+            {item.kind === 'setback' && !soSelo(item) && <div className="entry-kindline setback">{labels.tagSetback}</div>}
+            {item.kind === 'win' && !soSelo(item) && <div className="entry-kindline win">{labels.tagWin}</div>}
             {[7, 30, 60, 100].includes(item.day_number) && <div className="entry-milestone">{(labels.milestoneFmt || '').replace('{d}', item.day_number)}</div>}
 
             {(() => {
               const hasMedia = !!(item.photo_url || item.video_url);
-              const cleanText = item.text && item.text !== '📷' && item.text !== '🎥' ? item.text : '';
+              const cleanText = textoDaPessoa(item.text);
               const total = item.journey.total_days || 0;
               const day = item.journey.current_day || 0;
               const pct = total ? Math.min(100, Math.max(3, item.journey.progress_pct || Math.round((day / total) * 100))) : 0;
@@ -591,11 +600,16 @@ export default function FeedClient({ labels }) {
                 </div>
               ) : null;
               const trackFloat = item.track ? <TrackTag track={item.track} float hasBar={false} /> : null;
-              if (!hasMedia && cleanText) {
+              if (!hasMedia) {
+                // Sem mídia e sem relato: o dia foi marcado por botão.
+                // O cartão continua existindo — apagar o registro seria
+                // apagar o dia — mas mostra selo, não frase.
                 return (
                   <>
-                    <a href={`/${item.journey.slug}`} className="entry-textcard dp-card">
-                      <CardText text={cleanText} labels={labels} />
+                    <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText ? '' : ' so-selo'}`}>
+                      {cleanText
+                        ? <CardText text={cleanText} labels={labels} />
+                        : <SeloDoDia kind={item.kind} labels={labels.selo} />}
                       {trackFloat}
                     </a>
                     {progressEl}

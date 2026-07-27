@@ -134,11 +134,27 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     setSaving(false);
   }
 
-  async function quick(kind, defaultText) {
+  // ============================================================
+  // O BOTÃO NÃO ESCREVE MAIS NO LUGAR DA PESSOA
+  //
+  // Antes ele gravava uma frase pronta — "Fiz o que eu tinha pra
+  // fazer hoje." — e o feed publicava aquilo como se fosse relato
+  // dela. Cinco pessoas apertando o mesmo botão produziam a mesma
+  // frase cinco vezes. Era o app escrevendo, não elas.
+  //
+  // Agora o botão grava só o FATO: o `kind`. O dia continua
+  // contando igual — sequência, progresso, marco, tudo olha para
+  // o registro existir, não para o texto. No feed isso aparece
+  // como selo, que se lê como marca e não como voz.
+  //
+  // Texto vazio, e não NULL, porque há telas que fazem
+  // `u.text.slice()` sem guarda.
+  // ============================================================
+  async function quick(kind) {
     if (saving || uploading) return;
     setSaving(true);
     const supabase = createClient();
-    const { data: novo, error } = await supabase.from('updates').insert({ journey_id: journeyId, day_number: dayNumber, kind, text: defaultText }).select('id').maybeSingle();
+    const { data: novo, error } = await supabase.from('updates').insert({ journey_id: journeyId, day_number: dayNumber, kind, text: '' }).select('id').maybeSingle();
     setSaving(false);
     if (error) { alert(t.error); return; }
     if (novo?.id) { setLastId(novo.id); await fecharCapituloAnterior(supabase, novo.id); }
@@ -238,9 +254,9 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       <div className="ritual">
         <span className="ritual-q">{t.ritualQ}</span>
         <div className="ritual-btns">
-          <button type="button" className="ritual-btn did" onClick={() => quick('win', t.rDidText)} disabled={saving || uploading}>{t.rDid}</button>
-          <button type="button" className="ritual-btn tried" onClick={() => quick('step', t.rTriedText)} disabled={saving || uploading}>{t.rTried}</button>
-          <button type="button" className="ritual-btn paused" onClick={() => quick('setback', t.rPausedText)} disabled={saving || uploading}>{t.rPaused}</button>
+          <button type="button" className="ritual-btn did" onClick={() => quick('win')} disabled={saving || uploading}>{t.rDid}</button>
+          <button type="button" className="ritual-btn tried" onClick={() => quick('step')} disabled={saving || uploading}>{t.rTried}</button>
+          <button type="button" className="ritual-btn paused" onClick={() => quick('setback')} disabled={saving || uploading}>{t.rPaused}</button>
         </div>
       </div>
       {showCare && (
@@ -269,7 +285,13 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       {rawUrl && (
         <div className="crop-modal" role="dialog" aria-modal="true">
           <div className="crop-modal-card">
-            <ImageCropper src={rawUrl} labels={t.crop || {}} aspects={[['photo', 4 / 3]]} onDone={onCropDone} onCancel={onCropCancel} />
+            {/* O compositor só oferecia 4:3, e o recorte aqui é DESTRUTIVO:
+                o arquivo sobe já cortado. Toda foto de dia postada até agora
+                virou 4:3 no arquivo — nenhum CSS traz de volta. Agora abre em
+                "original" e o corte é escolha, não obrigação. */}
+            <ImageCropper src={rawUrl} labels={t.crop || {}}
+              aspects={[['original', null], ['portrait', 4 / 5], ['square', 1], ['landscape', 16 / 9]]}
+              onDone={onCropDone} onCancel={onCropCancel} />
           </div>
         </div>
       )}

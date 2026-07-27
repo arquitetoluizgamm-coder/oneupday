@@ -82,7 +82,7 @@ export default async function Home() {
     placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
     addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded, addVideo: t.addVideo, videoAdded: t.videoAdded, videoTooBig: t.videoTooBig,
     crisisTitle: t.crisisTitle, crisisText: t.crisisText, ritualQ: t.ritualQ, rDid: t.rDid, rTried: t.rTried, rPaused: t.rPaused,
-    rDidText: t.rDidText, rTriedText: t.rTriedText, rPausedText: t.rPausedText, aiWrite: t.aiWrite,
+    aiWrite: t.aiWrite,
     musicAdd: t.musicAdd, musicTitle: t.musicTitle, musicUse: t.musicUse, musicRemove: t.musicRemove, musicEmpty: t.musicEmpty, musicSearchPh: t.musicSearchPh, musicKeyNeeded: t.musicKeyNeeded,
     aiErr: t.aiErr, aiRateErr: t.aiRateErr,
     moodQ: t.moodQ, prompts: t.prompts, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful },
@@ -94,6 +94,7 @@ export default async function Home() {
 
   const feedLabels = {
     dayShort: t.dayShort, tagSetback: t.tagSetback, tagWin: t.tagWin,
+    selo: { fiz: t.seloFiz, tentei: t.seloTentei, parei: t.seloParei },
     viewPublic: t.viewPublic, muteTopic: t.muteTopic,
     inviteTitle: t.feedInviteTitle, inviteSub: t.feedInviteSub, inviteCta: t.feedInviteCta, loading: '',
     tabAll: t.tabAll, tabFollowing: t.tabFollowing, followingEmptyTitle: t.followingEmptyTitle, followingEmptySub: t.followingEmptySub,

@@ -3,13 +3,15 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../lib/supabase/client';
 import ImageCropper from './ImageCropper';
+import { textoDaPessoa } from '../lib/registro';
 
 // Editar um dia da jornada: texto + foto (adicionar/trocar/remover) + excluir post.
 export default function EditUpdate({ update, labels, onChanged }) {
   const L = labels || {};
-  const isPlaceholder = (tx) => tx === '📷' || tx === '🎥';
   const [open, setOpen] = useState(false);
-  const [text, setText] = useState(isPlaceholder(update.text) ? '' : (update.text || ''));
+  // Se o texto era do app (emoji de mídia ou frase de botão), o campo
+  // abre VAZIO — senão a pessoa editaria uma frase que não escreveu.
+  const [text, setText] = useState(textoDaPessoa(update.text));
   const [photoUrl, setPhotoUrl] = useState(update.photo_url || '');
   const [rawUrl, setRawUrl] = useState('');
   const [busy, setBusy] = useState(false);
@@ -73,7 +75,8 @@ export default function EditUpdate({ update, labels, onChanged }) {
         <div className="crop-modal" role="dialog" aria-modal="true" onClick={() => !busy && !rawUrl && setOpen(false)}>
           <div className="crop-modal-card ep-card" onClick={(e) => e.stopPropagation()}>
             {rawUrl ? (
-              <ImageCropper src={rawUrl} aspects={[['photo', 4 / 3]]}
+              // mesmo motivo do compositor: aqui o corte grava no arquivo
+              <ImageCropper src={rawUrl} aspects={[['original', null], ['portrait', 4 / 5], ['square', 1], ['landscape', 16 / 9]]}
                 labels={{ original: L.cropOriginal, square: L.cropSquare, portrait: L.cropPortrait, landscape: L.cropLandscape, use: L.cropUse, cancel: L.cropCancel, hint: L.cropHint, hintOriginal: L.cropHintOriginal, zoom: L.cropZoom }}
                 onDone={onCropDone} onCancel={() => { URL.revokeObjectURL(rawUrl); setRawUrl(''); }} />
             ) : (
