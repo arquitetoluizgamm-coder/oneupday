@@ -4781,3 +4781,85 @@ h1 { letter-spacing: -0.03em; }
   .jex-corpo p{font-size:12.5px}
   .jex-foto{max-width:150px}
 }
+
+/* ============================================================
+   JORNADA DE EXEMPLO — v2
+   No desktop o card esticava para ~800px e a jornada deixava de
+   parecer uma tela de produto: virava um bloco de site. Um card
+   de jornada tem largura de coluna de leitura, nao de pagina.
+   Teto de 420px e ele volta a parecer o que e'.
+   ============================================================ */
+.acao-tela{display:flex;justify-content:center}
+.jex{max-width:420px;width:100%}
+
+/* no desktop a tela fica a esquerda e as chamadas a direita, mas
+   sem a tela esticar para preencher a sobra */
+@media(min-width:861px){
+  .acao-palco{grid-template-columns:420px minmax(0,1fr);gap:44px;align-items:start}
+  .acao-tela{justify-content:flex-start}
+  .acao-chamadas{padding-top:8px}
+  .acao-chamadas li{font-size:16px}
+}
+
+/* ---- numeros qualitativos, no lugar da porcentagem ---- */
+.jex-nums{
+  list-style:none;display:grid;grid-template-columns:repeat(3,1fr);
+  gap:8px;padding:14px 20px 0;margin:0;
+}
+.jex-nums li{
+  border:1px solid var(--line);border-radius:12px;padding:9px 4px;text-align:center;
+}
+.jex-nums b{display:block;font-family:var(--display);font-weight:600;font-size:18px;color:var(--ink)}
+.jex-nums span{display:block;font-size:10.5px;color:var(--muted);margin-top:1px}
+
+/* a barra agora mostra 7 de 30: em andamento, nao concluida */
+.jex-barra{height:6px;margin:14px 20px 4px}
+.jex-barra i{width:auto}
+
+/* ---- o rotulo do capitulo: comeco / dificuldade / significado ---- */
+.jex-rotulo{
+  font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.04em;
+  text-transform:lowercase;color:var(--muted);
+}
+
+/* ---- os quatro capitulos escondidos ---- */
+.jex-mais{padding:0 20px}
+.jex-mais summary{
+  list-style:none;cursor:pointer;
+  font-size:12.5px;font-weight:700;color:var(--sage-deep,#5E6B55);
+  padding:9px 0;border-top:1px solid var(--line);
+  display:flex;align-items:center;gap:6px;
+}
+.jex-mais summary::-webkit-details-marker{display:none}
+.jex-mais summary::after{
+  content:'';width:7px;height:7px;border-right:1.8px solid currentColor;
+  border-bottom:1.8px solid currentColor;transform:rotate(45deg);margin-top:-3px;
+  transition:transform .18s ease;
+}
+.jex-mais[open] summary::after{transform:rotate(-135deg);margin-top:2px}
+.jex-dias-resto{padding:4px 0 8px}
+
+/* ---- o proximo capitulo: o que fica em aberto ---- */
+.jex-proximo{
+  margin:6px 20px 20px;padding:12px 14px;
+  background:var(--sage-soft,#DDE3D6);border-radius:12px;
+}
+.jex-proximo b{
+  display:block;font-size:10px;font-weight:800;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--sage-deep,#5E6B55);margin-bottom:4px;
+}
+.jex-proximo p{margin:0;font-size:13px;line-height:1.5;color:var(--ink)}
+
+/* o selo do dia dificil e' mais largo que o antigo: quebra sozinho */
+.jex-cab{flex-wrap:wrap}
+.jex-tag.setback{white-space:nowrap}
+
+/* as duas secoes que ficaram sem teto: no desktop de 1100px os
+   quatro cartoes viravam blocos largos demais para o texto de
+   uma linha que carregam. */
+.land-passos{max-width:900px}
+.land-acao{max-width:1000px}
+@media(min-width:861px){
+  .passos-grade{gap:18px}
+  .passo{min-height:158px}
+}
