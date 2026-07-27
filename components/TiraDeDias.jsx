@@ -4,15 +4,44 @@ import { useEffect, useRef, useState } from 'react';
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-function scrollToDay(day) {
+const calmo = () => typeof matchMedia === 'function'
+  && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ============================================================
+// A PASSAGEM DOS DIAS
+//
+// Faltavam duas coisas que a especificação pedia e a implementação
+// não trouxe — e eu revisei este componente e não peguei:
+//
+//   1. Durante o arraste, o conteúdo não acompanhava. A marca se
+//      mexia, o balão mudava de número, e a história embaixo ficava
+//      parada até você soltar. O dedo percorria 60 dias e a tela
+//      não percorria nenhum: o balão virava um seletor abstrato em
+//      vez de uma viagem pela jornada.
+//
+//   2. O registro entrava sem transição nenhuma. Trocar de dia era
+//      um corte seco, sem dizer de onde veio o novo conteúdo.
+//
+// Durante o arraste a rolagem é INSTANTÂNEA de propósito: rolagem
+// suave briga com o dedo — o conteúdo chegaria atrasado e a
+// sensação seria de peso, não de fluidez. O 'smooth' fica para
+// setas, teclado e o momento de soltar, onde não há competição.
+// ============================================================
+function scrollToDay(day, instantaneo = false) {
   const node = document.getElementById(`journey-day-${day}`);
   if (!node) return;
-  // O CSS já desliga as transições em prefers-reduced-motion, mas a
-  // rolagem suave é JavaScript e passava por fora da regra — que é a
-  // parte que mais incomoda quem tem sensibilidade a movimento.
-  const calmo = typeof matchMedia === 'function'
-    && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  node.scrollIntoView({ behavior: calmo ? 'auto' : 'smooth', block: 'start' });
+  node.scrollIntoView({ behavior: (instantaneo || calmo()) ? 'auto' : 'smooth', block: 'start' });
+}
+
+// fade + 8px, 180ms — o registro entra dizendo de onde veio
+function entrarRegistro(day) {
+  if (calmo()) return;
+  const node = document.getElementById(`journey-day-${day}`);
+  if (!node || !node.animate) return;
+  node.animate(
+    [{ opacity: 0.35, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }],
+    { duration: 180, easing: 'cubic-bezier(.32,.72,.3,1)' }
+  );
 }
 
 export default function TiraDeDias({ dias = [], hoje = 0, total = 0, labels = {} }) {
@@ -72,14 +101,20 @@ export default function TiraDeDias({ dias = [], hoje = 0, total = 0, labels = {}
     return clamp(Math.round(1 + ratio * (totalDays - 1)), 1, maxDay);
   };
 
+  // Durante o arraste: acompanha o dedo, sem suavização e sem fade —
+  // a 60 quadros por segundo, animação por cima de animação vira borrão.
   const updatePreview = (day, shouldVibrate = false) => {
     const next = clamp(day, 1, maxDay);
     // O toque marca a MUDANÇA de dia, não o fim do arraste. É o que
     // deixa a pessoa contar os dias sem olhar — e por isso não pode
     // repetir quando o dedo anda dentro da mesma marca.
-    if (shouldVibrate && draggingRef.current && next !== previewRef.current && navigator.vibrate) navigator.vibrate(6);
+    const mudou = next !== previewRef.current;
+    if (shouldVibrate && draggingRef.current && mudou && navigator.vibrate) navigator.vibrate(6);
     previewRef.current = next;
     setPreview(next);
+    // A história acompanha o dedo. É isto que faz o arraste ser uma
+    // viagem pela jornada em vez de um seletor de número.
+    if (mudou && draggingRef.current) scrollToDay(next, true);
   };
 
   const commit = (day, shouldScroll = true) => {
@@ -87,7 +122,11 @@ export default function TiraDeDias({ dias = [], hoje = 0, total = 0, labels = {}
     setSelected(next);
     setPreview(next);
     previewRef.current = next;
-    if (shouldScroll) scrollToDay(next);
+    if (!shouldScroll) return;
+    scrollToDay(next);
+    // Só fora do arraste: durante ele o conteúdo já está passando, e
+    // um fade a cada dia seria pisca-pisca.
+    if (!draggingRef.current) entrarRegistro(next);
   };
 
   const onPointerDown = (event) => {
