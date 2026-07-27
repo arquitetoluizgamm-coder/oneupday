@@ -255,11 +255,13 @@ function DemoJourneyPage({ story, t, locale }) {
             barra logo abaixo já o mostra. Esta é a página que o visitante
             novo vê primeiro — se o exemplo for descuidado, ele decide o
             que esperar do resto. */}
-        <div className="stats stats-2">
-          <article><b>{story.stats.days_posted || 0}</b><span>{plural(story.stats.days_posted || 0, t.daysPostedOne, t.daysPosted)}</span></article>
-          <article><b>{story.stats.streak || 0}</b><span>{plural(story.stats.streak || 0, t.dayStreakLabelOne, t.dayStreakLabel)}</span></article>
-        </div>
+        {/* Mesma hierarquia da jornada real. */}
         <ProgressBar day={story.stats.current_day || 0} total={story.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+        <p className="stats-linha">
+          {story.stats.days_posted || 0} {plural(story.stats.days_posted || 0, t.daysPostedOne, t.daysPosted)}
+          <i aria-hidden="true">·</i>
+          {story.stats.streak || 0} {plural(story.stats.streak || 0, t.dayStreakLabelOne, t.dayStreakLabel)}
+        </p>
 
         <section className="timeline">
           {story.updates.slice().reverse().map((u, i, arr) => (
@@ -447,19 +449,54 @@ export default async function JourneyPage({ params, searchParams }) {
             <b>{owner?.name}</b>
             <span>{owner?.handle} · {fill(t.dayXofY, { d: stats.current_day || 0, t: journey.total_days })}</span>
           </a>
-          <FollowButton journeyId={journey.id} labelFollow={t.follow} labelFollowing={t.following} />
+          {viewerId && <FollowButton journeyId={journey.id} labelFollow={t.follow} labelFollowing={t.following} />}
         </div>
-        <div className="who-tools"><BlockButton ownerId={journey.owner_id} label={t.blockUser} /></div>
+
+        {/* ============================================================
+            UMA AÇÃO CLARA, PERTO DO TÍTULO
+
+            Quem chega sem conta encontrava o convite só lá embaixo,
+            depois de rolar a jornada inteira — ou seja, depois de já
+            ter decidido ir embora.
+
+            O convite de acompanhar sem conta continua no rodapé, para
+            quem leu tudo e se convenceu no caminho. Este aqui é para
+            quem se convenceu no primeiro parágrafo.
+            ============================================================ */}
+        {!viewerId && (
+          <a className="cta cta-jornada" href="/login">{t.startCta || t.follow}</a>
+        )}
+        {/* ============================================================
+            "Bloquear" saiu da área principal.
+
+            Não é só ruído: um botão de bloquear ao lado do nome da
+            pessoa sugere que ela é um risco. Numa rede sobre
+            vulnerabilidade, isso é uma acusação feita pela moldura,
+            antes de qualquer palavra dela ser lida.
+
+            Continua a um toque de distância, no menu — que é onde
+            moram as ações que a pessoa procura quando precisa, e não
+            as que o app oferece sem ser perguntado.
+            ============================================================ */}
+        <details className="mais-menu who-mais">
+          <summary aria-label={t.moreOptions || 'Mais opções'}>⋯</summary>
+          <div className="mais-lista"><BlockButton ownerId={journey.owner_id} label={t.blockUser} /></div>
+        </details>
 
         {/* O "progresso %" saiu daqui: a barra logo abaixo já mostra o
             mesmo número, e a repetição em 200px de tela fazia a pessoa
             conferir se eram coisas diferentes. Ficam os dois que só
             existem aqui. */}
-        <div className="stats stats-2">
-          <article><b>{stats.days_posted || 0}</b><span>{plural(stats.days_posted || 0, t.daysPostedOne, t.daysPosted)}</span></article>
-          <article><b>{stats.streak || 0}</b><span>{plural(stats.streak || 0, t.dayStreakLabelOne, t.dayStreakLabel)}</span></article>
-        </div>
+        {/* A barra abaixo já é a leitura principal: "Dia 3 de 30 · 10%".
+            Estes dois números descem para uma linha discreta — eles
+            interessam a quem já entrou na história, não a quem está
+            decidindo se entra. */}
         <ProgressBar day={stats.current_day || 0} total={journey.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+        <p className="stats-linha">
+          {stats.days_posted || 0} {plural(stats.days_posted || 0, t.daysPostedOne, t.daysPosted)}
+          <i aria-hidden="true">·</i>
+          {stats.streak || 0} {plural(stats.streak || 0, t.dayStreakLabelOne, t.dayStreakLabel)}
+        </p>
 
         {showBeforeNow && (
           <section className="before-now">
@@ -533,7 +570,16 @@ export default async function JourneyPage({ params, searchParams }) {
                   <Comments updateId={u.id} labels={{ comment: t.comment, close: t.commentClose, empty: t.commentEmpty, placeholder: t.commentPlaceholder, send: t.commentSend, sending: t.commentSending, unsafe: t.commentUnsafe, pendente: t.commentPendente, error: t.commentError, someone: t.commentSomeone, reply: t.commentReply, more: t.commentMore, less: t.commentLess, replying: t.commentReplying, cancel: t.commentCancel }} />
                   {isOwner
                     ? <EditUpdate update={{ id: u.id, text: u.text, photo_url: u.photo_url, day: u.day_number }} labels={{ btn: t.euBtn, title: t.euTitle, text: t.euText, photo: t.euPhoto, photoAdd: t.ejCoverAdd, photoChange: t.ejCoverChange, photoRemove: t.ejCoverRemove, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errSave: t.epErrSave, errEmpty: t.euErrEmpty, deletePost: t.euDeletePost, deleteConfirm: t.postDeleteConfirm, cropOriginal: t.cropOriginal, cropSquare: t.cropSquare, cropPortrait: t.cropPortrait, cropLandscape: t.cropLandscape, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropHintOriginal: t.cropHintOriginal, cropZoom: t.cropZoom }} />
-                    : <ReportButton updateId={u.id} label={t.report} doneLabel={t.reported} />}
+                    : (
+                      /* Dez posts com quatro controles cada davam quarenta
+                         botões numa página de três dias. Ficam visíveis os
+                         dois que a pessoa veio fazer; denunciar é o que ela
+                         procura quando precisa. */
+                      <details className="mais-menu post-mais">
+                        <summary aria-label={t.moreOptions || 'Mais opções'}>⋯</summary>
+                        <div className="mais-lista"><ReportButton updateId={u.id} label={t.report} doneLabel={t.reported} /></div>
+                      </details>
+                    )}
                 </div>
                 </div>
                 ))}
