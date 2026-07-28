@@ -67,7 +67,7 @@ async function contarSinais(sb, userId) {
 export default async function AppTop({
   sino = false,            // true só no feed
   backHref = '/home', backLabel,
-  likes, follows, unread, avatarStyle,
+  likes, follows, unread,
 }) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -113,8 +113,7 @@ export default async function AppTop({
 
       <div className="top-right">
         <LanguagePicker current={locale} />
-        <a className="header-tree" href="/arvore" aria-label={t.treeTab} title={t.treeTab}
-          style={avatarStyle}>
+        <a className="header-tree" href="/arvore" aria-label={t.treeTab} title={t.treeTab}>
           <img src="/tree-one.svg" alt="" />
         </a>
       </div>

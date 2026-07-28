@@ -14,7 +14,6 @@ import ScrollChrome from '../../components/ScrollChrome';
 import DailyMood from '../../components/DailyMood';
 import NextChapter from '../../components/NextChapter';
 import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
-import { MOODS, moodGlow } from '../../lib/moods';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#C16F54', '#84917A', '#5B7189', '#96523C', '#B3874A', '#A8637A'];
@@ -73,8 +72,8 @@ export default async function Home() {
   heartFollowers.delete(user.id);
   const heartFollows = heartFollowers.size;
 
-  let myMood = ''; let moodToday = false;
-  try { const { data: mp } = await supabase.from('profiles').select('mood, mood_at').eq('id', user.id).maybeSingle(); if (mp?.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) { myMood = mp.mood || ''; moodToday = !!myMood; } } catch {}
+  let moodToday = false;
+  try { const { data: mp } = await supabase.from('profiles').select('mood, mood_at').eq('id', user.id).maybeSingle(); if (mp?.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) moodToday = !!mp.mood; } catch {}
 
   let aiPrefOff = false;
   try { const { data: pref } = await supabase.from('profiles').select('ai_opt_out').eq('id', user.id).maybeSingle(); aiPrefOff = !!pref?.ai_opt_out; } catch { }
@@ -117,8 +116,7 @@ export default async function Home() {
     <>
       {/* mesmo topo do resto do app. A home passa os numeros do sino
           porque ja os calculou aqui — evita repetir as consultas. */}
-      <AppTop sino likes={heartLikes} follows={heartFollows} unread={unread || 0}
-        avatarStyle={myMood && MOODS[myMood] ? { boxShadow: moodGlow(MOODS[myMood]) } : undefined} />
+      <AppTop sino likes={heartLikes} follows={heartFollows} unread={unread || 0} />
 
       <Track type="visit" meta={{ page: "home" }} />
       <Origem />
