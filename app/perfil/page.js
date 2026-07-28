@@ -330,7 +330,7 @@ export default async function Perfil() {
             e pessoas para explorar — e o vazio precisa de uma saída */}
         <ProfileTabs
             labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, quotes: t.profTabQuotes, people: t.profTabPeople }}
-            extraTab={<><a className="ptab ptab-link" href="/diario">{t.navDiary}</a><a className="ptab ptab-link" href="/futuro">{t.futureTitle}</a></>}
+            extraTab={<><a className="ptab ptab-link" href="/diario">{t.navDiary}</a><a className="ptab ptab-link" href="/futuro">{t.futureTitle}</a><a className="ptab ptab-link" href="/arvore">{t.treeTab}</a></>}
             journeys={(
               <>
                 {list.length === 0 && (
