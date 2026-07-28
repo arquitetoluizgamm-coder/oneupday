@@ -3442,6 +3442,9 @@ h1 { letter-spacing: -0.03em; }
 .wz-num span{font-size:13.5px;color:var(--muted)}
 
 .wz-hint{margin:12px 0 0;font-size:12.5px;line-height:1.5;color:var(--muted);opacity:.85}
+.wz-field-note{margin:0 0 10px;font-family:var(--display);font-weight:800;font-size:10px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.wz-field-note-gap{margin-top:28px}
 
 /* area de escrita */
 .wz-area{position:relative}
@@ -3455,6 +3458,8 @@ h1 { letter-spacing: -0.03em; }
 
 .wz-media{margin-top:14px;aspect-ratio:4/3;overflow:hidden;background:#f0ede8}
 .wz-media img,.wz-media video{width:100%;height:100%;object-fit:cover;display:block}
+.wz-review-media{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+.wz-review-media .wz-label{margin-bottom:10px}
 
 /* privacidade: opcao com marcador, nao caixa de radio do sistema */
 .wz-vis{display:flex;flex-direction:column;gap:8px}

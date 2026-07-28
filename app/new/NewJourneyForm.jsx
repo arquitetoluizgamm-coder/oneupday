@@ -9,7 +9,7 @@ const MAX_VIDEO = 60 * 1024 * 1024;
 // ============================================================
 // UMA PERGUNTA POR TELA
 //
-// Sete telas, e cada uma tem UMA pergunta. Não é enfeite: um
+// Cinco perguntas, e cada uma tem UMA decisão principal. Não é enfeite: um
 // formulário com seis campos faz a pessoa decidir seis coisas ao
 // mesmo tempo, e ela responde todas mal. Uma pergunta por vez ela
 // responde de verdade.
@@ -18,12 +18,14 @@ const MAX_VIDEO = 60 * 1024 * 1024;
 // isso só a PRIMEIRA é obrigatória. Todas as outras têm "Pular
 // esta", e a jornada nasce igual sem elas.
 //
-// A IA aparece em quatro das sete, sempre do mesmo jeito: a pessoa
+// A IA aparece nas perguntas de conteúdo, sempre do mesmo jeito: a pessoa
 // escreve, ela dá forma, a pessoa edita. Nenhuma tela depende de
 // IA para funcionar — sem chave, tudo continua sendo campo livre.
 // ============================================================
-const STEPS = 7;
-const S_TITULO = 0, S_PORQUE = 1, S_PRATICA = 2, S_RITMO = 3, S_TEMPO = 4, S_HOJE = 5, S_REV = 6;
+// Cinco perguntas objetivas + uma tela final de revisão.
+// Ritmo e duração são uma única decisão: "como você quer seguir?".
+const STEPS = 6;
+const S_TITULO = 0, S_PORQUE = 1, S_PRATICA = 2, S_PLANO = 3, S_HOJE = 4, S_REV = 5;
 
 const COLORS = {
   art: '#8A6A9B', body: '#5E6B55', health: '#6E8168', mind: '#5B7189',
@@ -124,7 +126,6 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     [t.wizT3, t.wizS3],
     [t.wzTPratica, t.wzSPratica],
     [t.wzTRitmo, t.wzSRitmo],
-    [t.wzTTempo, t.wzSTempo],
     [t.wzTHoje, t.wzSHoje],
     [t.wzTRev, t.wzSRev],
   ];
@@ -438,9 +439,10 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         </div>
       )}
 
-      {/* ---------------- 4 · ritmo ---------------- */}
-      {step === S_RITMO && (
+      {/* ---------------- 4 · plano ---------------- */}
+      {step === S_PLANO && (
         <div className="wz-body">
+          <p className="wz-field-note">{t.wzSRitmo}</p>
           <div className="wz-chips">
             {RITMOS.map(([v, l]) => (
               <button type="button" key={v} className={`wz-chip${ritmo === v ? ' on' : ''}`}
@@ -451,12 +453,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
             <input className="wz-input small" value={ritmoOutro} maxLength={60}
               placeholder={t.ritmoOutroPh} onChange={(e) => setRitmoOutro(e.target.value)} />
           )}
-        </div>
-      )}
-
-      {/* ---------------- 5 · por quanto tempo ---------------- */}
-      {step === S_TEMPO && (
-        <div className="wz-body">
+          <p className="wz-field-note wz-field-note-gap">{t.wzSTempo}</p>
           <div className="wz-chips">
             {DURS.map(([v, l]) => (
               <button type="button" key={v} className={`wz-chip${dur === v ? ' on' : ''}`} onClick={() => setDur(v)}>{l}</button>
@@ -473,7 +470,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         </div>
       )}
 
-      {/* ---------------- 6 · o dia 1 ---------------- */}
+      {/* ---------------- 5 · o primeiro passo ---------------- */}
       {step === S_HOJE && (
         <div className="wz-body">
           <div className="wz-area">
@@ -492,20 +489,6 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
             </div>
           )}
 
-          {photoUrl && <div className="wz-media"><img src={photoUrl} alt="" /></div>}
-          {videoUrl && <div className="wz-media"><video src={videoUrl} controls playsInline /></div>}
-          <div className="wz-chips">
-            <button type="button" className={`wz-chip${photoUrl ? ' on' : ''}`}
-              onClick={() => photoRef.current?.click()} disabled={uploading}>
-              {uploading ? t.uploading : (photoUrl ? t.photoAdded : t.addPhoto)}
-            </button>
-            <button type="button" className={`wz-chip${videoUrl ? ' on' : ''}`}
-              onClick={() => videoRef.current?.click()} disabled={uploading}>
-              {uploading ? t.uploading : (videoUrl ? t.videoAdded : t.addVideo)}
-            </button>
-            <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPhoto} />
-            <input ref={videoRef} type="file" accept="video/*" hidden onChange={onVideo} />
-          </div>
         </div>
       )}
 
@@ -543,6 +526,22 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
               {photoUrl ? <img src={photoUrl} alt="" /> : <video src={videoUrl} controls playsInline />}
             </div>
           )}
+
+          <div className="wz-review-media">
+            <span className="wz-label">{t.addPhoto} / {t.addVideo}</span>
+            <div className="wz-chips">
+              <button type="button" className={`wz-chip${photoUrl ? ' on' : ''}`}
+                onClick={() => photoRef.current?.click()} disabled={uploading}>
+                {uploading ? t.uploading : (photoUrl ? t.photoAdded : t.addPhoto)}
+              </button>
+              <button type="button" className={`wz-chip${videoUrl ? ' on' : ''}`}
+                onClick={() => videoRef.current?.click()} disabled={uploading}>
+                {uploading ? t.uploading : (videoUrl ? t.videoAdded : t.addVideo)}
+              </button>
+              <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPhoto} />
+              <input ref={videoRef} type="file" accept="video/*" hidden onChange={onVideo} />
+            </div>
+          </div>
 
           <div className="wz-field">
             <span className="wz-label">{t.wzRevCat}</span>
