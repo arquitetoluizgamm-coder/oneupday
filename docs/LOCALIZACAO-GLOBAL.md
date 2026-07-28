@@ -22,7 +22,8 @@ O idioma é escolhido pelo cabeçalho `Accept-Language`, com fallback para ingl�
 ### Etapa 2 — espanhol (em andamento)
 
 - adicionar `es` em `locales`; **feito nesta etapa**;
-- criar o núcleo espanhol das telas de entrada, wizard, feed, comentários, perfil e ações; **feito nesta etapa**;
+- criar o núcleo espanhol das telas de entrada, wizard, feed, comentários, perfil e ações; **feito**;
+- ampliar o núcleo com login, categorias, mídia, duração, recorte, capítulos e mensagens de erro; **feito nesta etapa**;
 - concluir o dicionário espanhol completo, sem copiar traduções automáticas sem revisão; **pendente**;
 - incluir Espanha, México, Colômbia, Argentina e Chile como primeiros mercados de teste;
 - revisar plural, gênero, tratamento e vocabulário de apoio;
