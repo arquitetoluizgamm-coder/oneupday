@@ -6,7 +6,8 @@ import NewJourneyForm from '../new/NewJourneyForm';
 import EditBanner from '../../components/EditBanner';
 import BottomNav from '../../components/BottomNav';
 import EditAvatar from '../../components/EditAvatar';
-import CompanionCard from '../home/CompanionCard';
+import ProgressUpi from '../../components/ProgressUpi';
+import UpiGreeting from '../../components/UpiGreeting';
 import NextStep from '../home/NextStep';
 import ProgressBar from '../../components/ProgressBar';
 import MediaGallery from '../../components/MediaGallery';
@@ -28,7 +29,6 @@ import JourneyDays from '../../components/JourneyDays';
 import JourneyFold from '../../components/JourneyFold';
 import { pickUpi } from '../../lib/upi';
 import ChallengeRespond from '../../components/ChallengeRespond';
-import UpiGreeting from '../../components/UpiGreeting';
 import PushToggle from '../../components/PushToggle';
 import EcoToggle from '../../components/EcoToggle';
 
@@ -289,15 +289,7 @@ export default async function Perfil() {
 
         {/* o Upi ficou com a linha inteira: e' uma frase, precisa de largura.
             Sem fala, a linha nao existe — antes sobrava um vao de 12px. */}
-        <div className="pc-bar pc-progress-bar">
-          <div className="pc-progress-upi">
-            <img className="upi-char bob" src="/upi.svg" alt="Upi" />
-            <div className="upi-bubble upi-open">
-              <b className="upi-name">Upi</b>
-              <p>{t.companionBtn}</p>
-            </div>
-          </div>
-        </div>
+        <ProgressUpi labels={{ prompt: t.companionBtn, loading: t.companionLoading, error: t.aiErr }} />
         {false && upi?.line && (
           <div className="pc-bar">
             <div className="pc-bar-upi">
@@ -366,7 +358,6 @@ export default async function Perfil() {
                     </a>
                   );
                 })}
-                {aiConfigured && <CompanionCard userId={user.id} title={t.companionTitle} btn={t.companionBtn} loading={t.companionLoading} initialOff={aiPrefOff} labels={{ consent: t.aiConsent, off: t.aiOff, offState: t.aiOffState, reactivate: t.aiReactivate, err: t.aiErr, rateErr: t.aiRateErr }} />}
               </>
             )}
             album={myAlbum.length > 0 ? (
