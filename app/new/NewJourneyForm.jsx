@@ -125,6 +125,19 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   // embaixo de outra é o tipo de coisa que faz a pessoa desconfiar do app.
   useEffect(() => { setAjPergunta(''); setAjResposta(''); setAjItens([]); setAjErro(''); }, [step]);
 
+  // A IA preenche a revisão por código, sem disparar onInput. Recalcular
+  // aqui garante que respostas longas apareçam inteiras também nesse caso.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const id = window.requestAnimationFrame(() => {
+      document.querySelectorAll('.wz-grow-input').forEach((el) => {
+        el.style.height = 'auto';
+        el.style.height = `${el.scrollHeight}px`;
+      });
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [goal, hoje, first, iaOrganizou, step]);
+
   const heads = [
     [t.wizT1, t.wizS1],
     [t.wizT2, t.wizS2],
