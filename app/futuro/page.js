@@ -12,5 +12,6 @@ export default async function Futuro() {
   const sb = createClient();
   const { data: { user } } = await sb.auth.getUser();
   if (!user) redirect('/login');
-  return <><AppTop backLabel={getDict(getLocale()).back} /><main className="wrap future-page"><FuturoClient labels={getDict(getLocale())} /></main><BottomNav active="create" t={getDict(getLocale())} /></>;
+  const labels = getDict(getLocale());
+  return <><AppTop backLabel={labels.back} /><main className="wrap future-page"><FuturoClient labels={labels} userId={user.id} /></main><BottomNav active="create" t={labels} /></>;
 }
