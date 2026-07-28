@@ -683,6 +683,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .ritual-btn.paused:hover{background:#f6f4ef}
 .ritual-btn:disabled{opacity:.6}
 @media(max-width:520px){.ritual-btn{flex-basis:100%}}
+.ritual-btn.selected{background:#fff;box-shadow:0 0 0 2px currentColor,0 5px 14px rgba(16,19,45,.08);font-weight:850}
 
 /* ---------- Momento de vida ---------- */
 .chip.moment.on{background:var(--blue);border-color:var(--blue)}
@@ -5914,3 +5915,6 @@ h1 { letter-spacing: -0.03em; }
   .ca-verbo{font-size:10.5px;white-space:nowrap}
   .ca-obj{font-size:11.5px}
 }
+
+/* O ritual apenas seleciona o estado do próximo registro. */
+.composer2 .ritual-btn.selected{background:#fff!important;box-shadow:0 0 0 2px currentColor,0 5px 14px rgba(16,19,45,.08);font-weight:850}

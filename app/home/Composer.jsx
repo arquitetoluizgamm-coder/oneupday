@@ -237,16 +237,12 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   // `u.text.slice()` sem guarda.
   // ============================================================
   async function quick(kind) {
+    // O ritual escolhe o estado; a publicação só acontece depois da edição
+    // e da confirmação no botão "Postar".
     if (saving || uploading) return;
-    setSaving(true);
-    const supabase = createClient();
-    const { data: novo, error } = await supabase.from('updates').insert({ journey_id: journeyId, day_number: dayNumber, kind, text: '' }).select('id').maybeSingle();
-    setSaving(false);
-    if (error) { alert(t.error); return; }
-    if (novo?.id) { setLastId(novo.id); await fecharCapituloAnterior(supabase, novo.id); }
-    trackEvent('update_posted', { journeyId, kind, quick: true });
-    setPostedKind(kind);
-    setPosted(true);
+    setKind(kind);
+    setAiErr('');
+    requestAnimationFrame(() => inputRef.current?.focus());
   }
 
   // fecha o capítulo aberto do dia anterior desta jornada
@@ -354,9 +350,9 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       <div className="ritual">
         <span className="ritual-q">{t.ritualQ}</span>
         <div className="ritual-btns">
-          <button type="button" className="ritual-btn did" onClick={() => quick('win')} disabled={saving || uploading}>{t.rDid}</button>
-          <button type="button" className="ritual-btn tried" onClick={() => quick('step')} disabled={saving || uploading}>{t.rTried}</button>
-          <button type="button" className="ritual-btn paused" onClick={() => quick('setback')} disabled={saving || uploading}>{t.rPaused}</button>
+          <button type="button" className={`ritual-btn did${kind === 'win' ? ' selected' : ''}`} onClick={() => quick('win')} aria-pressed={kind === 'win'} disabled={saving || uploading}>{t.rDid}</button>
+          <button type="button" className={`ritual-btn tried${kind === 'step' ? ' selected' : ''}`} onClick={() => quick('step')} aria-pressed={kind === 'step'} disabled={saving || uploading}>{t.rTried}</button>
+          <button type="button" className={`ritual-btn paused${kind === 'setback' ? ' selected' : ''}`} onClick={() => quick('setback')} aria-pressed={kind === 'setback'} disabled={saving || uploading}>{t.rPaused}</button>
         </div>
       </div>
       {showCare && (
