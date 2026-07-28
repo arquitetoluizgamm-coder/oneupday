@@ -131,6 +131,11 @@ export default async function Home() {
           backTitle: t.homeWelcomeBackTitle, backSub: t.homeWelcomeBackSub, register: t.homeWelcomeRegister,
           day: t.homeWelcomeDay, journeySub: t.homeWelcomeJourneySub,
         }} />
+        <a className="diary-shortcut" href="/diario">
+          <span className="diary-shortcut-icon" aria-hidden="true">✎</span>
+          <span><b>{t.navDiary}</b><small>{t.diarySub}</small></span>
+          <span className="diary-shortcut-arrow" aria-hidden="true">›</span>
+        </a>
         {nc.mode && (
           <NextChapter mode={nc.mode} line={nc.line} env={nc.env} labels={ncLabels(t, nc)} dismissible />
         )}

@@ -281,6 +281,12 @@ export default async function Perfil() {
           </div>
         </section>
 
+        <a className="diary-shortcut profile-diary-shortcut" href="/diario">
+          <span className="diary-shortcut-icon" aria-hidden="true">✎</span>
+          <span><b>{t.navDiary}</b><small>{t.diarySub}</small></span>
+          <span className="diary-shortcut-arrow" aria-hidden="true">›</span>
+        </a>
+
         {/* o Upi ficou com a linha inteira: e' uma frase, precisa de largura.
             Sem fala, a linha nao existe — antes sobrava um vao de 12px. */}
         {upi?.line && (
