@@ -49,7 +49,8 @@ export async function POST(req) {
     return NextResponse.json({ error: 'url' }, { status: 400 });
   }
 
-  const lang = getLocale() === 'en' ? 'English' : 'português do Brasil';
+  const locale = getLocale();
+  const lang = locale === 'en' ? 'English' : locale === 'es' ? 'español' : 'português do Brasil';
   const system = [
     'Você descreve uma imagem para alguém que não pode vê-la, num app de jornadas pessoais.',
     'Escreva UMA frase, no máximo 140 caracteres, em ' + lang + '.',

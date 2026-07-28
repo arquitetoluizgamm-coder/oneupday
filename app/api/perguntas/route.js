@@ -47,7 +47,8 @@ export async function POST(req) {
     (ups || []).length ? 'Últimos registros:\n' + (ups || []).map((u) => `- Dia ${u.day_number}: ${(u.text || '').slice(0, 100)}`).join('\n') : '',
   ].filter(Boolean).join('\n');
 
-  const lang = getLocale() === 'en' ? 'English' : 'português do Brasil';
+  const locale = getLocale();
+  const lang = locale === 'en' ? 'English' : locale === 'es' ? 'español' : 'português do Brasil';
   const system = [
     'Você escreve perguntas curtas para ajudar alguém a registrar o dia da própria jornada num app.',
     'Devolva EXATAMENTE 3 perguntas, uma por linha, sem numerar, sem marcador, sem aspas.',

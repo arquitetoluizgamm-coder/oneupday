@@ -7,6 +7,37 @@ import ImageCropper from '../../components/ImageCropper';
 
 const MAX_VIDEO = 60 * 1024 * 1024;
 
+// Rascunhos antigos guardavam o texto exibido em vez de um identificador.
+// Esta lista permite trocar exemplos já salvos para o idioma atual sem
+// traduzir o que a própria pessoa escreveu.
+const LEGACY_GOAL_EXAMPLES_PT = [
+  'Voltar a treinar', 'Caminhar mais', 'Dormir melhor', 'Cuidar da alimentação', 'Beber mais água',
+  'Meditar', 'Ter mais calma', 'Cuidar da ansiedade', 'Fazer terapia', 'Ter mais tempo para mim',
+  'Voltar a estudar', 'Aprender inglês', 'Ler mais', 'Fazer um curso', 'Estudar para uma prova',
+  'Organizar minha vida', 'Arrumar minha casa', 'Economizar dinheiro', 'Planejar minha rotina', 'Usar menos o celular',
+  'Começar um projeto', 'Tirar uma ideia do papel', 'Voltar a desenhar', 'Escrever um livro', 'Começar um negócio',
+  'Estar mais presente', 'Ligar para minha família', 'Fazer novos amigos', 'Cuidar do meu relacionamento', 'Aprender a conversar melhor',
+];
+
+function goalExamplesFrom(t) {
+  return (t.wzGoalGroups || []).flatMap((group) => group[1] || []);
+}
+
+function localizeLegacyGoal(value, t) {
+  const index = LEGACY_GOAL_EXAMPLES_PT.indexOf(String(value || '').trim());
+  const localized = goalExamplesFrom(t);
+  return index >= 0 && localized[index] ? localized[index] : value;
+}
+
+function normalizeLegacyFrequency(value) {
+  const key = String(value || '').trim().toLowerCase();
+  if (['todos os dias', 'every day', 'todos los días'].includes(key)) return 'daily';
+  if (['3 vezes por semana', 'três vezes por semana', 'three times a week', 'tres veces por semana'].includes(key)) return '3x';
+  if (['fins de semana', 'weekends', 'fines de semana'].includes(key)) return 'weekends';
+  if (['personalizado', 'custom'].includes(key)) return 'custom';
+  return value;
+}
+
 // ============================================================
 // UMA PERGUNTA POR TELA
 //
@@ -66,13 +97,13 @@ function slugify(title) {
 
 // A prévia usa a mesma fileira visual do feed. Os botões são apenas uma
 // amostra, mas os SVGs e as classes são os mesmos usados na publicação real.
-function PreviewActions() {
+function PreviewActions({ t }) {
   return (
     <div className="entry-actions feed-acts wz-preview-actions" aria-hidden="true">
       <div className="support-wrap">
         <button type="button" className="support-pill">
           <svg className="sp-heart" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1 7.8 7.8 7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z" /></svg>
-          <span className="action-label">Estou com você</span>
+          <span className="action-label">{t.withYouIdle}</span>
         </button>
         <button type="button" className="supporters-icon" tabIndex={-1}>
           <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="8" r="3" /><path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.8M16 14a5 5 0 0 1 4.5 5" /></svg>
@@ -80,11 +111,11 @@ function PreviewActions() {
       </div>
       <button type="button" className="comment-toggle">
         <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12 7.6L3 21l1.9-5.7A8.4 8.4 0 1 1 21 11.5z" /></svg>
-        <span className="action-label">Comentar</span>
+        <span className="action-label">{t.comment}</span>
       </button>
       <button type="button" className="feed-share">
         <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13" /></svg>
-        <span className="action-label">Compartilhar</span>
+        <span className="action-label">{t.shareShort}</span>
       </button>
     </div>
   );
@@ -166,8 +197,8 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       if (raw) {
         const d = JSON.parse(raw);
         if (typeof d.step === 'number') setStep(Math.max(0, Math.min(STEPS - 1, d.step)));
-        if (d.title) setTitle(d.title); if (d.goal) setGoal(d.goal); if (d.pratica) setPratica(d.pratica);
-        if (d.frequencia) setFrequencia(d.frequencia); if (d.frequenciaOutro) setFrequenciaOutro(d.frequenciaOutro);
+        if (d.title) setTitle(localizeLegacyGoal(d.title, t)); if (d.goal) setGoal(d.goal); if (d.pratica) setPratica(d.pratica);
+        if (d.frequencia) setFrequencia(normalizeLegacyFrequency(d.frequencia)); if (d.frequenciaOutro) setFrequenciaOutro(d.frequenciaOutro);
         if (d.plano) setPlano(d.plano); if (d.ritmo) setRitmo(d.ritmo); if (d.ritmoOutro) setRitmoOutro(d.ritmoOutro);
         if (d.dur) setDur(d.dur); if (d.customDur) setCustomDur(d.customDur); if (d.hoje) setHoje(d.hoje);
         if (d.first) setFirst(d.first); if (d.cat) { setCat(d.cat); setCatTocada(true); }
@@ -228,34 +259,16 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     { fala: t.wzUpQ5 || 'O que fez hoje ser o dia em que você decidiu começar?', exemplos: t.wzUpEx5 || ['Dei o primeiro passo', 'Cansei de adiar', 'Hoje eu tive um pouco de tempo'], aplicar: setHoje },
   ];
   const ajudaAtual = [S_TITULO, S_PORQUE, S_HOJE].includes(step) ? ajudaPorEtapa[step] : null;
-  const objetivoCategorias = [
-    ['Corpo e saúde', ['Voltar a treinar', 'Caminhar mais', 'Dormir melhor', 'Cuidar da alimentação', 'Beber mais água']],
-    ['Mente e bem-estar', ['Meditar', 'Ter mais calma', 'Cuidar da ansiedade', 'Fazer terapia', 'Ter mais tempo para mim']],
-    ['Estudos e aprendizado', ['Voltar a estudar', 'Aprender inglês', 'Ler mais', 'Fazer um curso', 'Estudar para uma prova']],
-    ['Vida prática', ['Organizar minha vida', 'Arrumar minha casa', 'Economizar dinheiro', 'Planejar minha rotina', 'Usar menos o celular']],
-    ['Projetos e criação', ['Começar um projeto', 'Tirar uma ideia do papel', 'Voltar a desenhar', 'Escrever um livro', 'Começar um negócio']],
-    ['Relacionamentos', ['Estar mais presente', 'Ligar para minha família', 'Fazer novos amigos', 'Cuidar do meu relacionamento', 'Aprender a conversar melhor']],
-  ];
+  const objetivoCategorias = t.wzGoalGroups || [];
   function escolherExemplo(exemplo) {
     ajudaAtual?.aplicar(exemplo);
     setAjudaAberta(false);
     setErro('');
   }
 
-  const fallbackSugestoes = (tipo, contexto) => {
-    const c = adivinhar(contexto);
-    if (tipo === 'acao') {
-      const porCat = {
-        body: ['Caminhar 20 minutos', 'Fazer um treino curto', 'Alongar por 10 minutos'],
-        study: ['Estudar uma aula', 'Ler 5 páginas', 'Fazer um exercício'],
-        creative: ['Desenhar por 15 minutos', 'Escrever um parágrafo', 'Praticar uma música'],
-        health: ['Beber mais água', 'Preparar uma refeição', 'Dormir no horário combinado'],
-        home: ['Arrumar uma gaveta', 'Organizar um cômodo', 'Guardar o que está fora do lugar'],
-      };
-      return porCat[c] || ['Dar um passo pequeno hoje', 'Reservar 20 minutos para isso', 'Começar pela parte mais simples'];
-    }
-    return ['Dei o primeiro passo', 'Cansei de adiar', 'Hoje eu tive um pouco de tempo'];
-  };
+  const fallbackSugestoes = (tipo) => (
+    tipo === 'acao' ? (t.wzUpEx2 || []).slice(0, 3) : (t.wzUpEx5 || []).slice(0, 3)
+  );
 
   async function buscarSugestoes(tipo, contexto) {
     const locais = fallbackSugestoes(tipo, contexto);
@@ -302,7 +315,16 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     try {
       const r = await fetch('/api/titulo', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ modo: 'organizar', rascunho: title.trim(), porque: goal.trim(), pratica: (frequencia === 'Personalizado' ? frequenciaOutro : frequencia).trim(), plano: plano.trim(), hoje: hoje.trim() }),
+        body: JSON.stringify({
+          modo: 'organizar',
+          rascunho: title.trim(),
+          porque: goal.trim(),
+          pratica: (frequencia === 'custom'
+            ? frequenciaOutro
+            : ({ daily: t.ritmoDiario, '3x': t.ritmo3x, weekends: t.ritmoFds }[frequencia] || frequencia)).trim(),
+          plano: plano.trim(),
+          hoje: hoje.trim(),
+        }),
       });
       const d = await r.json().catch(() => ({}));
       if (r.ok && d.titulo) {
@@ -585,8 +607,8 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
           </div>
         )}
         {ajudaAtual && ajudaAberta && step === S_TITULO && (
-          <div className="wz-up-modal" role="dialog" aria-modal="true" aria-label="Exemplos para começar">
-            <div className="wz-up-modal-head"><div><b>Encontre um ponto de partida</b><span>Escolha algo que tenha a ver com você.</span></div><button type="button" className="wz-up-modal-close" onClick={() => setAjudaAberta(false)} aria-label="Fechar">×</button></div>
+          <div className="wz-up-modal" role="dialog" aria-modal="true" aria-label={t.wzExamplesDialog}>
+            <div className="wz-up-modal-head"><div><b>{t.wzExamplesTitle}</b><span>{t.wzExamplesSub}</span></div><button type="button" className="wz-up-modal-close" onClick={() => setAjudaAberta(false)} aria-label={t.wzExamplesClose}>×</button></div>
             <div className="wz-up-categories">
               {objetivoCategorias.map(([categoria, exemplos]) => (
                 <section className="wz-up-category" key={categoria}>
@@ -595,7 +617,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
                 </section>
               ))}
             </div>
-            <button type="button" className="wz-up-write" onClick={() => setAjudaAberta(false)}>Escrever outra coisa</button>
+            <button type="button" className="wz-up-write" onClick={() => setAjudaAberta(false)}>{t.wzWriteOther}</button>
           </div>
         )}
       </div>
@@ -613,9 +635,9 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {step === S_PORQUE && (
         <div className="wz-body">
           {upSugestoesTipo === 'acao' && (
-            <div className="wz-ai-suggestions"><span className="wz-label">{upSugestoesBusy ? 'O Up está pensando…' : 'Sugestões para o seu objetivo'}</span>
+            <div className="wz-ai-suggestions"><span className="wz-label">{upSugestoesBusy ? t.wzUpThinking : t.wzActionSuggestions}</span>
               <div className="wz-suggestion-row">{upSugestoes.map((item) => <button type="button" key={item} onClick={() => setGoal(item)}>{item}</button>)}</div>
-              <button type="button" className="wz-up-write" onClick={() => setUpSugestoes([])}>Escrever outra coisa</button>
+              <button type="button" className="wz-up-write" onClick={() => setUpSugestoes([])}>{t.wzWriteOther}</button>
             </div>
           )}
           <div className="wz-line-area">
@@ -630,12 +652,12 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {step === S_PRATICA && (
         <div className="wz-body">
           <div className="wz-choice-grid">
-            {['Todos os dias', '3 vezes por semana', 'Fins de semana'].map((item) => (
-              <button type="button" className={`wz-choice${frequencia === item ? ' on' : ''}`} key={item} onClick={() => setFrequencia(item)}>{item}</button>
+            {[['daily', t.ritmoDiario], ['3x', t.ritmo3x], ['weekends', t.ritmoFds]].map(([value, label]) => (
+              <button type="button" className={`wz-choice${frequencia === value ? ' on' : ''}`} key={value} onClick={() => setFrequencia(value)}>{label}</button>
             ))}
-            <button type="button" className={`wz-choice${frequencia === 'Personalizado' ? ' on' : ''}`} onClick={() => setFrequencia('Personalizado')}>Personalizado</button>
+            <button type="button" className={`wz-choice${frequencia === 'custom' ? ' on' : ''}`} onClick={() => setFrequencia('custom')}>{t.ritmoOutro}</button>
           </div>
-          {frequencia === 'Personalizado' && <input className="wz-input" value={frequenciaOutro} onChange={(e) => setFrequenciaOutro(e.target.value)} maxLength={80} placeholder="Ex.: 2 vezes por semana" autoFocus />}
+          {frequencia === 'custom' && <input className="wz-input" value={frequenciaOutro} onChange={(e) => setFrequenciaOutro(e.target.value)} maxLength={80} placeholder={t.wzFrequencyCustomPh} autoFocus />}
         </div>
       )}
 
@@ -643,8 +665,8 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {step === S_PLANO && (
         <div className="wz-body">
           <input className="wz-input" value={plano} onChange={(e) => setPlano(e.target.value)}
-            maxLength={40} placeholder="Ex.: 30" autoFocus />
-          <p className="wz-hint">A IA organiza o ritmo e a duração na revisão final.</p>
+            maxLength={40} placeholder={t.wzDurationPh} autoFocus />
+          <p className="wz-hint">{t.wzDurationHint}</p>
         </div>
       )}
 
@@ -652,9 +674,9 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {step === S_HOJE && (
         <div className="wz-body">
           {upSugestoesTipo === 'primeiro' && (
-            <div className="wz-ai-suggestions"><span className="wz-label">{upSugestoesBusy ? 'O Up está pensando…' : 'Escolha uma forma de começar'}</span>
+            <div className="wz-ai-suggestions"><span className="wz-label">{upSugestoesBusy ? t.wzUpThinking : t.wzStartSuggestions}</span>
               <div className="wz-suggestion-row">{upSugestoes.map((item) => <button type="button" key={item} onClick={() => setHoje(item)}>{item}</button>)}</div>
-              <button type="button" className="wz-up-write" onClick={() => setUpSugestoes([])}>Escrever outra coisa</button>
+              <button type="button" className="wz-up-write" onClick={() => setUpSugestoes([])}>{t.wzWriteOther}</button>
             </div>
           )}
           <div className="wz-line-area">
@@ -666,24 +688,24 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
       {step === S_MIDIA && (
         <div className="wz-body wz-media-step">
-          <div className="wz-up-help wz-up-media-copy"><img className="upi-char bob" src="/upi.svg" alt="" aria-hidden="true" /><div className="wz-up-help-copy"><p>Que tal registrar este momento com uma foto ou vídeo?</p></div></div>
+          <div className="wz-up-help wz-up-media-copy"><img className="upi-char bob" src="/upi.svg" alt="" aria-hidden="true" /><div className="wz-up-help-copy"><p>{t.wzMediaUp}</p></div></div>
           <div className="wz-media-actions">
             <button type="button" className={`wz-media-action${photoUrl ? ' on' : ''}`} onClick={() => photoRef.current?.click()} disabled={uploading}>{uploading ? t.uploading : (photoUrl ? t.photoAdded : t.addPhoto)}</button>
             <button type="button" className={`wz-media-action${videoUrl ? ' on' : ''}`} onClick={() => videoRef.current?.click()} disabled={uploading}>{uploading ? t.uploading : (videoUrl ? t.videoAdded : t.addVideo)}</button>
             <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPhoto} />
             <input ref={videoRef} type="file" accept="video/*" hidden onChange={onVideo} />
           </div>
-          <p className="wz-media-note">O vídeo será preservado no formato original. No feed, ele aparece em um quadro 4:5 com opção de expandir.</p>
+          <p className="wz-media-note">{t.wzMediaNote}</p>
           {(photoUrl || videoUrl) && <div className="wz-media"><>{photoUrl ? <img src={photoUrl} alt="" /> : <video src={videoUrl} controls playsInline />}</></div>}
           {rawPhotoUrl && (
-            <div className="crop-modal" role="dialog" aria-modal="true" aria-label="Enquadrar foto">
+            <div className="crop-modal" role="dialog" aria-modal="true" aria-label={t.wzCropPhoto}>
               <div className="crop-modal-card">
                 <ImageCropper src={rawPhotoUrl} labels={t.crop || {}} aspects={[['portrait', 4 / 5]]}
                   onDone={onPhotoCropDone} onCancel={onPhotoCropCancel} />
               </div>
             </div>
           )}
-          <button type="button" className="wz-media-skip" onClick={() => irPara(S_REV)}>Continuar sem foto ou vídeo</button>
+          <button type="button" className="wz-media-skip" onClick={() => irPara(S_REV)}>{t.wzMediaSkip}</button>
         </div>
       )}
 
@@ -691,25 +713,25 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
       {step === S_REV && (
         <div className="wz-preview-wrap">
-          <span className="wz-preview-kicker">Prévia do post</span>
+          <span className="wz-preview-kicker">{t.wzPostPreview}</span>
           <article className="entry wz-preview-entry">
             <div className="entry-head">
               <div className="entry-person">
                 <span className="entry-ava wz-preview-ava">V</span>
-                <span className="entry-id"><b>Você</b><small><span className="entry-journey">{title || 'Minha jornada'}</span> · Dia 1</small></span>
+                <span className="entry-id"><b>{t.wzYou}</b><small><span className="entry-journey">{title || t.wzMyJourney}</span> · {t.wzDayOne}</small></span>
               </div>
             </div>
             {(photoUrl || videoUrl) && (
               <div className="entry-media livre wz-preview-media" style={{ aspectRatio: '4 / 5' }}>
                 {photoUrl
-                  ? <img src={photoUrl} alt="Prévia da foto do Dia 1" />
+                  ? <img src={photoUrl} alt={t.wzPreviewPhotoAlt} />
                   : <video src={videoUrl} controls playsInline />}
               </div>
             )}
             {(first || hoje) && <div className="dp-text under wz-preview-text"><p className="entry-text">{first || hoje}</p></div>}
-            <PreviewActions />
+            <PreviewActions t={t} />
           </article>
-          <button type="button" className="wz-preview-edit" onClick={voltar}>Voltar e editar</button>
+          <button type="button" className="wz-preview-edit" onClick={voltar}>{t.wzBackEdit}</button>
         </div>
       )}
 
@@ -723,7 +745,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
       {rascunhoStatus && <p className="wz-draft-status" aria-live="polite">{rascunhoStatus}</p>}
       {ajErro && <p className="wz-aj-err">{ajErro}</p>}
-      {organizando && <p className="wz-organizando" aria-live="polite">Organizando sua jornada…</p>}
+      {organizando && <p className="wz-organizando" aria-live="polite">{t.wzOrganizing}</p>}
       {erro && <p className="wz-erro" role="alert">{erro}</p>}
 
       <div className="wz-nav">

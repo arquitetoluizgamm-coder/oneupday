@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '../lib/supabase/client';
 import { comCapa } from '../lib/media';
 
-export default function MediaGallery({ items, showVis, visLabels, own, deleteLabel, deleteConfirm }) {
+export default function MediaGallery({ items, showVis, visLabels, own, deleteLabel, deleteConfirm, navLabels }) {
   const [list, setList] = useState(items || []);
   const [open, setOpen] = useState(-1);
   const [busy, setBusy] = useState(false);
@@ -15,6 +15,7 @@ export default function MediaGallery({ items, showVis, visLabels, own, deleteLab
   }, [open]);
   if (!list.length) return null;
   const V = visLabels || {};
+  const N = navLabels || {};
 
   async function remove(m) {
     if (busy) return;
@@ -53,7 +54,7 @@ export default function MediaGallery({ items, showVis, visLabels, own, deleteLab
       </div>
       {open >= 0 && list[open] && (
         <div className="lightbox" onClick={() => setOpen(-1)}>
-          <button className="lb-close" onClick={() => setOpen(-1)} aria-label="Fechar">✕</button>
+          <button className="lb-close" onClick={() => setOpen(-1)} aria-label={N.close || 'Close'}>✕</button>
           {own && <button className="lb-del" onClick={(e) => { e.stopPropagation(); remove(list[open]); }} disabled={busy} aria-label={deleteLabel}>🗑 {deleteLabel}</button>}
           <div className="lb-inner" onClick={(e) => e.stopPropagation()}>
             {list[open].kind === 'video'
@@ -62,8 +63,8 @@ export default function MediaGallery({ items, showVis, visLabels, own, deleteLab
           </div>
           {list.length > 1 && (
             <>
-              <button className="lb-nav prev" onClick={(e) => { e.stopPropagation(); setOpen((open - 1 + list.length) % list.length); }} aria-label="Anterior">‹</button>
-              <button className="lb-nav next" onClick={(e) => { e.stopPropagation(); setOpen((open + 1) % list.length); }} aria-label="Próxima">›</button>
+              <button className="lb-nav prev" onClick={(e) => { e.stopPropagation(); setOpen((open - 1 + list.length) % list.length); }} aria-label={N.previous || 'Previous'}>‹</button>
+              <button className="lb-nav next" onClick={(e) => { e.stopPropagation(); setOpen((open + 1) % list.length); }} aria-label={N.next || 'Next'}>›</button>
             </>
           )}
         </div>

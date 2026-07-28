@@ -57,7 +57,8 @@ export async function POST(req) {
   const tipoSugestoes = corte(body.tipo, 20);
   const contextoSugestoes = corte(body.contexto, 300);
 
-  const lang = getLocale() === 'en' ? 'English' : 'português do Brasil';
+  const locale = getLocale();
+  const lang = locale === 'en' ? 'English' : locale === 'es' ? 'español' : 'português do Brasil';
   const NUNCA_INVENTE = 'Use SOMENTE informação que a pessoa deu. Nunca invente número, prazo, motivo ou detalhe.';
   const SEM_MOTIVACAO = 'Nada de motivação genérica, elogio, adjetivo de valor, emoji, exclamação ou dois-pontos.';
 

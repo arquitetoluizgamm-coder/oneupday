@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { createClient } from '../../lib/supabase/client';
 import { track } from '../../lib/track';
 
-export default function EncourageBar({ updateId, mediaId, labelIdle, labelActive, supportersLabel = 'See who is with you', supportersLoading = 'Loading…', supportersEmpty = 'You are the first to show up here.', initialActive = false }) {
+export default function EncourageBar({ updateId, mediaId, labelIdle, labelActive, supportersLabel = 'See who is with you', supportersLoading = 'Loading…', supportersEmpty = 'You are the first to show up here.', closeLabel = 'Close', initialActive = false }) {
   const col = mediaId ? 'media_id' : 'update_id';
   const val = mediaId || updateId;
   const [active, setActive] = useState(initialActive);
@@ -54,7 +54,7 @@ export default function EncourageBar({ updateId, mediaId, labelIdle, labelActive
         <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.8M16 14a5 5 0 0 1 4.5 5"/></svg>
       </button>
       {supportersOpen && people && <div className="supporters-popover">
-        <button type="button" className="supporters-close" onClick={() => setSupportersOpen(false)} aria-label="Fechar">×</button>
+        <button type="button" className="supporters-close" onClick={() => setSupportersOpen(false)} aria-label={closeLabel}>×</button>
         {people.length ? people.map(p => p.handle ? <a key={p.id} href={`/${p.handle}`}>{p.name}</a> : <span key={p.id}>{p.name}</span>) : <span>{supportersEmpty}</span>}
       </div>}
     </div>

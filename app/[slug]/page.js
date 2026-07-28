@@ -263,8 +263,8 @@ async function ProfilePage({ handle }) {
             </>
           )}
           /* sem foto nenhuma, a aba nao existe — nao ha nada atras dela */
-          album={album.length > 0 ? <MediaGallery items={album} /> : null}
-          quotes={citacoes.length > 0 ? <MediaGallery items={citacoes} /> : null}
+          album={album.length > 0 ? <MediaGallery items={album} navLabels={{ close: t.commentClose, previous: t.dpPrev, next: t.dpNext }} /> : null}
+          quotes={citacoes.length > 0 ? <MediaGallery items={citacoes} navLabels={{ close: t.commentClose, previous: t.dpPrev, next: t.dpNext }} /> : null}
           people={null}
         />
       </main>
@@ -669,8 +669,8 @@ export default async function JourneyPage({ params, searchParams }) {
                     </ul>
                   </div>
                 )}
-                <div className="update-foot">
-                  <EncourageBar updateId={u.id} initialActive={myEncSet.has(u.id)} labelIdle={t.withYouIdle} labelActive={t.withYouActive} supportersLabel={t.supporters} supportersLoading={t.supportersLoading} supportersEmpty={t.supportersEmpty} />
+                <div className="update-foot journey-icon-actions">
+                  <EncourageBar updateId={u.id} initialActive={myEncSet.has(u.id)} labelIdle={t.withYouIdle} labelActive={t.withYouActive} supportersLabel={t.supporters} supportersLoading={t.supportersLoading} supportersEmpty={t.supportersEmpty} closeLabel={t.commentClose} />
                   <Comments updateId={u.id} labels={{ comment: t.comment, close: t.commentClose, empty: t.commentEmpty, placeholder: t.commentPlaceholder, send: t.commentSend, sending: t.commentSending, unsafe: t.commentUnsafe, pendente: t.commentPendente, error: t.commentError, someone: t.commentSomeone, reply: t.commentReply, more: t.commentMore, less: t.commentLess, replying: t.commentReplying, cancel: t.commentCancel }} />
                   {isOwner
                     ? <EditUpdate update={{ id: u.id, text: u.text, alt: u.alt, photo_url: u.photo_url, day: u.day_number }} labels={{ altLabel: t.altLabel, altPh: t.altPh, altOk: t.altOk, altVazio: t.altVazio, btn: t.euBtn, title: t.euTitle, text: t.euText, photo: t.euPhoto, photoAdd: t.ejCoverAdd, photoChange: t.ejCoverChange, photoRemove: t.ejCoverRemove, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errSave: t.epErrSave, errEmpty: t.euErrEmpty, deletePost: t.euDeletePost, deleteConfirm: t.postDeleteConfirm, cropOriginal: t.cropOriginal, cropSquare: t.cropSquare, cropPortrait: t.cropPortrait, cropLandscape: t.cropLandscape, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropHintOriginal: t.cropHintOriginal, cropZoom: t.cropZoom }} />

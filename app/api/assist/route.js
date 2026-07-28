@@ -26,7 +26,8 @@ export async function POST(req) {
   const ctx = `Jornada: "${journey.title}". Motivo: ${journey.goal || '-'}.\nÚltimos passos:\n` +
     (ups || []).map(u => `- Dia ${u.day_number} [${u.kind}]: ${(u.text || '').slice(0, 120)}`).join('\n');
 
-  const lang = getLocale() === 'pt' ? 'português do Brasil' : 'English';
+  const locale = getLocale();
+  const lang = locale === 'pt' ? 'português do Brasil' : locale === 'es' ? 'español' : 'English';
   let system, prompt;
   if (mode === 'write') {
     system = `Você ajuda alguém a escrever um update curto e honesto da própria jornada no app One Up Day. Primeira pessoa, 1-2 frases, humilde e real, sem clichê motivacional. Se houver rascunho, melhore mantendo a voz da pessoa. Escreva em ${lang}. Responda só com o texto do update, sem aspas.`;

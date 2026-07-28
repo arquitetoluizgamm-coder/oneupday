@@ -39,7 +39,7 @@ export async function POST() {
   const facts = lines.join('\n');
 
   const locale = getLocale();
-  const lang = locale === 'pt' ? 'português do Brasil' : 'English';
+  const lang = locale === 'pt' ? 'português do Brasil' : locale === 'es' ? 'español' : 'English';
   const system = [
     'Você é uma companhia de progresso do app One Up Day.',
     'Você NÃO é terapeuta e não faz diagnóstico nem tratamento psicológico ou médico.',

@@ -17,7 +17,7 @@ export default function Amanha({ people, labels }) {
 
   return (
     <article className="entry aux-post am-block">
-      <header className="aux-post-head"><span className="aux-post-mark" aria-hidden="true">↗</span><div><b>{L.title || 'Amanhã por aqui'}</b><small>Algumas jornadas continuam amanhã.</small></div></header>
+      <header className="aux-post-head"><span className="aux-post-mark" aria-hidden="true">↗</span><div><b>{L.title || 'Tomorrow around here'}</b><small>{L.sub || 'Some journeys continue tomorrow.'}</small></div></header>
       <div className="am-list">
         {list.map((x, i) => {
           const p = x.owner || {};

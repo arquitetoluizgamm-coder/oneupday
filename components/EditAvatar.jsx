@@ -18,7 +18,7 @@ import ImageCropper from './ImageCropper';
 // `modo="linha"` desenha como item de menu; sem ele, continua
 // sendo o botao redondo (nada mais usa hoje, mas nao custa).
 // ============================================================
-export default function EditAvatar({ userId, label, uploadingLabel, modo }) {
+export default function EditAvatar({ userId, label, uploadingLabel, modo, errorLabel, dialogLabel, cropLabels }) {
   const ref = useRef(null);
   const [busy, setBusy] = useState(false);
   const [erro, setErro] = useState('');
@@ -54,7 +54,7 @@ export default function EditAvatar({ userId, label, uploadingLabel, modo }) {
       router.refresh();
     } catch (e) {
       console.error('[perfil] avatar:', e);
-      setErro('Não foi possível atualizar a foto. Tente novamente.');
+      setErro(errorLabel || 'Could not update the photo. Try again.');
     }
     setBusy(false);
     if (ref.current) ref.current.value = '';
@@ -78,9 +78,9 @@ export default function EditAvatar({ userId, label, uploadingLabel, modo }) {
       <input ref={ref} type="file" accept="image/*" hidden onChange={onPick} />
       {erro && <span className="profile-upload-error" role="alert">{erro}</span>}
       {rawUrl && (
-        <div className="crop-modal" role="dialog" aria-modal="true" aria-label="Ajustar foto do perfil">
+        <div className="crop-modal" role="dialog" aria-modal="true" aria-label={dialogLabel || 'Adjust profile photo'}>
           <div className="crop-modal-card">
-            <ImageCropper src={rawUrl} labels={{ square: 'Quadrada', original: 'Original', use: 'Usar foto', cancel: 'Cancelar', hint: 'Arraste e ajuste a foto', hintOriginal: 'A foto será usada inteira', zoom: 'Zoom' }} aspects={[['square', 1], ['original', null]]} onDone={onCropDone} onCancel={onCropCancel} />
+            <ImageCropper src={rawUrl} labels={cropLabels || {}} aspects={[['square', 1], ['original', null]]} onDone={onCropDone} onCancel={onCropCancel} />
           </div>
         </div>
       )}

@@ -31,7 +31,7 @@ export default function NeedsSupport({ people, labels }) {
 
   return (
     <article className="entry aux-post needs">
-      <header className="aux-post-head"><span className="aux-post-mark" aria-hidden="true">♥</span><div><b>{L.title}</b><small>Uma presença pode mudar o dia de alguém.</small></div></header>
+      <header className="aux-post-head"><span className="aux-post-mark" aria-hidden="true">♥</span><div><b>{L.title}</b><small>{L.sub}</small></div></header>
       <div className="needs-list">
         {list.map((p) => (
           <div key={p.id} className={`needs-person${sent[p.id] ? ' leaving' : ''}`}>

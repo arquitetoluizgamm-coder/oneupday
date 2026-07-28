@@ -122,8 +122,8 @@ export default function EditarJornada({ journey, currentDay = 0, t }) {
   return (
     <div className="ej-page">
       <section className="ej-section">
-        <h2 className="ej-section-title">Identidade</h2>
-        <p className="ej-section-sub">O que as pessoas entendem quando encontram sua jornada.</p>
+        <h2 className="ej-section-title">{L.ejIdentity}</h2>
+        <p className="ej-section-sub">{L.ejIdentitySub}</p>
       <label className="ep-field">{L.ejName}
         <input value={title} onChange={(e) => { setTitle(e.target.value); setSalvo(false); }} maxLength={80} />
       </label>
@@ -153,8 +153,8 @@ export default function EditarJornada({ journey, currentDay = 0, t }) {
       </section>
 
       <section className="ej-section">
-        <h2 className="ej-section-title">Plano</h2>
-        <p className="ej-section-sub">A categoria e o tempo que você escolheu para caminhar.</p>
+        <h2 className="ej-section-title">{L.ejPlan}</h2>
+        <p className="ej-section-sub">{L.ejPlanSub}</p>
       <div className="ep-field">{L.ejCategory}
         <div className="ej-chips">
           {CATS.map(([v, l]) => (
@@ -189,8 +189,8 @@ export default function EditarJornada({ journey, currentDay = 0, t }) {
       </section>
 
       <section className="ej-section">
-        <h2 className="ej-section-title">Quem acompanha</h2>
-        <p className="ej-section-sub">Você pode mudar isso quando quiser.</p>
+        <h2 className="ej-section-title">{L.ejAudience}</h2>
+        <p className="ej-section-sub">{L.ejAudienceSub}</p>
       <div className="ep-field">{L.ejPrivacy}
         <div className="wz-vis ej-vis">
           {VIS.map(([v, l, sub]) => (

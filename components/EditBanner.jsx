@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '../lib/supabase/client';
 import ImageCropper from './ImageCropper';
 
-export default function EditBanner({ userId, label, uploadingLabel, cropLabels, modo }) {
+export default function EditBanner({ userId, label, uploadingLabel, cropLabels, modo, errorLabel }) {
   const ref = useRef(null);
   const [busy, setBusy] = useState(false);
   const [rawUrl, setRawUrl] = useState('');
@@ -40,7 +40,7 @@ export default function EditBanner({ userId, label, uploadingLabel, cropLabels, 
       router.refresh();
     } catch (e) {
       console.error('[perfil] capa:', e);
-      setErro('Não foi possível atualizar a capa. Tente novamente.');
+      setErro(errorLabel || 'Could not update the cover. Try again.');
     }
     setBusy(false);
     if (ref.current) ref.current.value = '';
