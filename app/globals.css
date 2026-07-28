@@ -5775,6 +5775,15 @@ h1 { letter-spacing: -0.03em; }
   min-height:48px;resize:none;overflow:hidden;white-space:normal;
   overflow-wrap:anywhere;word-break:break-word;
 }
+.wz-up-help{display:flex;align-items:center;gap:10px;margin:14px 0 0;padding:10px 12px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.58);text-align:left}
+.wz-up-help img{width:42px;height:42px;flex:0 0 42px}
+.wz-up-help-copy{min-width:0;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.wz-up-help-copy p{margin:0;color:var(--ink);font-size:13px;line-height:1.35;font-weight:650}
+.wz-up-help-copy button{border:0;background:none;color:var(--terracotta,#C16F54);font:inherit;font-size:12px;font-weight:800;white-space:nowrap;cursor:pointer;padding:6px 0}
+.wz-up-examples{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 2px;padding-left:52px}
+.wz-up-examples button{border:1px solid var(--line);background:var(--surface);border-radius:999px;color:var(--ink);font:inherit;font-size:12px;font-weight:650;line-height:1.2;padding:8px 11px;cursor:pointer;transition:background .16s ease,border-color .16s ease,transform .16s ease}
+.wz-up-examples button:hover,.wz-up-examples button:focus-visible{background:#fff;border-color:#C16F54;transform:translateY(-1px);outline:none}
+@media(max-width:560px){.wz-up-help-copy{display:block}.wz-up-help-copy button{display:inline-block;margin-top:4px}.wz-up-examples{padding-left:0}}
 .wz-rev-linha{display:flex;flex-wrap:wrap;gap:18px}
 .wz-rev-par{font-size:14px;color:var(--ink)}
 .wz-rev-par b{

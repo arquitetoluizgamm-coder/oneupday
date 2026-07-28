@@ -94,6 +94,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   const [ajItens, setAjItens] = useState([]);
   const [ajBusy, setAjBusy] = useState('');
   const [ajErro, setAjErro] = useState('');
+  const [ajudaAberta, setAjudaAberta] = useState(false);
   const [organizando, setOrganizando] = useState(false);
   const [iaOrganizou, setIaOrganizou] = useState(false);
 
@@ -123,7 +124,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
   // Trocar de tela limpa a ajuda: sugestão de uma pergunta aparecendo
   // embaixo de outra é o tipo de coisa que faz a pessoa desconfiar do app.
-  useEffect(() => { setAjPergunta(''); setAjResposta(''); setAjItens([]); setAjErro(''); }, [step]);
+  useEffect(() => { setAjPergunta(''); setAjResposta(''); setAjItens([]); setAjErro(''); setAjudaAberta(false); }, [step]);
 
   // A IA preenche a revisão por código, sem disparar onInput. Recalcular
   // aqui garante que respostas longas apareçam inteiras também nesse caso.
@@ -146,6 +147,22 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     [t.wzTHoje, t.wzSHoje],
     [t.wzTRev, t.wzSRev],
   ];
+
+  // O Up oferece caminhos concretos sem obrigar a pessoa a escolher um.
+  // Cada exemplo preenche apenas a resposta da tela atual e continua editável.
+  const ajudaPorEtapa = [
+    { fala: 'Quer algumas ideias para encontrar um objetivo que tenha a ver com você?', exemplos: ['Voltar a treinar', 'Dormir melhor', 'Voltar a estudar', 'Organizar minha vida', 'Começar um projeto', 'Cuidar melhor da minha saúde', 'Parar um hábito', 'Ter mais tempo para mim'], aplicar: setTitle },
+    { fala: 'Quer transformar esse objetivo em uma ação simples?', exemplos: ['Caminhar 20 minutos', 'Estudar uma aula', 'Beber mais água', 'Escrever o primeiro parágrafo', 'Arrumar uma gaveta', 'Ligar para alguém de quem sinto falta'], aplicar: setGoal },
+    { fala: 'Quer ver ritmos que cabem na vida real?', exemplos: ['Todos os dias', 'Três vezes por semana', 'Nos fins de semana', 'Um pouco toda manhã', 'Quando eu conseguir'], aplicar: setFrequencia },
+    { fala: 'Quer começar pequeno ou se dar mais tempo?', exemplos: ['7 dias', '30 dias', '60 dias', '100 dias', 'Vou decidir no caminho'], aplicar: setPlano },
+    { fala: 'O que fez hoje ser o dia em que você decidiu começar?', exemplos: ['Dei o primeiro passo', 'Cansei de adiar', 'Alguém me encorajou', 'Hoje eu tive um pouco de tempo', 'Quero tentar de novo'], aplicar: setHoje },
+  ];
+  const ajudaAtual = step < S_REV ? ajudaPorEtapa[step] : null;
+  function escolherExemplo(exemplo) {
+    ajudaAtual?.aplicar(exemplo);
+    setAjudaAberta(false);
+    setErro('');
+  }
 
   // ============================================================
   // A IA. Sempre o mesmo contrato: ela recebe o que a pessoa
@@ -425,6 +442,24 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         <span className="wz-count">{(t.wizStep || '{n}/{t}').replace('{n}', step + 1).replace('{t}', STEPS)}</span>
         <h1>{heads[step][0]}</h1>
         <p className="wz-explain">{heads[step][1]}</p>
+        {ajudaAtual && (
+          <div className={`wz-up-help${ajudaAberta ? ' aberta' : ''}`}>
+            <img src="/upi.svg" alt="" aria-hidden="true" />
+            <div className="wz-up-help-copy">
+              <p>{ajudaAtual.fala}</p>
+              <button type="button" onClick={() => setAjudaAberta((v) => !v)} aria-expanded={ajudaAberta}>
+                {ajudaAberta ? 'Esconder exemplos' : 'Ver exemplos'}
+              </button>
+            </div>
+          </div>
+        )}
+        {ajudaAtual && ajudaAberta && (
+          <div className="wz-up-examples" aria-label="Exemplos para começar">
+            {ajudaAtual.exemplos.map((exemplo) => (
+              <button type="button" key={exemplo} onClick={() => escolherExemplo(exemplo)}>{exemplo}</button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ---------------- 1 · o que ---------------- */}
