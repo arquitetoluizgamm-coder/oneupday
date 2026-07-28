@@ -71,6 +71,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   const [title, setTitle] = useState('');
   const [goal, setGoal] = useState('');
   const [pratica, setPratica] = useState('');
+  const [plano, setPlano] = useState('');
   const [ritmo, setRitmo] = useState('');
   const [ritmoOutro, setRitmoOutro] = useState('');
   const [dur, setDur] = useState('30');
@@ -92,6 +93,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   const [ajItens, setAjItens] = useState([]);
   const [ajBusy, setAjBusy] = useState('');
   const [ajErro, setAjErro] = useState('');
+  const [organizando, setOrganizando] = useState(false);
 
   const photoRef = useRef(null);
   const videoRef = useRef(null);
@@ -154,6 +156,30 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     if (ajBusy || title.trim().length < 2) return;
     const d = await pedir('pergunta', { rascunho: title.trim() });
     if (d?.pergunta) setAjPergunta(d.pergunta);
+  }
+
+  async function organizarRascunho() {
+    if (organizando) return;
+    setOrganizando(true); setAjErro('');
+    try {
+      const r = await fetch('/api/titulo', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ modo: 'organizar', rascunho: title.trim(), porque: goal.trim(), pratica: pratica.trim(), plano: plano.trim(), hoje: hoje.trim() }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok && d.titulo) {
+        setTitle(d.titulo || title);
+        setGoal(d.descricao || goal);
+        setPratica(d.pratica || pratica);
+        setFirst(d.primeiro || hoje);
+        if (d.dias) { const n = String(d.dias); setDur(['7', '30', '60', '100'].includes(n) ? n : 'other'); if (!['7', '30', '60', '100'].includes(n)) setCustomDur(n); }
+        if (d.ritmo === 'diario' || d.ritmo === '3x' || d.ritmo === 'fds') { setRitmo(d.ritmo); setRitmoOutro(''); }
+        else if (d.ritmo) { setRitmo('outro'); setRitmoOutro(d.ritmo); }
+        const categoria = CATS.find(([v]) => v === d.categoria)?.[0];
+        if (categoria) { setCat(categoria); setCatTocada(true); }
+      }
+    } catch { setAjErro(t.ajErro || ''); }
+    setOrganizando(false);
   }
 
   async function montarTitulo() {
@@ -221,7 +247,11 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     setStep(n);
     if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  function avancar() { if (podeAvancar && step < STEPS - 1) irPara(step + 1); }
+  async function avancar() {
+    if (!podeAvancar || step >= STEPS - 1) return;
+    if (step === S_HOJE) await organizarRascunho();
+    irPara(step + 1);
+  }
   function voltar() { if (step > 0) irPara(step - 1); }
 
   async function upload(file) {
@@ -353,61 +383,12 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         <p>{heads[step][1]}</p>
       </div>
 
-      {/* a jornada nascendo — cresce a cada tela */}
-      {title.trim() && step !== S_REV && (
-        <aside className="wz-prev" aria-hidden="true">
-          <span className="wz-prev-tag">{t.wizPreview}</span>
-          <b className="wz-prev-title">{title.trim()}</b>
-          {totalPreview > 0 && (
-            <div className="wz-prev-line">
-              <span className="wz-prev-dots">
-                {Array.from({ length: Math.min(totalPreview, 12) }).map((_, i) => (
-                  <i key={i} className={i === 0 ? 'on' : ''} />
-                ))}
-              </span>
-              <em>{(t.dayXofY || 'Dia {d} de {t}').replace('{d}', 1).replace('{t}', totalPreview)}</em>
-            </div>
-          )}
-          {goal.trim() && <q className="wz-prev-why">{goal.trim()}</q>}
-          {catLabel && <span className="wz-prev-cat">{catLabel}</span>}
-        </aside>
-      )}
-
       {/* ---------------- 1 · o que ---------------- */}
       {step === S_TITULO && (
         <div className="wz-body">
           <input className="wz-input" value={title} onChange={(e) => setTitle(e.target.value)}
             maxLength={80} placeholder={t.fNamePh} autoFocus />
 
-          {!title.trim() && sugestoes.length > 0 && (
-            <div className="wz-sugs">
-              {sugestoes.map((sg, i) => (
-                <button type="button" key={i} className="wz-sug" onClick={() => setTitle(sg)}>{sg}</button>
-              ))}
-            </div>
-          )}
-
-          {/* A IA pergunta o que falta ser concreto; a pessoa responde; o
-              título sai das palavras dela. Nunca um cardápio de títulos
-              prontos — cardápio parecido produz feed parecido. */}
-          {title.trim().length >= 2 && !ajPergunta && botaoIA(t.ajBtn, pedirPergunta, 'pergunta')}
-
-          {ajPergunta && (
-            <div className="wz-aj">
-              <p className="wz-aj-q">{ajPergunta}</p>
-              <input className="wz-input" value={ajResposta} maxLength={200} autoFocus
-                placeholder={t.ajPh || ''} onChange={(e) => setAjResposta(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); montarTitulo(); } }} />
-              <div className="wz-aj-acts">
-                <button type="button" className="wz-aj-skip" onClick={() => { setAjPergunta(''); setAjResposta(''); }}>
-                  {t.ajPular || ''}
-                </button>
-                <button type="button" className="wz-aj-use" onClick={montarTitulo} disabled={!ajResposta.trim() || !!ajBusy}>
-                  {ajBusy === 'titulo' ? (t.ajPensando || '') : (t.ajUsar || '')}
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       )}
 
@@ -420,12 +401,6 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
             <span className="wz-opcional">{t.wizWhyOptional}</span>
             <span className="wz-inline-count">{goal.length}/300</span>
           </div>
-          {/* Pontos de partida, não motivos prontos. A IA nunca afirma o
-              que a pessoa sente — ela oferece começos de frase amplos
-              para a pessoa completar com a própria história. */}
-          {!goal.trim() && botaoIA(t.ajOpcoes, pedirPorques, 'porque')}
-          {listaDeAjuda((it) => setGoal(it + ' '))}
-          <p className="wz-hint">{t.wizWhyNote}</p>
         </div>
       )}
 
@@ -434,39 +409,15 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         <div className="wz-body">
           <input className="wz-input" value={pratica} onChange={(e) => setPratica(e.target.value)}
             maxLength={120} placeholder={t.wzPraticaPh} autoFocus />
-          {pratica.trim().length >= 2 && botaoIA(t.ajObservavel, pedirPraticas, 'pratica')}
-          {listaDeAjuda((it) => setPratica(it))}
         </div>
       )}
 
       {/* ---------------- 4 · plano ---------------- */}
       {step === S_PLANO && (
         <div className="wz-body">
-          <p className="wz-field-note">{t.wzSRitmo}</p>
-          <div className="wz-chips">
-            {RITMOS.map(([v, l]) => (
-              <button type="button" key={v} className={`wz-chip${ritmo === v ? ' on' : ''}`}
-                onClick={() => setRitmo(ritmo === v ? '' : v)}>{l}</button>
-            ))}
-          </div>
-          {ritmo === 'outro' && (
-            <input className="wz-input small" value={ritmoOutro} maxLength={60}
-              placeholder={t.ritmoOutroPh} onChange={(e) => setRitmoOutro(e.target.value)} />
-          )}
-          <p className="wz-field-note wz-field-note-gap">{t.wzSTempo}</p>
-          <div className="wz-chips">
-            {DURS.map(([v, l]) => (
-              <button type="button" key={v} className={`wz-chip${dur === v ? ' on' : ''}`} onClick={() => setDur(v)}>{l}</button>
-            ))}
-          </div>
-          {dur === 'other' && (
-            <div className="wz-num">
-              <input type="number" min="1" max="730" value={customDur}
-                onChange={(e) => setCustomDur(e.target.value)} placeholder={t.durCustomPh} />
-              <span>{t.durDaysWord}</span>
-            </div>
-          )}
-          <p className="wz-hint">{t.durHint}</p>
+          <input className="wz-input" value={plano} onChange={(e) => setPlano(e.target.value)}
+            maxLength={180} placeholder="Ex.: 30 dias, 3 vezes por semana" autoFocus />
+          <p className="wz-hint">A IA organiza o ritmo e a duração na revisão final.</p>
         </div>
       )}
 
@@ -477,18 +428,6 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
             <textarea value={hoje} onChange={(e) => setHoje(e.target.value)}
               maxLength={400} rows={4} placeholder={t.wzHojePh} autoFocus />
           </div>
-          {/* A única parte que a IA não pode inventar: por que HOJE. O
-              título e o motivo já estão na página; se o dia 1 repetisse
-              os dois, o feed ficaria com trinta posts iguais. */}
-          {hoje.trim().length >= 8 && botaoIA(t.ajPrimeiro, montarPrimeiro, 'primeiro')}
-          {first.trim() && (
-            <div className="wz-aj">
-              <p className="wz-aj-q">{t.wzRevDia1}</p>
-              <textarea className="wz-aj-txt" value={first} maxLength={500} rows={3}
-                onChange={(e) => setFirst(e.target.value)} />
-            </div>
-          )}
-
         </div>
       )}
 
@@ -584,6 +523,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       )}
 
       {ajErro && <p className="wz-aj-err">{ajErro}</p>}
+      {organizando && <p className="wz-organizando" aria-live="polite">Organizando sua jornada…</p>}
       {erro && <p className="wz-erro" role="alert">{erro}</p>}
 
       <div className="wz-nav">

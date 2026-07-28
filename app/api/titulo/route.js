@@ -31,7 +31,7 @@ export const dynamic = 'force-dynamic';
 // Nada disso é obrigatório em lugar nenhum: sem chave da OpenAI a
 // rota responde 503 e o wizard funciona inteiro com campo livre.
 // ============================================================
-const MODOS = new Set(['pergunta', 'titulo', 'porque', 'pratica', 'primeiro']);
+const MODOS = new Set(['pergunta', 'titulo', 'porque', 'pratica', 'primeiro', 'organizar']);
 
 export async function POST(req) {
   const key = process.env.OPENAI_API_KEY;
@@ -52,6 +52,8 @@ export async function POST(req) {
   const pratica = corte(body.pratica, 120);
   const ritmo = corte(body.ritmo, 60);
   const dias = parseInt(body.dias, 10) || 0;
+  const plano = corte(body.plano, 180);
+  const hoje = corte(body.hoje, 400);
 
   const lang = getLocale() === 'en' ? 'English' : 'português do Brasil';
   const NUNCA_INVENTE = 'Use SOMENTE informação que a pessoa deu. Nunca invente número, prazo, motivo ou detalhe.';
@@ -106,6 +108,28 @@ export async function POST(req) {
       'Responda só com as linhas.',
     ].join(' ');
     entrada = `Jornada: "${titulo}"\nO que a pessoa escreveu: "${rascunho || pratica}"`;
+  } else if (modo === 'organizar') {
+    if (!rascunho || !hoje) return NextResponse.json({}, { status: 400 });
+    system = [
+      'Organize as respostas de uma pessoa em um rascunho de jornada pessoal.',
+      `Responda SOMENTE um JSON válido, em ${lang}, sem markdown, com estas chaves exatas:`,
+      'titulo, descricao, pratica, ritmo, dias, primeiro, categoria.',
+      'titulo: curto, começando por verbo quando couber.',
+      'descricao: preserve o motivo contado pela pessoa, sem inventar sentimento.',
+      'pratica: transforme a ação em algo observável, usando somente o que foi dito.',
+      'ritmo: use diario, 3x, fds ou outro texto curto; se não houver informação, use vazio.',
+      'dias: número informado pela pessoa; se não houver, use 30.',
+      'primeiro: registro curto em primeira pessoa sobre o primeiro passo.',
+      'categoria: escolha somente body, health, mind, study, work, money, relationship, creative, home, habit, life ou other.',
+      NUNCA_INVENTE, SEM_MOTIVACAO,
+    ].join(' ');
+    entrada = [
+      `O que quero mudar: "${rascunho}"`,
+      porque && `Por que importa: "${porque}"`,
+      pratica && `O que farei na prática: "${pratica}"`,
+      plano && `Ritmo e duração: "${plano}"`,
+      `Meu primeiro passo hoje: "${hoje}"`,
+    ].filter(Boolean).join('\n');
   } else {
     // primeiro
     if (!resposta) return NextResponse.json({}, { status: 400 });
@@ -138,8 +162,9 @@ export async function POST(req) {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [{ role: 'system', content: system }, { role: 'user', content: entrada }],
-        max_tokens: modo === 'primeiro' ? 140 : 90,
+        max_tokens: modo === 'primeiro' ? 140 : (modo === 'organizar' ? 260 : 90),
         temperature: modo === 'porque' ? 0.7 : 0.4,
+        ...(modo === 'organizar' ? { response_format: { type: 'json_object' } } : {}),
       }),
     });
     if (!r.ok) return NextResponse.json({}, { status: 502 });
@@ -152,6 +177,23 @@ export async function POST(req) {
       .replace(/^["“]|["”]$/g, '')
       .replace(/[.]+\s*$/, '')
       .trim();
+
+    if (modo === 'organizar') {
+      try {
+        const objeto = JSON.parse(bruto);
+        return NextResponse.json({
+          titulo: corte(objeto.titulo, 80),
+          descricao: corte(objeto.descricao, 300),
+          pratica: corte(objeto.pratica, 120),
+          ritmo: corte(objeto.ritmo, 60),
+          dias: Math.min(730, Math.max(1, parseInt(objeto.dias, 10) || 30)),
+          primeiro: corte(objeto.primeiro, 500),
+          categoria: corte(objeto.categoria, 24),
+        });
+      } catch {
+        return NextResponse.json({}, { status: 502 });
+      }
+    }
 
     // Listas
     if (modo === 'porque' || modo === 'pratica') {
