@@ -50,7 +50,13 @@ export default function DiarioClient({ labels }) {
   return (
     <div className="diary-shell">
       <header className="diary-intro">
-        <div className="diary-intro-top"><div><p className="eyebrow">{labels.diaryEyebrow}</p><h1>{labels.diaryTitle}</h1><p>{labels.diarySub}</p></div><img className="diary-upi bob" src="/upi.svg" alt="Upi" /></div>
+        <p className="eyebrow">{labels.diaryEyebrow}</p>
+        <h1>{labels.diaryTitle}</h1>
+        <div className="diary-up-welcome">
+          <img className="diary-upi bob" src="/upi.svg" alt="Upi" />
+          <div className="diary-up-bubble"><b>Upi</b><p>{labels.diaryUpGreeting}</p></div>
+        </div>
+        <p>{labels.diarySub}</p>
       </header>
       <section className="diary-card">
         <label className="diary-date">{labels.diaryDate}<input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></label>
