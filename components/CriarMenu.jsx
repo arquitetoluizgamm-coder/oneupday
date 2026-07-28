@@ -15,6 +15,7 @@ const ICONES = {
   jornada: <path d="M5 12h14M12 5v14" />,
   citacao: <><path d="M4 6h16M4 11h11" /><path d="M7 20c-1.6 0-2.6-1-2.6-2.6 0-1.5 1-2.6 2.4-2.6 1.3 0 2.2.9 2.2 2.2 0 1.9-1.4 3.4-3.4 4.2" /><path d="M15 20c-1.6 0-2.6-1-2.6-2.6 0-1.5 1-2.6 2.4-2.6 1.3 0 2.2.9 2.2 2.2 0 1.9-1.4 3.4-3.4 4.2" /></>,
   diario: <><path d="M6 4.5A2.5 2.5 0 0 1 8.5 2H19v17H8.5A2.5 2.5 0 0 0 6 21.5z" /><path d="M6 4.5v17M10 6h5M10 10h5" /></>,
+  futuro: <><circle cx="12" cy="12" r="8.5" /><path d="M12 7v5l3 2M5 4 3 2M19 4l2-2" /></>,
 };
 
 export default function CriarMenu({ t, className = 'bn-create', tamanho = 26, rotulo }) {
@@ -32,6 +33,7 @@ export default function CriarMenu({ t, className = 'bn-create', tamanho = 26, ro
     { href: '/midia', icone: 'midia', texto: t.navMedia },
     { href: '/citacao', icone: 'citacao', texto: t.navQuote },
     { href: '/diario', icone: 'diario', texto: t.navDiary },
+    { href: '/futuro', icone: 'futuro', texto: t.futureTitle },
     { href: '/new', icone: 'jornada', texto: t.navJourney },
   ];
 
