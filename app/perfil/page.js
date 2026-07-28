@@ -265,8 +265,9 @@ export default async function Perfil() {
                 sair={<form action="/auth/signout" method="post"><button className="pm-sair-btn" type="submit">{t.signOut}</button></form>}
               >
                 <div className="pm-linhas">
+                  <p className="pm-section-hint">Personalize sua foto e sua capa</p>
                   <EditAvatar userId={user.id} label={t.editPhoto} uploadingLabel={t.uploading} modo="linha" />
-                  <EditBanner userId={user.id} label={t.editBanner} uploadingLabel={t.uploading} cropLabels={{ cover: t.cropCover, use: t.cropUse, cancel: t.cropCancel, hint: t.cropHint, zoom: t.cropZoom }} />
+                  <EditBanner userId={user.id} label={t.editBanner} uploadingLabel={t.uploading} modo="linha" cropLabels={{ cover: t.cropCover, use: t.cropUse, cancel: t.cropCancel, hint: t.cropHint, zoom: t.cropZoom }} />
                   <EditProfileInfo userId={user.id} initialName={profile.name} initialHandle={profile.handle} labels={{ btn: t.epBtn, title: t.epTitle, name: t.epName, handle: t.epHandle, hint: t.epHint, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errName: t.epErrName, errHandle: t.epErrHandle, errTaken: t.epErrTaken, errSave: t.epErrSave }} />
                   <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
                 </div>

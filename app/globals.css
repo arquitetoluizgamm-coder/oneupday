@@ -5918,3 +5918,22 @@ h1 { letter-spacing: -0.03em; }
 
 /* O ritual apenas seleciona o estado do próximo registro. */
 .composer2 .ritual-btn.selected{background:#fff!important;box-shadow:0 0 0 2px currentColor,0 5px 14px rgba(16,19,45,.08);font-weight:850}
+
+/* Na página pública da jornada, as ações ficam silenciosas: o SVG continua
+   acessível por aria-label, mas o texto não compete com o relato. */
+.journey-icon-actions{display:flex;align-items:center;gap:18px}
+.journey-icon-actions .action-label{display:none!important}
+.journey-icon-actions .support-pill,
+.journey-icon-actions .feed-share,
+.journey-icon-actions .comment-toggle{display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;padding:4px;color:var(--muted);font-size:0;line-height:1}
+.journey-icon-actions .support-pill:hover,
+.journey-icon-actions .feed-share:hover,
+.journey-icon-actions .comment-toggle:hover{background:transparent;color:var(--ink)}
+.journey-icon-actions .support-pill svg,
+.journey-icon-actions .feed-share svg,
+.journey-icon-actions .comment-toggle svg{display:block;width:22px;height:22px}
+.journey-icon-actions .support-wrap{display:inline-flex;align-items:center;gap:6px;position:relative}
+.journey-icon-actions .supporters-icon{display:inline-flex;border:0;background:transparent;padding:3px;color:var(--muted)}
+.journey-icon-actions .supporters-icon svg{display:block;width:18px;height:18px}
+.profile-upload-error{display:block;margin-top:6px;color:#a64b43;font-size:11px;line-height:1.35}
+.pm-section-hint{margin:0 0 6px;color:var(--muted);font-size:11px;line-height:1.35}
