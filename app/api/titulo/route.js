@@ -115,19 +115,19 @@ export async function POST(req) {
       `Responda SOMENTE um JSON válido, em ${lang}, sem markdown, com estas chaves exatas:`,
       'titulo, descricao, pratica, ritmo, dias, primeiro, categoria.',
       'titulo: curto, concreto e começando por verbo quando couber. Não copie apenas as palavras soltas da resposta.',
-      'descricao: una o motivo e o contexto em 1 ou 2 frases naturais. Dê clareza para quem ler no feed, sem inventar sentimento.',
+      'descricao: una o objetivo e a ação em 1 ou 2 frases naturais. Dê clareza para quem ler no feed, sem inventar sentimento.',
       'pratica: transforme a ação em uma frase observável e específica, usando somente o que foi dito.',
-      'ritmo: use diario, 3x, fds ou outro texto curto; se não houver informação, use vazio.',
-      'dias: número informado pela pessoa; se não houver, use 30.',
+      'ritmo: interprete a resposta de frequência e use diario, 3x, fds ou outro texto curto; se não houver informação, use vazio.',
+      'dias: interprete a resposta de duração; use o número informado e, se não houver número, use 30.',
       'primeiro: registro curto, humano e em primeira pessoa sobre o primeiro passo. Combine as respostas quando isso deixar o Dia 1 mais claro.',
       'categoria: escolha somente body, health, mind, study, work, money, relationship, creative, home, habit, life ou other.',
       NUNCA_INVENTE, SEM_MOTIVACAO,
     ].join(' ');
     entrada = [
       `O que quero mudar: "${rascunho}"`,
-      porque && `Por que importa: "${porque}"`,
-      pratica && `O que farei na prática: "${pratica}"`,
-      plano && `Ritmo e duração: "${plano}"`,
+      porque && `Ação que vou fazer: "${porque}"`,
+      pratica && `Frequência: "${pratica}"`,
+      plano && `Duração: "${plano}"`,
       `Meu primeiro passo hoje: "${hoje}"`,
     ].filter(Boolean).join('\n');
   } else {

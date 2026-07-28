@@ -71,6 +71,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   const [title, setTitle] = useState('');
   const [goal, setGoal] = useState('');
   const [pratica, setPratica] = useState('');
+  const [frequencia, setFrequencia] = useState('');
   const [plano, setPlano] = useState('');
   const [ritmo, setRitmo] = useState('');
   const [ritmoOutro, setRitmoOutro] = useState('');
@@ -116,9 +117,9 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
   useEffect(() => {
     if (catTocada) return;
-    const g = adivinhar(title + ' ' + pratica);
+    const g = adivinhar(title + ' ' + goal);
     if (g) setCat(g);
-  }, [title, pratica, catTocada]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [title, goal, catTocada]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Trocar de tela limpa a ajuda: sugestão de uma pergunta aparecendo
   // embaixo de outra é o tipo de coisa que faz a pessoa desconfiar do app.
@@ -126,7 +127,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
   const heads = [
     [t.wizT1, t.wizS1],
-    [t.wizT3, t.wizS3],
+    [t.wizT2, t.wizS2],
     [t.wzTPratica, t.wzSPratica],
     [t.wzTRitmo, t.wzSRitmo],
     [t.wzTHoje, t.wzSHoje],
@@ -165,14 +166,14 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     try {
       const r = await fetch('/api/titulo', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ modo: 'organizar', rascunho: title.trim(), porque: goal.trim(), pratica: pratica.trim(), plano: plano.trim(), hoje: hoje.trim() }),
+        body: JSON.stringify({ modo: 'organizar', rascunho: title.trim(), porque: goal.trim(), pratica: frequencia.trim(), plano: plano.trim(), hoje: hoje.trim() }),
       });
       const d = await r.json().catch(() => ({}));
       if (r.ok && d.titulo) {
         setIaOrganizou(true);
         setTitle(d.titulo || title);
         setGoal(d.descricao || goal);
-        setPratica(d.pratica || pratica);
+        setPratica(d.pratica || goal);
         setFirst(d.primeiro || hoje);
         if (d.dias) { const n = String(d.dias); setDur(['7', '30', '60', '100'].includes(n) ? n : 'other'); if (!['7', '30', '60', '100'].includes(n)) setCustomDur(n); }
         if (d.ritmo === 'diario' || d.ritmo === '3x' || d.ritmo === 'fds') { setRitmo(d.ritmo); setRitmoOutro(''); }
@@ -181,9 +182,10 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         if (categoria) { setCat(categoria); setCatTocada(true); }
       } else {
         setIaOrganizou(false);
+        setPratica((current) => current || goal);
         setAjErro(t.ajErro || 'A recomendação não ficou disponível. Você pode tentar novamente.');
       }
-    } catch { setIaOrganizou(false); setAjErro(t.ajErro || 'A recomendação não ficou disponível. Você pode tentar novamente.'); }
+    } catch { setIaOrganizou(false); setPratica((current) => current || goal); setAjErro(t.ajErro || 'A recomendação não ficou disponível. Você pode tentar novamente.'); }
     setOrganizando(false);
   }
 
@@ -354,7 +356,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
   function crescerCampo(e) {
     e.currentTarget.style.height = 'auto';
-    e.currentTarget.style.height = `${Math.min(e.currentTarget.scrollHeight, 180)}px`;
+    e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
   }
 
   const totalPreview = dur === 'other' ? (parseInt(customDur || '0', 10) || 0) : parseInt(dur, 10);
@@ -407,7 +409,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         <div className="wz-body">
           <div className="wz-line-area">
             <textarea className="wz-input wz-grow-input" value={goal} onInput={crescerCampo} onChange={(e) => setGoal(e.target.value)}
-              maxLength={300} rows={1} placeholder={t.fWhyPh} autoFocus />
+              maxLength={180} rows={1} placeholder={t.wzActionPh} autoFocus />
             <span className="wz-inline-count">{goal.length}/300</span>
           </div>
         </div>
@@ -416,8 +418,8 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {/* ---------------- 3 · como praticar ---------------- */}
       {step === S_PRATICA && (
         <div className="wz-body">
-          <input className="wz-input" value={pratica} onChange={(e) => setPratica(e.target.value)}
-            maxLength={120} placeholder={t.wzPraticaPh} autoFocus />
+          <input className="wz-input" value={frequencia} onChange={(e) => setFrequencia(e.target.value)}
+            maxLength={80} placeholder={t.wzPraticaPh} autoFocus />
         </div>
       )}
 
@@ -425,7 +427,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {step === S_PLANO && (
         <div className="wz-body">
           <input className="wz-input" value={plano} onChange={(e) => setPlano(e.target.value)}
-            maxLength={180} placeholder="Ex.: 30 dias, 3 vezes por semana" autoFocus />
+            maxLength={40} placeholder="Ex.: 30" autoFocus />
           <p className="wz-hint">A IA organiza o ritmo e a duração na revisão final.</p>
         </div>
       )}
