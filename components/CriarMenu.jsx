@@ -14,6 +14,7 @@ const ICONES = {
   midia: <><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="9" cy="10" r="1.6" /><path d="m4 18 5-5 4 4 3-3 4 4" /></>,
   jornada: <path d="M5 12h14M12 5v14" />,
   citacao: <><path d="M4 6h16M4 11h11" /><path d="M7 20c-1.6 0-2.6-1-2.6-2.6 0-1.5 1-2.6 2.4-2.6 1.3 0 2.2.9 2.2 2.2 0 1.9-1.4 3.4-3.4 4.2" /><path d="M15 20c-1.6 0-2.6-1-2.6-2.6 0-1.5 1-2.6 2.4-2.6 1.3 0 2.2.9 2.2 2.2 0 1.9-1.4 3.4-3.4 4.2" /></>,
+  diario: <><path d="M6 4.5A2.5 2.5 0 0 1 8.5 2H19v17H8.5A2.5 2.5 0 0 0 6 21.5z" /><path d="M6 4.5v17M10 6h5M10 10h5" /></>,
 };
 
 export default function CriarMenu({ t, className = 'bn-create', tamanho = 26, rotulo }) {
@@ -30,6 +31,7 @@ export default function CriarMenu({ t, className = 'bn-create', tamanho = 26, ro
     { href: '/perfil', icone: 'hoje', texto: t.navToday, principal: true },
     { href: '/midia', icone: 'midia', texto: t.navMedia },
     { href: '/citacao', icone: 'citacao', texto: t.navQuote },
+    { href: '/diario', icone: 'diario', texto: t.navDiary },
     { href: '/new', icone: 'jornada', texto: t.navJourney },
   ];
 
