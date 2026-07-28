@@ -23,6 +23,10 @@ import { MOODS, moodGlow } from '../../lib/moods';
 import { comCapa } from '../../lib/media';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
+function OneLevel({ level, labels }) {
+  if (!level || !labels?.oneLevels?.[level.rank]) return null;
+  return <span className="one-level" style={{ color: level.color }} aria-label={`ONE ${labels.oneLevels[level.rank]}`}>ONE {labels.oneLevels[level.rank]}</span>;
+}
 
 function TrackTag({ track, float, hasBar }) {
   const [playing, setPlaying] = useState(false);
@@ -544,7 +548,7 @@ export default function FeedClient({ labels }) {
               <span className="entry-ava" style={{ background: item.owner.avatar_color || 'var(--orange)' }}>
                 {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}
               </span>
-              <span className="entry-id"><b>{item.owner.name}</b>{item.kind === 'quote' && labels.quoteLabel && <small className="entry-media-kind">{labels.quoteLabel.replace('{name}', item.owner.name || '')}</small>}</span>
+              <span className="entry-id"><b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} /></b>{item.kind === 'quote' && labels.quoteLabel && <small className="entry-media-kind">{labels.quoteLabel.replace('{name}', item.owner.name || '')}</small>}</span>
             </a>
             <MidiaGaleria item={item} labels={labels} />
             <div className="entry-actions feed-acts">
@@ -563,8 +567,8 @@ export default function FeedClient({ labels }) {
                   {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}
                 </span>
                 <span className="entry-id">
-                  <b>{item.owner.name}{item.historia && <span className="hist-selo">{labels.histSelo}</span>}{item.owner.mood && (labels.moods || {})[item.owner.mood] && <span className="entry-mood" style={{ color: MOODS[item.owner.mood] }}> · {labels.moods[item.owner.mood]}</span>}</b>
-                  <small><span className="entry-journey">{item.journey.title}</span> · {dayLabel(item.day_number)}</small>
+                  <b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} />{item.historia && <span className="hist-selo">{labels.histSelo}</span>}</b>
+                  <small><span className="entry-journey">{item.journey.title}</span> · {dayLabel(item.day_number)}{item.owner.mood && (labels.moods || {})[item.owner.mood] && <span className="entry-mood" style={{ color: MOODS[item.owner.mood] }}> · {labels.moods[item.owner.mood]}</span>}</small>
                 </span>
               </a>
               {item.owner.id && !item.own && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}

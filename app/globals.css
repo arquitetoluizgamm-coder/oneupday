@@ -1609,6 +1609,7 @@ img,video{max-width:100%}
 /* 1) UM ACENTO SÓ — cor sai; diferença por peso/texto (Seguir permanece) */
 .entry-kindline{color:var(--graphite)!important;opacity:.7}
 .entry-media-kind{display:block;color:var(--muted);font-size:11px;line-height:1.25;margin-top:2px;font-weight:600}
+.one-level{display:inline-block;margin-left:6px;font-size:10px;line-height:1.2;font-weight:800;letter-spacing:.04em;white-space:nowrap;vertical-align:middle}
 .entry-kindline::before{content:'—';font-size:12px;margin-right:7px;opacity:.6}
 .entry-head .follow-btn{color:var(--graphite)!important;font-weight:700}
 .entry-head .follow-btn.on{color:var(--muted)!important;font-weight:600}

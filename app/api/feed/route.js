@@ -148,6 +148,24 @@ export async function GET(req) {
   const mediaOwnerIds = [...new Set(mediaRows.map((m) => m.user_id))];
   const mediaIds = mediaRows.map((m) => m.id);
 
+  // Nivel ONE por dias distintos registrados, nunca por curtidas.
+  const levelOwnerIds = [...new Set([...ownerIds, ...mediaOwnerIds])];
+  const levelJourneysR = levelOwnerIds.length ? await guard(supabase.from('journeys').select('id, owner_id').in('owner_id', levelOwnerIds)) : { data: [] };
+  const levelJourneyRows = levelJourneysR.data || [];
+  const levelJourneyIds = [...new Set(levelJourneyRows.map((j) => j.id))];
+  const levelUpsR = levelJourneyIds.length ? await guard(supabase.from('updates').select('journey_id, day_number').in('journey_id', levelJourneyIds)) : { data: [] };
+  const ownerByJourney = {};
+  levelJourneyRows.forEach((j) => { ownerByJourney[j.id] = j.owner_id; });
+  const daysByLevelOwner = {};
+  (levelUpsR.data || []).forEach((u) => { const owner = ownerByJourney[u.journey_id]; if (owner) (daysByLevelOwner[owner] ||= new Set()).add(Number(u.day_number) || 0); });
+  const levelFor = (owner) => {
+    const count = daysByLevelOwner[owner]?.size || 0;
+    if (!count) return null;
+    const rank = count >= 30 ? 6 : count >= 15 ? 5 : count >= 7 ? 4 : count >= 3 ? 3 : count >= 1 ? 2 : 1;
+    const colors = { 1: '#87957A', 2: '#6F927D', 3: '#5F8790', 4: '#5C7D86', 5: '#C47152', 6: '#B58A42' };
+    return { rank, color: colors[rank] };
+  };
+
   const [supProfR, mediaProfR, mediaEncR] = await Promise.all([
     supIds.length ? guard(supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', supIds)) : { data: [] },
     mediaOwnerIds.length ? guard(supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', mediaOwnerIds)) : { data: [] },
@@ -216,7 +234,7 @@ export async function GET(req) {
       });
     }
   } catch {}
-  const mediaFeed = mediaRows.map((m) => ({ id: 'media-' + m.id, media: true, mediaId: m.id, url: m.url, kind: m.kind, caption: m.caption || '', created_at: m.created_at, owner: mediaProf[m.user_id] || {}, encouraged: mediaEncSet.has(m.id), challenge: challengeByOwner[m.user_id] || null, challengeable: canChallenge.has(m.user_id) }));
+  const mediaFeed = mediaRows.map((m) => ({ id: 'media-' + m.id, media: true, mediaId: m.id, url: m.url, kind: m.kind, caption: m.caption || '', created_at: m.created_at, owner: { ...(mediaProf[m.user_id] || {}), one_level: levelFor(m.user_id) }, encouraged: mediaEncSet.has(m.id), challenge: challengeByOwner[m.user_id] || null, challengeable: canChallenge.has(m.user_id) }));
   const mediaTotal = mediaFeed.length;
 
   // ---- a jornada é um post só: dias agrupados, navegáveis no card ----
@@ -261,7 +279,7 @@ export async function GET(req) {
       challenge: challengeByOwner[journey.owner_id] || null,
       challengeable: canChallenge.has(journey.owner_id),
       journey: { slug: journey.slug, title: journey.title, category: journey.category, total_days: journey.total_days, current_day: (statsByJourney[journey.id] || {}).current_day || 0, progress_pct: (statsByJourney[journey.id] || {}).progress_pct || 0 },
-      owner: { ...(profileMap[journey.owner_id] || {}), mood: ownerMoodById[journey.owner_id] || null },
+      owner: { ...(profileMap[journey.owner_id] || {}), mood: ownerMoodById[journey.owner_id] || null, one_level: levelFor(journey.owner_id) },
       own: journey.owner_id === user.id,
       track: trackByUpdate[item.id] || null,
       nextStep: item.closed_by ? null : (item.next_step || null), nextWhen: item.next_when || null,
