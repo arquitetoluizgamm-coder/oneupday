@@ -116,12 +116,21 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
 
 
   async function upload(file, extOverride) {
-    const supabase = createClient();
-    const ext = (extOverride || file.name?.split('.').pop() || 'bin').toLowerCase();
-    const path = `${journeyId}/${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from('photos').upload(path, file, { upsert: false });
-    if (error) return null;
-    return supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
+    try {
+      if (!file) return null;
+      const supabase = createClient();
+      const ext = (extOverride || file.name?.split('.').pop() || 'bin').toLowerCase();
+      const id = typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const path = `${journeyId}/${id}.${ext}`;
+      const { error } = await supabase.storage.from('photos').upload(path, file, { upsert: false });
+      if (error) { console.error('[upload] storage:', error); return null; }
+      return supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
+    } catch (error) {
+      console.error('[upload] unexpected:', error);
+      return null;
+    }
   }
 
   function onPickPhoto(e) {
@@ -139,12 +148,15 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     setRawUrl('');
     if (!toUpload) return;
     setUploading(true);
-    const url = await upload(toUpload, ext);
-    setUploading(false);
-    if (!url) { alert(t.error); return; }
-    setPhotoUrl(url); setVideoUrl(null);
-    if (videoRef.current) videoRef.current.value = '';
-    descrever(url);
+    try {
+      const url = await upload(toUpload, ext);
+      if (!url) { alert(t.error); return; }
+      setPhotoUrl(url); setVideoUrl(null);
+      if (videoRef.current) videoRef.current.value = '';
+      descrever(url);
+    } finally {
+      setUploading(false);
+    }
   }
   // O rascunho da descrição. Falhar aqui não custa nada: sem
   // chave, sem rede ou com o modelo fora do ar, o campo fica
@@ -171,11 +183,14 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     if (!file) return;
     if (file.size > MAX_VIDEO) { alert(t.videoTooBig); e.target.value = ''; return; }
     setUploading(true);
-    const url = await upload(file);
-    setUploading(false);
-    if (!url) { alert(t.error); return; }
-    setVideoUrl(url); setPhotoUrl(null); setAlt('');
-    if (photoRef.current) photoRef.current.value = '';
+    try {
+      const url = await upload(file);
+      if (!url) { alert(t.error); return; }
+      setVideoUrl(url); setPhotoUrl(null); setAlt('');
+      if (photoRef.current) photoRef.current.value = '';
+    } finally {
+      setUploading(false);
+    }
   }
 
   async function aiSoftWrite() { await aiWrite(); }

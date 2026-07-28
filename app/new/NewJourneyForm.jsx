@@ -275,25 +275,44 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   function voltar() { if (step > 0) irPara(step - 1); }
 
   async function upload(file) {
-    const supabase = createClient();
-    const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
-    const path = `${userId}/${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from('photos').upload(path, file, { upsert: false });
-    if (error) return null;
-    return supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
+    try {
+      if (!file) return null;
+      const supabase = createClient();
+      const ext = (file.name?.split('.').pop() || 'bin').toLowerCase();
+      const id = typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const path = `${userId}/${id}.${ext}`;
+      const { error } = await supabase.storage.from('photos').upload(path, file, { upsert: false });
+      if (error) { console.error('[wizard upload] storage:', error); return null; }
+      return supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
+    } catch (error) {
+      console.error('[wizard upload] unexpected:', error);
+      return null;
+    }
   }
   async function onPhoto(e) {
     const file = e.target.files?.[0]; if (!file) return;
-    setUploading(true); const url = await upload(file); setUploading(false);
-    if (!url) { setErro(t.createError); return; }
-    setPhotoUrl(url); setVideoUrl(null); if (videoRef.current) videoRef.current.value = '';
+    setUploading(true); setErro('');
+    try {
+      const url = await upload(file);
+      if (!url) { setErro(t.createError); return; }
+      setPhotoUrl(url); setVideoUrl(null); if (videoRef.current) videoRef.current.value = '';
+    } finally {
+      setUploading(false);
+    }
   }
   async function onVideo(e) {
     const file = e.target.files?.[0]; if (!file) return;
     if (file.size > MAX_VIDEO) { setErro(t.videoTooBig); e.target.value = ''; return; }
-    setUploading(true); const url = await upload(file); setUploading(false);
-    if (!url) { setErro(t.createError); return; }
-    setVideoUrl(url); setPhotoUrl(null); if (photoRef.current) photoRef.current.value = '';
+    setUploading(true); setErro('');
+    try {
+      const url = await upload(file);
+      if (!url) { setErro(t.createError); return; }
+      setVideoUrl(url); setPhotoUrl(null); if (photoRef.current) photoRef.current.value = '';
+    } finally {
+      setUploading(false);
+    }
   }
 
   // ============================================================
@@ -468,7 +487,8 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
           </div>
           <label className="wz-rev-campo">
             <span>{t.wzRevTitulo}</span>
-            <input className="wz-input" value={title} maxLength={80} onChange={(e) => setTitle(e.target.value)} />
+            <textarea className="wz-input wz-grow-input" value={title} maxLength={80} rows={1}
+              onInput={crescerCampo} onChange={(e) => setTitle(e.target.value)} />
           </label>
 
           <label className="wz-rev-campo">

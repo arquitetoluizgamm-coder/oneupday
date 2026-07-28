@@ -5400,7 +5400,7 @@ h1 { letter-spacing: -0.03em; }
 .jcover-text h1{
   margin:12px 0 10px;font-family:var(--display);color:var(--ink);
   font-size:32px;line-height:1.1;letter-spacing:-.035em;
-  text-wrap:balance;
+  text-wrap:balance;white-space:normal;overflow-wrap:anywhere;word-break:break-word;
 }
 /* 34rem é a medida de leitura confortável: acima disso o olho perde
    a linha ao voltar para a esquerda. */
@@ -5771,6 +5771,10 @@ h1 { letter-spacing: -0.03em; }
   background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;
 }
 .wz-rev-campo textarea:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+.wz-rev-campo .wz-grow-input{
+  min-height:48px;resize:none;overflow:hidden;white-space:normal;
+  overflow-wrap:anywhere;word-break:break-word;
+}
 .wz-rev-linha{display:flex;flex-wrap:wrap;gap:18px}
 .wz-rev-par{font-size:14px;color:var(--ink)}
 .wz-rev-par b{
