@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="72" viewBox="0 0 360 72">
+  <rect x="1" y="1" width="358" height="70" rx="35" fill="#FFFFFF" stroke="#17213A" stroke-width="2"/>
+  <path d="M170 17v38" stroke="#17213A" stroke-width="2" opacity=".4"/>
+  <text x="198" y="45" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#17213A">Legado</text>
+</svg>
