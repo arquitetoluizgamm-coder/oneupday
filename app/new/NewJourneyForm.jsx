@@ -24,8 +24,8 @@ const MAX_VIDEO = 60 * 1024 * 1024;
 // ============================================================
 // Cinco perguntas objetivas + uma tela final de revisão.
 // Ritmo e duração são uma única decisão: "como você quer seguir?".
-const STEPS = 6;
-const S_TITULO = 0, S_PORQUE = 1, S_PRATICA = 2, S_PLANO = 3, S_HOJE = 4, S_REV = 5;
+const STEPS = 7;
+const S_TITULO = 0, S_PORQUE = 1, S_PRATICA = 2, S_PLANO = 3, S_HOJE = 4, S_MIDIA = 5, S_REV = 6;
 
 const COLORS = {
   art: '#8A6A9B', body: '#5E6B55', health: '#6E8168', mind: '#5B7189',
@@ -72,6 +72,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   const [goal, setGoal] = useState('');
   const [pratica, setPratica] = useState('');
   const [frequencia, setFrequencia] = useState('');
+  const [frequenciaOutro, setFrequenciaOutro] = useState('');
   const [plano, setPlano] = useState('');
   const [ritmo, setRitmo] = useState('');
   const [ritmoOutro, setRitmoOutro] = useState('');
@@ -95,6 +96,9 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   const [ajBusy, setAjBusy] = useState('');
   const [ajErro, setAjErro] = useState('');
   const [ajudaAberta, setAjudaAberta] = useState(false);
+  const [upSugestoes, setUpSugestoes] = useState([]);
+  const [upSugestoesTipo, setUpSugestoesTipo] = useState('');
+  const [upSugestoesBusy, setUpSugestoesBusy] = useState(false);
   const [organizando, setOrganizando] = useState(false);
   const [iaOrganizou, setIaOrganizou] = useState(false);
 
@@ -145,23 +149,52 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     [t.wzTPratica, t.wzSPratica],
     [t.wzTRitmo, t.wzSRitmo],
     [t.wzTHoje, t.wzSHoje],
-    [t.wzTRev, t.wzSRev],
+    [t.wzTMidia, t.wzSMidia],
+    [t.wizTpriv || 'Quem vai ver?', t.wizSpriv || 'Escolha quem poderá acompanhar.'],
   ];
 
   // O Up oferece caminhos concretos sem obrigar a pessoa a escolher um.
   // Cada exemplo preenche apenas a resposta da tela atual e continua editável.
   const ajudaPorEtapa = [
-    { fala: 'Quer algumas ideias para encontrar um objetivo que tenha a ver com você?', exemplos: ['Voltar a treinar', 'Dormir melhor', 'Voltar a estudar', 'Organizar minha vida', 'Começar um projeto', 'Cuidar melhor da minha saúde', 'Parar um hábito', 'Ter mais tempo para mim'], aplicar: setTitle },
-    { fala: 'Quer transformar esse objetivo em uma ação simples?', exemplos: ['Caminhar 20 minutos', 'Estudar uma aula', 'Beber mais água', 'Escrever o primeiro parágrafo', 'Arrumar uma gaveta', 'Ligar para alguém de quem sinto falta'], aplicar: setGoal },
-    { fala: 'Quer ver ritmos que cabem na vida real?', exemplos: ['Todos os dias', 'Três vezes por semana', 'Nos fins de semana', 'Um pouco toda manhã', 'Quando eu conseguir'], aplicar: setFrequencia },
+    { fala: t.wzUpQ1 || 'Quer algumas ideias para encontrar um objetivo que tenha a ver com você?', exemplos: t.wzUpEx1 || ['Voltar a treinar', 'Dormir melhor', 'Voltar a estudar', 'Organizar minha vida'], aplicar: setTitle },
+    { fala: t.wzUpQ2 || 'Quer transformar esse objetivo em uma ação simples?', exemplos: t.wzUpEx2 || ['Caminhar 20 minutos', 'Estudar uma aula', 'Beber mais água'], aplicar: setGoal },
+    { fala: 'Escolha um ritmo que caiba na sua vida real.', exemplos: [], aplicar: setFrequencia },
     { fala: 'Quer começar pequeno ou se dar mais tempo?', exemplos: ['7 dias', '30 dias', '60 dias', '100 dias', 'Vou decidir no caminho'], aplicar: setPlano },
-    { fala: 'O que fez hoje ser o dia em que você decidiu começar?', exemplos: ['Dei o primeiro passo', 'Cansei de adiar', 'Alguém me encorajou', 'Hoje eu tive um pouco de tempo', 'Quero tentar de novo'], aplicar: setHoje },
+    { fala: t.wzUpQ5 || 'O que fez hoje ser o dia em que você decidiu começar?', exemplos: t.wzUpEx5 || ['Dei o primeiro passo', 'Cansei de adiar', 'Hoje eu tive um pouco de tempo'], aplicar: setHoje },
   ];
-  const ajudaAtual = step < S_REV ? ajudaPorEtapa[step] : null;
+  const ajudaAtual = [S_TITULO, S_PORQUE, S_HOJE].includes(step) ? ajudaPorEtapa[step] : null;
   function escolherExemplo(exemplo) {
     ajudaAtual?.aplicar(exemplo);
     setAjudaAberta(false);
     setErro('');
+  }
+
+  const fallbackSugestoes = (tipo, contexto) => {
+    const c = adivinhar(contexto);
+    if (tipo === 'acao') {
+      const porCat = {
+        body: ['Caminhar 20 minutos', 'Fazer um treino curto', 'Alongar por 10 minutos'],
+        study: ['Estudar uma aula', 'Ler 5 páginas', 'Fazer um exercício'],
+        creative: ['Desenhar por 15 minutos', 'Escrever um parágrafo', 'Praticar uma música'],
+        health: ['Beber mais água', 'Preparar uma refeição', 'Dormir no horário combinado'],
+        home: ['Arrumar uma gaveta', 'Organizar um cômodo', 'Guardar o que está fora do lugar'],
+      };
+      return porCat[c] || ['Dar um passo pequeno hoje', 'Reservar 20 minutos para isso', 'Começar pela parte mais simples'];
+    }
+    return ['Dei o primeiro passo', 'Cansei de adiar', 'Hoje eu tive um pouco de tempo'];
+  };
+
+  async function buscarSugestoes(tipo, contexto) {
+    const locais = fallbackSugestoes(tipo, contexto);
+    setUpSugestoesTipo(tipo); setUpSugestoes(locais); setUpSugestoesBusy(false);
+    if (!aiOn || !contexto.trim()) return;
+    setUpSugestoesBusy(true);
+    try {
+      const r = await fetch('/api/titulo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ modo: 'sugestoes', tipo, contexto: contexto.trim() }) });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok && Array.isArray(d.itens) && d.itens.length) setUpSugestoes(d.itens);
+    } catch {}
+    setUpSugestoesBusy(false);
   }
 
   // ============================================================
@@ -196,7 +229,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     try {
       const r = await fetch('/api/titulo', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ modo: 'organizar', rascunho: title.trim(), porque: goal.trim(), pratica: frequencia.trim(), plano: plano.trim(), hoje: hoje.trim() }),
+        body: JSON.stringify({ modo: 'organizar', rascunho: title.trim(), porque: goal.trim(), pratica: (frequencia === 'Personalizado' ? frequenciaOutro : frequencia).trim(), plano: plano.trim(), hoje: hoje.trim() }),
       });
       const d = await r.json().catch(() => ({}));
       if (r.ok && d.titulo) {
@@ -286,6 +319,8 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   }
   async function avancar() {
     if (!podeAvancar || step >= STEPS - 1) return;
+    if (step === S_TITULO) buscarSugestoes('acao', title);
+    if (step === S_PORQUE) buscarSugestoes('primeiro', `${title}. ${goal}`);
     if (step === S_HOJE) await organizarRascunho();
     irPara(step + 1);
   }
@@ -444,20 +479,24 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         <p className="wz-explain">{heads[step][1]}</p>
         {ajudaAtual && (
           <div className={`wz-up-help${ajudaAberta ? ' aberta' : ''}`}>
-            <img src="/upi.svg" alt="" aria-hidden="true" />
+            <img className="upi-char bob" src="/upi.svg" alt="Upi" aria-hidden="true" />
             <div className="wz-up-help-copy">
               <p>{ajudaAtual.fala}</p>
               <button type="button" onClick={() => setAjudaAberta((v) => !v)} aria-expanded={ajudaAberta}>
-                {ajudaAberta ? 'Esconder exemplos' : 'Ver exemplos'}
+                {ajudaAberta ? (t.wzUpClose || 'Esconder exemplos') : (t.wzUpOpen || 'Ver exemplos')}
               </button>
             </div>
           </div>
         )}
-        {ajudaAtual && ajudaAberta && (
-          <div className="wz-up-examples" aria-label="Exemplos para começar">
+        {ajudaAtual && ajudaAberta && step === S_TITULO && (
+          <div className="wz-up-modal" role="dialog" aria-label="Exemplos para começar">
+            <div className="wz-up-modal-head"><b>Escolha um ponto de partida</b><button type="button" onClick={() => setAjudaAberta(false)}>Fechar</button></div>
+            <div className="wz-up-examples">
             {ajudaAtual.exemplos.map((exemplo) => (
               <button type="button" key={exemplo} onClick={() => escolherExemplo(exemplo)}>{exemplo}</button>
             ))}
+            </div>
+            <button type="button" className="wz-up-write" onClick={() => setAjudaAberta(false)}>Escrever outra coisa</button>
           </div>
         )}
       </div>
@@ -474,6 +513,12 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {/* ---------------- 2 · por que importa ---------------- */}
       {step === S_PORQUE && (
         <div className="wz-body">
+          {upSugestoesTipo === 'acao' && (
+            <div className="wz-ai-suggestions"><span className="wz-label">{upSugestoesBusy ? 'O Up está pensando…' : 'Sugestões para o seu objetivo'}</span>
+              <div className="wz-suggestion-row">{upSugestoes.map((item) => <button type="button" key={item} onClick={() => setGoal(item)}>{item}</button>)}</div>
+              <button type="button" className="wz-up-write" onClick={() => setUpSugestoes([])}>Escrever outra coisa</button>
+            </div>
+          )}
           <div className="wz-line-area">
             <textarea className="wz-input wz-grow-input" value={goal} onInput={crescerCampo} onChange={(e) => setGoal(e.target.value)}
               maxLength={180} rows={1} placeholder={t.wzActionPh} autoFocus />
@@ -485,8 +530,13 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {/* ---------------- 3 · como praticar ---------------- */}
       {step === S_PRATICA && (
         <div className="wz-body">
-          <input className="wz-input" value={frequencia} onChange={(e) => setFrequencia(e.target.value)}
-            maxLength={80} placeholder={t.wzPraticaPh} autoFocus />
+          <div className="wz-choice-grid">
+            {['Todos os dias', '3 vezes por semana', 'Fins de semana'].map((item) => (
+              <button type="button" className={`wz-choice${frequencia === item ? ' on' : ''}`} key={item} onClick={() => setFrequencia(item)}>{item}</button>
+            ))}
+            <button type="button" className={`wz-choice${frequencia === 'Personalizado' ? ' on' : ''}`} onClick={() => setFrequencia('Personalizado')}>Personalizado</button>
+          </div>
+          {frequencia === 'Personalizado' && <input className="wz-input" value={frequenciaOutro} onChange={(e) => setFrequenciaOutro(e.target.value)} maxLength={80} placeholder="Ex.: 2 vezes por semana" autoFocus />}
         </div>
       )}
 
@@ -502,6 +552,12 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {/* ---------------- 5 · o primeiro passo ---------------- */}
       {step === S_HOJE && (
         <div className="wz-body">
+          {upSugestoesTipo === 'primeiro' && (
+            <div className="wz-ai-suggestions"><span className="wz-label">{upSugestoesBusy ? 'O Up está pensando…' : 'Escolha uma forma de começar'}</span>
+              <div className="wz-suggestion-row">{upSugestoes.map((item) => <button type="button" key={item} onClick={() => setHoje(item)}>{item}</button>)}</div>
+              <button type="button" className="wz-up-write" onClick={() => setUpSugestoes([])}>Escrever outra coisa</button>
+            </div>
+          )}
           <div className="wz-line-area">
             <textarea className="wz-input wz-grow-input" value={hoje} onInput={crescerCampo} onChange={(e) => setHoje(e.target.value)}
               maxLength={400} rows={1} placeholder={t.wzHojePh} autoFocus />
@@ -509,104 +565,27 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         </div>
       )}
 
-      {/* ---------------- 7 · revisão ----------------
-          Tudo editável, no lugar. Se a pessoa precisar voltar quatro
-          telas para trocar uma palavra, ela publica errado ou desiste. */}
-      {step === S_REV && (
-        <div className="wz-body wz-rev">
-          <div className={`wz-ai-status${iaOrganizou ? ' ready' : ''}`}>
-            <span>{iaOrganizou ? 'Recomendação da IA pronta para editar' : 'A recomendação ainda não foi gerada'}</span>
-            <button type="button" onClick={organizarRascunho} disabled={organizando}>
-              {organizando ? (t.ajPensando || 'Organizando…') : (t.ajRetry || 'Tentar novamente')}
-            </button>
+      {step === S_MIDIA && (
+        <div className="wz-body wz-media-step">
+          <div className="wz-up-help wz-up-media-copy"><img className="upi-char bob" src="/upi.svg" alt="" aria-hidden="true" /><div className="wz-up-help-copy"><p>Que tal registrar este momento com uma foto ou vídeo?</p></div></div>
+          <div className="wz-media-actions">
+            <button type="button" className={`wz-media-action${photoUrl ? ' on' : ''}`} onClick={() => photoRef.current?.click()} disabled={uploading}>{uploading ? t.uploading : (photoUrl ? t.photoAdded : t.addPhoto)}</button>
+            <button type="button" className={`wz-media-action${videoUrl ? ' on' : ''}`} onClick={() => videoRef.current?.click()} disabled={uploading}>{uploading ? t.uploading : (videoUrl ? t.videoAdded : t.addVideo)}</button>
+            <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPhoto} />
+            <input ref={videoRef} type="file" accept="video/*" hidden onChange={onVideo} />
           </div>
-          <label className="wz-rev-campo">
-            <span>{t.wzRevTitulo}</span>
-            <textarea className="wz-input wz-grow-input" value={title} maxLength={80} rows={1}
-              onInput={crescerCampo} onChange={(e) => setTitle(e.target.value)} />
-          </label>
-
-          <label className="wz-rev-campo">
-            <span>{t.wzRevPorque}</span>
-            <textarea className="wz-input wz-grow-input" value={goal} maxLength={300} rows={1}
-              onInput={crescerCampo} onChange={(e) => setGoal(e.target.value)} />
-          </label>
-
-          <label className="wz-rev-campo">
-            <span>{t.wzRevPratica}</span>
-            <textarea className="wz-input wz-grow-input" value={pratica} maxLength={120} rows={1}
-              onInput={crescerCampo} onChange={(e) => setPratica(e.target.value)} />
-          </label>
-
-          <div className="wz-rev-linha">
-            <span className="wz-rev-par"><b>{t.wzRevRitmo}</b> {ritmoTexto() || '—'}</span>
-            <span className="wz-rev-par"><b>{t.wzRevTempo}</b> {totalDias()} {t.durDaysWord}</span>
-          </div>
-
-          <label className="wz-rev-campo">
-            <span>{t.wzRevDia1}</span>
-            <textarea className="wz-input wz-grow-input" value={first} maxLength={500} rows={1}
-              onInput={crescerCampo} onChange={(e) => setFirst(e.target.value)} />
-          </label>
-          {(photoUrl || videoUrl) && (
-            <div className="wz-media">
-              {photoUrl ? <img src={photoUrl} alt="" /> : <video src={videoUrl} controls playsInline />}
-            </div>
-          )}
-
-          <div className="wz-review-media">
-            <span className="wz-label">{t.addPhoto} / {t.addVideo}</span>
-            <div className="wz-chips">
-              <button type="button" className={`wz-chip${photoUrl ? ' on' : ''}`}
-                onClick={() => photoRef.current?.click()} disabled={uploading}>
-                {uploading ? t.uploading : (photoUrl ? t.photoAdded : t.addPhoto)}
-              </button>
-              <button type="button" className={`wz-chip${videoUrl ? ' on' : ''}`}
-                onClick={() => videoRef.current?.click()} disabled={uploading}>
-                {uploading ? t.uploading : (videoUrl ? t.videoAdded : t.addVideo)}
-              </button>
-              <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPhoto} />
-              <input ref={videoRef} type="file" accept="video/*" hidden onChange={onVideo} />
-            </div>
-          </div>
-
-          <div className="wz-field">
-            <span className="wz-label">{t.wzRevCat}</span>
-            <div className="wz-chips">
-              {CATS.map(([v, l]) => (
-                <button type="button" key={v} className={`wz-chip${cat === v ? ' on' : ''}`}
-                  onClick={() => { setCat(v); setCatTocada(true); }}>{l}</button>
-              ))}
-              <button type="button" className={`wz-chip${cat === 'other' ? ' on' : ''}`}
-                onClick={() => { setCat('other'); setCatTocada(true); }}>{t.catOther}</button>
-            </div>
-            {cat === 'other' && (
-              <input className="wz-input small" value={customCat} onChange={(e) => setCustomCat(e.target.value)}
-                maxLength={24} placeholder={t.customCatPh} />
-            )}
-          </div>
+          {(photoUrl || videoUrl) && <div className="wz-media"><>{photoUrl ? <img src={photoUrl} alt="" /> : <video src={videoUrl} controls playsInline />}</></div>}
+          <button type="button" className="wz-media-skip" onClick={() => irPara(S_REV)}>Continuar sem foto ou vídeo</button>
         </div>
       )}
+
+      {step === S_REV && <div className="wz-publish-final" aria-hidden="true" />}
 
       {/* Privacidade: não é decisão do fluxo, mas ninguém pode ser
           publicado sem saber. Uma linha declara o que vai acontecer. */}
       {step === S_REV && (
-        <div className={`wz-priv${privAberta ? ' aberta' : ''}`}>
-          <div className="wz-priv-line">
-            <span>{(t.wizPrivShort || '').replace('{v}', (VIS.find(([v]) => v === visibility) || [])[1] || '')}</span>
-            <button type="button" onClick={() => setPrivAberta((v) => !v)}>{t.wizPrivChange}</button>
-          </div>
-          {privAberta && (
-            <div className="wz-vis">
-              {VIS.map(([v, l, sub]) => (
-                <button type="button" key={v} className={`wz-opt${visibility === v ? ' on' : ''}`}
-                  onClick={() => { setVisibility(v); setPrivAberta(false); }}>
-                  <i aria-hidden="true" />
-                  <span><b>{l}</b><em>{sub}</em></span>
-                </button>
-              ))}
-            </div>
-          )}
+        <div className="wz-priv-simple">
+          <div className="wz-priv-options">{VIS.map(([v, l]) => <button type="button" key={v} className={visibility === v ? 'on' : ''} onClick={() => setVisibility(v)}>{l}</button>)}</div>
         </div>
       )}
 
@@ -631,7 +610,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
           </>
         ) : (
           <button type="button" className="wz-go" onClick={criar} disabled={saving || uploading}>
-            {saving ? t.creating : t.createBtn}
+            {saving ? t.creating : (t.publishJourney || 'Publicar jornada')}
           </button>
         )}
       </div>

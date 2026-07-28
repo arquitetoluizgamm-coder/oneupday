@@ -31,7 +31,7 @@ export const dynamic = 'force-dynamic';
 // Nada disso é obrigatório em lugar nenhum: sem chave da OpenAI a
 // rota responde 503 e o wizard funciona inteiro com campo livre.
 // ============================================================
-const MODOS = new Set(['pergunta', 'titulo', 'porque', 'pratica', 'primeiro', 'organizar']);
+const MODOS = new Set(['pergunta', 'titulo', 'porque', 'pratica', 'primeiro', 'organizar', 'sugestoes']);
 
 export async function POST(req) {
   const key = process.env.OPENAI_API_KEY;
@@ -54,6 +54,8 @@ export async function POST(req) {
   const dias = parseInt(body.dias, 10) || 0;
   const plano = corte(body.plano, 180);
   const hoje = corte(body.hoje, 400);
+  const tipoSugestoes = corte(body.tipo, 20);
+  const contextoSugestoes = corte(body.contexto, 300);
 
   const lang = getLocale() === 'en' ? 'English' : 'português do Brasil';
   const NUNCA_INVENTE = 'Use SOMENTE informação que a pessoa deu. Nunca invente número, prazo, motivo ou detalhe.';
@@ -61,7 +63,19 @@ export async function POST(req) {
 
   let system, entrada, minimo = 4, maximo = 90;
 
-  if (modo === 'pergunta') {
+  if (modo === 'sugestoes') {
+    if (!contextoSugestoes) return NextResponse.json({}, { status: 400 });
+    system = [
+      'Você é o Up, guia de um app de jornadas pessoais.',
+      tipoSugestoes === 'acao'
+        ? 'Sugira 3 ações pequenas, observáveis e realistas relacionadas ao objetivo da pessoa.'
+        : 'Sugira 3 formas curtas e humanas de escrever o primeiro dia, usando apenas o contexto dado.',
+      `Cada sugestão deve ter no máximo ${tipoSugestoes === 'acao' ? 9 : 14} palavras, em ${lang}, sem emojis, sem promessa e sem motivação genérica.`,
+      'Responda somente com 3 linhas, sem números ou marcadores.', NUNCA_INVENTE, SEM_MOTIVACAO,
+    ].join(' ');
+    entrada = `Contexto da jornada: "${contextoSugestoes}"`;
+    minimo = 3; maximo = 80;
+  } else if (modo === 'pergunta') {
     if (rascunho.length < 2) return NextResponse.json({}, { status: 400 });
     system = [
       'Alguém está criando uma jornada pessoal num app e escreveu só uma palavra ou duas.',
@@ -196,7 +210,7 @@ export async function POST(req) {
     }
 
     // Listas
-    if (modo === 'porque' || modo === 'pratica') {
+    if (modo === 'porque' || modo === 'pratica' || modo === 'sugestoes') {
       const proibido = /sentindo|orgulh|autoestima|voc[êe] consegue|feeling|proud/i;
       const itens = bruto.split('\n').map(limpaLinha)
         .filter((l) => l.length >= 3 && l.length <= 60 && !proibido.test(l))
