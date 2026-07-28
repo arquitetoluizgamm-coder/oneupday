@@ -32,6 +32,12 @@ export default function DiarioClient({ labels }) {
     try { localStorage.setItem(KEY, JSON.stringify(list)); } catch {}
   }
   function toggleUp() { const next = !upOn; setUpOn(next); try { localStorage.setItem(UP_KEY, next ? '1' : '0'); } catch {} }
+  function removeEntry(entry) {
+    if (!window.confirm(labels.diaryDeleteConfirm)) return;
+    const list = entries.filter((e) => e.id !== entry.id);
+    setEntries(list); if (entry.date === date) { setText(''); setUpText(''); }
+    try { localStorage.setItem(KEY, JSON.stringify(list)); } catch {}
+  }
   async function askUpFor(entry) {
     if (!upOn || !entry?.text?.trim() || busy) return;
     setBusy(true); setUpText('');
@@ -67,7 +73,7 @@ export default function DiarioClient({ labels }) {
         <div><b>{labels.diaryUpTitle}</b><p>{labels.diaryUpSub}</p></div>
         <button type="button" className="ghost-btn" onClick={toggleUp}>{upOn ? labels.diaryUpOn : labels.diaryUpOff}</button>
       </section>
-      {entries.length > 0 && <section className="diary-history"><h2>{labels.diaryHistory}</h2>{entries.map((e) => <div className={`diary-entry-wrap${e.date === date ? ' on' : ''}`} key={e.id}><button type="button" className="diary-entry" onClick={() => setDate(e.date)}><time>{new Date(`${e.date}T12:00:00`).toLocaleDateString()}</time><span>{e.text}</span></button>{upOn && <button type="button" className="diary-entry-up" onClick={() => askUpFor(e)} disabled={busy}>{busy ? labels.diaryUpThinking : labels.diaryAsk}</button>}{e.up && <p className="diary-entry-comment">{e.up}</p>}</div>)}</section>}
+      {entries.length > 0 && <section className="diary-history"><h2>{labels.diaryHistory}</h2>{entries.map((e) => <div className={`diary-entry-wrap${e.date === date ? ' on' : ''}`} key={e.id}><button type="button" className="diary-entry" onClick={() => setDate(e.date)}><time>{new Date(`${e.date}T12:00:00`).toLocaleDateString()}</time><span>{e.text}</span></button><div className="diary-entry-tools">{upOn && <button type="button" className="diary-entry-up" onClick={() => askUpFor(e)} disabled={busy}>{busy ? labels.diaryUpThinking : labels.diaryAsk}</button>}<button type="button" className="diary-entry-delete" onClick={() => removeEntry(e)}>{labels.diaryDelete}</button></div>{e.up && <div className="diary-entry-comment"><img src="/upi.svg" alt="Upi" /><p>{e.up}</p></div>}</div>)}</section>}
       <p className="diary-private-note">{labels.diaryPrivate}</p>
     </div>
   );
