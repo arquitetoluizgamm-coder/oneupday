@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Árvore da Vida ONE</title>
+  <desc id="desc">Uma copa verde envolve o número um terracota, que forma o tronco e as raízes.</desc>
+  <path fill="#87957A" d="M114 241C109 189 139 149 185 133C196 82 238 51 286 61C326 69 351 97 359 132C407 139 441 174 441 218C441 270 399 306 347 306H183C145 303 118 278 114 241Z"/>
+  <path d="M211 224L273 174V404M275 405C243 405 215 414 190 432M275 405C307 405 333 414 354 432" fill="none" stroke="#C47152" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

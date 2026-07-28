@@ -246,7 +246,12 @@ export default async function Perfil() {
               {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : profile.name[0]}
             </div>
             <div className="pc-meta">
-              <h1>{profile.name}</h1>
+              <div className="pc-name-line">
+                <h1>{profile.name}</h1>
+                <a className="pc-tree-link" href="/arvore" aria-label={t.treeTab} title={t.treeTab}>
+                  <img src="/tree-one.svg" alt="" />
+                </a>
+              </div>
               <div className="pc-sub">
                 <span>{profile.handle}</span>
               </div>
@@ -330,7 +335,7 @@ export default async function Perfil() {
             e pessoas para explorar — e o vazio precisa de uma saída */}
         <ProfileTabs
             labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, quotes: t.profTabQuotes, people: t.profTabPeople }}
-            extraTab={<><a className="ptab ptab-link" href="/diario">{t.navDiary}</a><a className="ptab ptab-link" href="/futuro">{t.futureTitle}</a><a className="ptab ptab-link" href="/arvore">{t.treeTab}</a></>}
+            extraTab={<><a className="ptab ptab-link" href="/diario">{t.navDiary}</a><a className="ptab ptab-link" href="/futuro">{t.futureTitle}</a></>}
             journeys={(
               <>
                 {list.length === 0 && (

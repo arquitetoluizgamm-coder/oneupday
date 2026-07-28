@@ -88,9 +88,6 @@ export default async function AppTop({
     );
   }
 
-  const { data: profile } = await supabase.from('profiles')
-    .select('name, handle, avatar_url, avatar_color').eq('id', user.id).maybeSingle();
-
   // Contar sinal só faz sentido onde o sino aparece. Fora do feed
   // isso seria meia dúzia de consultas por página para desenhar nada.
   let sinais = null;
@@ -116,12 +113,10 @@ export default async function AppTop({
 
       <div className="top-right">
         <LanguagePicker current={locale} />
-        {profile && (
-          <a className="header-ava" href="/perfil" aria-label={profile.name || ''}
-            style={{ background: profile.avatar_color || 'var(--orange)', ...(avatarStyle || {}) }}>
-            {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : (profile.name || '?')[0]}
-          </a>
-        )}
+        <a className="header-tree" href="/arvore" aria-label={t.treeTab} title={t.treeTab}
+          style={avatarStyle}>
+          <img src="/tree-one.svg" alt="" />
+        </a>
       </div>
     </header>
   );
