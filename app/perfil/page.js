@@ -329,6 +329,7 @@ export default async function Perfil() {
             e pessoas para explorar — e o vazio precisa de uma saída */}
         <ProfileTabs
             labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, quotes: t.profTabQuotes, people: t.profTabPeople }}
+            actions={<a className="profile-diary-link" href="/diario">{t.navDiary}</a>}
             journeys={(
               <>
                 {list.length === 0 && (

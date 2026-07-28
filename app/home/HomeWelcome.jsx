@@ -35,6 +35,10 @@ export default function HomeWelcome({ journeys = [], name = '', labels = {} }) {
 
       {temJornadas ? (
         <div className="home-welcome-journeys">
+          <a className="home-welcome-journey home-welcome-diary" href="/diario">
+            <span><b>{L.diaryTitle}</b><small>{L.diarySub}</small></span>
+            <strong aria-hidden="true">›</strong>
+          </a>
           {journeys.slice(0, 4).map((j) => {
             const dia = Math.min(j.total_days || 999, diaAtual(j));
             return (
@@ -47,7 +51,13 @@ export default function HomeWelcome({ journeys = [], name = '', labels = {} }) {
           <a className="home-welcome-primary" href="/perfil">{L.register}</a>
         </div>
       ) : (
-        <a className="home-welcome-primary" href="/new">{L.newCta}</a>
+        <>
+          <a className="home-welcome-journey home-welcome-diary" href="/diario">
+            <span><b>{L.diaryTitle}</b><small>{L.diarySub}</small></span>
+            <strong aria-hidden="true">›</strong>
+          </a>
+          <a className="home-welcome-primary" href="/new">{L.newCta}</a>
+        </>
       )}
 
       <button type="button" className="home-welcome-skip" onClick={sair}>{L.skip}</button>
