@@ -121,6 +121,9 @@ export default function EditarJornada({ journey, currentDay = 0, t }) {
 
   return (
     <div className="ej-page">
+      <section className="ej-section">
+        <h2 className="ej-section-title">Identidade</h2>
+        <p className="ej-section-sub">O que as pessoas entendem quando encontram sua jornada.</p>
       <label className="ep-field">{L.ejName}
         <input value={title} onChange={(e) => { setTitle(e.target.value); setSalvo(false); }} maxLength={80} />
       </label>
@@ -147,7 +150,11 @@ export default function EditarJornada({ journey, currentDay = 0, t }) {
         </div>
         <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPick} />
       </div>
+      </section>
 
+      <section className="ej-section">
+        <h2 className="ej-section-title">Plano</h2>
+        <p className="ej-section-sub">A categoria e o tempo que você escolheu para caminhar.</p>
       <div className="ep-field">{L.ejCategory}
         <div className="ej-chips">
           {CATS.map(([v, l]) => (
@@ -179,7 +186,11 @@ export default function EditarJornada({ journey, currentDay = 0, t }) {
         )}
         <p className="ej-note">{L.ejDurNote}</p>
       </div>
+      </section>
 
+      <section className="ej-section">
+        <h2 className="ej-section-title">Quem acompanha</h2>
+        <p className="ej-section-sub">Você pode mudar isso quando quiser.</p>
       <div className="ep-field">{L.ejPrivacy}
         <div className="wz-vis ej-vis">
           {VIS.map(([v, l, sub]) => (
@@ -191,6 +202,7 @@ export default function EditarJornada({ journey, currentDay = 0, t }) {
           ))}
         </div>
       </div>
+      </section>
 
       {erro && <p className="ep-err" role="alert">{erro}</p>}
 

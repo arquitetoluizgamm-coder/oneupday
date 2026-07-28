@@ -5937,3 +5937,15 @@ h1 { letter-spacing: -0.03em; }
 .journey-icon-actions .supporters-icon svg{display:block;width:18px;height:18px}
 .profile-upload-error{display:block;margin-top:6px;color:#a64b43;font-size:11px;line-height:1.35}
 .pm-section-hint{margin:0 0 6px;color:var(--muted);font-size:11px;line-height:1.35}
+.composer-extra{margin-top:10px}
+.composer-extra-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:transparent;color:var(--muted);padding:7px 0;font-size:12px;font-weight:700;cursor:pointer}
+.composer-extra-toggle:hover{color:var(--ink)}
+.composer-extra-toggle b{font-size:20px;line-height:1;font-weight:500}
+.composer-extra-panel:not(.open) .tools{display:none}
+.composer-extra-panel:not(.open){justify-content:flex-end}
+.ej-section{padding:18px 0;border-bottom:1px solid var(--line,#ece9e2)}
+.ej-section:first-child{padding-top:0}
+.ej-section-title{margin:0;color:var(--ink);font-family:var(--display);font-size:16px;font-weight:850;letter-spacing:-.01em}
+.ej-section-sub{margin:4px 0 16px;color:var(--muted);font-size:12px;line-height:1.45}
+.ej-section .ep-field{margin-top:14px}
+.ej-section .ep-field:first-of-type{margin-top:0}

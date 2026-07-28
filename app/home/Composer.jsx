@@ -8,8 +8,6 @@ import TrackPicker from './TrackPicker';
 import ImageCropper from '../../components/ImageCropper';
 import { track as trackEvent } from '../../lib/track';
 
-const ORDER = ['step', 'win', 'setback', 'learned'];
-
 // Frases que podem indicar sofrimento intenso — mostra apoio, nunca bloqueia.
 const RISK = [
   'nao aguento mais', 'não aguento mais', 'quero morrer', 'não quero mais viver', 'nao quero mais viver',
@@ -59,6 +57,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [quando, setQuando] = useState('');
   const [rawFile, setRawFile] = useState(null);
   const [rawUrl, setRawUrl] = useState('');
+  const [extrasOpen, setExtrasOpen] = useState(false);
   const photoRef = useRef(null);
   const videoRef = useRef(null);
   const inputRef = useRef(null);
@@ -412,13 +411,13 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
         </div>
       )}
 
-      <div className="kind-seg">
-        {ORDER.map(k => (
-          <button key={k} type="button" className={`kseg${kind === k ? ' on' : ''} k-${k}`} onClick={() => setKind(k)}>{labels[k]}</button>
-        ))}
+      <div className="composer-extra">
+        <button type="button" className="composer-extra-toggle" onClick={() => setExtrasOpen((v) => !v)} aria-expanded={extrasOpen}>
+          <span>{extrasOpen ? 'Esconder opções' : 'Adicionar foto, vídeo, música ou ajuda'}</span>
+          <b aria-hidden="true">{extrasOpen ? '−' : '+'}</b>
+        </button>
       </div>
-
-      <div className="composer-toolbar">
+      <div className={`composer-toolbar composer-extra-panel${extrasOpen ? ' open' : ''}`}>
         <div className="tools">
           <button type="button" className={`tool${photoUrl ? ' set' : ''}`} title={t.addPhoto} aria-label={t.addPhoto} onClick={() => photoRef.current?.click()} disabled={uploading}><ToolIcon type="photo" /></button>
           <button type="button" className={`tool${videoUrl ? ' set' : ''}`} title={t.addVideo} aria-label={t.addVideo} onClick={() => videoRef.current?.click()} disabled={uploading}><ToolIcon type="video" /></button>
