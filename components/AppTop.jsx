@@ -5,6 +5,7 @@ import HeaderHeart from './HeaderHeart';
 import BackBtn from './BackBtn';
 import Logo, { Wordmark } from './Logo';
 import LanguagePicker from './LanguagePicker';
+import CriarMenu from './CriarMenu';
 
 // ============================================================
 // TOPO — um só, para todo o app
@@ -112,10 +113,7 @@ export default async function AppTop({
       </a>
 
       <div className="top-right">
-        <LanguagePicker current={locale} />
-        <a className="header-tree" href="/arvore" aria-label={t.treeTab} title={t.treeTab}>
-          <img src="/tree-one.svg" alt="" />
-        </a>
+        <CriarMenu t={t} className="header-create" tamanho={25} rotulo={t.navCreate} />
       </div>
     </header>
   );

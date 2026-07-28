@@ -31,6 +31,7 @@ import { pickUpi } from '../../lib/upi';
 import ChallengeRespond from '../../components/ChallengeRespond';
 import PushToggle from '../../components/PushToggle';
 import EcoToggle from '../../components/EcoToggle';
+import LanguagePicker from '../../components/LanguagePicker';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#C16F54', '#84917A', '#5B7189', '#96523C', '#B3874A', '#A8637A'];
@@ -270,10 +271,22 @@ export default async function Perfil() {
                 sair={<form action="/auth/signout" method="post"><button className="pm-sair-btn" type="submit">{t.signOut}</button></form>}
               >
                 <div className="pm-linhas">
-                  <p className="pm-section-hint">Personalize sua foto e sua capa</p>
-                  <EditAvatar userId={user.id} label={t.editPhoto} uploadingLabel={t.uploading} modo="linha" />
-                  <EditBanner userId={user.id} label={t.editBanner} uploadingLabel={t.uploading} modo="linha" cropLabels={{ cover: t.cropCover, use: t.cropUse, cancel: t.cropCancel, hint: t.cropHint, zoom: t.cropZoom }} />
+                  <p className="pm-section-hint">{t.profileMediaHint}</p>
+                  <EditAvatar
+                    userId={user.id}
+                    label={t.editPhoto}
+                    uploadingLabel={t.uploading}
+                    modo="linha"
+                    errorLabel={t.avatarUpdateError}
+                    dialogLabel={t.avatarCropLabel}
+                    cropLabels={{ square: t.cropSquare, original: t.cropOriginal, use: t.cropUse, cancel: t.cropCancel, hint: t.cropHint, hintOriginal: t.cropHintOriginal, zoom: t.cropZoom }}
+                  />
+                  <EditBanner userId={user.id} label={t.editBanner} uploadingLabel={t.uploading} modo="linha" errorLabel={t.bannerUpdateError} cropLabels={{ cover: t.cropCover, use: t.cropUse, cancel: t.cropCancel, hint: t.cropHint, zoom: t.cropZoom }} />
                   <EditProfileInfo userId={user.id} initialName={profile.name} initialHandle={profile.handle} labels={{ btn: t.epBtn, title: t.epTitle, name: t.epName, handle: t.epHandle, hint: t.epHint, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errName: t.epErrName, errHandle: t.epErrHandle, errTaken: t.epErrTaken, errSave: t.epErrSave }} />
+                  <div className="pm-language-row">
+                    <span>{t.languageLabel || 'Idioma'}</span>
+                    <LanguagePicker current={getLocale()} />
+                  </div>
                   <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
                 </div>
 
@@ -366,7 +379,7 @@ export default async function Perfil() {
               </>
             )}
             album={myAlbum.length > 0 ? (
-              <MediaGallery items={myAlbum} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} own deleteLabel={t.mediaDelete} deleteConfirm={t.mediaDeleteConfirm} />
+              <MediaGallery items={myAlbum} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} own deleteLabel={t.mediaDelete} deleteConfirm={t.mediaDeleteConfirm} navLabels={{ close: t.commentClose, previous: t.dpPrev, next: t.dpNext }} />
             ) : (
               <div className="tab-empty">
                 <p>{t.albumEmpty}</p>
@@ -374,7 +387,7 @@ export default async function Perfil() {
               </div>
             )}
             quotes={myQuotes.length > 0 ? (
-              <MediaGallery items={myQuotes} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} own deleteLabel={t.mediaDelete} deleteConfirm={t.mediaDeleteConfirm} />
+              <MediaGallery items={myQuotes} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} own deleteLabel={t.mediaDelete} deleteConfirm={t.mediaDeleteConfirm} navLabels={{ close: t.commentClose, previous: t.dpPrev, next: t.dpNext }} />
             ) : (
               <div className="tab-empty">
                 <p>{t.quotesEmpty}</p>

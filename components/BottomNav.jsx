@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import CriarMenu from './CriarMenu';
 import { createClient } from '../lib/supabase/client';
 
 function ProfileNavAvatar() {
@@ -45,16 +44,13 @@ export default function BottomNav({ active, t }) {
   const items = [
     { key: 'home', href: '/home', label: t.navHome, d: 'M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z' },
     { key: 'search', href: '/buscar', label: t.navSearch, d: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm6 12 4 4' },
-    { key: 'create', create: true, label: t.navCreate },
     { key: 'explore', href: '/explore', label: t.navExplore, d: 'M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm3 5-2 5-5 2 2-5z' },
     { key: 'profile', href: '/perfil', label: t.navProfile, avatar: true },
   ];
 
   return (
     <nav className={`bottom-nav${scrolling ? ' scrolling' : ''}`} aria-label="Navigation">
-      {items.map((it) => it.create ? (
-        <CriarMenu key={it.key} t={t} className="bn-create" tamanho={26} rotulo={it.label} />
-      ) : (
+      {items.map((it) => (
         <a key={it.key} href={it.href} className={active === it.key ? 'on' : ''} aria-label={it.label} title={it.label}>
           {it.avatar
             ? <ProfileNavAvatar />

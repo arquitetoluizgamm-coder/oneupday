@@ -6025,6 +6025,15 @@ h1 { letter-spacing: -0.03em; }
 .lang-picker select{appearance:none;border:0;background:transparent;color:inherit;font:inherit;cursor:pointer;padding:4px 2px;outline:none}
 .lang-picker select:focus-visible{outline:2px solid var(--orange);outline-offset:2px;border-radius:4px}
 
+/* Topo limpo: criar fica no topo; idioma vai para configuracoes; arvore fica no perfil. */
+.header-create{display:grid;place-items:center;width:42px;height:42px;border:0;border-radius:50%;background:transparent;color:var(--ink);cursor:pointer}
+.header-create:hover,.header-create:focus-visible{background:rgba(16,19,45,.055);outline:none}
+.header-create svg{display:block}
+.pm-language-row{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:11px 12px;color:var(--ink);font-size:13px;font-weight:750}
+.pm-language-row .lang-picker{font-size:12px}
+.pm-language-row .lang-picker span{display:none}
+.bottom-nav{grid-template-columns:repeat(4,1fr)!important}
+
 /* Entrada "Hoje": uma pausa curta antes do feed. */
 .home-welcome{min-height:min(620px,calc(100svh - 128px));display:flex;flex-direction:column;align-items:center;justify-content:center;max-width:560px;margin:0 auto;padding:42px 24px 34px;text-align:center}
 .home-welcome-mark{width:112px;height:112px;display:grid;place-items:center;margin-bottom:18px}
