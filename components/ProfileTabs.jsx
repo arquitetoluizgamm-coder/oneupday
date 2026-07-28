@@ -12,7 +12,7 @@ import { useState } from 'react';
 // Com um painel só, a barra de abas não aparece: uma aba sozinha
 // não é escolha, é enfeite.
 // ============================================================
-export default function ProfileTabs({ labels, journeys, album, quotes, people, actions }) {
+export default function ProfileTabs({ labels, journeys, album, quotes, people, actions, extraTab }) {
   const L = labels || {};
 
   // Citações vêm depois do álbum e antes de pessoas: as três primeiras
@@ -31,7 +31,7 @@ export default function ProfileTabs({ labels, journeys, album, quotes, people, a
   if (abas.length <= 1) {
     return (
       <div className="ptabs-wrap">
-        {actions && <div className="ptabs-row"><div className="ptab-actions">{actions}</div></div>}
+        {(actions || extraTab) && <div className="ptabs-row"><div className="ptab-actions">{actions || extraTab}</div></div>}
         <div className="ptab-panel">{abas[0] ? abas[0][2] : null}</div>
       </div>
     );
@@ -45,6 +45,7 @@ export default function ProfileTabs({ labels, journeys, album, quotes, people, a
             <button key={k} type="button" role="tab" aria-selected={atual === k}
               className={`ptab${atual === k ? ' on' : ''}`} onClick={() => setTab(k)}>{l}</button>
           ))}
+          {extraTab}
         </div>
         {actions && <div className="ptab-actions">{actions}</div>}
       </div>
