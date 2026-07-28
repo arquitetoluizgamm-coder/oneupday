@@ -499,7 +499,8 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
           <label className="wz-rev-campo">
             <span>{t.wzRevPratica}</span>
-            <input className="wz-input" value={pratica} maxLength={120} onChange={(e) => setPratica(e.target.value)} />
+            <textarea className="wz-input wz-grow-input" value={pratica} maxLength={120} rows={1}
+              onInput={crescerCampo} onChange={(e) => setPratica(e.target.value)} />
           </label>
 
           <div className="wz-rev-linha">
