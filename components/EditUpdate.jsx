@@ -100,7 +100,7 @@ export default function EditUpdate({ update, labels, onChanged }) {
             ) : (
               <>
                 <b className="ep-title">{(L.title || '').replace('{d}', update.day)}</b>
-                <label className="ep-field">{L.text}
+                <label className="ep-field ep-text">{L.text}
                   <textarea className="ej-goal" value={text} onChange={(e) => setText(e.target.value)} maxLength={500} rows={4} />
                 </label>
                 <div className="ep-field">{L.photo}
@@ -118,14 +118,14 @@ export default function EditUpdate({ update, labels, onChanged }) {
                   <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPick} />
                 </div>
                 {photoUrl && (
-                  <label className="ep-field">{L.altLabel}
+                  <label className="ep-field ep-alt">{L.altLabel}
                     <textarea className="ej-goal" value={alt} maxLength={ALT_MAX} rows={2}
                       placeholder={L.altPh} onChange={(e) => setAlt(e.target.value)} />
                     <span className="alt-dica">{alt.trim() ? L.altOk : L.altVazio}</span>
                   </label>
                 )}
                 {err && <p className="ep-err">{err}</p>}
-                <div className="crop-actions">
+                <div className="crop-actions ep-actions">
                   <button type="button" className="ghost-btn" onClick={() => setOpen(false)} disabled={busy}>{L.cancel}</button>
                   <button type="button" className="cta grow" onClick={save} disabled={busy}>{busy ? L.saving : L.save}</button>
                 </div>

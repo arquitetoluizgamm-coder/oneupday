@@ -2251,17 +2251,22 @@ h1 { letter-spacing: -0.03em; }
 .eu-del{margin-top:2px;text-align:center;font-size:13px}
 .ep-card{width:min(500px,calc(100vw - 28px));max-height:calc(100svh - 28px);overflow-y:auto;overscroll-behavior:contain;padding:20px}
 .ep-card .ep-title{display:block;line-height:1.2;margin-bottom:2px}
-.ep-card .ej-goal{width:100%;box-sizing:border-box;min-height:86px;max-height:180px;overflow:auto}
-.ep-card .eu-photo{width:100%;min-height:0;height:auto;aspect-ratio:4/5!important;max-height:38svh;background-size:contain!important;background-color:#10111a}
+.ep-card .ej-goal{width:100%;box-sizing:border-box;min-height:76px;max-height:118px;overflow:auto}
+.ep-card .ep-alt .ej-goal{min-height:60px;max-height:86px}
+.ep-card .eu-photo{width:100%;min-height:0;height:auto;aspect-ratio:4/5!important;max-height:30svh;background-size:contain!important;background-color:#10111a}
 .ej-photo-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:-4px}
 .ej-photo-actions .ej-cover-btn{border:1px solid var(--line);box-shadow:none;background:var(--surface);color:var(--ink);padding:8px 12px}
 .ej-photo-actions .ej-cover-del{color:#a13b32}
 @media(max-width:640px){
   .crop-modal{align-items:flex-start;padding:12px 10px}
   .ep-card{padding:16px;gap:10px}
-  .ep-card .eu-photo{max-height:34svh}
+  .ep-card .eu-photo{max-height:27svh}
   .ep-card .ep-field{gap:5px}
 }
+.ep-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px}
+.ep-actions .ghost-btn,.ep-actions .cta{width:100%;min-height:40px;justify-content:center;border-radius:10px;padding:9px 12px;font-size:13px}
+.ep-actions .cta.grow{background:var(--night);color:#fff;box-shadow:none}
+.ep-actions .cta.grow:hover{background:var(--night-2);box-shadow:none}
 
 /* ============================================================
    AÇÕES COM IDENTIDADE — chips OUD (fim dos links pelados)
