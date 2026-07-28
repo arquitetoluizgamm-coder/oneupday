@@ -125,7 +125,12 @@ export default async function Home() {
       <ScrollChrome />
       <DailyMood userId={user.id} answeredToday={moodToday} labels={{ title: t.dailyMoodTitle, sub: t.dailyMoodSub, skip: t.dailyMoodSkip, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful } }} />
       <main className="wrap feed-page">
-        <HomeWelcome journeys={welcomeJourneys} name={profile.name || ''} />
+        <HomeWelcome journeys={welcomeJourneys} name={profile.name || ''} labels={{
+          newEyebrow: t.homeWelcomeNewEyebrow, newTitle: t.homeWelcomeNewTitle, newSub: t.homeWelcomeNewSub,
+          newCta: t.homeWelcomeNewCta, skip: t.homeWelcomeSkip, backEyebrow: t.homeWelcomeBackEyebrow,
+          backTitle: t.homeWelcomeBackTitle, backSub: t.homeWelcomeBackSub, register: t.homeWelcomeRegister,
+          day: t.homeWelcomeDay, journeySub: t.homeWelcomeJourneySub,
+        }} />
         {nc.mode && (
           <NextChapter mode={nc.mode} line={nc.line} env={nc.env} labels={ncLabels(t, nc)} dismissible />
         )}
