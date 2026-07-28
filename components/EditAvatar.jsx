@@ -50,6 +50,7 @@ export default function EditAvatar({ userId, label, uploadingLabel, modo }) {
       const url = supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
       const { error: profileError } = await supabase.from('profiles').update({ avatar_url: url }).eq('id', userId);
       if (profileError) throw profileError;
+      window.dispatchEvent(new CustomEvent('oud:profile-updated', { detail: { userId, avatar_url: url } }));
       router.refresh();
     } catch (e) {
       console.error('[perfil] avatar:', e);

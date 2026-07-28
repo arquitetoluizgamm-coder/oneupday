@@ -447,6 +447,30 @@ export default function FeedClient({ labels }) {
   const [momentos, setMomentos] = useState({ transformacoes: [], amanha: [], retornos: [] });
   const [andamento, setAndamento] = useState([]);
   const [needs, setNeeds] = useState([]);
+  useEffect(() => {
+    function onProfileUpdated(e) {
+      const { userId, avatar_url } = e.detail || {};
+      if (!userId || !avatar_url) return;
+      setItems((prev) => prev.map((item) => item.owner?.id === userId
+        ? { ...item, owner: { ...item.owner, avatar_url } }
+        : item));
+    }
+    function onUpdateUpdated(e) {
+      const patch = e.detail || {};
+      if (!patch.id) return;
+      setItems((prev) => prev.map((item) => {
+        if (item.id === patch.id) return { ...item, ...patch };
+        if (!item.days) return item;
+        return { ...item, days: item.days.map((day) => day.id === patch.id ? { ...day, ...patch } : day) };
+      }));
+    }
+    window.addEventListener('oud:profile-updated', onProfileUpdated);
+    window.addEventListener('oud:update-updated', onUpdateUpdated);
+    return () => {
+      window.removeEventListener('oud:profile-updated', onProfileUpdated);
+      window.removeEventListener('oud:update-updated', onUpdateUpdated);
+    };
+  }, []);
   useEffect(() => { fetch('/api/needs').then((r) => r.json()).then((j) => setNeeds(j.people || [])).catch(() => {}); }, []);
   useEffect(() => { fetch('/api/suggestions').then((r) => r.json()).then((j) => setSuggestions(j.people || [])).catch(() => {}); }, []);
   useEffect(() => { fetch('/api/eco', { method: 'POST' }).catch(() => {}); }, []);

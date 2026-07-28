@@ -18,6 +18,7 @@ export default function EditUpdate({ update, labels, onChanged }) {
   // com o rascunho da IA precisa de um lugar para corrigir depois.
   const [alt, setAlt] = useState(update.alt || '');
   const [rawUrl, setRawUrl] = useState('');
+  const [rawFile, setRawFile] = useState(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const fileRef = useRef(null);
@@ -26,17 +27,21 @@ export default function EditUpdate({ update, labels, onChanged }) {
   function onPick(e) {
     const file = e.target.files?.[0]; if (!file) return;
     if (rawUrl) URL.revokeObjectURL(rawUrl);
+    setRawFile(file);
     setRawUrl(URL.createObjectURL(file));
   }
 
   async function onCropDone(result) {
+    const toUpload = result === 'original' || !result ? rawFile : result;
+    const ext = result === 'original' || !result ? (rawFile?.name.split('.').pop() || 'jpg').toLowerCase() : 'jpg';
     if (rawUrl) URL.revokeObjectURL(rawUrl);
     setRawUrl('');
-    if (!result || result === 'original') return;
+    setRawFile(null);
+    if (!toUpload) return;
     setBusy(true);
     const sb = createClient();
-    const path = `updates/${update.id}/${crypto.randomUUID()}.jpg`;
-    const { error } = await sb.storage.from('photos').upload(path, result, { upsert: false });
+    const path = `updates/${update.id}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await sb.storage.from('photos').upload(path, toUpload, { upsert: false });
     setBusy(false);
     if (error) { setErr(L.errSave); return; }
     setPhotoUrl(sb.storage.from('photos').getPublicUrl(path).data.publicUrl);
@@ -62,7 +67,9 @@ export default function EditUpdate({ update, labels, onChanged }) {
     setBusy(false);
     if (error) { setErr(L.errSave); return; }
     setOpen(false);
-    if (onChanged) onChanged({ text: value || '📷', photo_url: photoUrl || null, alt: alt.trim() });
+    const changed = { text: value || '📷', photo_url: photoUrl || null, alt: alt.trim() };
+    if (onChanged) onChanged(changed);
+    window.dispatchEvent(new CustomEvent('oud:update-updated', { detail: { id: update.id, ...changed } }));
     router.refresh();
   }
 
@@ -89,7 +96,7 @@ export default function EditUpdate({ update, labels, onChanged }) {
               // mesmo motivo do compositor: aqui o corte grava no arquivo
               <ImageCropper src={rawUrl} aspects={[['original', null], ['portrait', 4 / 5], ['square', 1], ['landscape', 16 / 9]]}
                 labels={{ original: L.cropOriginal, square: L.cropSquare, portrait: L.cropPortrait, landscape: L.cropLandscape, use: L.cropUse, cancel: L.cropCancel, hint: L.cropHint, hintOriginal: L.cropHintOriginal, zoom: L.cropZoom }}
-                onDone={onCropDone} onCancel={() => { URL.revokeObjectURL(rawUrl); setRawUrl(''); }} />
+                onDone={onCropDone} onCancel={() => { URL.revokeObjectURL(rawUrl); setRawUrl(''); setRawFile(null); }} />
             ) : (
               <>
                 <b className="ep-title">{(L.title || '').replace('{d}', update.day)}</b>
