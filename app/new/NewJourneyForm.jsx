@@ -347,6 +347,11 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     if (step < STEPS - 1) avancar();
   }
 
+  function crescerCampo(e) {
+    e.currentTarget.style.height = 'auto';
+    e.currentTarget.style.height = `${Math.min(e.currentTarget.scrollHeight, 180)}px`;
+  }
+
   const totalPreview = dur === 'other' ? (parseInt(customDur || '0', 10) || 0) : parseInt(dur, 10);
   const catLabel = cat === 'other'
     ? (customCat.trim() || t.catOther)
@@ -395,10 +400,9 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {/* ---------------- 2 · por que importa ---------------- */}
       {step === S_PORQUE && (
         <div className="wz-body">
-          <div className="wz-area">
-            <textarea value={goal} onChange={(e) => setGoal(e.target.value)}
-              maxLength={300} rows={5} placeholder={t.fWhyPh} autoFocus />
-            <span className="wz-opcional">{t.wizWhyOptional}</span>
+          <div className="wz-line-area">
+            <textarea className="wz-input wz-grow-input" value={goal} onInput={crescerCampo} onChange={(e) => setGoal(e.target.value)}
+              maxLength={300} rows={1} placeholder={t.fWhyPh} autoFocus />
             <span className="wz-inline-count">{goal.length}/300</span>
           </div>
         </div>
@@ -424,9 +428,9 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {/* ---------------- 5 · o primeiro passo ---------------- */}
       {step === S_HOJE && (
         <div className="wz-body">
-          <div className="wz-area">
-            <textarea value={hoje} onChange={(e) => setHoje(e.target.value)}
-              maxLength={400} rows={4} placeholder={t.wzHojePh} autoFocus />
+          <div className="wz-line-area">
+            <textarea className="wz-input wz-grow-input" value={hoje} onInput={crescerCampo} onChange={(e) => setHoje(e.target.value)}
+              maxLength={400} rows={1} placeholder={t.wzHojePh} autoFocus />
           </div>
         </div>
       )}
@@ -443,7 +447,8 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
           <label className="wz-rev-campo">
             <span>{t.wzRevPorque}</span>
-            <textarea value={goal} maxLength={300} rows={3} onChange={(e) => setGoal(e.target.value)} />
+            <textarea className="wz-input wz-grow-input" value={goal} maxLength={300} rows={1}
+              onInput={crescerCampo} onChange={(e) => setGoal(e.target.value)} />
           </label>
 
           <label className="wz-rev-campo">
@@ -458,7 +463,8 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
           <label className="wz-rev-campo">
             <span>{t.wzRevDia1}</span>
-            <textarea value={first} maxLength={500} rows={3} onChange={(e) => setFirst(e.target.value)} />
+            <textarea className="wz-input wz-grow-input" value={first} maxLength={500} rows={1}
+              onInput={crescerCampo} onChange={(e) => setFirst(e.target.value)} />
           </label>
           {(photoUrl || videoUrl) && (
             <div className="wz-media">

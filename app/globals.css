@@ -3453,6 +3453,13 @@ h1 { letter-spacing: -0.03em; }
   resize:vertical;outline:none;transition:border-color .25s ease}
 .wz-area textarea:focus{border-color:#E8A64C}
 .wz-area textarea::placeholder{color:rgba(16,19,45,.3)}
+.wz-line-area{position:relative}
+.wz-grow-input{display:block;width:100%;min-height:48px;padding:11px 0 12px;
+  font-family:inherit;font-size:17px;font-weight:500;line-height:1.5;resize:none;
+  overflow:hidden;border:0;border-bottom:1.5px solid var(--line);background:none}
+.wz-grow-input:focus{border-bottom-color:#E8A64C}
+.wz-grow-input::placeholder{color:rgba(16,19,45,.3);font-weight:500}
+.wz-line-area .wz-inline-count{right:0;bottom:3px;background:var(--bg)}
 .wz-inline-count{position:absolute;right:12px;bottom:10px;font-size:11px;color:var(--muted);
   background:#fffdf9;padding:0 4px;pointer-events:none}
 
