@@ -64,6 +64,32 @@ function slugify(title) {
   return `${base}-${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
+// A prévia usa a mesma fileira visual do feed. Os botões são apenas uma
+// amostra, mas os SVGs e as classes são os mesmos usados na publicação real.
+function PreviewActions() {
+  return (
+    <div className="entry-actions feed-acts wz-preview-actions" aria-hidden="true">
+      <div className="support-wrap">
+        <button type="button" className="support-pill">
+          <svg className="sp-heart" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1 7.8 7.8 7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z" /></svg>
+          <span className="action-label">Estou com você</span>
+        </button>
+        <button type="button" className="supporters-icon" tabIndex={-1}>
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="8" r="3" /><path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.8M16 14a5 5 0 0 1 4.5 5" /></svg>
+        </button>
+      </div>
+      <button type="button" className="comment-toggle">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12 7.6L3 21l1.9-5.7A8.4 8.4 0 1 1 21 11.5z" /></svg>
+        <span className="action-label">Comentar</span>
+      </button>
+      <button type="button" className="feed-share">
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13" /></svg>
+        <span className="action-label">Compartilhar</span>
+      </button>
+    </div>
+  );
+}
+
 export default function NewJourneyForm({ userId, t, aiOn }) {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -628,10 +654,15 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
                 <span className="entry-id"><b>Você</b><small><span className="entry-journey">{title || 'Minha jornada'}</span> · Dia 1</small></span>
               </div>
             </div>
-            {(first || hoje) && <div className="wz-preview-text">{first || hoje}</div>}
-            {photoUrl && <img className="wz-preview-media" src={photoUrl} alt="Prévia da foto do Dia 1" />}
-            {videoUrl && !photoUrl && <video className="wz-preview-media" src={videoUrl} controls playsInline />}
-            <div className="wz-preview-actions" aria-hidden="true"><span>♡ Estou com você</span><span>◯ Comentar</span><span>↗ Compartilhar</span></div>
+            {(photoUrl || videoUrl) && (
+              <div className="entry-media livre wz-preview-media" style={{ aspectRatio: '4 / 5' }}>
+                {photoUrl
+                  ? <img src={photoUrl} alt="Prévia da foto do Dia 1" />
+                  : <video src={videoUrl} controls playsInline />}
+              </div>
+            )}
+            {(first || hoje) && <div className="dp-text under wz-preview-text"><p className="entry-text">{first || hoje}</p></div>}
+            <PreviewActions />
           </article>
           <button type="button" className="wz-preview-edit" onClick={voltar}>Voltar e editar</button>
         </div>
