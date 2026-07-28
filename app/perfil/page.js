@@ -289,7 +289,16 @@ export default async function Perfil() {
 
         {/* o Upi ficou com a linha inteira: e' uma frase, precisa de largura.
             Sem fala, a linha nao existe — antes sobrava um vao de 12px. */}
-        {upi?.line && (
+        <div className="pc-bar pc-progress-bar">
+          <div className="pc-progress-upi">
+            <img className="upi-char bob" src="/upi.svg" alt="Upi" />
+            <div className="upi-bubble upi-open">
+              <b className="upi-name">Upi</b>
+              <p>{t.companionBtn}</p>
+            </div>
+          </div>
+        </div>
+        {false && upi?.line && (
           <div className="pc-bar">
             <div className="pc-bar-upi">
               <UpiGreeting line={upi.line} cat={upi.cat}

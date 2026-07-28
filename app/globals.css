@@ -4390,6 +4390,7 @@ h1 { letter-spacing: -0.03em; }
   border-right:7px solid var(--line);
 }
 .pc-bar .upi-bubble::after{left:-6px;border-right-color:var(--surface)}
+.pc-progress-upi{display:flex;align-items:center;gap:10px}.pc-progress-upi .upi-char{flex:none}.pc-progress-upi .upi-bubble{margin-top:0;background:var(--sage-soft);border-color:rgba(132,145,122,.35);box-shadow:0 6px 18px rgba(70,80,60,.08)}.pc-progress-upi .upi-bubble::after{border-right-color:var(--sage-soft)}.pc-progress-upi .upi-bubble p{font-family:var(--display);font-style:normal;font-weight:800;font-size:15px}
 
 @media(max-width:640px){
   .pc-bar{--upi-tam:72px}
