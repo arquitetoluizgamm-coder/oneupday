@@ -22,14 +22,14 @@ function ProfileNavAvatar() {
   }, []);
 
   return (
-    <span className="bn-profile-avatar" aria-hidden="true"
+    <div className="bn-profile-avatar" aria-hidden="true"
       style={profile ? { background: profile.avatar_color || 'var(--orange)' } : undefined}>
       {profile?.avatar_url
         ? <img src={profile.avatar_url} alt="" />
         : profile?.name
           ? profile.name.trim().charAt(0).toUpperCase()
-          : <span className="bn-avatar-placeholder" />}
-    </span>
+          : <i className="bn-avatar-placeholder" />}
+    </div>
   );
 }
 
