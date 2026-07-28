@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 import { track } from '../../lib/track';
+import ImageCropper from '../../components/ImageCropper';
 
 const MAX_VIDEO = 60 * 1024 * 1024;
 
@@ -87,6 +88,8 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   const [privAberta, setPrivAberta] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
+  const [rawPhotoFile, setRawPhotoFile] = useState(null);
+  const [rawPhotoUrl, setRawPhotoUrl] = useState('');
   const [uploading, setUploading] = useState(false);
 
   // ---- estado da ajuda da IA, um por tela ----
@@ -334,11 +337,11 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   }
   function voltar() { if (step > 0) irPara(step - 1); }
 
-  async function upload(file) {
+  async function upload(file, extOverride) {
     try {
       if (!file) return null;
       const supabase = createClient();
-      const ext = (file.name?.split('.').pop() || 'bin').toLowerCase();
+      const ext = (extOverride || file.name?.split('.').pop() || 'bin').toLowerCase();
       const id = typeof crypto !== 'undefined' && crypto.randomUUID
         ? crypto.randomUUID()
         : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -353,14 +356,28 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   }
   async function onPhoto(e) {
     const file = e.target.files?.[0]; if (!file) return;
+    if (rawPhotoUrl) URL.revokeObjectURL(rawPhotoUrl);
+    setRawPhotoFile(file); setRawPhotoUrl(URL.createObjectURL(file)); setErro('');
+  }
+  async function onPhotoCropDone(result) {
+    const file = result === 'original' || !result ? rawPhotoFile : result;
+    const ext = result === 'original' || !result ? undefined : 'jpg';
+    if (rawPhotoUrl) URL.revokeObjectURL(rawPhotoUrl);
+    setRawPhotoUrl(''); setRawPhotoFile(null);
+    if (!file) return;
     setUploading(true); setErro('');
     try {
-      const url = await upload(file);
+      const url = await upload(file, ext);
       if (!url) { setErro(t.createError); return; }
       setPhotoUrl(url); setVideoUrl(null); if (videoRef.current) videoRef.current.value = '';
     } finally {
       setUploading(false);
     }
+  }
+  function onPhotoCropCancel() {
+    if (rawPhotoUrl) URL.revokeObjectURL(rawPhotoUrl);
+    setRawPhotoUrl(''); setRawPhotoFile(null);
+    if (photoRef.current) photoRef.current.value = '';
   }
   async function onVideo(e) {
     const file = e.target.files?.[0]; if (!file) return;
@@ -587,6 +604,14 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
           </div>
           <p className="wz-media-note">O vídeo será preservado no formato original. No feed, ele aparece em um quadro 4:5 com opção de expandir.</p>
           {(photoUrl || videoUrl) && <div className="wz-media"><>{photoUrl ? <img src={photoUrl} alt="" /> : <video src={videoUrl} controls playsInline />}</></div>}
+          {rawPhotoUrl && (
+            <div className="crop-modal" role="dialog" aria-modal="true" aria-label="Enquadrar foto">
+              <div className="crop-modal-card">
+                <ImageCropper src={rawPhotoUrl} labels={t.crop || {}} aspects={[['portrait', 4 / 5]]}
+                  onDone={onPhotoCropDone} onCancel={onPhotoCropCancel} />
+              </div>
+            </div>
+          )}
           <button type="button" className="wz-media-skip" onClick={() => irPara(S_REV)}>Continuar sem foto ou vídeo</button>
         </div>
       )}

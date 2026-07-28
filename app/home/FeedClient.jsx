@@ -100,7 +100,7 @@ function Media({ photo, video, href, labels, caption, onRatio, children, alt = '
   const L = labels || {};
 
   const minimo = video ? (4 / 5) : RATIO_ALTO_FOTO;
-  const r = nat ? (video ? RATIO_ALTO_VIDEO : Math.min(RATIO_LARGO, Math.max(minimo, nat))) : null;
+  const r = nat ? (video ? (4 / 5) : Math.min(RATIO_LARGO, Math.max(minimo, nat))) : null;
   const style = r ? { aspectRatio: String(r) } : undefined;
   const vertical = ehVertical(r);
   const cortado = !!(nat && r && Math.abs(nat - r) > 0.02);
