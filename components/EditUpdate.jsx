@@ -105,12 +105,13 @@ export default function EditUpdate({ update, labels, onChanged }) {
                 </label>
                 <div className="ep-field">{L.photo}
                   {photoUrl ? (
-                    <div className="ej-cover eu-photo" style={{ backgroundImage: `url(${photoUrl})` }}>
-                      <div className="ej-cover-actions">
+                    <>
+                      <div className="ej-cover eu-photo" style={{ backgroundImage: `url(${photoUrl})` }} aria-label={L.photo} />
+                      <div className="ej-photo-actions">
                         <button type="button" className="ej-cover-btn" onClick={() => fileRef.current?.click()} disabled={busy}>{L.photoChange}</button>
                         <button type="button" className="ej-cover-btn ej-cover-del" onClick={() => setPhotoUrl('')} disabled={busy}>{L.photoRemove}</button>
                       </div>
-                    </div>
+                    </>
                   ) : (
                     <button type="button" className="eu-add-photo" onClick={() => fileRef.current?.click()} disabled={busy}>+ {L.photoAdd}</button>
                   )}
