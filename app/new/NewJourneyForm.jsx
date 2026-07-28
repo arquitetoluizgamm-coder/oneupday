@@ -748,7 +748,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {organizando && <p className="wz-organizando" aria-live="polite">{t.wzOrganizing}</p>}
       {erro && <p className="wz-erro" role="alert">{erro}</p>}
 
-      <div className="wz-nav">
+      <div className={`wz-nav${step === STEPS - 1 ? ' wz-nav-final' : ''}`}>
         <button type="button" className="wz-back" onClick={voltar} disabled={step === 0 || saving}>
           {t.wizBack}
         </button>
@@ -765,11 +765,11 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
           </>
         ) : (
           <div className="wz-final-actions">
-            <button type="button" className="wz-draft-btn" onClick={salvarRascunhoESair} disabled={saving || uploading}>
-              {t.wzDraftSave || 'Salvar e continuar depois'}
-            </button>
             <button type="button" className="wz-go" onClick={criar} disabled={saving || uploading}>
               {saving ? t.creating : (t.publishJourney || 'Publicar jornada')}
+            </button>
+            <button type="button" className="wz-draft-btn" onClick={salvarRascunhoESair} disabled={saving || uploading}>
+              {t.wzDraftSave || 'Salvar e continuar depois'}
             </button>
           </div>
         )}
