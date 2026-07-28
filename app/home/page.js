@@ -93,7 +93,7 @@ export default async function Home() {
     inviteTitle: t.feedInviteTitle, inviteSub: t.feedInviteSub, inviteCta: t.feedInviteCta, loading: '',
     tabAll: t.tabAll, tabFollowing: t.tabFollowing, followingEmptyTitle: t.followingEmptyTitle, followingEmptySub: t.followingEmptySub,
     supportIdle: t.withYouIdle, supportActive: t.withYouActive, supporters: t.supporters, supportersLoading: t.supportersLoading, supportersEmpty: t.supportersEmpty, supportStrip: t.supportStrip, supporting: t.supportingFmt, progressFmt: t.progressFmt, suggest: { title: t.suggestTitle, sub: t.suggestSub, follow: t.follow, following: t.following, followBack: t.followBack, newcomer: t.suggestNewcomer, dayFmt: t.dayShort }, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful },
-    share: t.shareShort, linkCopied: t.linkCopied,
+    share: t.shareShort, linkCopied: t.linkCopied, quoteLabel: t.quoteLabel,
     videoFill: t.videoFill, videoFit: t.videoFit,
     histSelo: t.histSelo, histTitle: t.histTitle, histSub: t.histSub, histCta: t.histCta,
     meuNome: profile.name || '',

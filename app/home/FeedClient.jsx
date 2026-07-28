@@ -544,7 +544,7 @@ export default function FeedClient({ labels }) {
               <span className="entry-ava" style={{ background: item.owner.avatar_color || 'var(--orange)' }}>
                 {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}
               </span>
-              <span className="entry-id"><b>{item.owner.name}</b></span>
+              <span className="entry-id"><b>{item.owner.name}</b>{item.kind === 'quote' && labels.quoteLabel && <small className="entry-media-kind">{labels.quoteLabel.replace('{name}', item.owner.name || '')}</small>}</span>
             </a>
             <MidiaGaleria item={item} labels={labels} />
             <div className="entry-actions feed-acts">
