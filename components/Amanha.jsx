@@ -16,8 +16,8 @@ export default function Amanha({ people, labels }) {
   };
 
   return (
-    <section className="am-block">
-      <h3 className="am-title">{L.title || 'Amanhã por aqui'}</h3>
+    <article className="entry aux-post am-block">
+      <header className="aux-post-head"><span className="aux-post-mark" aria-hidden="true">↗</span><div><b>{L.title || 'Amanhã por aqui'}</b><small>Algumas jornadas continuam amanhã.</small></div></header>
       <div className="am-list">
         {list.map((x, i) => {
           const p = x.owner || {};
@@ -36,6 +36,6 @@ export default function Amanha({ people, labels }) {
           );
         })}
       </div>
-    </section>
+    </article>
   );
 }

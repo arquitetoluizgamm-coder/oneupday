@@ -8,11 +8,8 @@ export default function SuggestionCard({ people, labels }) {
   const L = labels || {};
   if (!people || !people.length) return null;
   return (
-    <section className="suggest-card">
-      <div className="sg-head">
-        <b>{L.title}</b>
-        <span>{L.sub}</span>
-      </div>
+    <article className="entry aux-post suggest-card">
+      <div className="aux-post-head"><span className="aux-post-mark" aria-hidden="true">✦</span><div><b>{L.title}</b><small>{L.sub}</small></div></div>
       <div className="sg-carousel">
         {people.map((p) => (
           <div className="sgc-item" key={p.ownerId}>
@@ -29,6 +26,6 @@ export default function SuggestionCard({ people, labels }) {
           </div>
         ))}
       </div>
-    </section>
+    </article>
   );
 }

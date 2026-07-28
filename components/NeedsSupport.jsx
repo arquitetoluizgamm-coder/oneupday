@@ -30,8 +30,8 @@ export default function NeedsSupport({ people, labels }) {
   }
 
   return (
-    <section className="needs">
-      <span className="needs-title">{L.title}</span>
+    <article className="entry aux-post needs">
+      <header className="aux-post-head"><span className="aux-post-mark" aria-hidden="true">♥</span><div><b>{L.title}</b><small>Uma presença pode mudar o dia de alguém.</small></div></header>
       <div className="needs-list">
         {list.map((p) => (
           <div key={p.id} className={`needs-person${sent[p.id] ? ' leaving' : ''}`}>
@@ -45,6 +45,6 @@ export default function NeedsSupport({ people, labels }) {
           </div>
         ))}
       </div>
-    </section>
+    </article>
   );
 }

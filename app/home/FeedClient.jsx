@@ -16,7 +16,7 @@ import { textoAlternativo } from '../../lib/alt';
 import Retornos from '../../components/Retornos';
 import { StepOpen, StepResult } from '../../components/StepChapter';
 import Percepcao from '../../components/Percepcao';
-import Andamento, { Hoje } from '../../components/Andamento';
+import Andamento from '../../components/Andamento';
 import Espelho from '../../components/Espelho';
 import LoopMarca from '../../components/LoopMarca';
 import { MOODS, moodGlow } from '../../lib/moods';
@@ -442,12 +442,11 @@ export default function FeedClient({ labels }) {
   const [suggestions, setSuggestions] = useState([]);
   const [momentos, setMomentos] = useState({ transformacoes: [], amanha: [], retornos: [] });
   const [andamento, setAndamento] = useState([]);
-  const [hoje, setHoje] = useState(null);
   const [needs, setNeeds] = useState([]);
   useEffect(() => { fetch('/api/needs').then((r) => r.json()).then((j) => setNeeds(j.people || [])).catch(() => {}); }, []);
   useEffect(() => { fetch('/api/suggestions').then((r) => r.json()).then((j) => setSuggestions(j.people || [])).catch(() => {}); }, []);
   useEffect(() => { fetch('/api/eco', { method: 'POST' }).catch(() => {}); }, []);
-  useEffect(() => { fetch('/api/andamento').then((r) => r.json()).then((j) => { setAndamento(j.andamento || []); setHoje(j.hoje || null); }).catch(() => {}); }, []);
+  useEffect(() => { fetch('/api/andamento').then((r) => r.json()).then((j) => setAndamento(j.andamento || [])).catch(() => {}); }, []);
   useEffect(() => { fetch('/api/momentos').then((r) => r.json()).then((j) => setMomentos({ transformacoes: j.transformacoes || [], amanha: j.amanha || [], retornos: j.retornos || [] })).catch(() => {}); }, []);
 
   async function load() {
@@ -517,7 +516,6 @@ export default function FeedClient({ labels }) {
 
   return (
     <>
-      <Hoje dado={hoje} nome={labels.meuNome} labels={labels.hj} />
       <Andamento itens={andamento} labels={labels.an} />
 
       <div className="feed-tabs">

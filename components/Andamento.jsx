@@ -14,8 +14,8 @@ export default function Andamento({ itens, labels }) {
   };
 
   return (
-    <section className="an-block">
-      <h3 className="an-title">{L.title || 'Em andamento'}</h3>
+    <article className="entry aux-post an-block">
+      <header className="aux-post-head"><span className="aux-post-mark" aria-hidden="true">◌</span><div><b>{L.title || 'Em andamento'}</b><small>Histórias que continuam sendo acompanhadas.</small></div></header>
       <div className="an-scroll">
         {itens.map((x, i) => {
           const p = x.owner || {};
@@ -37,7 +37,7 @@ export default function Andamento({ itens, labels }) {
           );
         })}
       </div>
-    </section>
+    </article>
   );
 }
 

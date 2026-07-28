@@ -5943,6 +5943,14 @@ h1 { letter-spacing: -0.03em; }
 .composer-extra-toggle b{font-size:20px;line-height:1;font-weight:500}
 .composer-extra-panel:not(.open) .tools{display:none}
 .composer-extra-panel:not(.open){justify-content:flex-end}
+.feed-stream > .aux-post{margin:0 0 14px;padding:18px 16px;background:var(--surface,#fff);border:1px solid var(--line);border-radius:16px;box-shadow:0 7px 22px rgba(24,36,59,.045)}
+.aux-post-head{display:flex;align-items:flex-start;gap:11px;margin:0 0 14px}
+.aux-post-head>div{display:grid;gap:3px;min-width:0}
+.aux-post-head b{color:var(--ink);font-family:var(--display);font-size:15px;font-weight:850;line-height:1.2}
+.aux-post-head small{color:var(--muted);font-size:11px;line-height:1.35}
+.aux-post-mark{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:50%;background:var(--support-soft,#f2ded4);color:var(--orange,#c16f54);font-size:16px}
+.aux-post .needs-title,.aux-post .sg-head,.aux-post .am-title,.aux-post .an-title{display:none}
+@media(max-width:640px){.feed-stream > .aux-post{margin-inline:0;border-radius:0;border-left:0;border-right:0;box-shadow:none;padding:18px 16px}}
 .ej-section{padding:18px 0;border-bottom:1px solid var(--line,#ece9e2)}
 .ej-section:first-child{padding-top:0}
 .ej-section-title{margin:0;color:var(--ink);font-family:var(--display);font-size:16px;font-weight:850;letter-spacing:-.01em}
