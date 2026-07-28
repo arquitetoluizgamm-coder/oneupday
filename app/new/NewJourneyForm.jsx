@@ -163,6 +163,14 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     { fala: t.wzUpQ5 || 'O que fez hoje ser o dia em que você decidiu começar?', exemplos: t.wzUpEx5 || ['Dei o primeiro passo', 'Cansei de adiar', 'Hoje eu tive um pouco de tempo'], aplicar: setHoje },
   ];
   const ajudaAtual = [S_TITULO, S_PORQUE, S_HOJE].includes(step) ? ajudaPorEtapa[step] : null;
+  const objetivoCategorias = [
+    ['Corpo e saúde', ['Voltar a treinar', 'Caminhar mais', 'Dormir melhor', 'Cuidar da alimentação', 'Beber mais água']],
+    ['Mente e bem-estar', ['Meditar', 'Ter mais calma', 'Cuidar da ansiedade', 'Fazer terapia', 'Ter mais tempo para mim']],
+    ['Estudos e aprendizado', ['Voltar a estudar', 'Aprender inglês', 'Ler mais', 'Fazer um curso', 'Estudar para uma prova']],
+    ['Vida prática', ['Organizar minha vida', 'Arrumar minha casa', 'Economizar dinheiro', 'Planejar minha rotina', 'Usar menos o celular']],
+    ['Projetos e criação', ['Começar um projeto', 'Tirar uma ideia do papel', 'Voltar a desenhar', 'Escrever um livro', 'Começar um negócio']],
+    ['Relacionamentos', ['Estar mais presente', 'Ligar para minha família', 'Fazer novos amigos', 'Cuidar do meu relacionamento', 'Aprender a conversar melhor']],
+  ];
   function escolherExemplo(exemplo) {
     ajudaAtual?.aplicar(exemplo);
     setAjudaAberta(false);
@@ -489,12 +497,15 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
           </div>
         )}
         {ajudaAtual && ajudaAberta && step === S_TITULO && (
-          <div className="wz-up-modal" role="dialog" aria-label="Exemplos para começar">
-            <div className="wz-up-modal-head"><b>Escolha um ponto de partida</b><button type="button" onClick={() => setAjudaAberta(false)}>Fechar</button></div>
-            <div className="wz-up-examples">
-            {ajudaAtual.exemplos.map((exemplo) => (
-              <button type="button" key={exemplo} onClick={() => escolherExemplo(exemplo)}>{exemplo}</button>
-            ))}
+          <div className="wz-up-modal" role="dialog" aria-modal="true" aria-label="Exemplos para começar">
+            <div className="wz-up-modal-head"><div><b>Encontre um ponto de partida</b><span>Escolha algo que tenha a ver com você.</span></div><button type="button" className="wz-up-modal-close" onClick={() => setAjudaAberta(false)} aria-label="Fechar">×</button></div>
+            <div className="wz-up-categories">
+              {objetivoCategorias.map(([categoria, exemplos]) => (
+                <section className="wz-up-category" key={categoria}>
+                  <h2>{categoria}</h2>
+                  <div className="wz-up-examples">{exemplos.map((exemplo) => <button type="button" key={exemplo} onClick={() => escolherExemplo(exemplo)}>{exemplo}</button>)}</div>
+                </section>
+              ))}
             </div>
             <button type="button" className="wz-up-write" onClick={() => setAjudaAberta(false)}>Escrever outra coisa</button>
           </div>
