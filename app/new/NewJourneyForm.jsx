@@ -592,6 +592,25 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
       {step === S_REV && <div className="wz-publish-final" aria-hidden="true" />}
 
+      {step === S_REV && (
+        <div className="wz-preview-wrap">
+          <span className="wz-preview-kicker">Prévia do post</span>
+          <article className="entry wz-preview-entry">
+            <div className="entry-head">
+              <div className="entry-person">
+                <span className="entry-ava wz-preview-ava">V</span>
+                <span className="entry-id"><b>Você</b><small><span className="entry-journey">{title || 'Minha jornada'}</span> · Dia 1</small></span>
+              </div>
+            </div>
+            {(first || hoje) && <div className="wz-preview-text">{first || hoje}</div>}
+            {photoUrl && <img className="wz-preview-media" src={photoUrl} alt="Prévia da foto do Dia 1" />}
+            {videoUrl && !photoUrl && <video className="wz-preview-media" src={videoUrl} controls playsInline />}
+            <div className="wz-preview-actions" aria-hidden="true"><span>♡ Estou com você</span><span>◯ Comentar</span><span>↗ Compartilhar</span></div>
+          </article>
+          <button type="button" className="wz-preview-edit" onClick={voltar}>Voltar e editar</button>
+        </div>
+      )}
+
       {/* Privacidade: não é decisão do fluxo, mas ninguém pode ser
           publicado sem saber. Uma linha declara o que vai acontecer. */}
       {step === S_REV && (
