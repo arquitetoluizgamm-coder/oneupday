@@ -28,11 +28,12 @@ O idioma é escolhido pelo cabeçalho `Accept-Language`, com fallback para ingl�
 - revisar plural, gênero, tratamento e vocabulário de apoio;
 - testar wizard, feed, comentários, notificações, perfil, moderação e mensagens de erro.
 
-### Etapa 3 — preferência de idioma
+### Etapa 3 — preferência de idioma (iniciada)
 
-- reconhecer `pt`, `en` e `es` pelo navegador;
-- permitir troca manual dentro do perfil/configurações;
-- salvar a preferência para não depender do navegador em cada acesso;
+- reconhecer `pt`, `en` e `es` pelo navegador; **feito**;
+- permitir troca manual no topo do app; **feito nesta etapa**;
+- salvar a preferência em cookie para não depender do navegador em cada acesso; **feito nesta etapa**;
+- revisar o seletor e mover para perfil/configurações se a navegação global ficar pesada; **pendente**;
 - manter o idioma dos textos gerados pela IA igual ao idioma escolhido.
 
 ### Etapa 4 — conteúdo e operação

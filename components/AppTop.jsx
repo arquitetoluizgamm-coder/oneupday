@@ -4,6 +4,7 @@ import { getDict } from '../lib/i18n';
 import HeaderHeart from './HeaderHeart';
 import BackBtn from './BackBtn';
 import Logo, { Wordmark } from './Logo';
+import LanguagePicker from './LanguagePicker';
 
 // ============================================================
 // TOPO — um só, para todo o app
@@ -70,7 +71,8 @@ export default async function AppTop({
 }) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const t = getDict(getLocale());
+  const locale = getLocale();
+  const t = getDict(locale);
 
   // Sem conta: marca e o convite. Sem sino e sem avatar — não há
   // notificação para ver nem perfil para abrir.
@@ -79,6 +81,7 @@ export default async function AppTop({
       <header className="top top-visita">
         <Logo />
         <div className="top-right">
+          <LanguagePicker current={locale} />
           <a className="cta" href="/login">{t.startYourJourney}</a>
         </div>
       </header>
@@ -112,6 +115,7 @@ export default async function AppTop({
       </a>
 
       <div className="top-right">
+        <LanguagePicker current={locale} />
         {profile && (
           <a className="header-ava" href="/perfil" aria-label={profile.name || ''}
             style={{ background: profile.avatar_color || 'var(--orange)', ...(avatarStyle || {}) }}>
