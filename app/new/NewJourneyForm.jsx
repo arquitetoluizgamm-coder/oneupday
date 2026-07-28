@@ -130,10 +130,13 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   const [upSugestoesBusy, setUpSugestoesBusy] = useState(false);
   const [organizando, setOrganizando] = useState(false);
   const [iaOrganizou, setIaOrganizou] = useState(false);
+  const [rascunhoStatus, setRascunhoStatus] = useState('');
+  const rascunhoPronto = useRef(false);
 
   const photoRef = useRef(null);
   const videoRef = useRef(null);
   const router = useRouter();
+  const draftKey = `oneupday:new-journey:${userId}`;
 
   const CATS = [
     ['body', t.catBody], ['health', t.catHealth], ['mind', t.catMind], ['study', t.catStudy],
@@ -154,6 +157,39 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     const g = adivinhar(title + ' ' + goal);
     if (g) setCat(g);
   }, [title, goal, catTocada]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Recupera o que a pessoa já respondeu quando ela volta ao wizard.
+  useEffect(() => {
+    if (!userId || typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem(draftKey);
+      if (raw) {
+        const d = JSON.parse(raw);
+        if (typeof d.step === 'number') setStep(Math.max(0, Math.min(STEPS - 1, d.step)));
+        if (d.title) setTitle(d.title); if (d.goal) setGoal(d.goal); if (d.pratica) setPratica(d.pratica);
+        if (d.frequencia) setFrequencia(d.frequencia); if (d.frequenciaOutro) setFrequenciaOutro(d.frequenciaOutro);
+        if (d.plano) setPlano(d.plano); if (d.ritmo) setRitmo(d.ritmo); if (d.ritmoOutro) setRitmoOutro(d.ritmoOutro);
+        if (d.dur) setDur(d.dur); if (d.customDur) setCustomDur(d.customDur); if (d.hoje) setHoje(d.hoje);
+        if (d.first) setFirst(d.first); if (d.cat) { setCat(d.cat); setCatTocada(true); }
+        if (d.customCat) setCustomCat(d.customCat); if (d.visibility) setVisibility(d.visibility);
+        if (d.photoUrl) setPhotoUrl(d.photoUrl); if (d.videoUrl) setVideoUrl(d.videoUrl);
+        setRascunhoStatus(t.wzDraftRestored || 'Rascunho recuperado');
+      }
+    } catch {}
+    rascunhoPronto.current = true;
+  }, [userId, draftKey, t.wzDraftRestored]);
+
+  // Salva respostas automaticamente. Arquivos já enviados ficam representados
+  // pela URL pública; o arquivo ainda não escolhido não interrompe o rascunho.
+  useEffect(() => {
+    if (!userId || !rascunhoPronto.current || typeof window === 'undefined') return;
+    if (![title, goal, pratica, frequencia, plano, hoje, first].some((v) => String(v || '').trim()) && !photoUrl && !videoUrl) return;
+    const payload = { step, title, goal, pratica, frequencia, frequenciaOutro, plano, ritmo, ritmoOutro, dur, customDur, hoje, first, cat, customCat, visibility, photoUrl, videoUrl, savedAt: Date.now() };
+    const timer = window.setTimeout(() => {
+      try { window.localStorage.setItem(draftKey, JSON.stringify(payload)); setRascunhoStatus(t.wzDraftSaved || 'Rascunho salvo'); } catch {}
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [userId, draftKey, step, title, goal, pratica, frequencia, frequenciaOutro, plano, ritmo, ritmoOutro, dur, customDur, hoje, first, cat, customCat, visibility, photoUrl, videoUrl, t.wzDraftSaved]);
 
   // Trocar de tela limpa a ajuda: sugestão de uma pergunta aparecendo
   // embaixo de outra é o tipo de coisa que faz a pessoa desconfiar do app.
@@ -477,8 +513,17 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
 
     track('journey_created', { slug, visibility });
     track('day1_posted', { slug });
+    try { window.localStorage.removeItem(draftKey); } catch {}
     router.push(`/created/${slug}`);
     router.refresh();
+  }
+
+  function salvarRascunhoESair() {
+    try {
+      window.localStorage.setItem(draftKey, JSON.stringify({ step, title, goal, pratica, frequencia, frequenciaOutro, plano, ritmo, ritmoOutro, dur, customDur, hoje, first, cat, customCat, visibility, photoUrl, videoUrl, savedAt: Date.now() }));
+    } catch {}
+    setRascunhoStatus(t.wzDraftSaved || 'Rascunho salvo');
+    router.push('/home');
   }
 
   // Enter nunca envia nada: no máximo avança de tela.
@@ -676,6 +721,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         </div>
       )}
 
+      {rascunhoStatus && <p className="wz-draft-status" aria-live="polite">{rascunhoStatus}</p>}
       {ajErro && <p className="wz-aj-err">{ajErro}</p>}
       {organizando && <p className="wz-organizando" aria-live="polite">Organizando sua jornada…</p>}
       {erro && <p className="wz-erro" role="alert">{erro}</p>}
@@ -696,9 +742,14 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
             </button>
           </>
         ) : (
-          <button type="button" className="wz-go" onClick={criar} disabled={saving || uploading}>
-            {saving ? t.creating : (t.publishJourney || 'Publicar jornada')}
-          </button>
+          <div className="wz-final-actions">
+            <button type="button" className="wz-draft-btn" onClick={salvarRascunhoESair} disabled={saving || uploading}>
+              {t.wzDraftSave || 'Salvar e continuar depois'}
+            </button>
+            <button type="button" className="wz-go" onClick={criar} disabled={saving || uploading}>
+              {saving ? t.creating : (t.publishJourney || 'Publicar jornada')}
+            </button>
+          </div>
         )}
       </div>
     </div>
