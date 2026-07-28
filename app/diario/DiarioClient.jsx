@@ -8,7 +8,7 @@ export default function DiarioClient({ labels }) {
   const [entries, setEntries] = useState([]);
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [text, setText] = useState('');
-  const [upOn, setUpOn] = useState(false);
+  const [upOn, setUpOn] = useState(true);
   const [upText, setUpText] = useState('');
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -18,7 +18,7 @@ export default function DiarioClient({ labels }) {
     try {
       const list = JSON.parse(localStorage.getItem(KEY) || '[]');
       setEntries(Array.isArray(list) ? list : []);
-      setUpOn(localStorage.getItem(UP_KEY) === '1');
+      setUpOn(localStorage.getItem(UP_KEY) !== '0');
     } catch {}
   }, []);
   useEffect(() => { setText(current?.text || ''); setUpText(current?.up || ''); setSaved(false); }, [current?.id, date]);
@@ -57,12 +57,11 @@ export default function DiarioClient({ labels }) {
         <label className="diary-date">{labels.diaryDate}<input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></label>
         <textarea value={text} onChange={(e) => { setText(e.target.value); setSaved(false); }} placeholder={labels.diaryPh} rows={8} />
         <div className="diary-actions"><button className="cta" type="button" onClick={save} disabled={!text.trim()}>{labels.diarySave}</button><span aria-live="polite">{saved ? labels.diarySaved : ''}</span></div>
+        {upOn && <div className="diary-note-up"><button type="button" onClick={askUp} disabled={busy || !text.trim() || !current}>{busy ? labels.diaryUpThinking : labels.diaryAsk}</button>{upText && <p className="diary-up-text">{upText}</p>}</div>}
       </section>
       <section className={`diary-up${upOn ? ' on' : ''}`}>
         <div><b>{labels.diaryUpTitle}</b><p>{labels.diaryUpSub}</p></div>
         <button type="button" className="ghost-btn" onClick={toggleUp}>{upOn ? labels.diaryUpOn : labels.diaryUpOff}</button>
-        {upOn && <button type="button" className="diary-ask" onClick={askUp} disabled={busy || !text.trim()}>{busy ? labels.diaryUpThinking : labels.diaryAsk}</button>}
-        {upText && <p className="diary-up-text">{upText}</p>}
       </section>
       {entries.length > 0 && <section className="diary-history"><h2>{labels.diaryHistory}</h2>{entries.map((e) => <button type="button" key={e.id} className={`diary-entry${e.date === date ? ' on' : ''}`} onClick={() => setDate(e.date)}><time>{new Date(`${e.date}T12:00:00`).toLocaleDateString()}</time><span>{e.text}</span></button>)}</section>}
       <p className="diary-private-note">{labels.diaryPrivate}</p>
