@@ -405,7 +405,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       <div className="wz-head">
         <span className="wz-count">{(t.wizStep || '{n}/{t}').replace('{n}', step + 1).replace('{t}', STEPS)}</span>
         <h1>{heads[step][0]}</h1>
-        <p>{heads[step][1]}</p>
+        <p className="wz-explain">{heads[step][1]}</p>
       </div>
 
       {/* ---------------- 1 · o que ---------------- */}

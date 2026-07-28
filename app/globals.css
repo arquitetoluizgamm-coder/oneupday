@@ -3402,6 +3402,7 @@ h1 { letter-spacing: -0.03em; }
 .wz-head h1{margin:0 0 8px;font-family:var(--display);font-weight:800;
   font-size:29px;line-height:1.14;letter-spacing:-.03em;color:var(--ink)}
 .wz-head p{margin:0;font-size:15px;line-height:1.5;color:var(--muted);max-width:38ch}
+.wz-head .wz-explain{font-style:italic;color:var(--muted)}
 @media(max-width:640px){ .wz-head h1{font-size:25px} }
 
 .wz-body{display:flex;flex-direction:column}
