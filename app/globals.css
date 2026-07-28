@@ -1701,7 +1701,9 @@ html.chrome-scrolling .top{ box-shadow:0 1px 0 rgba(16,19,45,.05) }
 .top-3 .top-brand{justify-self:center;display:flex;align-items:center;line-height:0}
 .top-3 .top-brand img{height:26px;width:auto;display:block}
 /* O wordmark deixou de ser <img> e virou <svg>: a regra acima continua
-   para qualquer imagem que sobre no cabeçalho, e esta cuida da marca. */
+   para qualquer imagem que sobre no cabeçalho, e esta cuida da marca.
+   Com o viewBox justo na tinta, estes 26px são 26px de LETRA — antes
+   eram 9,9, porque 62% do viewBox do arquivo é espaço vazio. */
 .top-3 .top-brand .one-mark{height:26px;width:auto;display:block}
 .top-3 .top-right{justify-self:end;display:flex;align-items:center;gap:10px}
 @media(max-width:640px){ .top-3 .top-brand img,.top-3 .top-brand .one-mark{height:23px} }
@@ -2147,13 +2149,18 @@ h1 { letter-spacing: -0.03em; }
 .one-anim .oa-e2 { animation:oneAbre .8s cubic-bezier(.22,1,.36,1) 1.35s forwards }
 @keyframes oneAbre{ to{ width:var(--ate) } }
 
+/* O corpo e a entreletra vêm da altura da marca, não de um número
+   solto: 0,185 e 0,093 de 255. É a mesma proporção do logo antigo —
+   trocar o desenho não pode mudar a respiração da peça. */
 .oud-anim .oa-word{ opacity:0; transform:translateY(10px);
-  font-family:var(--display,'Montserrat',sans-serif); font-size:52px; font-weight:500;
-  letter-spacing:26px; fill:#4E4E4E;
+  font-family:var(--display,'Montserrat',sans-serif); font-size:47px; font-weight:500;
+  letter-spacing:24px; fill:#4E4E4E;
   animation:oudRise .6s cubic-bezier(.22,1,.36,1) 1.8s forwards }
 @keyframes oudRise{ to{ opacity:1; transform:none } }
 @media (prefers-reduced-motion: reduce){
-  .one-anim .oa-corte{ width:1024px; animation:none }
+  /* 715 é a largura total da tinta no viewBox justo: a marca
+     aparece inteira, nunca um pedaço. */
+  .one-anim .oa-corte{ width:715px; animation:none }
   .oud-anim .oa-word{opacity:1;transform:none;animation:none}
 }
 .auth-mark-anim.auth-mark{width:100%;height:auto;margin:4px auto 12px;border-radius:0;background:transparent;box-shadow:none;border:0;display:flex;justify-content:center;place-items:initial}
@@ -4658,7 +4665,7 @@ h1 { letter-spacing: -0.03em; }
 @media(prefers-reduced-motion:reduce){
   .reveal{opacity:1!important;transform:none!important;transition:none!important}
   .lt-barra{transform:scaleX(1)!important;animation:none!important}
-  .one-anim .oa-corte{ width:1024px; animation:none }
+  .one-anim .oa-corte{ width:715px; animation:none }
   .land-mark-nao-usado{
     stroke-dashoffset:0!important;animation:none!important}
   .oud-anim .oa-word{opacity:1!important;transform:none!important;animation:none!important}
