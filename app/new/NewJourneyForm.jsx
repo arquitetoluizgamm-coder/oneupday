@@ -585,6 +585,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
             <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPhoto} />
             <input ref={videoRef} type="file" accept="video/*" hidden onChange={onVideo} />
           </div>
+          <p className="wz-media-note">O vídeo será preservado no formato original. No feed, ele aparece em um quadro 4:5 com opção de expandir.</p>
           {(photoUrl || videoUrl) && <div className="wz-media"><>{photoUrl ? <img src={photoUrl} alt="" /> : <video src={videoUrl} controls playsInline />}</></div>}
           <button type="button" className="wz-media-skip" onClick={() => irPara(S_REV)}>Continuar sem foto ou vídeo</button>
         </div>

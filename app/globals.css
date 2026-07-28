@@ -5812,6 +5812,7 @@ h1 { letter-spacing: -0.03em; }
 .wz-media-action{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);font:inherit;font-weight:750;padding:15px 10px;cursor:pointer}
 .wz-media-action.on{border-color:#84917A;background:rgba(132,145,122,.12)}
 .wz-media-skip{align-self:center;border:0;background:none;color:var(--muted);font:inherit;font-size:13px;cursor:pointer;padding:5px}
+.wz-media-note{margin:-5px 0 0;color:var(--muted);font-size:12px;line-height:1.45;text-align:center}
 .wz-priv-simple{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0 18px;padding:12px 0;border-bottom:1px solid var(--line);color:var(--ink);font-size:14px;font-weight:750}
 .wz-priv-options{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .wz-priv-options button{border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--muted);font:inherit;font-size:12px;font-weight:750;padding:7px 10px;cursor:pointer}

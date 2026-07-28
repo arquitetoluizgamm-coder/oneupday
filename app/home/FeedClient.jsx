@@ -99,8 +99,8 @@ function Media({ photo, video, href, labels, caption, onRatio, children, alt = '
   const [inteiro, setInteiro] = useState(false); // ver o quadro todo (contain)
   const L = labels || {};
 
-  const minimo = video ? RATIO_ALTO_VIDEO : RATIO_ALTO_FOTO;
-  const r = nat ? Math.min(RATIO_LARGO, Math.max(minimo, nat)) : null;
+  const minimo = video ? (4 / 5) : RATIO_ALTO_FOTO;
+  const r = nat ? (video ? RATIO_ALTO_VIDEO : Math.min(RATIO_LARGO, Math.max(minimo, nat))) : null;
   const style = r ? { aspectRatio: String(r) } : undefined;
   const vertical = ehVertical(r);
   const cortado = !!(nat && r && Math.abs(nat - r) > 0.02);
