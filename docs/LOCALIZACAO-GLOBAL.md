@@ -19,10 +19,11 @@ O idioma é escolhido pelo cabeçalho `Accept-Language`, com fallback para ingl�
 - retirar strings fixas de componentes novos, como a tela Hoje;
 - garantir que cada componente receba seus textos por `labels` ou `t`.
 
-### Etapa 2 — espanhol
+### Etapa 2 — espanhol (em andamento)
 
-- adicionar `es` em `locales`;
-- criar o dicionário espanhol completo, sem copiar traduções automáticas sem revisão;
+- adicionar `es` em `locales`; **feito nesta etapa**;
+- criar o núcleo espanhol das telas de entrada, wizard, feed, comentários, perfil e ações; **feito nesta etapa**;
+- concluir o dicionário espanhol completo, sem copiar traduções automáticas sem revisão; **pendente**;
 - incluir Espanha, México, Colômbia, Argentina e Chile como primeiros mercados de teste;
 - revisar plural, gênero, tratamento e vocabulário de apoio;
 - testar wizard, feed, comentários, notificações, perfil, moderação e mensagens de erro.
@@ -55,4 +56,4 @@ Não liberar um idioma apenas porque a página da Play Store está traduzida. O 
 
 ## Próximo trabalho
 
-Depois desta fundação, a próxima entrega deve ser o dicionário `es` completo e uma revisão visual de todas as telas em espanhol. Só então vale abrir o teste espanhol na Play Store.
+Depois deste núcleo, a próxima entrega deve ser completar as chaves restantes do dicionário `es`, revisar gênero/plural e fazer uma passagem visual em todas as telas. Só então vale abrir o teste espanhol na Play Store.
