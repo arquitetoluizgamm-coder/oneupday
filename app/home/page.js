@@ -5,6 +5,7 @@ import { getDict } from '../../lib/i18n';
 import AppTop from '../../components/AppTop';
 import BottomNav from '../../components/BottomNav';
 import FeedClient from './FeedClient';
+import HomeWelcome from './HomeWelcome';
 import NextStep from './NextStep';
 import ProgressBar from '../../components/ProgressBar';
 import Track from '../../components/Track';
@@ -49,6 +50,12 @@ export default async function Home() {
   const primary = list[0] || null;
   let pstats = {};
   if (primary) { const { data: st } = await supabase.from('journey_stats').select('*').eq('journey_id', primary.id).maybeSingle(); pstats = st || {}; }
+  let welcomeJourneys = list;
+  if (list.length) {
+    const { data: stats } = await supabase.from('journey_stats').select('journey_id, current_day').in('journey_id', list.map((j) => j.id));
+    const byId = Object.fromEntries((stats || []).map((s) => [s.journey_id, s.current_day || 0]));
+    welcomeJourneys = list.map((j) => ({ ...j, current_day: byId[j.id] || 0 }));
+  }
 
   let heartLikes = 0; const heartFollowers = new Set();
   if (list.length) {
@@ -118,19 +125,10 @@ export default async function Home() {
       <ScrollChrome />
       <DailyMood userId={user.id} answeredToday={moodToday} labels={{ title: t.dailyMoodTitle, sub: t.dailyMoodSub, skip: t.dailyMoodSkip, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful } }} />
       <main className="wrap feed-page">
+        <HomeWelcome journeys={welcomeJourneys} name={profile.name || ''} />
         {nc.mode && (
           <NextChapter mode={nc.mode} line={nc.line} env={nc.env} labels={ncLabels(t, nc)} dismissible />
         )}
-        {!primary && (
-          <section className="first-journey">
-            <span className="fj-eyebrow">{t.fjEyebrow}</span>
-            <h1>{t.fjTitle.replace('{name}', (profile.name || '').split(' ')[0])}</h1>
-            <p>{t.fjSub}</p>
-            <a className="cta grow" href="/new">{t.fjCta}</a>
-            <p className="fj-hint">{t.fjHint}</p>
-          </section>
-        )}
-
         <FeedClient mutedCats={profile.muted_cats || ''} labels={feedLabels} />
       </main>
       <BottomNav active="home" t={t} />

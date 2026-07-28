@@ -433,6 +433,7 @@ export default function FeedClient({ labels }) {
   const [scope, setScope] = useState('all');
   const [kind, setKind] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
   const sentinel = useRef(null);
   const offsetRef = useRef(0);
   const doneRef = useRef(false);
@@ -522,9 +523,12 @@ export default function FeedClient({ labels }) {
       <div className="feed-tabs">
         <button className={scope === 'all' ? 'on' : ''} onClick={() => switchScope('all')}>{labels.tabAll}</button>
         <button className={scope === 'following' ? 'on' : ''} onClick={() => switchScope('following')}>{labels.tabFollowing}</button>
+        <button type="button" className={`focus-toggle${focusMode ? ' on' : ''}`} onClick={() => setFocusMode((v) => !v)} aria-pressed={focusMode}>
+          {focusMode ? 'Feed livre' : 'Modo presença'}
+        </button>
       </div>
 
-      <section className="feed-stream">
+      <section id="feed" className={`feed-stream${focusMode ? ' focus-mode' : ''}`}>
         {started && items.length === 0 && (
           <div className="feed-invite">
             <LoopMarca size={132} />

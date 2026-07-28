@@ -5949,3 +5949,32 @@ h1 { letter-spacing: -0.03em; }
 .ej-section-sub{margin:4px 0 16px;color:var(--muted);font-size:12px;line-height:1.45}
 .ej-section .ep-field{margin-top:14px}
 .ej-section .ep-field:first-of-type{margin-top:0}
+
+/* Entrada "Hoje": uma pausa curta antes do feed. */
+.home-welcome{min-height:min(620px,calc(100svh - 128px));display:flex;flex-direction:column;align-items:center;justify-content:center;max-width:560px;margin:0 auto;padding:42px 24px 34px;text-align:center}
+.home-welcome-mark{width:112px;height:112px;display:grid;place-items:center;margin-bottom:18px}
+.home-welcome-mark .upi-char{width:104px;height:104px;object-fit:contain}
+.home-welcome-eyebrow{color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.home-welcome h1{max-width:470px;margin:12px 0 10px;color:var(--ink);font-family:var(--display);font-size:clamp(28px,5vw,42px);line-height:1.05;letter-spacing:-.04em}
+.home-welcome-copy{max-width:430px;margin:0 auto 24px;color:var(--muted);font-size:15px;line-height:1.55}
+.home-welcome-primary{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;border-radius:999px;background:var(--night);color:#fff;font-size:14px;font-weight:850;text-decoration:none;box-shadow:0 8px 20px rgba(16,19,45,.12)}
+.home-welcome-primary:hover{background:var(--orange);color:#fff;text-decoration:none;transform:translateY(-1px)}
+.home-welcome-journeys{display:grid;width:min(100%,430px);gap:8px;text-align:left}
+.home-welcome-journey{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 15px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);text-decoration:none}
+.home-welcome-journey:hover{border-color:var(--orange);text-decoration:none}
+.home-welcome-journey span{display:grid;gap:3px;min-width:0}.home-welcome-journey b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.home-welcome-journey small{color:var(--muted);font-size:11px}.home-welcome-journey strong{color:var(--orange);font-size:24px;font-weight:400}
+.home-welcome-journeys .home-welcome-primary{margin-top:6px}
+.home-welcome-skip{margin-top:18px;border:0;background:none;color:var(--muted);font-size:12px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.home-welcome-skip:hover{color:var(--ink)}
+.focus-toggle{margin-left:auto!important;color:var(--muted)!important;font-size:11px!important;font-weight:750!important}
+.focus-toggle.on{color:var(--ink)!important;background:var(--surface)!important;box-shadow:0 1px 4px rgba(16,19,45,.08)}
+@media(max-width:640px){
+  .home-welcome{min-height:calc(100svh - 112px);padding:30px 20px 26px}
+  .home-welcome-mark,.home-welcome-mark .upi-char{width:88px;height:88px}
+  .home-welcome h1{font-size:30px}
+  .home-welcome-copy{font-size:14px}
+  .feed-stream.focus-mode{scroll-snap-type:y proximity;scroll-padding-top:12px}
+  .feed-stream.focus-mode > article.entry{min-height:calc(100svh - 108px);scroll-snap-align:start;display:flex;flex-direction:column;justify-content:flex-start}
+  .feed-stream.focus-mode > article.entry .entry-actions{margin-top:auto}
+  .feed-stream.focus-mode > article.entry .entry-media,.feed-stream.focus-mode > article.entry .entry-textcard{max-height:none}
+}
