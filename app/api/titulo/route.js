@@ -109,17 +109,17 @@ export async function POST(req) {
     ].join(' ');
     entrada = `Jornada: "${titulo}"\nO que a pessoa escreveu: "${rascunho || pratica}"`;
   } else if (modo === 'organizar') {
-    if (!rascunho || !hoje) return NextResponse.json({}, { status: 400 });
+    if (!rascunho) return NextResponse.json({}, { status: 400 });
     system = [
-      'Organize as respostas de uma pessoa em um rascunho de jornada pessoal.',
+      'Organize as respostas de uma pessoa em uma recomendação clara e específica para uma jornada pessoal.',
       `Responda SOMENTE um JSON válido, em ${lang}, sem markdown, com estas chaves exatas:`,
       'titulo, descricao, pratica, ritmo, dias, primeiro, categoria.',
-      'titulo: curto, começando por verbo quando couber.',
-      'descricao: preserve o motivo contado pela pessoa, sem inventar sentimento.',
-      'pratica: transforme a ação em algo observável, usando somente o que foi dito.',
+      'titulo: curto, concreto e começando por verbo quando couber. Não copie apenas as palavras soltas da resposta.',
+      'descricao: una o motivo e o contexto em 1 ou 2 frases naturais. Dê clareza para quem ler no feed, sem inventar sentimento.',
+      'pratica: transforme a ação em uma frase observável e específica, usando somente o que foi dito.',
       'ritmo: use diario, 3x, fds ou outro texto curto; se não houver informação, use vazio.',
       'dias: número informado pela pessoa; se não houver, use 30.',
-      'primeiro: registro curto em primeira pessoa sobre o primeiro passo.',
+      'primeiro: registro curto, humano e em primeira pessoa sobre o primeiro passo. Combine as respostas quando isso deixar o Dia 1 mais claro.',
       'categoria: escolha somente body, health, mind, study, work, money, relationship, creative, home, habit, life ou other.',
       NUNCA_INVENTE, SEM_MOTIVACAO,
     ].join(' ');

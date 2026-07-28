@@ -3467,6 +3467,13 @@ h1 { letter-spacing: -0.03em; }
 .wz-media img,.wz-media video{width:100%;height:100%;object-fit:cover;display:block}
 .wz-review-media{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
 .wz-review-media .wz-label{margin-bottom:10px}
+.wz-ai-status{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin:0 0 24px;padding:12px 14px;border-left:2px solid #C16F54;background:#fffaf7;
+  font-size:12px;line-height:1.4;color:var(--muted)}
+.wz-ai-status.ready{border-left-color:#84917A;background:#f7faf5}
+.wz-ai-status button{flex:0 0 auto;border:0;background:none;color:var(--ink);cursor:pointer;
+  font-family:var(--display);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.wz-ai-status button:hover{color:#C16F54}
 
 /* privacidade: opcao com marcador, nao caixa de radio do sistema */
 .wz-vis{display:flex;flex-direction:column;gap:8px}

@@ -94,6 +94,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   const [ajBusy, setAjBusy] = useState('');
   const [ajErro, setAjErro] = useState('');
   const [organizando, setOrganizando] = useState(false);
+  const [iaOrganizou, setIaOrganizou] = useState(false);
 
   const photoRef = useRef(null);
   const videoRef = useRef(null);
@@ -168,6 +169,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       });
       const d = await r.json().catch(() => ({}));
       if (r.ok && d.titulo) {
+        setIaOrganizou(true);
         setTitle(d.titulo || title);
         setGoal(d.descricao || goal);
         setPratica(d.pratica || pratica);
@@ -177,8 +179,11 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         else if (d.ritmo) { setRitmo('outro'); setRitmoOutro(d.ritmo); }
         const categoria = CATS.find(([v]) => v === d.categoria)?.[0];
         if (categoria) { setCat(categoria); setCatTocada(true); }
+      } else {
+        setIaOrganizou(false);
+        setAjErro(t.ajErro || 'A recomendação não ficou disponível. Você pode tentar novamente.');
       }
-    } catch { setAjErro(t.ajErro || ''); }
+    } catch { setIaOrganizou(false); setAjErro(t.ajErro || 'A recomendação não ficou disponível. Você pode tentar novamente.'); }
     setOrganizando(false);
   }
 
@@ -440,6 +445,12 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
           telas para trocar uma palavra, ela publica errado ou desiste. */}
       {step === S_REV && (
         <div className="wz-body wz-rev">
+          <div className={`wz-ai-status${iaOrganizou ? ' ready' : ''}`}>
+            <span>{iaOrganizou ? 'Recomendação da IA pronta para editar' : 'A recomendação ainda não foi gerada'}</span>
+            <button type="button" onClick={organizarRascunho} disabled={organizando}>
+              {organizando ? (t.ajPensando || 'Organizando…') : (t.ajRetry || 'Tentar novamente')}
+            </button>
+          </div>
           <label className="wz-rev-campo">
             <span>{t.wzRevTitulo}</span>
             <input className="wz-input" value={title} maxLength={80} onChange={(e) => setTitle(e.target.value)} />
