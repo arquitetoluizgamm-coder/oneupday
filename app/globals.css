@@ -6806,11 +6806,18 @@ html.chrome-scrolling .feed-tabs{
    cortaria 20% de TODA foto já postada, inclusive nas telas onde
    sobrava espaço.
    ============================================================ */
+/* ------------------------------------------------------------
+   AS ÁREAS SEGURAS ESTAVAM FALTANDO NA CONTA
+
+   Eu medi o encaixe num iframe de computador, onde
+   `env(safe-area-inset-*)` vale ZERO. Num iPhone com entalhe são
+   47px em cima e 34 embaixo — 81px que eu simplesmente ignorei,
+   e é por isso que na minha medição cabia e no seu celular não.
+
+   Agora elas entram no teto. O `--sa-*` já existe no arquivo e
+   vale 0 em navegador comum, então nada muda onde não há entalhe.
+   ------------------------------------------------------------ */
 .feed-page .entry-media img,
 .feed-page .entry-media video{
-  max-height:calc(100svh - 340px);
-}
-@media(max-width:640px){
-  .feed-page .entry-media img,
-  .feed-page .entry-media video{max-height:calc(100svh - 340px)}
+  max-height:calc(100svh - 340px - var(--sa-top,0px) - var(--sa-bottom,0px));
 }
