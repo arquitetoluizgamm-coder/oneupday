@@ -7388,3 +7388,88 @@ button.home-welcome-primary{border:0;font:inherit;cursor:pointer;width:100%}
 
 /* a linha do nome perdeu o icone e volta a ser so o nome */
 .pc-name-line{gap:0}
+
+/* ============================================================
+   PATCH 180 · AS ABAS DO PERFIL EM DUAS FILEIRAS
+
+   São seis: Jornadas, Álbum, Citações, Pessoas, Diário privado e
+   Eu do futuro. Só quatro apareciam — as duas últimas ficavam
+   fora da tela, dentro de uma rolagem lateral que não tem seta,
+   não tem sombra e não tem nada dizendo que existe mais coisa ali.
+
+   Rolagem lateral escondida é o pior tipo de menu: quem não sabe
+   que ela existe nunca descobre as opções. E "Eu do futuro" é uma
+   das telas mais bonitas do app.
+
+   ------------------------------------------------------------
+   A CORREÇÃO É DESFAZER, NÃO CONSTRUIR
+
+   O `.ptabs` JÁ é uma grade de três colunas (linha 2093). Quem a
+   desmancha é a linha 137:
+
+       .ptabs-row .ptabs:has(.ptab-link){display:flex;overflow-x:auto}
+
+   Ela vira flex e rola. Com seis itens numa grade de três, o
+   navegador faz duas fileiras de três sozinho — não preciso
+   escrever nem uma coluna.
+
+   A especificidade tem que empatar: `.ptabs-row` + `.ptabs` +
+   `:has(.ptab-link)` conta (0,3,0). Repito a mesma forma e ganho
+   por vir depois.
+   ============================================================ */
+.ptabs-row .ptabs:has(.ptab-link){
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  overflow-x:visible;
+  gap:3px;
+  border-radius:20px;      /* 999px em duas fileiras vira uma cápsula
+                              alta e estranha; 20 acompanha a altura */
+}
+
+/* os itens deixam de ser faixas de rolagem e viram células */
+.ptabs-row .ptabs:has(.ptab-link) .ptab{
+  flex:none;
+  scroll-snap-align:none;
+  white-space:nowrap;      /* medido: o rótulo mais longo, "Diário
+                              privado", pede ~96px numa coluna de
+                              116. Nenhum precisa quebrar. */
+  min-height:44px;
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;
+  border-radius:14px;
+}
+
+/* ------------------------------------------------------------
+   E AQUI O CUIDADO QUE ESTA MUDANÇA EXIGIU
+
+   O Patch 178 deu a cada `.ptab` um alvo invisível de 44px de
+   altura, centrado nele. Isso funcionava numa fileira só.
+
+   Com duas fileiras, os alvos se atropelam: a aba tem ~32px, o
+   alvo tem 44, então ele passa 6px acima e 6px abaixo da aba. Com
+   3px de espaço entre as fileiras, o alvo de cima invade o de
+   baixo por 9px — e como os dois são absolutos e irmãos, quem
+   ganha o toque é o que vem DEPOIS no HTML.
+
+   Resultado: a faixa de baixo de "Jornadas" abriria "Pessoas".
+
+   Por isso, nas duas fileiras, a aba passa a ter 44px de verdade
+   (regra acima) e o alvo postiço é desligado. Alvo real não se
+   sobrepõe a vizinho.
+   ------------------------------------------------------------ */
+.ptabs-row .ptabs:has(.ptab-link) .ptab::after{content:none}
+
+/* os links (Diário, Eu do futuro) herdam o mesmo desenho das abas:
+   na grade eles são células iguais, não links soltos no fim */
+.ptabs-row .ptabs:has(.ptab-link) .ptab-link{
+  text-decoration:none;
+}
+.ptabs-row .ptabs:has(.ptab-link) .ptab-link:hover{
+  background:rgba(16,19,45,.05);color:var(--ink);text-decoration:none;
+}
+
+/* na faixa estreita o tipo encolhe um degrau, como já fazia antes */
+@media(max-width:640px){
+  .ptabs-row .ptabs:has(.ptab-link){padding:3px}
+  .ptabs-row .ptabs:has(.ptab-link) .ptab{font-size:12px;padding:7px 4px}
+}
