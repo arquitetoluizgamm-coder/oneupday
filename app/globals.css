@@ -8362,3 +8362,84 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
   }
   .jd-config > summary::after{margin-left:auto}
 }
+
+/* ============================================================
+   PATCH 197 · Depois do Dia 1, deixar amanhã esperando
+   ============================================================ */
+.tomorrow-step{
+  width:100%;
+  box-sizing:border-box;
+  margin:20px auto 18px;
+  padding:18px;
+  border:1px solid rgba(135,149,122,.28);
+  border-radius:20px;
+  background:linear-gradient(180deg,#fff,rgba(237,241,231,.72));
+  text-align:left;
+}
+.tomorrow-upi,
+.tomorrow-step.saved{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+}
+.tomorrow-step img,
+.tomorrow-upi img{
+  width:42px;
+  height:42px;
+  flex:none;
+}
+.tomorrow-step b{
+  display:block;
+  font-family:var(--display);
+  font-size:17px;
+  font-weight:850;
+  letter-spacing:-.025em;
+  color:var(--ink);
+}
+.tomorrow-step p{
+  margin:5px 0 0;
+  color:#667085;
+  font-size:13.5px;
+  line-height:1.45;
+}
+.tomorrow-step textarea{
+  width:100%;
+  box-sizing:border-box;
+  margin-top:14px;
+  border:1px solid rgba(24,36,59,.12);
+  border-radius:15px;
+  background:#fff;
+  padding:13px 14px;
+  font:inherit;
+  font-size:14.5px;
+  line-height:1.45;
+  resize:vertical;
+}
+.tomorrow-step textarea:focus{
+  outline:none;
+  border-color:rgba(135,149,122,.55);
+  box-shadow:0 0 0 4px rgba(135,149,122,.13);
+}
+.tomorrow-actions{
+  display:grid;
+  grid-template-columns:1fr 1.5fr;
+  gap:10px;
+  margin-top:12px;
+}
+.tomorrow-actions .ghost-btn,
+.tomorrow-actions .cta{
+  width:100%;
+  min-height:44px;
+  box-sizing:border-box;
+}
+.tomorrow-error{
+  color:#a13b32!important;
+  font-weight:750;
+}
+.tomorrow-step.saved{
+  align-items:center;
+}
+@media(max-width:520px){
+  .tomorrow-step{padding:16px}
+  .tomorrow-actions{grid-template-columns:1fr}
+}

@@ -8,6 +8,7 @@ import ShareButton from '../../[slug]/ShareButton';
 import Dia1Card from '../../[slug]/Dia1Card';
 import ChallengeButton from '../../[slug]/ChallengeButton';
 import EscolherMomento from '../../../components/EscolherMomento';
+import TomorrowStep from '../TomorrowStep';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,6 +41,11 @@ export default async function Created({ params }) {
             <b>{journey.title}</b>
             <span>{t.cardDay} 1 · {journey.total_days} {t.cardOf}</span>
           </div>
+          <TomorrowStep userId={user.id} journeyId={journey.id} labels={{
+            title: t.tomorrowTitle, sub: t.tomorrowSub, placeholder: t.tomorrowPh,
+            save: t.tomorrowSave, saving: t.tomorrowSaving, skip: t.tomorrowSkip,
+            savedTitle: t.tomorrowSavedTitle, savedSub: t.tomorrowSavedSub, error: t.tomorrowError,
+          }} />
           <div className="success-actions">
             <Dia1Card journey={journey} owner={owner} theme={journey.title}
               label={t.dia1CardBtn} downloading={t.shareDownloading}
