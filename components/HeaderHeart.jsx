@@ -47,15 +47,46 @@ export default function HeaderHeart({ likes = 0, follows = 0, unread = 0, ariaLa
 
   return (
     <div className="header-heart">
-      <a href="/notifications" className="icon-btn heart-btn" aria-label={ariaLabel} onClick={marcarVisto}>
-        {/* Sino. A mão com coração tinha quatro traços cruzados e virava
-            um borrão a 24px no celular — o tamanho em que este ícone vive.
-            O coração não servia de troca: já é a ação de apoiar no feed. */}
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M18 8.5a6 6 0 1 0-12 0c0 6.2-2.4 7.9-2.4 7.9h16.8S18 14.7 18 8.5Z" />
-          <path d="M13.7 20.2a2 2 0 0 1-3.4 0" />
+      <a href="/notifications" className={`icon-btn heart-btn upi-sino${unread > 0 ? ' tem' : ''}`}
+        aria-label={ariaLabel} onClick={marcarVisto}>
+        {/* ============================================================
+            O UPI NO LUGAR DO SINO
+
+            Antes era um sino neutro com uma bolinha vermelha colada do
+            lado: um selo genérico num ícone genérico. O Upi já tem um
+            pingo — então o indicador deixa de ser um crachá pregado no
+            ícone e passa a ser uma parte do personagem.
+
+              pingo parado ..... nada novo
+              pingo pulsando ... tem coisa
+
+            ------------------------------------------------------------
+            SEM ROSTO, E O MOTIVO É ARITMÉTICO
+
+            Os olhos têm 1,7 unidades de largura num desenho de 24. Nos
+            30px em que este ícone vive, isso vira 2,1px reais, e a boca
+            1,7. Não existe traço fino que sobreviva a esse tamanho — o
+            que sobrevive é a silhueta. Com rosto, o ícone só começa a
+            ler a partir de 34px; sem rosto, lê a 26.
+
+            E há um ganho que não é de legibilidade: sem os olhos e o
+            sorriso, o pingo passa a ser a única coisa viva no ícone.
+            Ele não compete com mais nada — que é exatamente o que este
+            botão precisa dizer.
+
+            O Upi de rosto continua existindo inteiro em `public/upi.svg`,
+            nos tamanhos onde ele cabe: a saudação da tela inicial, o
+            Diário, o progresso do perfil.
+            ============================================================ */}
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" aria-hidden="true" className="upi-mini">
+          <path className="um-corpo" d="M7.4 5.2 L7.4 13 A4.6 4.6 0 0 0 16.6 13 L16.6 9.4"
+            stroke="currentColor" strokeWidth="2.3" />
+          {/* o brilho por baixo e o anel por cima: só aparecem com novidade */}
+          <circle className="um-brilho" cx="16.6" cy="6.1" r="2.5" fill="var(--upi-pingo,#C16F54)" />
+          <circle className="um-halo" cx="16.6" cy="6.1" r="2.5" fill="none"
+            stroke="var(--upi-pingo,#C16F54)" strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
+          <circle className="um-pingo" cx="16.6" cy="6.1" r="2.5" fill="var(--upi-pingo,#C16F54)" />
         </svg>
-        {unread > 0 && <i className="heart-dot" />}
       </a>
       {open && has && (
         <div className="heart-pop" role="status" onClick={dispensar}>

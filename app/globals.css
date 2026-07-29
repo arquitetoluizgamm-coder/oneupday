@@ -6194,3 +6194,95 @@ body{padding-bottom:calc(76px + var(--sa-bottom))}
     max-height:calc(100dvh - 96px);
   }
 }
+
+/* ============================================================
+   O UPI NO BOTÃO DE NOTIFICAÇÕES
+
+   O indicador não é mais um selo colado no ícone — é o pingo do
+   próprio Upi. Parado quer dizer "nada novo"; brilhando quer dizer
+   "tem coisa". A marca vira o mensageiro em vez de carregar um
+   crachá vermelho.
+
+   ------------------------------------------------------------
+   POR QUE A PRIMEIRA VERSÃO DO PISCAR FICOU FRACA
+
+   Eu animava a opacidade do pingo **para baixo**: ele sumia um
+   pouco e voltava. Contra um fundo claro, uma coisa que clareia
+   quase não se percebe — o olho reage a algo que APARECE, não a
+   algo que enfraquece.
+
+   Agora o pingo fica sempre sólido, e o movimento vem de duas
+   camadas que nascem dele:
+
+     brilho ... um disco difuso que cresce por baixo — dá corpo
+     halo ..... um anel que abre e some — dá o pulso que se
+                percebe pelo canto do olho
+
+   O anel usa `vector-effect: non-scaling-stroke` para afinar
+   enquanto abre. Sem isso o `scale` engrossa o traço junto, e o
+   anel vira uma bolha em vez de uma onda.
+
+   ------------------------------------------------------------
+   O RITMO NÃO MUDOU
+
+   Continua 1,4s por ciclo — 0,71 por segundo, contra o teto de 3
+   da WCAG 2.3.1. O brilho ficou mais forte sem ficar mais rápido,
+   que é o que cansa.
+
+   ------------------------------------------------------------
+   O PULO EM RAJADAS
+
+   Dois pulos e 4,6s de descanso, não pulo contínuo. Um elemento
+   fixo que balança sem parar é do tipo que a gente remove uma
+   semana depois de colocar. Para deixar contínuo, é só apagar a
+   linha dos 100% da @keyframes upiPulo.
+
+   O pulo é `translateY` e não `top`: translate não recalcula
+   layout, e este ícone mora dentro do cabeçalho.
+   ============================================================ */
+.upi-sino{position:relative;color:var(--upi-corpo,#84917A)}
+.upi-sino .upi-mini{display:block;overflow:visible}
+.upi-sino .um-pingo,.upi-sino .um-halo,.upi-sino .um-brilho{
+  transform-box:fill-box;transform-origin:center;
+}
+/* em repouso as duas camadas de brilho não existem */
+.upi-sino .um-halo,.upi-sino .um-brilho{opacity:0}
+
+.upi-sino.tem .um-pingo {animation:upiPingo  1.4s ease-in-out infinite}
+.upi-sino.tem .um-brilho{animation:upiBrilho 1.4s ease-in-out infinite}
+.upi-sino.tem .um-halo  {animation:upiHalo   1.4s ease-out     infinite}
+.upi-sino.tem .upi-mini {animation:upiPulo   5.4s ease-in-out  infinite}
+
+/* o pingo só engorda um pouco. Nunca some: a informação fica. */
+@keyframes upiPingo{
+  0%,100%{transform:scale(1)}
+  50%    {transform:scale(1.16)}
+}
+@keyframes upiBrilho{
+  0%,100%{transform:scale(1);opacity:0}
+  50%    {transform:scale(1.95);opacity:.34}
+}
+@keyframes upiHalo{
+  0%  {transform:scale(1);  opacity:.85}
+  70% {transform:scale(2.4);opacity:0}
+  100%{transform:scale(2.4);opacity:0}
+}
+
+/* 0 a 15,6% do ciclo = os dois pulos (0,84s de 5,4s). O resto descansa. */
+@keyframes upiPulo{
+  0%    {transform:translateY(0)}
+  3.9%  {transform:translateY(-2.9px)}
+  7.8%  {transform:translateY(0)}
+  11.7% {transform:translateY(-2.9px)}
+  15.6% {transform:translateY(0)}
+  100%  {transform:translateY(0)}
+}
+
+/* quem pediu menos movimento continua sabendo que tem novidade:
+   o pingo fica maior e com o brilho aceso, sem nada se mexer. */
+@media(prefers-reduced-motion:reduce){
+  .upi-sino.tem .um-pingo {animation:none;transform:scale(1.2)}
+  .upi-sino.tem .um-brilho{animation:none;opacity:.3;transform:scale(1.8)}
+  .upi-sino.tem .um-halo  {animation:none;opacity:0}
+  .upi-sino.tem .upi-mini {animation:none}
+}
