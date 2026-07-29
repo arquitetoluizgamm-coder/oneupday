@@ -14,6 +14,7 @@ import ScrollChrome from '../../components/ScrollChrome';
 import DailyMood from '../../components/DailyMood';
 import NextChapter from '../../components/NextChapter';
 import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
+import UpiDailyMemory from './UpiDailyMemory';
 
 export const dynamic = 'force-dynamic';
 const COLORS = ['#C16F54', '#84917A', '#5B7189', '#96523C', '#B3874A', '#A8637A'];
@@ -154,6 +155,11 @@ export default async function Home() {
           <span><b>{t.navDiary}</b><small>{t.diarySub}</small></span>
           <span className="diary-shortcut-arrow" aria-hidden="true">›</span>
         </a>
+        <UpiDailyMemory labels={{
+          title: t.upiMemoryTitle, sub: t.upiMemorySub, placeholder: t.upiMemoryPh,
+          save: t.upiMemorySave, update: t.upiMemoryUpdate, saving: t.upiMemorySaving,
+          saved: t.upiMemorySaved, diary: t.navDiary,
+        }} />
         {nc.mode && (
           <NextChapter mode={nc.mode} line={nc.line} env={nc.env} labels={ncLabels(t, nc)} dismissible />
         )}

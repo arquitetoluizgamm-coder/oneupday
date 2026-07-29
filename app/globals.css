@@ -8443,3 +8443,119 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
   .tomorrow-step{padding:16px}
   .tomorrow-actions{grid-template-columns:1fr}
 }
+
+/* ============================================================
+   PATCH 199 · Upi pergunta do dia na home
+   ============================================================ */
+.home-upi-memory{
+  margin:12px 0 16px;
+  border:1px solid rgba(135,149,122,.26);
+  border-radius:18px;
+  background:rgba(255,255,255,.78);
+  box-shadow:0 14px 32px rgba(16,19,45,.045);
+  overflow:hidden;
+}
+.home-upi-memory-head{
+  width:100%;
+  min-height:72px;
+  border:0;
+  background:transparent;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-align:left;
+  cursor:pointer;
+}
+.home-upi-memory-head img{
+  width:42px;
+  height:42px;
+  object-fit:contain;
+  flex:none;
+}
+.home-upi-memory-head span{
+  flex:1;
+  min-width:0;
+}
+.home-upi-memory-head b{
+  display:block;
+  color:var(--ink);
+  font-family:var(--display);
+  font-size:16px;
+  font-weight:850;
+  letter-spacing:-.02em;
+}
+.home-upi-memory-head small{
+  display:block;
+  margin-top:3px;
+  color:#667085;
+  font-size:12.5px;
+  line-height:1.35;
+}
+.home-upi-memory-head i{
+  width:32px;
+  height:32px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  color:var(--terracotta);
+  font-style:normal;
+  font-size:20px;
+  line-height:1;
+  flex:none;
+}
+.home-upi-memory-body{
+  padding:0 16px 16px;
+}
+.home-upi-memory-body p{
+  margin:0 0 10px;
+  color:var(--ink);
+  font-family:var(--display);
+  font-size:18px;
+  font-weight:850;
+  line-height:1.22;
+  letter-spacing:-.025em;
+}
+.home-upi-memory-body textarea{
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid rgba(24,36,59,.12);
+  border-radius:15px;
+  background:#fff;
+  padding:13px 14px;
+  color:var(--ink);
+  font:inherit;
+  font-size:14.5px;
+  line-height:1.45;
+  resize:vertical;
+}
+.home-upi-memory-body textarea:focus{
+  outline:none;
+  border-color:rgba(135,149,122,.55);
+  box-shadow:0 0 0 4px rgba(135,149,122,.13);
+}
+.home-upi-memory-body > div{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-top:12px;
+}
+.home-upi-memory-body .cta{
+  min-height:42px;
+  padding-inline:22px;
+}
+.home-upi-memory-body a{
+  color:#667085;
+  font-size:12.5px;
+  font-weight:800;
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+@media(max-width:520px){
+  .home-upi-memory{border-radius:16px}
+  .home-upi-memory-head{padding:13px 14px}
+  .home-upi-memory-body{padding:0 14px 14px}
+  .home-upi-memory-body > div{display:grid}
+  .home-upi-memory-body .cta{width:100%}
+}
