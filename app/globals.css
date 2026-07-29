@@ -6577,11 +6577,36 @@ body{padding-bottom:calc(76px + var(--sa-bottom))}
   .feed-page .entry .etx .entry-text{font-size:17px}
 }
 
+/* ------------------------------------------------------------
+   O QUE ESTAVA SOBRANDO, E POR QUE A FRASE FICAVA LONGE DO "mais"
+
+   Lá em cima (linha 3074) existe a regra original do botão:
+
+     .etx-more{ position:absolute; right:0; bottom:0;
+                padding-left:30px;
+                background:linear-gradient(...); }
+
+   Quando reescrevi o botão para viver no fluxo do texto, eu troquei
+   a cor, o peso e a margem — e ESQUECI de desligar o `position`.
+   Uma regra de especificidade menor continua valendo para toda
+   propriedade que a maior não redeclara.
+
+   Resultado: o botão continuava ancorado no canto inferior direito.
+   O texto acabava onde acabava, e o "…mais" ia para a borda —
+   exatamente o "frase          ...mais" que você viu.
+
+   Aqui as quatro propriedades da regra antiga são explicitamente
+   desfeitas. Não basta parar de querer o posicionamento: é preciso
+   dizer que ele não vale mais.
+   ------------------------------------------------------------ */
 .feed-page .entry .etx .etx-more{
+  position:static;
+  right:auto;bottom:auto;z-index:auto;
   display:inline;margin:0;padding:0;
   border:0;background:none;
   font:inherit;font-weight:800;
   color:var(--link,#27304a);
+  white-space:normal;
   cursor:pointer;vertical-align:baseline;
 }
 .feed-page .entry .etx .etx-more:hover,
