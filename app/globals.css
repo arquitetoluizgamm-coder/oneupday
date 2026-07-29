@@ -8973,6 +8973,103 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
 }
 
 /* ============================================================
+   PATCH 210 · Upi melhora o registro antes de publicar
+   ============================================================ */
+.upi-polish{
+  margin:12px 0 0;
+  padding:12px;
+  border:1px solid rgba(132,149,126,.24);
+  border-radius:18px;
+  background:linear-gradient(180deg,#fffefd 0%,#f6f8f2 100%);
+}
+.upi-polish-head{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+}
+.upi-polish-head img{
+  width:28px;
+  height:28px;
+  object-fit:contain;
+  flex:0 0 auto;
+  animation:upiFloat 2.8s ease-in-out infinite;
+}
+@keyframes upiFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-3px)}
+}
+.upi-polish-head b{
+  display:block;
+  color:var(--ink);
+  font-size:14px;
+  line-height:1.15;
+}
+.upi-polish-head p{
+  margin:3px 0 0;
+  color:#6f7786;
+  font-size:12.5px;
+  line-height:1.35;
+}
+.upi-polish-btn{
+  width:100%;
+  min-height:40px;
+  margin-top:10px;
+  border:0;
+  border-radius:999px;
+  background:var(--ink);
+  color:#fff;
+  font-weight:850;
+  letter-spacing:.02em;
+  cursor:pointer;
+}
+.upi-polish-btn:disabled{
+  opacity:.62;
+  cursor:default;
+}
+.upi-polish-options{
+  display:grid;
+  gap:8px;
+  margin-top:10px;
+}
+.upi-polish-option{
+  width:100%;
+  padding:11px 12px;
+  border:1px solid rgba(24,36,59,.10);
+  border-radius:15px;
+  background:#fff;
+  color:var(--ink);
+  text-align:left;
+  cursor:pointer;
+}
+.upi-polish-option span{
+  display:block;
+  margin-bottom:3px;
+  color:#c46f52;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.upi-polish-option p{
+  margin:0;
+  color:#273044;
+  font-size:14px;
+  line-height:1.42;
+}
+.upi-polish-option:hover,
+.upi-polish-option:focus-visible{
+  border-color:rgba(193,111,84,.34);
+  box-shadow:0 10px 24px rgba(18,24,42,.07);
+  outline:0;
+}
+
+@media(max-width:640px){
+  .upi-polish{
+    border-radius:16px;
+  }
+}
+
+/* ============================================================
    PATCH 209 · Jornada como leitura guiada, nao como carrossel
 
    O carrossel por dia parecia moderno, mas escondia contexto e criava

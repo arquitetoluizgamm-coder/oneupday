@@ -84,6 +84,7 @@ export default async function JornadaDoDono({ params }) {
             dayRegisterTitle: t.dayRegisterTitle, dayRegisterSub: t.dayRegisterSub,
             dayPicked: t.dayPicked, dayChooseFirst: t.dayChooseFirst,
             dayPost: t.dayPost, draftSaved: t.draftSaved,
+            upiPolishTitle: t.upiPolishTitle, upiPolishSub: t.upiPolishSub, upiPolishBtn: t.upiPolishBtn,
             extraShow: t.extraShow, extraHide: t.extraHide,
             // A pergunta do dia. `prompts` saiu: os quatro chips fixos
             // viraram uma pergunta só, escolhida pela situação da jornada.

@@ -57,6 +57,9 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [envText, setEnvText] = useState('');
   const [envBusy, setEnvBusy] = useState(false);
   const [lastId, setLastId] = useState(null);
+  const [upiOptions, setUpiOptions] = useState([]);
+  const [upiBusy, setUpiBusy] = useState(false);
+  const [upiBase, setUpiBase] = useState('');
   const [quando, setQuando] = useState('');
   const [rawFile, setRawFile] = useState(null);
   const [rawUrl, setRawUrl] = useState('');
@@ -222,6 +225,38 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     setSaving(false);
   }
 
+  async function upiMelhorarRegistro() {
+    const draft = text.trim();
+    if (!aiOn || !kind || !draft || upiBusy || saving || uploading) return;
+    setUpiBusy(true);
+    setAiErr('');
+    setUpiOptions([]);
+    setUpiBase(draft);
+    try {
+      const r = await fetch('/api/assist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'polish', journeyId, draft, kind }),
+      });
+      if (r.status === 429) { setAiErr(t.aiRateErr); return; }
+      if (!r.ok) { setAiErr(t.aiErr); return; }
+      const j = await r.json();
+      const opts = Array.isArray(j.options) ? j.options.filter((o) => o?.text).slice(0, 3) : [];
+      if (opts.length) setUpiOptions(opts);
+      else setAiErr(t.aiErr);
+    } catch {
+      setAiErr(t.aiErr);
+    } finally {
+      setUpiBusy(false);
+    }
+  }
+
+  function usarSugestao(texto) {
+    setText(String(texto || '').slice(0, 500));
+    setUpiOptions([]);
+    requestAnimationFrame(() => inputRef.current?.focus());
+  }
+
   // ============================================================
   // O BOTÃO NÃO ESCREVE MAIS NO LUGAR DA PESSOA
   //
@@ -308,7 +343,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     trackEvent('update_posted', { journeyId, kind });
     setPostedKind(kind);
     try { localStorage.removeItem(`oud-day-draft:${journeyId}:${dayNumber}`); } catch {}
-    setText(''); setKind(''); setPhotoUrl(null); setVideoUrl(null); setTrack(null); setAlt(''); setQi(0);
+    setText(''); setKind(''); setPhotoUrl(null); setVideoUrl(null); setTrack(null); setAlt(''); setQi(0); setUpiOptions([]); setUpiBase('');
     if (photoRef.current) photoRef.current.value = '';
     if (videoRef.current) videoRef.current.value = '';
     setPosted(true);
@@ -371,6 +406,10 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       else localStorage.setItem(draftKey, JSON.stringify({ text: value, kind, savedAt: Date.now() }));
     } catch {}
   }, [draftKey, text, kind]);
+
+  useEffect(() => {
+    if (upiOptions.length && text.trim() !== upiBase) setUpiOptions([]);
+  }, [text, upiBase, upiOptions.length]);
 
   if (posted) {
     return (
@@ -453,6 +492,30 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           if (e.defaultPrevented) return;
           if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); post(); }
         }} />
+      {aiOn && kind && text.trim().length >= 3 && (
+        <div className="upi-polish">
+          <div className="upi-polish-head">
+            <img src="/upi.svg" alt="" aria-hidden="true" />
+            <div>
+              <b>{t.upiPolishTitle || 'Quer deixar esse registro mais claro?'}</b>
+              <p>{t.upiPolishSub || 'A Upi sugere versões melhores. Você escolhe, edita ou mantém o seu texto.'}</p>
+            </div>
+          </div>
+          <button type="button" className="upi-polish-btn" onClick={upiMelhorarRegistro} disabled={upiBusy || saving || uploading}>
+            {upiBusy ? (t.aiThinking || 'Pensando...') : (t.upiPolishBtn || 'Melhorar com a Upi')}
+          </button>
+          {!!upiOptions.length && (
+            <div className="upi-polish-options">
+              {upiOptions.map((opt, i) => (
+                <button type="button" key={i} className="upi-polish-option" onClick={() => usarSugestao(opt.text)}>
+                  <span>{opt.label || ['Simples', 'Emocional', 'Direta'][i] || 'Opção'}</span>
+                  <p>{opt.text}</p>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       {photoUrl && (
         <div className="photo-preview">
           <img src={photoUrl} alt={alt} />
