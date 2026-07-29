@@ -614,10 +614,10 @@ export default async function JourneyPage({ params, searchParams }) {
         )}
         <p className="journey-swipe-hint">
           {locale === 'pt'
-            ? 'Deslize para o lado para passar pelos dias.'
+            ? 'Use a linha do tempo para pular entre os dias.'
             : locale === 'es'
-              ? 'Desliza hacia el lado para recorrer los días.'
-              : 'Swipe sideways to move through the days.'}
+              ? 'Usa la línea de tiempo para saltar entre los días.'
+              : 'Use the timeline to jump between days.'}
         </p>
 
         <section className="timeline">

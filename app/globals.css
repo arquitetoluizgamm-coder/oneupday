@@ -8971,3 +8971,137 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
     padding-right:16px;
   }
 }
+
+/* ============================================================
+   PATCH 209 · Jornada como leitura guiada, nao como carrossel
+
+   O carrossel por dia parecia moderno, mas escondia contexto e criava
+   rolagem dentro de rolagem. A jornada publica precisa ser uma historia:
+   leitura vertical, capitulos claros e uma linha do tempo fixa para pular
+   entre os dias.
+   ============================================================ */
+.journey-public .days-strip{
+  position:sticky;
+  top:8px;
+  z-index:12;
+  margin:14px 0 18px;
+  padding:10px 12px 9px;
+  border:1px solid rgba(24,36,59,.08);
+  border-radius:22px;
+  background:rgba(255,254,251,.92);
+  box-shadow:0 12px 30px rgba(18,24,42,.08);
+  backdrop-filter:blur(16px);
+}
+.journey-public .days-strip-head{
+  grid-template-columns:32px minmax(0,1fr) 32px;
+}
+.journey-public .days-strip-current b{
+  color:var(--ink);
+  font-size:12.5px;
+  font-weight:850;
+}
+.journey-public .days-strip-current small{
+  display:block;
+  margin-top:1px;
+  color:#7d8492;
+  font-size:10.5px;
+  font-weight:650;
+}
+.journey-public .days-strip-track{
+  margin-top:4px;
+}
+.journey-public .days-strip-tooltip{
+  display:none;
+}
+.journey-swipe-hint{
+  display:block;
+  margin:-8px 0 16px;
+  color:#7a8190;
+  font-size:12px;
+  font-weight:720;
+  text-align:center;
+}
+.journey-public .timeline{
+  display:grid;
+  gap:18px;
+  margin-top:0;
+}
+.journey-public .timeline article{
+  display:block;
+  scroll-margin-top:118px;
+}
+.journey-public .timeline .body{
+  padding:18px 16px 16px;
+  border:1px solid rgba(24,36,59,.09);
+  border-radius:24px;
+  background:linear-gradient(180deg,#fffefd 0%,#fbfaf6 100%);
+  box-shadow:0 14px 34px rgba(18,24,42,.06);
+}
+.journey-public .journey-day-card.win .body{
+  border-color:rgba(132,149,126,.26);
+  background:linear-gradient(180deg,#fffefd 0%,#f1f6ee 100%);
+}
+.journey-public .journey-day-card.setback .body{
+  border-color:rgba(193,111,84,.24);
+  background:linear-gradient(180deg,#fffefd 0%,#f8eee8 100%);
+}
+.journey-public .timeline h2.day,
+.journey-public .timeline .day{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+.journey-public .timeline h2.day::after,
+.journey-public .timeline .day::after{
+  content:"";
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  background:#d7d3ca;
+  box-shadow:0 0 0 5px rgba(215,211,202,.22);
+}
+.journey-public .journey-day-card.win h2.day::after,
+.journey-public .journey-day-card.win .day::after{
+  background:#84957e;
+  box-shadow:0 0 0 5px rgba(132,149,126,.18);
+}
+.journey-public .journey-day-card.setback h2.day::after,
+.journey-public .journey-day-card.setback .day::after{
+  background:#c16f54;
+  box-shadow:0 0 0 5px rgba(193,111,84,.16);
+}
+
+@media(max-width:640px){
+  .journey-public .days-strip{
+    top:6px;
+    margin:12px 0 16px;
+  }
+  .journey-public .timeline{
+    display:grid;
+    gap:16px;
+    overflow:visible;
+    margin-left:0;
+    margin-right:0;
+    padding:0 0 18px;
+    scroll-snap-type:none;
+  }
+  .journey-public .timeline article{
+    flex:none;
+    height:auto;
+    min-height:0;
+    scroll-snap-align:none;
+  }
+  .journey-public .timeline .body{
+    height:auto;
+    overflow:visible;
+    overscroll-behavior:auto;
+    padding:18px 16px 16px;
+  }
+  .journey-public .update-photo img,
+  .journey-public .update-photo video,
+  .journey-public .journey-day-card:has(.dia-item.extra) .update-photo img,
+  .journey-public .journey-day-card:has(.dia-item.extra) .update-photo video{
+    max-height:none;
+  }
+}
