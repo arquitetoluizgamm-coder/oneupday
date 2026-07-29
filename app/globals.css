@@ -6478,38 +6478,64 @@ body{padding-bottom:calc(76px + var(--sa-bottom))}
 .entry-textcard .dpc-more:hover{color:inherit;opacity:1}
 
 /* ============================================================
-   O FEED ENCOSTADO NA BORDA — fechando a faixa que faltava
+   O FEED ENCOSTADO NA BORDA — a causa é uma linha só
 
-   As regras que fazem o post sangrar até a borda vivem em
-   `@media(max-width:640px)`. As de computador, em
-   `@media(min-width:861px)`.
+   O post descolou da borda no celular por causa desta regra, do
+   bloco "HOME NO CELULAR — quatro consertos":
 
-   Entre 641 e 860 não existe nenhuma das duas. Nessa faixa o feed
-   volta a ser uma coluna com 20px de cada lado — o post descola da
-   borda e vira um cartão no meio da tela.
+     .feed-page > section:not(.entry) { padding-left:16px }
+
+   Ela existe para devolver respiro aos blocos do topo da home que
+   tinham perdido o padding — o herói, o Próximo Capítulo, o
+   convite. A intenção estava certa.
+
+   Mas `.feed-stream` TAMBÉM é um <section>, também é filho direto
+   de `.feed-page`, e também não é `.entry`. Então a regra pegou o
+   feed inteiro junto — e 16px no contêiner empurram todos os
+   posts para dentro, foto e tudo.
+
+   Medido no app, numa largura real de celular (386px):
+
+     .feed-stream padding .... 16px
+     o post ................. 16..355   <- devia ser 0..371
+     a foto ................. 16..355   <- não encostava
+
+   A correção é tirar o feed dessa regra, e só ele. A
+   especificidade precisa ser maior que a dela — `.feed-page >
+   section:not(.entry)` conta (0,2,1), então uso
+   `.wrap.feed-page > .feed-stream`, que conta (0,3,0) e ganha.
+
+   ------------------------------------------------------------
+   E DE QUEBRA, A FAIXA QUE NUNCA TEVE DONO
+
+   As regras de sangrar até a borda viviam em max-width:640px; as
+   de computador em min-width:861px. Entre 641 e 860 não havia
+   nenhuma das duas, e o feed virava uma coluna com margem.
 
    É a MESMA faixa descoberta que fazia o rodapé virar barra de
-   ponta a ponta (Patch 152). O arquivo tem dois mundos, celular e
-   computador, e nada escrito para o que está no meio: tablet,
-   celular deitado, dobrável aberto, ou uma janela de navegador
-   arrastada para um tamanho intermediário.
+   ponta a ponta (Patch 152). O arquivo tem dois mundos e nada
+   escrito para o meio: tablet, celular deitado, dobrável aberto.
+   Aqui ela é coberta, encostando exatamente onde o layout de
+   computador começa.
 
-   Aqui a faixa é coberta: tudo abaixo do layout de computador se
-   comporta como celular. `max-width:860px` encosta exatamente onde
-   `min-width:861px` começa, sem sobra e sem sobreposição.
+   Só a MÍDIA vai até a borda. Texto, cabeçalho e ícones seguem
+   com os 16px de respiro.
    ============================================================ */
 @media(max-width:860px){
   .wrap.feed-page{padding-left:0;padding-right:0}
+  .wrap.feed-page > .feed-stream{padding-left:0;padding-right:0}
+
   .feed-page .entry{
     width:auto;margin:0;padding:16px 0;
     border-left:0;border-right:0;border-radius:0;
   }
-  /* o texto não encosta: só a mídia é que vai até a borda */
+
   .feed-page .entry .entry-head,
   .feed-page .entry > .entry-text,
   .feed-page .entry > .entry-kindline,
   .feed-page .entry .entry-actions,
   .feed-page .entry .etx,
+  .feed-page .entry .dp-text,
   .feed-tabs,
   .feed-invite{padding-left:16px;padding-right:16px}
 
