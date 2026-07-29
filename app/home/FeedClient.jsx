@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState, Fragment } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, Fragment } from 'react';
 import EncourageBar from '../[slug]/EncourageBar';
 import FeedShare from './FeedShare';
 import Comments from '../../components/Comments';
@@ -363,18 +363,37 @@ function cortar(texto, limite) {
   return s.slice(0, corte).replace(/[\s,;:.\-]+$/, '');
 }
 
+// O React avisa se `useLayoutEffect` roda no servidor. No servidor
+// não existe layout para medir, então lá ele vira o efeito comum.
+const useMedirAntesDePintar = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
 function EntryText({ text, labels, limit = 180, mencoes }) {
   const [expanded, setExpanded] = useState(false);
-  const [largura, setLargura] = useState(0);
+  const [teto, setTeto] = useState(null);
   const caixa = useRef(null);
+  const paragrafo = useRef(null);
 
-  // uma medida na montagem e a cada mudança de tamanho da janela:
-  // é o mesmo texto em telas diferentes, e o corte tem que
-  // acompanhar quem gira o celular ou arrasta a janela.
+  // ------------------------------------------------------------
+  // O PALPITE, PELA LARGURA
+  //
+  // `clientWidth` inclui o PADDING. O `.etx` tem 16px de cada lado
+  // no celular, então eu vinha calculando o corte com 32px a mais
+  // de largura do que o texto realmente tem — e sobrava caractere
+  // suficiente para uma terceira linha. Era este o defeito.
+  // ------------------------------------------------------------
+  const medir = () => {
+    const el = caixa.current;
+    if (!el) return;
+    const cs = window.getComputedStyle(el);
+    const util = el.clientWidth
+      - (parseFloat(cs.paddingLeft) || 0)
+      - (parseFloat(cs.paddingRight) || 0);
+    setTeto(limitePelaLargura(util, limit));
+  };
+
   useEffect(() => {
     const el = caixa.current;
     if (!el) return;
-    const medir = () => setLargura(el.clientWidth || 0);
     medir();
     if (typeof ResizeObserver === 'undefined') {
       window.addEventListener('resize', medir);
@@ -385,14 +404,41 @@ function EntryText({ text, labels, limit = 180, mencoes }) {
     return () => ro.disconnect();
   }, []);
 
-  const teto = limitePelaLargura(largura, limit);
-  const compact = text.length > teto;
+  // ------------------------------------------------------------
+  // A CONFERÊNCIA, PELA ALTURA REAL
+  //
+  // Estimar por número de caracteres nunca vai ser exato: uma frase
+  // de "iiii" e outra de "mmmm" ocupam larguras diferentes com o
+  // mesmo tamanho. Por isso, depois de pintar, o próprio parágrafo
+  // é medido: se passou de duas linhas, o teto encolhe 8% e ele
+  // tenta de novo.
+  //
+  // Converge em uma ou duas voltas e vale para qualquer fonte,
+  // qualquer idioma e qualquer largura — sem eu precisar acertar
+  // uma constante de largura de letra.
+  //
+  // `useLayoutEffect` roda ANTES da pintura, então o ajuste não
+  // pisca na tela.
+  // ------------------------------------------------------------
+  useMedirAntesDePintar(() => {
+    if (expanded || teto == null) return;
+    const p = paragrafo.current;
+    if (!p) return;
+    const lh = parseFloat(window.getComputedStyle(p).lineHeight) || 25;
+    const limiteDeAltura = lh * 2 + 2;          // duas linhas, com 2px de perdão
+    if (p.scrollHeight > limiteDeAltura && teto > 24) {
+      setTeto((t) => Math.max(24, Math.floor(t * 0.92)));
+    }
+  });
+
+  const alvo = teto == null ? limit : teto;
+  const compact = text.length > alvo;
 
   if (compact && !expanded) {
     return (
       <div className="etx" ref={caixa}>
-        <p className="entry-text">
-          <TextoComMencoes texto={cortar(text, teto)} porHandle={mencoes} />
+        <p className="entry-text" ref={paragrafo}>
+          <TextoComMencoes texto={cortar(text, alvo)} porHandle={mencoes} />
           <button type="button" className="etx-more" onClick={() => setExpanded(true)}>
             <span aria-hidden="true">…</span>{labels.moreText}
           </button>
