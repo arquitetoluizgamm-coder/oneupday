@@ -287,6 +287,7 @@ export default async function Perfil() {
                     <span>{t.languageLabel || 'Idioma'}</span>
                     <LanguagePicker current={getLocale()} />
                   </div>
+                  <a className="ghost-btn" href="/mencoes">{t.navMentions}</a>
                   <a className="ghost-btn" href={`/${profile.handle}`}>{t.viewPublic}</a>
                 </div>
 

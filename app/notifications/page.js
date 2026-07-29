@@ -64,6 +64,11 @@ export default async function Notifications() {
               ? fill(t.notifChallenge, { name: a.name || '' })
               : n.type === 'challenge_accept'
               ? fill(t.notifChallengeAccept, { name: a.name || '' })
+              // A menção precisava de ramo próprio: sem ele, a linha caía no
+              // `else` e a pessoa lia "fulano apoiou você" quando na verdade
+              // tinha sido marcada. O aviso chegava — dizendo a coisa errada.
+              : n.type === 'mention'
+              ? fill(t.notifMention, { name: a.name || '' })
               : fill(t.notifEncourage, { name: a.name || '' });
             const href = (n.type === 'challenge' || n.type === 'challenge_accept')
               ? '/perfil'
