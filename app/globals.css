@@ -6623,18 +6623,32 @@ body{padding-bottom:calc(76px + var(--sa-bottom))}
    ainda intercepta o toque é pior que um topo visível — a pessoa
    tenta apoiar o primeiro post e nada acontece.
    ============================================================ */
+/* ------------------------------------------------------------
+   POR QUE `visibility` E NÃO `pointer-events`
+
+   Com `pointer-events:none` o toque morre no instante em que a
+   classe sai — mas a opacidade leva 0,28s para chegar a zero.
+   Nessa janela o topo ESTÁ na tela e não responde: a pessoa vê o
+   botão, toca, e não acontece nada. Foi o que você pegou.
+
+   `visibility` resolve porque ela pode ser adiada: a transição
+   dela tem `0s linear .28s`, ou seja, só vira `hidden` DEPOIS que
+   o desaparecimento terminou. Enquanto dá para ver, dá para tocar.
+   Ao voltar, o atraso é zero — aparece e já responde.
+   ------------------------------------------------------------ */
 .top.top-feed{
   background:transparent;
   -webkit-backdrop-filter:none;backdrop-filter:none;
   box-shadow:none;
   opacity:0;
-  pointer-events:none;
-  transition:opacity .22s ease, transform .28s ease;
+  visibility:hidden;
+  transition:opacity .28s ease, visibility 0s linear .28s, transform .28s ease;
 }
 html.chrome-scrolling .top.top-feed,
 html.chrome-top .top.top-feed{
   opacity:1;
-  pointer-events:auto;
+  visibility:visible;
+  transition:opacity .16s ease, visibility 0s linear 0s, transform .28s ease;
 }
 html.chrome-hide .top.top-feed{transform:none}
 html.chrome-scrolling .top.top-feed{box-shadow:none}
@@ -6652,6 +6666,7 @@ html.chrome-scrolling .top.top-feed{box-shadow:none}
    bloqueio de toque, venha de onde vier. */
 .top:not(.top-feed){
   opacity:1!important;
+  visibility:visible!important;
   pointer-events:auto!important;
 }
 

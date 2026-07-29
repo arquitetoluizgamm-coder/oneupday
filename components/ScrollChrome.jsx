@@ -26,7 +26,17 @@ import { useEffect } from 'react';
 // pessoa já faz sem pensar — e quem quiser ler o feed inteiro
 // simplesmente para de rolar.
 // ============================================================
-const TOPO = 40;   // até aqui ainda é "o começo da página"
+const TOPO = 40;      // até aqui ainda é "o começo da página"
+
+// Quanto o topo fica na tela depois que a rolagem para.
+//
+// Estava em 260ms — tempo suficiente para o dedo sair da tela e
+// não para ele voltar e acertar um botão. Quem rola e decide
+// tocar no + leva perto de um segundo entre uma coisa e outra.
+//
+// 1,8s dá folga para o gesto e ainda some sozinho antes de virar
+// uma barra permanente por cima do feed.
+const ESPERA = 1800;
 
 export default function ScrollChrome() {
   useEffect(() => {
@@ -42,7 +52,7 @@ export default function ScrollChrome() {
       marcarTopo();
       html.classList.add('chrome-scrolling');
       clearTimeout(timer);
-      timer = setTimeout(() => html.classList.remove('chrome-scrolling'), 260);
+      timer = setTimeout(() => html.classList.remove('chrome-scrolling'), ESPERA);
     };
 
     // no primeiro quadro a página pode nem ter rolado ainda:
