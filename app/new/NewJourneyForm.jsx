@@ -219,11 +219,27 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     // vale mais que um exemplo, e sobrescrever o que a pessoa
     // escreveu seria apagar trabalho dela.
     // ------------------------------------------------------------
+    //
+    // E vem também do CONVITE, por um caminho mais longo.
+    //
+    // Quem escreveu "voltar a correr" no /invite semanas atrás
+    // recebeu um link pessoal. Ao clicar, a frase foi guardada no
+    // navegador antes de a pessoa ser mandada para o login — porque
+    // o `?tema=` da URL não sobrevive à ida e volta da autenticação.
+    //
+    // Aqui a gente procura nos dois lugares: primeiro a URL (quem já
+    // estava logado chega direto), depois o armário (quem passou
+    // pelo login). E limpa o armário assim que usa: a promessa era
+    // guardar até ela entrar, não para sempre.
     try {
-      const tema = new URLSearchParams(window.location.search).get('tema');
+      const daUrl = new URLSearchParams(window.location.search).get('tema');
+      let guardado = null;
+      try { guardado = localStorage.getItem('oud-tema-guardado'); } catch {}
+      const tema = daUrl || guardado;
       if (tema) {
         const limpo = tema.trim().slice(0, 80);
         if (limpo) setTitle((atual) => (atual && atual.trim() ? atual : limpo));
+        try { localStorage.removeItem('oud-tema-guardado'); } catch {}
       }
     } catch {}
 
