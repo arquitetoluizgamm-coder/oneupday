@@ -6665,60 +6665,42 @@ html.chrome-scrolling .top{box-shadow:none}
 body{padding-bottom:calc(70px + var(--sa-bottom))}
 
 /* ============================================================
-   AS ABAS "TODOS / SEGUINDO" — o que quebrou e por quê
+   AS ABAS "TODOS / SEGUINDO" NÃO FLUTUAM MAIS
 
-   Elas são `position:sticky; top:0`, e o topo também para em 0.
-   Antes isso não colidia por dois motivos: o topo tinha fundo
-   opaco e cobria as abas, e a classe `chrome-hide` tirava as duas
-   da tela ao mesmo tempo.
+   Elas eram `position:sticky; top:0` — grudavam no alto e
+   acompanhavam a rolagem. Isso funcionava quando o topo tinha
+   fundo opaco: as duas faixas formavam um bloco só.
 
-   O Patch 163 tirou o fundo do topo E parou de usar `chrome-hide`.
-   Resultado: as abas ficaram permanentemente grudadas em y=0, com
-   a marca ONE e o + por cima delas. Duas camadas de interface
-   disputando os mesmos pixels.
+   Com o topo transparente, virou outra coisa: uma tarja de texto
+   solta no meio da tela, por cima das fotos, enquanto o feed
+   passa por baixo. Eu tentei consertar mandando elas aparecerem e
+   sumirem junto com o topo — e isso resolveu a colisão, mas não o
+   incômodo. Continuava uma camada a mais boiando sobre o conteúdo.
 
-   A correção trata as abas como o que elas são: parte do topo.
+   A correção é tirar o que estava sobrando: elas deixam de ser
+   sticky. Ficam no começo do feed, rolam junto com ele e somem
+   com o resto. Quem quiser trocar de aba sobe até o topo — o
+   mesmo gesto que traz o cabeçalho de volta.
 
-     · param ABAIXO dele, não em cima;
-     · aparecem e somem pela mesma regra (começo da página ou
-       rolando);
-     · perdem a faixa de fundo em degradê, que só existia para
-       esconder o texto que passava atrás — com o topo
-       transparente, ela virava uma tarja no meio da tela.
-
-   Sem fundo, elas ganham o mesmo halo claro do topo para não
-   sumirem quando uma foto escura passar por baixo.
+   Menos peça flutuando, menos regra para conflitar. O `top` e as
+   regras de opacidade que eu tinha escrito saíram junto: sem
+   sticky, não tinham mais função.
    ============================================================ */
-/* A altura do topo, num lugar só. Ele é 16px de respiro em cima
-   (mais a área segura), 44px de botão e 16px embaixo = 76. Medido
-   no navegador dá 78 com o arredondamento da linha; 82 deixa 4px
-   de folga entre uma coisa e outra.
-
-   Vive numa variável porque duas peças dependem dela: as abas
-   param aqui embaixo, e qualquer coisa futura que precise ficar
-   abaixo do topo deve ler daqui em vez de repetir o número. */
-:root{ --topo-altura:calc(82px + var(--sa-top,0px)); }
-
 .feed-tabs{
-  top:var(--topo-altura);
+  position:static;
+  top:auto;
   background:transparent;
-  opacity:0;
-  transform:translateY(-6px);
-  pointer-events:none;
-  transition:opacity .22s ease, transform .28s ease;
-}
-html.chrome-top .feed-tabs,
-html.chrome-scrolling .feed-tabs{
   opacity:1;
   transform:none;
   pointer-events:auto;
+  transition:none;
 }
-.feed-tabs button{
-  filter:drop-shadow(0 1px 2px rgba(250,247,242,.92))
-         drop-shadow(0 0 6px rgba(250,247,242,.6));
+/* nenhuma das classes de rolagem manda mais nelas */
+html.chrome-hide .feed-tabs,
+html.chrome-top .feed-tabs,
+html.chrome-scrolling .feed-tabs{
+  opacity:1;transform:none;pointer-events:auto;
 }
-/* a regra antiga não manda mais: `chrome-hide` não é mais aplicada */
-html.chrome-hide .feed-tabs{transform:none;opacity:inherit}
 
 /* ============================================================
    O ÍCONE DE NOTIFICAÇÕES, MAIOR E MAIS FIRME
