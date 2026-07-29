@@ -69,14 +69,26 @@ export default async function Notifications() {
               // tinha sido marcada. O aviso chegava — dizendo a coisa errada.
               : n.type === 'mention'
               ? fill(t.notifMention, { name: a.name || '' })
+              // O convite também precisa de ramo próprio, e pelo mesmo
+              // motivo da menção: sem ele a linha cai no `else` e você
+              // leria "apoiou você" — com o nome vazio, porque quem se
+              // inscreve no convite ainda não tem conta.
+              : n.type === 'convite'
+              ? t.notifConvite
               : fill(t.notifEncourage, { name: a.name || '' });
             const href = (n.type === 'challenge' || n.type === 'challenge_accept')
               ? '/perfil'
+              // O aviso do convite não tem para onde levar: as inscrições
+              // moram no painel do Supabase, e o cofre é fechado — nem o
+              // app pode ler aquela tabela. Fica em /home de propósito,
+              // como um toque no ombro: "vai lá olhar".
+              : n.type === 'convite'
+              ? '/home'
               : (j.slug ? `/${j.slug}` : (a.handle ? `/${a.handle}` : '/home'));
             return (
               <a className={`notif-item${n.read ? '' : ' unread'}`} key={n.id} href={href}>
-                <span className="notif-ava" style={{ background: (n.type === 'welcome' || n.type === 'metoo') ? 'var(--night)' : (a.avatar_color || 'var(--orange)') }}>
-                  {(n.type === 'welcome' || n.type === 'metoo') ? '💛' : (a.avatar_url ? <img src={a.avatar_url} alt="" /> : (a.name || '?')[0])}
+                <span className="notif-ava" style={{ background: (n.type === 'welcome' || n.type === 'metoo' || n.type === 'convite') ? 'var(--night)' : (a.avatar_color || 'var(--orange)') }}>
+                  {n.type === 'convite' ? '✉' : (n.type === 'welcome' || n.type === 'metoo') ? '💛' : (a.avatar_url ? <img src={a.avatar_url} alt="" /> : (a.name || '?')[0])}
                 </span>
                 <div><p>{text}</p>{j.title && <small>{j.title}</small>}</div>
               </a>

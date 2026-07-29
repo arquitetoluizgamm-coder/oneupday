@@ -128,6 +128,10 @@ async function handler(req) {
     comeback: (n) => ({ title: 'Alguém voltou', body: `${n} voltou para a jornada.` }),
     mood_low: (n) => ({ title: 'Alguém pode precisar', body: `Que tal mandar um abraço pra ${n}?` }),
     welcome: () => ({ title: 'Bem-vindo ao One Up Day', body: 'Aqui, voltar é sempre bem-vindo.' }),
+    // Sem `actor_id`: quem se inscreveu no convite ainda não tem conta.
+    // Por isso o texto não usa nome — e não pode usar, senão sairia
+    // "undefined guardou uma jornada".
+    convite: () => ({ title: 'Alguém guardou uma jornada', body: 'Uma pessoa nova se inscreveu no convite.' }),
   };
 
   const subsByUser = {};
