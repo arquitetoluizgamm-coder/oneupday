@@ -7282,3 +7282,109 @@ button.home-welcome-primary{border:0;font:inherit;cursor:pointer;width:100%}
   border-color:var(--sage);background:var(--sage-soft);text-decoration:none;
 }
 @media(max-width:640px){ .jd-links{margin:14px 16px 4px} }
+
+/* ============================================================
+   PATCH 179 · A ARVORE GANHA NOME E TAMANHO
+
+   Antes ela era um `.pc-tree-link` de 32x32 ao lado do nome, com
+   o rotulo escondido no `title` — que no celular ninguem ve,
+   porque nao existe passar o mouse. Um desenho de 30px sem
+   legenda nao convida ninguem a tocar.
+
+   ------------------------------------------------------------
+   POR QUE ELE NAO REAPROVEITA `.diary-shortcut`
+
+   Era o plano: o atalho do diario ja era a forma do app dizer
+   "isto leva a um lugar", e copiar a peca que existe e' quase
+   sempre melhor do que inventar outra.
+
+   So que na linha 119 deste arquivo existe:
+
+       .diary-shortcut{display:none!important}
+
+   O cartao do diario esta DESLIGADO. Montei o cartao da arvore
+   com aquela classe, abri no app e ele veio com `display:none` —
+   invisivel, sem erro nenhum aparecendo.
+
+   Entao `.tree-shortcut` e' independente: mesma linguagem visual,
+   nenhuma heranca. Se algum dia o cartao do diario voltar, os
+   dois vao continuar iguais por decisao, nao por acidente.
+   ============================================================ */
+
+.tree-shortcut{
+  display:flex;align-items:center;gap:12px;
+  margin:14px 0 10px;padding:13px 15px;
+  border:1px solid var(--sage,#87957A);border-radius:15px;
+  background:linear-gradient(180deg,#fff,var(--sage-soft,#EDF1E7));
+  color:var(--ink);text-decoration:none;
+  box-shadow:var(--shadow-sm);
+  min-height:44px;                       /* a regra de alvo do 178 */
+  transition:transform .16s ease,border-color .16s ease;
+}
+.tree-shortcut:hover,.tree-shortcut:focus-visible{
+  transform:translateY(-1px);border-color:var(--sage-deep,#5D7B69);
+  text-decoration:none;outline:none;
+}
+/* Sem margem lateral propria. A `.wrap` ja da 16px de cada lado
+   em telas de ate 640 (linha 277 deste arquivo). Eu tinha escrito
+   `margin:14px 16px` aqui e o cartao apareceu em 32..343 na tela,
+   16px mais para dentro que os vizinhos — dois recuos somados. */
+
+/* 30px dentro de um quadrado de 34 → 46px soltos.
+   Sem caixa de cor atras: a copa ja tem silhueta propria, e um
+   quadrado colorido so competiria com o desenho. E' a diferenca
+   proposital para o icone do diario, que e' um simbolo do lugar
+   enquanto a arvore E' o lugar. */
+.tree-shortcut-icon{
+  display:grid;place-items:center;
+  width:52px;height:52px;flex:0 0 auto;
+}
+.tree-shortcut-icon img{
+  display:block;width:46px;height:46px;object-fit:contain;
+  transition:transform .18s ease;
+}
+.tree-shortcut:hover .tree-shortcut-icon img,
+.tree-shortcut:focus-visible .tree-shortcut-icon img{
+  transform:translateY(-2px) scale(1.04);
+}
+
+.tree-shortcut-txt{display:grid;gap:2px;min-width:0}
+.tree-shortcut-txt b{font-size:15px;letter-spacing:-.01em}
+
+/* O titulo e a marca dividem a mesma linha.
+   `align-items:baseline` nao serve aqui: a marca e' um SVG, e SVG
+   nao tem linha de base — ele encostaria pela borda de baixo do
+   desenho, que no ONE fica abaixo da base das letras. Centralizar
+   pelo eixo e o que alinha o olho.
+   O `gap` e' 7px e nao 6 porque o E final da marca tem o corte
+   aberto para a direita e pede um respiro a mais do lado esquerdo. */
+.tree-shortcut-titulo{
+  display:flex;align-items:center;gap:7px;
+  flex-wrap:wrap;                 /* em tela muito estreita a marca
+                                     desce em vez de espremer o nome */
+}
+.tree-shortcut-titulo .one-mark{
+  display:block;flex:0 0 auto;
+  opacity:.85;                    /* assinatura, nao manchete */
+  transform:translateY(.5px);     /* meio pixel: o ONE tem a barriga
+                                     do O passando um fio abaixo da
+                                     caixa das maiusculas */
+}
+
+/* o subtitulo pode quebrar: "Uma semente esperando o Dia 1" tem
+   29 caracteres, e cortar o nome do estagio com reticencias seria
+   repetir, aqui, o defeito que o 178 acabou de corrigir no nome
+   da pessoa. */
+.tree-shortcut-txt small{
+  color:var(--sage-deep,#5D7B69);
+  font-size:12px;font-weight:650;line-height:1.35;
+  white-space:normal;overflow:visible;text-overflow:clip;
+}
+
+.tree-shortcut-arrow{
+  margin-left:auto;flex:0 0 auto;
+  color:var(--sage-deep,#5D7B69);font-size:23px;line-height:1;
+}
+
+/* a linha do nome perdeu o icone e volta a ser so o nome */
+.pc-name-line{gap:0}
