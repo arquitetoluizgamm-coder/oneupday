@@ -59,8 +59,22 @@ export default async function Home() {
   let heartLikes = 0; const heartFollowers = new Set();
   if (list.length) {
     const jIds = list.map((j) => j.id);
-    const { data: myUps } = await supabase.from('updates').select('id').in('journey_id', jIds);
+    // `created_at` entra aqui de graça: a consulta já existia, só não
+    // trazia a data. É com ela que a tela de entrada descobre se a
+    // pessoa JÁ registrou hoje — a informação mais importante que esta
+    // página tem, e que ela vinha ignorando.
+    const { data: myUps } = await supabase.from('updates').select('id, journey_id, created_at').in('journey_id', jIds);
     const uIds = (myUps || []).map((u) => u.id);
+
+    // dia local, não UTC: quem registra às 22h de Brasília não pode
+    // ver o app dizer que ainda não registrou.
+    const hojeLocal = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    const registradasHoje = new Set(
+      (myUps || [])
+        .filter((u) => u.created_at && new Date(new Date(u.created_at).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10) === hojeLocal)
+        .map((u) => u.journey_id),
+    );
+    welcomeJourneys = welcomeJourneys.map((j) => ({ ...j, hoje: registradasHoje.has(j.id) }));
     if (uIds.length) {
       const { count: lc } = await supabase.from('encouragements').select('*', { count: 'exact', head: true }).in('update_id', uIds).neq('user_id', user.id);
       heartLikes = lc || 0;
@@ -124,10 +138,12 @@ export default async function Home() {
       <ScrollChrome />
       <DailyMood userId={user.id} answeredToday={moodToday} labels={{ title: t.dailyMoodTitle, sub: t.dailyMoodSub, skip: t.dailyMoodSkip, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful } }} />
       <main className="wrap feed-page">
-        <HomeWelcome journeys={welcomeJourneys} name={profile.name || ''} labels={{
+        <HomeWelcome journeys={welcomeJourneys} name={profile.name || ''} naoLidas={unread || 0} labels={{
           newEyebrow: t.homeWelcomeNewEyebrow, newTitle: t.homeWelcomeNewTitle, newSub: t.homeWelcomeNewSub,
           newCta: t.homeWelcomeNewCta, skip: t.homeWelcomeSkip, backEyebrow: t.homeWelcomeBackEyebrow,
           backTitle: t.homeWelcomeBackTitle, backSub: t.homeWelcomeBackSub, register: t.homeWelcomeRegister,
+          doneTitle: t.homeWelcomeDoneTitle, doneSub: t.homeWelcomeDoneSub, doneToday: t.homeWelcomeDoneToday,
+          choose: t.homeWelcomeChoose, seeFeed: t.homeWelcomeSeeFeed, feedWithNews: t.homeWelcomeFeedNews,
           day: t.homeWelcomeDay, journeySub: t.homeWelcomeJourneySub, diaryTitle: t.navDiary, diarySub: t.diarySub,
         }} />
         <a className="diary-shortcut" href="/diario">

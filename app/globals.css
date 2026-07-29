@@ -6981,3 +6981,10 @@ html.chrome-parado .bottom-nav{
 .pc-opt > span{flex:1;min-width:0}
 .pc-opt.de-quem-manda > svg{color:var(--terra,#C47152)}
 .pc-opt.on > svg{color:var(--terra,#C47152)}
+
+/* a jornada já registrada hoje: presente, sem cobrança */
+.home-welcome-journey.feito{opacity:.72}
+.home-welcome-journey.feito b{font-weight:750}
+.hw-feito{font-style:normal;color:var(--sage,#87957A);font-weight:800}
+/* quando "ver o feed" vira a ação principal, ele é botão, não link */
+button.home-welcome-primary{border:0;font:inherit;cursor:pointer;width:100%}
