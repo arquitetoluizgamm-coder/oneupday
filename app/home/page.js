@@ -144,6 +144,7 @@ export default async function Home() {
           backTitle: t.homeWelcomeBackTitle, backSub: t.homeWelcomeBackSub, register: t.homeWelcomeRegister,
           doneTitle: t.homeWelcomeDoneTitle, doneSub: t.homeWelcomeDoneSub, doneToday: t.homeWelcomeDoneToday,
           choose: t.homeWelcomeChoose, seeFeed: t.homeWelcomeSeeFeed, feedWithNews: t.homeWelcomeFeedNews,
+          exemplos: t.homeWelcomeExemplos, seeOthers: t.homeWelcomeSeeOthers, diaryLater: t.homeWelcomeDiaryLater,
           day: t.homeWelcomeDay, journeySub: t.homeWelcomeJourneySub, diaryTitle: t.navDiary, diarySub: t.diarySub,
         }} />
         <a className="diary-shortcut" href="/diario">

@@ -207,6 +207,26 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         setRascunhoStatus(t.wzDraftRestored || 'Rascunho recuperado');
       }
     } catch {}
+
+    // ------------------------------------------------------------
+    // O TEMA QUE VEIO DA TELA DE ENTRADA
+    //
+    // Os exemplos da primeira tela ("Voltar a treinar", "Estudar
+    // todo dia") mandam `?tema=`. Ele entra como PALPITE no campo
+    // do título — a pessoa apaga e escreve o dela se quiser.
+    //
+    // Só preenche se o campo estiver vazio: um rascunho já começado
+    // vale mais que um exemplo, e sobrescrever o que a pessoa
+    // escreveu seria apagar trabalho dela.
+    // ------------------------------------------------------------
+    try {
+      const tema = new URLSearchParams(window.location.search).get('tema');
+      if (tema) {
+        const limpo = tema.trim().slice(0, 80);
+        if (limpo) setTitle((atual) => (atual && atual.trim() ? atual : limpo));
+      }
+    } catch {}
+
     rascunhoPronto.current = true;
   }, [userId, draftKey, t.wzDraftRestored]);
 

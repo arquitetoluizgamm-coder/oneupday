@@ -6988,3 +6988,30 @@ html.chrome-parado .bottom-nav{
 .hw-feito{font-style:normal;color:var(--sage,#87957A);font-weight:800}
 /* quando "ver o feed" vira a ação principal, ele é botão, não link */
 button.home-welcome-primary{border:0;font:inherit;cursor:pointer;width:100%}
+
+/* ============================================================
+   A PRIMEIRA VEZ — os exemplos que dão partida
+
+   Quem chega não tem o que responder num campo em branco. Estes
+   quatro não são decoração: cada um abre o wizard com o tema já
+   escrito, e a pessoa segue dali ou apaga e escreve o dela.
+
+   Ficam ANTES do botão porque são a parte fácil. O botão continua
+   para quem já sabe o que quer.
+   ============================================================ */
+.hw-exemplos{
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+  margin:0 0 16px;
+}
+.hw-exemplo{
+  padding:9px 14px;border:1px solid var(--line);border-radius:999px;
+  background:var(--surface,#fff);color:#3A4050;
+  font-size:13.5px;font-weight:650;text-decoration:none;
+  transition:border-color .15s ease,transform .15s ease;
+}
+.hw-exemplo:hover,.hw-exemplo:focus-visible{
+  border-color:var(--sage,#87957A);transform:translateY(-1px);
+  color:var(--ink);text-decoration:none;outline:none;
+}
+/* o diário agora vem depois do botão: é alternativa, não sugestão */
+.hw-depois{margin-top:12px}

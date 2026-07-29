@@ -72,12 +72,16 @@ export default function HomeWelcome({ journeys = [], name = '', naoLidas = 0, la
   const alvo = pendentes.length === 1 ? `/perfil/jornada/${pendentes[0].slug}` : '/perfil';
   const rotuloPrimario = pendentes.length === 1 ? L.register : (L.choose || L.register);
 
-  const diario = (
+  // O mesmo cartão, com uma frase diferente na primeira vez: ali ele
+  // precisa se explicar como ALTERNATIVA ("se preferir escrever só
+  // para você, por enquanto"), não como o que o app faz.
+  const cartaoDiario = (sub) => (
     <a className="home-welcome-journey home-welcome-diary" href="/diario">
-      <span><b>{L.diaryTitle}</b><small>{L.diarySub}</small></span>
+      <span><b>{L.diaryTitle}</b><small>{sub}</small></span>
       <strong aria-hidden="true">›</strong>
     </a>
   );
+  const diario = cartaoDiario(L.diarySub);
 
   return (
     <section className="home-welcome" aria-labelledby="home-welcome-title">
@@ -123,16 +127,53 @@ export default function HomeWelcome({ journeys = [], name = '', naoLidas = 0, la
           )}
         </div>
       ) : (
+        /* ============================================================
+           A PRIMEIRA VEZ
+
+           Era a tela mais fraca do app, e fazia a pergunta mais
+           difícil para quem tinha menos informação para responder:
+           "qual é o seu primeiro passo?" pede que a pessoa já tenha
+           decidido o objetivo E o primeiro passo dele.
+
+           Três mudanças:
+
+           1 · A pergunta virou "O que você quer mudar?", que é a
+               PRIMEIRA pergunta do wizard. A tela deixa de ser um
+               portão e passa a ser o começo da conversa.
+
+           2 · Quatro exemplos tocáveis. Quem veio da Play Store viu
+               uma história ("Voltei a estudar aos 38") e chegava
+               aqui num campo em branco — o exemplo que convenceu
+               sumia justo quando faria falta. Cada um leva ao
+               wizard com `?tema=` já preenchido.
+
+           3 · O diário desceu para DEPOIS do botão. Ele era o único
+               cartão da tela, então lia como a sugestão principal —
+               e ninguém baixa este app para escrever num caderno
+               privado.
+
+           E o atalho do feed deixou de ser "pular". Para quem já
+           tem jornada, o feed é secundário. Para quem chegou agora,
+           ver outras pessoas é a melhor primeira ação possível: é o
+           que ensina o que o app é.
+           ============================================================ */
         <>
-          {diario}
+          <div className="hw-exemplos">
+            {(L.exemplos || []).slice(0, 4).map((ex) => (
+              <a className="hw-exemplo" key={ex} href={`/new?tema=${encodeURIComponent(ex)}`}>{ex}</a>
+            ))}
+          </div>
           <a className="home-welcome-primary" href="/new">{L.newCta}</a>
+          <div className="home-welcome-journeys hw-depois">{cartaoDiario(L.diaryLater || L.diarySub)}</div>
         </>
       )}
 
       {/* o atalho de baixo só existe quando ele não é a ação principal */}
       {!jaRegistrou && (
         <button type="button" className="home-welcome-skip" onClick={sair}>
-          {naoLidas > 0 ? (L.feedWithNews || '').replace('{n}', naoLidas) : (L.seeFeed || L.skip)}
+          {!temJornadas
+            ? (L.seeOthers || L.seeFeed || L.skip)
+            : (naoLidas > 0 ? (L.feedWithNews || '').replace('{n}', naoLidas) : (L.seeFeed || L.skip))}
         </button>
       )}
     </section>
