@@ -34,7 +34,7 @@ function ToolIcon({ type }) {
 
 export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [text, setText] = useState('');
-  const [kind, setKind] = useState('step');
+  const [kind, setKind] = useState('');
   const [saving, setSaving] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
@@ -261,7 +261,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
 
   async function post() {
     const value = text.trim();
-    if ((!value && !photoUrl && !videoUrl) || saving) return;
+    if (!kind || (!value && !photoUrl && !videoUrl) || saving) return;
     setSaving(true);
     const supabase = createClient();
     const fallback = photoUrl ? '📷' : (videoUrl ? '🎥' : '');
@@ -295,7 +295,8 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     }
     trackEvent('update_posted', { journeyId, kind });
     setPostedKind(kind);
-    setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null); setAlt(''); setQi(0);
+    try { localStorage.removeItem(`oud-day-draft:${journeyId}:${dayNumber}`); } catch {}
+    setText(''); setKind(''); setPhotoUrl(null); setVideoUrl(null); setTrack(null); setAlt(''); setQi(0);
     if (photoRef.current) photoRef.current.value = '';
     if (videoRef.current) videoRef.current.value = '';
     setPosted(true);
@@ -327,6 +328,26 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const perguntas = [...perguntasDoDia({ dia: dayNumber, ...situacao }, t), ...daIA];
   const pergunta = perguntas.length ? perguntas[qi % perguntas.length] : '';
   const ph = t.placeholder.replace('{n}', dayNumber);
+  const draftKey = `oud-day-draft:${journeyId}:${dayNumber}`;
+  const kindText = kind === 'win' ? t.rDid : (kind === 'setback' ? t.rPaused : (kind === 'step' ? t.rTried : ''));
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(draftKey);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      if (d?.text) setText(String(d.text).slice(0, 500));
+      if (['win', 'step', 'setback'].includes(d?.kind)) setKind(d.kind);
+    } catch {}
+  }, [draftKey]);
+
+  useEffect(() => {
+    try {
+      const value = text.trim();
+      if (!value && !kind) localStorage.removeItem(draftKey);
+      else localStorage.setItem(draftKey, JSON.stringify({ text: value, kind, savedAt: Date.now() }));
+    } catch {}
+  }, [draftKey, text, kind]);
 
   if (posted) {
     return (
@@ -357,6 +378,13 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
 
   return (
     <div className="composer2">
+      <div className="day-ritual-head">
+        <img src="/upi.svg" alt="" aria-hidden="true" />
+        <div>
+          <b>{t.dayRegisterTitle || t.ritualQ}</b>
+          <p>{t.dayRegisterSub || ''}</p>
+        </div>
+      </div>
       <div className="ritual">
         <span className="ritual-q">{t.ritualQ}</span>
         <div className="ritual-btns">
@@ -365,6 +393,11 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           <button type="button" className={`ritual-btn paused${kind === 'setback' ? ' selected' : ''}`} onClick={() => quick('setback')} aria-pressed={kind === 'setback'} disabled={saving || uploading}>{t.rPaused}</button>
         </div>
       </div>
+      {kind && (
+        <p className="ritual-picked">
+          {(t.dayPicked || 'Escolhido: {kind}. Agora conte em uma frase.').replace('{kind}', kindText)}
+        </p>
+      )}
       {showCare && (
         <div className="care-box" role="note">
           <b>{t.crisisTitle}</b>
@@ -389,17 +422,9 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           quem manda no Enter é o CampoMencao: escolher a pessoa não
           pode publicar o registro sem querer. Por isso o onKeyDown de
           publicar checa se a lista está aberta antes de agir. */}
-      {/* Quando a pergunta do dia está logo acima, o placeholder repetia
-          ela palavra por palavra — o rótulo e o campo diziam "O que você
-          fez hoje, mesmo que pequeno?" ao mesmo tempo.
-
-          O placeholder é o único lugar da tela onde caberia dizer que uma
-          linha já basta, que é exatamente o que trava quem não sabe o que
-          escrever. Sem pergunta acima ele volta a ser `ph`, que aí não
-          repete nada. */}
       <CampoMencao textareaRef={inputRef} className="composer2-input" valor={text}
         onChange={e => setText(e.target.value)}
-        maxLength={500} placeholder={pergunta ? (t.phLivre || ph) : ph} rows={1}
+        maxLength={500} placeholder={kind ? (pergunta || ph) : (t.dayChooseFirst || ph)} rows={1}
         aria-describedby={pergunta ? 'perg-do-dia' : undefined}
         onKeyDown={e => {
           if (e.defaultPrevented) return;
@@ -440,7 +465,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
 
       <div className="composer-extra">
         <button type="button" className="composer-extra-toggle" onClick={() => setExtrasOpen((v) => !v)} aria-expanded={extrasOpen}>
-          <span>{extrasOpen ? 'Esconder opções' : 'Adicionar foto, vídeo, música ou ajuda'}</span>
+          <span>{extrasOpen ? (t.extraHide || 'Esconder opções') : (t.extraShow || 'Adicionar foto, vídeo, música ou ajuda')}</span>
           <b aria-hidden="true">{extrasOpen ? '−' : '+'}</b>
         </button>
       </div>
@@ -453,10 +478,11 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           <TrackPicker selected={track} onSelect={setTrack} labels={{ add: '🎵', title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded }} />
           {aiOn && <button type="button" className="tool ai" title={t.aiWrite} aria-label={t.aiWrite} onClick={aiWrite} disabled={saving || uploading}><ToolIcon type="ai" /></button>}
         </div>
-        <button className="post-btn" onClick={post} disabled={saving || uploading || (!text.trim() && !photoUrl && !videoUrl)}>
-          {saving ? t.posting : t.post}
+        <button className="post-btn" onClick={post} disabled={saving || uploading || !kind || (!text.trim() && !photoUrl && !videoUrl)}>
+          {saving ? t.posting : (t.dayPost || t.post)}
         </button>
       </div>
+      {(text.trim() || kind) && !saving && <p className="draft-mini">{t.draftSaved || 'Rascunho salvo'}</p>}
       {aiErr && <p className="ai-err">{aiErr}</p>}
       {kind === 'setback' && <p className="setback-note">{t.setbackNote}</p>}
       {aiOn && kind === 'setback' && (
