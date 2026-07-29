@@ -243,10 +243,38 @@ export async function GET(req) {
   Object.values(fullDaysByJourney).forEach((arr) => arr.sort((a, b) => ((a.day_number || 0) - (b.day_number || 0)) || (new Date(a.created_at) - new Date(b.created_at))));
   const dayIds = [];
   Object.values(fullDaysByJourney).forEach((arr) => arr.slice(-60).forEach((u) => dayIds.push(u.id)));
-  const [encAllR, tracksAllR] = await Promise.all([
+  // ============================================================
+  // AS MENÇÕES DO LOTE
+  //
+  // Entra aqui, junto com apoios e faixas dos dias, e não lá em
+  // cima: o card do feed mostra o registro do topo E os outros dias
+  // pelo paginador. Consultando só os ids do topo, os @ dos demais
+  // dias apareceriam como texto solto, sem link — funcionando pela
+  // metade, sem erro nenhum aparecendo. `dayIds` já é a lista
+  // completa do que vai para a tela.
+  //
+  // Uma consulta para o lote inteiro, no mesmo padrão do resto:
+  // por registro seria uma consulta por card.
+  //
+  // O perfil vem junto (`profiles(...)`) porque o que vale é o
+  // handle ATUAL de quem foi marcado — o @ escrito no texto pode
+  // estar velho se a pessoa trocou de handle depois.
+  // ============================================================
+  const idsParaMencao = [...new Set([...uids, ...dayIds])];
+  const [encAllR, tracksAllR, mencoesR] = await Promise.all([
     dayIds.length ? guard(supabase.from('encouragements').select('update_id').eq('user_id', user.id).in('update_id', dayIds)) : { data: [] },
     dayIds.length ? guard(supabase.from('updates').select('id, track_title, track_artist, track_audio_url').in('id', dayIds).not('track_audio_url', 'is', null)) : { data: [] },
+    idsParaMencao.length ? guard(supabase.from('mentions').select('update_id, profile:profiles!mentions_profile_id_fkey(id, name, handle, avatar_color)').in('update_id', idsParaMencao)) : { data: [] },
   ]);
+
+  // { update_id: { handle_sem_arroba: perfil } }
+  const mencoesPorUpdate = {};
+  (mencoesR.data || []).forEach((m) => {
+    const p = m.profile;
+    if (!p || !p.handle) return;
+    const chave = String(p.handle).trim().toLowerCase().replace(/^@+/, '');
+    (mencoesPorUpdate[m.update_id] ||= {})[chave] = p;
+  });
   const myEncAll = new Set((encAllR.data || []).map((e) => e.update_id));
   (tracksAllR.data || []).forEach((item) => { trackByUpdate[item.id] = { title: item.track_title, artist: item.track_artist, audio_url: item.track_audio_url }; });
 
@@ -270,6 +298,7 @@ export async function GET(req) {
     const daysArr = (fullDaysByJourney[item.journey_id] || []).slice(-60).map((u) => ({
       id: u.id, day_number: u.day_number, kind: u.kind, text: u.text, alt: u.alt || '', photo_url: u.photo_url, video_url: u.video_url, created_at: u.created_at,
       encouraged: myEncAll.has(u.id), track: trackByUpdate[u.id] || null, comeback: comebackByUpdate[u.id] || null,
+      mencoes: mencoesPorUpdate[u.id] || null,
       nextStep: u.closed_by ? null : (u.next_step || null), nextWhen: u.next_when || null,
       stepFollowing: meusPassos.has(u.id), closes: passoFechadoPor[u.id] || null,
     }));
@@ -287,6 +316,8 @@ export async function GET(req) {
       encouraged: myEnc.has(item.id),
       supporters: supportersByUpdate[item.id] || [],
       comeback: comebackByUpdate[item.id] || null,
+      // { handle: perfil } de quem foi marcado neste registro
+      mencoes: mencoesPorUpdate[item.id] || null,
     };
   }).filter(Boolean);
 

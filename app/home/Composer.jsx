@@ -7,6 +7,8 @@ import { perguntasDoDia } from '../../lib/perguntas';
 import TrackPicker from './TrackPicker';
 import ImageCropper from '../../components/ImageCropper';
 import { track as trackEvent } from '../../lib/track';
+import CampoMencao from '../../components/CampoMencao';
+import { salvarMencoes } from '../../lib/mencoes';
 
 // Frases que podem indicar sofrimento intenso — mostra apoio, nunca bloqueia.
 const RISK = [
@@ -281,7 +283,16 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     }
     setSaving(false);
     if (error) { alert(t.error); return; }
-    if (novo?.id) { setLastId(novo.id); await fecharCapituloAnterior(supabase, novo.id); }
+    if (novo?.id) {
+      setLastId(novo.id);
+      await fecharCapituloAnterior(supabase, novo.id);
+      // As menções são gravadas DEPOIS e sem travar o post. Se a
+      // tabela `mentions` ainda não existir (supabase/mencoes.sql não
+      // rodado), `salvarMencoes` engole o erro: publicar o dia é a
+      // ação central do app e não pode morrer por causa de um extra.
+      const { data: { user: eu } } = await supabase.auth.getUser();
+      if (eu) await salvarMencoes(supabase, { texto: row.text, autorId: eu.id, alvo: { update_id: novo.id } });
+    }
     trackEvent('update_posted', { journeyId, kind });
     setPostedKind(kind);
     setText(''); setKind('step'); setPhotoUrl(null); setVideoUrl(null); setTrack(null); setAlt(''); setQi(0);
@@ -374,10 +385,18 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           )}
         </div>
       )}
-      <textarea ref={inputRef} className="composer2-input" value={text} onChange={e => setText(e.target.value)}
+      {/* O Enter aqui publica. Mas enquanto a lista de @ está aberta,
+          quem manda no Enter é o CampoMencao: escolher a pessoa não
+          pode publicar o registro sem querer. Por isso o onKeyDown de
+          publicar checa se a lista está aberta antes de agir. */}
+      <CampoMencao textareaRef={inputRef} className="composer2-input" valor={text}
+        onChange={e => setText(e.target.value)}
         maxLength={500} placeholder={pergunta || ph} rows={1}
         aria-describedby={pergunta ? 'perg-do-dia' : undefined}
-        onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); post(); } }} />
+        onKeyDown={e => {
+          if (e.defaultPrevented) return;
+          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); post(); }
+        }} />
       {photoUrl && (
         <div className="photo-preview">
           <img src={photoUrl} alt={alt} />

@@ -11,6 +11,8 @@ import ChallengeButton from '../../components/ChallengeButton';
 import Transformacao from '../../components/Transformacao';
 import Amanha from '../../components/Amanha';
 import SeloDoDia from '../../components/SeloDoDia';
+import VerJornada from '../../components/VerJornada';
+import TextoComMencoes from '../../components/TextoComMencoes';
 import { textoDaPessoa } from '../../lib/registro';
 import { textoAlternativo } from '../../lib/alt';
 import Retornos from '../../components/Retornos';
@@ -208,13 +210,13 @@ function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat }) {
 
   return (
     <>
-      {item.photo_url && <Media photo={item.photo_url} alt={textoAlternativo(item.alt, { dia: item.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackFloat}</Media>}
+      {item.photo_url && <Media photo={item.photo_url} alt={textoAlternativo(item.alt, { dia: item.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackFloat}<VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
       {item.video_url && !item.photo_url && (
         <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackFloat}</Media>
       )}
       {!hasMedia && !cleanText && item.track && <TrackTag track={item.track} />}
       {cleanText && !legendaEmCima && (
-        <div className="dp-text under"><EntryText text={cleanText} labels={labels} limit={100} /></div>
+        <div className="dp-text under"><EntryText text={cleanText} labels={labels} limit={100} mencoes={item.mencoes} /></div>
       )}
     </>
   );
@@ -263,23 +265,23 @@ function DayPager({ item, labels, dayLabel, dark }) {
         <div className="dp-slide" key={d.id}>
           {hasMedia ? (
             <>
-              {d.photo_url && <Media photo={d.photo_url} alt={textoAlternativo(d.alt, { dia: d.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackEl}</Media>}
+              {d.photo_url && <Media photo={d.photo_url} alt={textoAlternativo(d.alt, { dia: d.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackEl}<VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
               {d.video_url && !d.photo_url && <Media video={d.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackEl}</Media>}
             </>
           ) : (
             <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}${cleanText ? '' : ' so-selo'}`}>
               {cleanText
-                ? <CardText text={cleanText} labels={labels} />
+                ? <CardText text={cleanText} labels={labels} mencoes={d.mencoes} />
                 : <SeloDoDia kind={d.kind} dia={d.day_number} labels={labels.selo} />}
               {trackEl}
-            </a>
+            <VerJornada slug={item.journey.slug} label={labels.seeFullJourney} claro /></a>
           )}
         </div>
       </div>
 
       {hasMedia && cleanText && !legendaEmCima && (
         <div className="dp-text under">
-          <EntryText key={'x' + d.id} text={cleanText} labels={labels} limit={100} />
+          <EntryText key={'x' + d.id} text={cleanText} labels={labels} limit={100} mencoes={d.mencoes} />
         </div>
       )}
 
@@ -314,7 +316,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
 // Dia marcado por botão: sem mídia e sem relato humano.
 const soSelo = (x) => !x.photo_url && !x.video_url && !textoDaPessoa(x.text);
 
-function EntryText({ text, labels, limit = 180 }) {
+function EntryText({ text, labels, limit = 180, mencoes }) {
   const [expanded, setExpanded] = useState(false);
   const compact = text.length > limit;
 
@@ -323,7 +325,7 @@ function EntryText({ text, labels, limit = 180 }) {
   if (compact && !expanded) {
     return (
       <div className="etx">
-        <p className="entry-text clamp2">{text}</p>
+        <p className="entry-text clamp2"><TextoComMencoes texto={text} porHandle={mencoes} /></p>
         <button type="button" className="etx-more" onClick={() => setExpanded(true)}>
           {labels.moreText}
         </button>
@@ -332,7 +334,7 @@ function EntryText({ text, labels, limit = 180 }) {
   }
   return (
     <div className="etx">
-      <p className="entry-text expanded">{text}</p>
+      <p className="entry-text expanded"><TextoComMencoes texto={text} porHandle={mencoes} /></p>
       {compact && (
         <button type="button" className="entry-expand" onClick={() => setExpanded(false)}>
           {labels.lessText}
@@ -380,13 +382,15 @@ function ActionsRow({ children, people, title }) {
 }
 
 // ---- Texto do card sem foto: recorta e deixa abrir por inteiro ----
-function CardText({ text, labels }) {
+function CardText({ text, labels, mencoes }) {
   const [open, setOpen] = useState(false);
   const long = text.length > 260;
   const cls = text.length > 140 ? ' long' : (text.length < 70 ? ' short' : '');
   return (
     <>
-      <p className={`dpc-text${cls}${open ? ' open' : ''}`}>{text}</p>
+      <p className={`dpc-text${cls}${open ? ' open' : ''}`}>
+        <TextoComMencoes texto={text} porHandle={mencoes} />
+      </p>
       {long && (
         <button type="button" className="dpc-more"
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((v) => !v); }}>
@@ -639,9 +643,10 @@ export default function FeedClient({ labels }) {
                   <>
                     <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText ? '' : ' so-selo'}`}>
                       {cleanText
-                        ? <CardText text={cleanText} labels={labels} />
+                        ? <CardText text={cleanText} labels={labels} mencoes={item.mencoes} />
                         : <SeloDoDia kind={item.kind} dia={item.day_number} labels={labels.selo} />}
                       {trackFloat}
+                      <VerJornada slug={item.journey.slug} label={labels.seeFullJourney} claro />
                     </a>
                     {progressEl}
                   </>

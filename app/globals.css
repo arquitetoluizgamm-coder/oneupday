@@ -6286,3 +6286,75 @@ body{padding-bottom:calc(76px + var(--sa-bottom))}
   .upi-sino.tem .um-halo  {animation:none;opacity:0}
   .upi-sino.tem .upi-mini {animation:none}
 }
+
+/* ============================================================
+   MENÇÕES (@)
+   ============================================================ */
+.mencao{color:var(--link,#27304a);font-weight:750;text-decoration:none;
+  border-bottom:1px solid rgba(39,48,74,.22)}
+.mencao:hover{border-bottom-color:currentColor}
+
+/* a lista do autocompletar */
+.campo-mencao{position:relative}
+.mencao-lista{position:absolute;z-index:80;left:0;right:0;top:calc(100% + 6px);
+  margin:0;padding:6px;list-style:none;max-height:266px;overflow-y:auto;
+  overscroll-behavior:contain;background:var(--surface,#fff);
+  border:1px solid var(--line);border-radius:14px;
+  box-shadow:0 14px 34px rgba(16,19,45,.14)}
+.ml-item{display:flex;align-items:center;gap:10px;width:100%;
+  padding:9px 10px;border:0;border-radius:10px;background:transparent;
+  font:inherit;text-align:left;cursor:pointer;color:var(--ink)}
+/* teclado e mouse acendem o MESMO estado: quem navega com as setas
+   precisa ver onde está, e um :hover sozinho não dá isso. */
+.ml-item.on{background:var(--soft,#f3f4f0)}
+.ml-ava{width:30px;height:30px;flex:none;border-radius:50%;overflow:hidden;
+  display:grid;place-items:center;color:#fff;font-size:12px;font-weight:850}
+.ml-ava img{width:100%;height:100%;object-fit:cover}
+.ml-nome{font-weight:750;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ml-handle{margin-left:auto;color:var(--muted);font-size:12.5px;white-space:nowrap}
+.ml-vazio{padding:10px;color:var(--muted);font-size:13px}
+
+/* ============================================================
+   "VER JORNADA COMPLETA" — o atalho discreto do card
+
+   O card já levava para a jornada por três caminhos: a foto, o
+   cartão de texto e o nome. Nenhum deles se ANUNCIA — quem não
+   tenta, não descobre. Este é o único com rótulo.
+
+   Discreto de propósito: ele não disputa com apoiar e comentar,
+   que são as ações do feed. Fica no canto de baixo, translúcido,
+   e ganha corpo no toque.
+
+   `backdrop-filter` para funcionar tanto sobre foto quanto sobre
+   fundo claro — sem ele, some em cima de imagem clara.
+   ============================================================ */
+.ver-jornada{
+  position:absolute;right:10px;bottom:10px;z-index:3;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 12px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.34);
+  background:rgba(16,19,45,.42);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  color:#fff;font-size:12px;font-weight:750;line-height:1;
+  text-decoration:none;opacity:.72;
+  transition:opacity .18s ease,background .18s ease,transform .18s ease;
+}
+.ver-jornada svg{display:block;opacity:.9}
+.ver-jornada:hover,.ver-jornada:focus-visible{
+  opacity:1;background:rgba(16,19,45,.62);transform:translateY(-1px);
+  color:#fff;text-decoration:none;outline:none;
+}
+.ver-jornada:focus-visible{box-shadow:0 0 0 2px rgba(255,255,255,.7)}
+
+/* sobre fundo claro (cartão de texto, sem foto) ele se inverte:
+   escuro sobre claro sumiria menos que claro sobre claro. */
+.ver-jornada.claro{
+  background:rgba(255,255,255,.72);border-color:rgba(16,19,45,.10);
+  color:var(--muted);
+}
+.ver-jornada.claro:hover,.ver-jornada.claro:focus-visible{
+  background:rgba(255,255,255,.95);color:var(--ink);
+}
+
+/* o card precisa ser a referência de posição do botão */
+.entry-media,.entry-textcard{position:relative}
