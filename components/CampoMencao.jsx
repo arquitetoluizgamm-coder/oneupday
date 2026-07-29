@@ -53,9 +53,25 @@ export default function CampoMencao({
     clearTimeout(timer.current);
   }
 
-  function lerTermo(el) {
-    const pos = el.selectionStart ?? 0;
-    const antes = String(valor || '').slice(0, pos);
+  // ------------------------------------------------------------
+  // O TEXTO VEM DO EVENTO, NÃO DA PROP
+  //
+  // Este é o erro que fez a lista parecer morta. `valor` é uma prop:
+  // quando o onChange dispara, o estado de quem chama ainda NÃO foi
+  // atualizado — a prop só muda no próximo render. Mas o cursor
+  // (`selectionStart`) já está na posição nova.
+  //
+  // Lendo a prop velha com o cursor novo, o trecho ficava sempre uma
+  // letra atrasado: digitando "@ana", a busca ia com "an". E nas duas
+  // primeiras teclas o trecho saía vazio, então a lista nem abria —
+  // que é exatamente "não puxa nada conforme vou digitando".
+  //
+  // `e.target.value` é o texto de verdade, no mesmo instante do cursor.
+  // ------------------------------------------------------------
+  function lerTermo(el, textoAtual) {
+    const s = String(textoAtual ?? valor ?? '');
+    const pos = el.selectionStart ?? s.length;
+    const antes = s.slice(0, pos);
     const at = antes.lastIndexOf('@');
     if (at < 0) return null;
     // o que vem antes do @ tem que ser começo de texto ou espaço
@@ -68,8 +84,12 @@ export default function CampoMencao({
   }
 
   function aoDigitar(e) {
+    // guarda o texto e o cursor ANTES de avisar quem chama: o onChange
+    // pode disparar um re-render e o evento do React é reaproveitado
+    const textoAgora = e.target.value;
+    const el = e.target;
     onChange(e);
-    const t = lerTermo(e.target);
+    const t = lerTermo(el, textoAgora);
     termo.current = t;
     clearTimeout(timer.current);
     if (!t) { setLista([]); return; }
@@ -95,7 +115,8 @@ export default function CampoMencao({
     const el = ref.current;
     if (!t || !el) return;
     const h = semArroba(p.handle);
-    const s = String(valor || '');
+    // o campo é a fonte da verdade, pelo mesmo motivo de lerTermo
+    const s = String(el.value ?? valor ?? '');
     const pos = el.selectionStart ?? s.length;
     const novo = s.slice(0, t.inicio) + '@' + h + ' ' + s.slice(pos);
     const cursor = t.inicio + h.length + 2;
