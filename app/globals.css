@@ -6536,7 +6536,10 @@ body{padding-bottom:calc(76px + var(--sa-bottom))}
   .feed-page .entry > .entry-text,
   .feed-page .entry > .entry-kindline,
   .feed-page .entry .entry-actions,
-  .feed-page .entry .etx,
+  /* O `.etx` NAO entra aqui. Ele vive dentro do `.dp-text`, que já
+     tem 16px de margem — somando os dois, o parágrafo ficava em
+     32..339 enquanto a barra ficava em 16..355. Era o recuo dobrado
+     que eu criei no Patch 160. */
   .feed-page .entry .dp-text,
   .feed-tabs,
   .feed-invite{padding-left:var(--recuo-feed);padding-right:var(--recuo-feed)}
@@ -6791,41 +6794,27 @@ html.chrome-scrolling .feed-tabs{
    ele, uma barra sálvia sobre céu branco desaparece.
    ============================================================ */
 /* ------------------------------------------------------------
-   A BARRA COMEÇA E TERMINA ONDE O TEXTO COMEÇA E TERMINA
+   A BARRA VOLTOU PARA FORA DA FOTO
 
-   Ela estava com 14px de recuo e o texto com 16 — dois pixels de
-   diferença, que bastam para o olho ver que uma coisa não bate com
-   a outra. E o "%" ficava NA MESMA LINHA, roubando largura: a
-   barra terminava antes da borda direita do parágrafo.
+   Eu a tinha colocado sobre a imagem para poupar 36px de altura.
+   Duas coisas mudaram desde então:
 
-   Agora as duas leem `--recuo-feed`, a mesma variável. Se um dia
-   esse recuo mudar, ele muda nos dois de uma vez — que é a única
-   forma de isso não desalinhar de novo.
+   1. O Patch 170 fez a pílula do rodapé sumir ao parar de rolar —
+      58px liberados, mais que os 36 que a barra custava. A
+      economia não é mais necessária.
 
-   E o "%" subiu para cima da barra, encostado à direita. A barra
-   ganha a largura inteira, de ponta a ponta, igual ao parágrafo.
+   2. Sobre a foto ela NUNCA ia alinhar com o texto. Medido no
+      app: a mídia fica em 8..379 (o carrossel de dias desloca o
+      slide), enquanto o texto fica em 16..355. Alinhar os dois
+      exigiria um padding de 8 de um lado e 24 do outro — números
+      que valem para um card e quebram no próximo.
+
+   Fora da foto ela mora no mesmo container do texto e alinha por
+   CONSTRUÇÃO, não por ajuste. É a diferença entre acertar e
+   garantir.
    ------------------------------------------------------------ */
-.progress-over{
-  position:absolute;left:0;right:0;bottom:0;z-index:2;
-  display:flex;flex-direction:column;align-items:stretch;gap:5px;
-  padding:24px var(--recuo-feed) 12px;
-  background:linear-gradient(to top, rgba(9,12,32,.55), rgba(9,12,32,0));
-  pointer-events:none;
-}
-.progress-over .mp-pct{align-self:flex-end}
-.progress-over .mp-bar{
-  width:100%;height:4px;border-radius:2px;
-  background:rgba(255,255,255,.34);overflow:hidden;
-}
-.progress-over .mp-bar > span{
-  display:block;height:100%;border-radius:2px;
-  background:linear-gradient(90deg,var(--sage,#87957A),var(--terra,#C47152));
-  transition:width .6s cubic-bezier(.22,1,.36,1);
-}
-.progress-over .mp-pct{
-  flex:0 0 auto;color:#fff;font-size:11px;font-weight:800;
-  text-shadow:0 1px 3px rgba(9,12,32,.6);
-}
+.progress-over{display:none}
+
 
 /* ============================================================
    O TETO DA MÍDIA, AGORA CALCULADO PARA O CARD CABER
@@ -6916,7 +6905,7 @@ html.chrome-parado .bottom-nav{
    ============================================================ */
 .feed-page .entry-media img,
 .feed-page .entry-media video{
-  max-height:calc(100svh - 290px - var(--sa-top,0px) - var(--sa-bottom,0px));
+  max-height:calc(100svh - 326px - var(--sa-top,0px) - var(--sa-bottom,0px));
 }
 
 /* ============================================================
