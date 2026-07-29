@@ -2412,7 +2412,13 @@ h1 { letter-spacing: -0.03em; }
 .message-nav,.message-avatar,.supporters-icon,.demo-story-avatar,.icon-btn,
 .ss-ava,.heart-btn .heart-dot,.sg-ava,.mood-chip i,.dm-dot,
 .comment-panel .cmt-ava,.needs-ava,.ps-ava,.lb-close,.lb-nav,
-.rules-list li::before,.sgc-ava,.nc-close,.om-x,.feed-track-spk{border-radius:50%!important}
+.rules-list li::before,.sgc-ava,.nc-close,.om-x,.feed-track-spk,
+/* o + do topo: estava de fora desta lista e por isso vinha QUADRADO
+   desde sempre, mesmo com `border-radius:50%` declarado duas vezes
+   no proprio arquivo. Quem ganhava era o reset universal logo acima,
+   que tem !important. O sino ao lado ja entrava aqui por carregar
+   `.icon-btn`; o + nao carrega. */
+.header-create{border-radius:50%!important}
 
 /* ---- Perfil compacto: ferramentas no card, abas em uma linha, jornada dobrável ---- */
 /* botões Editar perfil / Ver público / Sair: discretos, canto direito sob a capa */
@@ -7473,3 +7479,71 @@ button.home-welcome-primary{border:0;font:inherit;cursor:pointer;width:100%}
   .ptabs-row .ptabs:has(.ptab-link){padding:3px}
   .ptabs-row .ptabs:has(.ptab-link) .ptab{font-size:12px;padding:7px 4px}
 }
+
+/* ============================================================
+   PATCH 181 · O TOPO SOBRE A FOTO
+
+   Com o fundo do topo removido, a foto do post passa por baixo
+   dele. Os elementos ficaram se defendendo com um halo claro:
+
+       filter: drop-shadow(...) drop-shadow(...)
+
+   Medido olhando: sobre uma foto cheia de rosto e cabelo, o halo
+   não salva nada — só suja o desenho. É o "brilho" que incomoda.
+
+   A troca segue um critério, e não gosto:
+
+     CONTROLE precisa ser legível SEMPRE. Quem toca no + ou no
+     sino precisa achar os dois sobre qualquer foto. Eles ganham
+     um disco branco — fundo de verdade, não truque de sombra.
+
+     MARCA não é controle. Se o ONE some por um instante sobre
+     uma foto escura, não se perde nada: ninguém precisa da marca
+     para usar o app. Ela fica limpa, como foi desenhada.
+   ============================================================ */
+
+/* 1 · a marca volta ao original: sem halo, sem sombra */
+.top-feed .top-brand .one-mark{filter:none}
+
+/* 2 · os dois controles ganham disco branco.
+   Miro nos BOTÕES, não em `.top-left > *` / `.top-right > *`:
+   aqueles são invólucros (`.header-heart` é um div em volta), e
+   pintar o invólucro daria um quadrado branco em vez de um
+   círculo no ícone. */
+.top-feed .heart-btn,
+.top-feed .header-create{
+  filter:none;                       /* tira o halo daqui também */
+  background:#fff;
+  /* o raio nao mora aqui: quem manda e a lista de "circulos
+     preservados" la em cima, porque o reset universal do visual
+     reto usa !important e ganharia desta regra. */
+  width:44px;height:44px;
+  display:grid;place-items:center;
+  box-shadow:0 1px 3px rgba(16,19,45,.10),
+             0 4px 14px rgba(16,19,45,.10);
+}
+/* o disco não pode crescer no toque: 44 já é o alvo do Patch 178 */
+.top-feed .heart-btn:hover,
+.top-feed .header-create:hover{background:#fff}
+
+/* o resto do topo do feed perde o halo junto — ele existia só
+   para compensar a falta de fundo, e agora quem precisa tem fundo */
+.top-feed .top-left > *,
+.top-feed .top-right > *{filter:none}
+
+/* ============================================================
+   E O SELO DE NÍVEL, QUE SAIU DO FEED
+
+   O `<OneLevel/>` passou a devolver `null` (ver FeedClient). A
+   regra de cor dele continuava aqui sem nada para pintar.
+
+   Deixo esta linha escrita em vez de apagar em silêncio: se um
+   dia o selo voltar, que volte sabendo que ele já foi removido
+   uma vez e por quê.
+
+   No Patch 178 eu escureci as seis cores dele para passarem em
+   4,5:1. Esse trabalho virou pó agora, e tudo bem — é melhor
+   remover uma peça que contradiz a promessa do que deixá-la
+   legível.
+   ============================================================ */
+.one-level{display:none}

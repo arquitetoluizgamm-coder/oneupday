@@ -25,9 +25,35 @@ import { MOODS, MOODS_TEXTO, moodGlow } from '../../lib/moods';
 import { comCapa } from '../../lib/media';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
-function OneLevel({ level, labels }) {
-  if (!level || !labels?.oneLevels?.[level.rank]) return null;
-  return <span className="one-level" style={{ color: level.color }} aria-label={`ONE ${labels.oneLevels[level.rank]}`}>ONE {labels.oneLevels[level.rank]}</span>;
+// ============================================================
+// O SELO DE NÍVEL SAIU DO FEED
+//
+// Ele mostrava seis patentes ao lado de cada nome, dadas por dias
+// registrados: Começo · Passo · Ritmo · Presença · Inspira ·
+// Legado. Em 1, 3, 7, 15 e 30 dias.
+//
+// Isso é um ranking. Público, permanente, colado na identidade —
+// e o app é vendido dizendo que não existe ranking.
+//
+// Quem o app quer alcançar é quem parou de postar por se sentir
+// atrás. Para essa pessoa, chegar num feed onde todo mundo já tem
+// uma patente e ela não tem nenhuma é a confirmação exata do medo
+// que a fez calar.
+//
+// E o selo não carregava nada que a tela já não dissesse: o dia da
+// jornada aparece no cabeçalho do post, e o crescimento pessoal já
+// tem uma peça melhor e mais generosa — a Árvore da Vida, que é
+// privada, não tem degraus com nome e nunca volta para trás.
+//
+// Foi por isso que sobrou remover em vez de reescrever: o mesmo
+// dado já vive num lugar onde ele é espelho, e não patente.
+//
+// O `levelFor` continua na rota do feed. Não é código morto por
+// descuido: é o dado intacto, caso um dia ele volte no perfil da
+// própria pessoa — onde ninguém compara com ninguém.
+// ============================================================
+function OneLevel() {
+  return null;
 }
 
 function TrackTag({ track, float, hasBar }) {
