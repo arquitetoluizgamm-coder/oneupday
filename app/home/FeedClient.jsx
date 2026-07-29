@@ -317,20 +317,42 @@ function DayPager({ item, labels, dayLabel, dark }) {
 const soSelo = (x) => !x.photo_url && !x.video_url && !textoDaPessoa(x.text);
 
 // ============================================================
-// "LER MAIS"
+// "LER MAIS" — duas linhas exatas, e o "mais" colado nos pontinhos
 //
-// Antes: o texto era recortado por `-webkit-line-clamp` e o botão
-// ficava posicionado por cima, no canto de baixo, com um degradê
-// cobrindo o texto atrás. Funcionava, mas era uma peça de layout
-// para resolver uma questão de texto — e o botão nunca encostava
-// nas reticências: ele ia para o canto direito, onde as reticências
-// só calham de estar quando a última linha está cheia.
+// As duas exigências brigam entre si, e vale registrar por quê:
 //
-// Agora o corte é no TEXTO: pega até `limit`, volta até o último
-// espaço para não partir palavra ao meio, e escreve "… ler mais"
-// em sequência. O botão fica no fluxo, colado nas reticências,
-// sem posição absoluta, sem degradê e sem z-index.
+//   · para o "…mais" ficar COLADO no fim do texto, ele tem que
+//     estar no fluxo do parágrafo;
+//   · para garantir DUAS LINHAS em qualquer largura, o corte
+//     natural seria `-webkit-line-clamp`, que conta linha.
+//
+// Mas o clamp desenha as reticências DELE no fim da linha, e elas
+// caem onde o texto acabou — que raramente é a borda. Testado: numa
+// coluna de 326px sobrava um vão entre os pontinhos do navegador e
+// o botão, e apareciam duas reticências seguidas.
+//
+// Então o corte é por caractere, mas o limite não é fixo: sai da
+// largura medida do elemento. Medi na fonte real do app quantos
+// caracteres cabem em duas linhas:
+//
+//     326px -> 76      358px -> 81      568px -> 140
+//
+// O que dá cerca de 8,6px por caractere a 16px. A conta abaixo usa
+// esse número com ~8% de folga, para uma palavra comprida não
+// empurrar a terceira linha.
+//
+// Um número fixo não serviria: 76 cortaria pela metade no
+// computador, e 140 estouraria para três linhas no celular.
 // ============================================================
+const PX_POR_LETRA = 8.6;   // medido na Fraunces a 16px
+const FOLGA = 0.92;
+
+function limitePelaLargura(largura, base) {
+  if (!largura) return base;
+  const porLinha = largura / PX_POR_LETRA;
+  return Math.max(40, Math.floor(porLinha * 2 * FOLGA));
+}
+
 function cortar(texto, limite) {
   const s = String(texto || '');
   if (s.length <= limite) return s;
@@ -343,23 +365,43 @@ function cortar(texto, limite) {
 
 function EntryText({ text, labels, limit = 180, mencoes }) {
   const [expanded, setExpanded] = useState(false);
-  const compact = text.length > limit;
+  const [largura, setLargura] = useState(0);
+  const caixa = useRef(null);
+
+  // uma medida na montagem e a cada mudança de tamanho da janela:
+  // é o mesmo texto em telas diferentes, e o corte tem que
+  // acompanhar quem gira o celular ou arrasta a janela.
+  useEffect(() => {
+    const el = caixa.current;
+    if (!el) return;
+    const medir = () => setLargura(el.clientWidth || 0);
+    medir();
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', medir);
+      return () => window.removeEventListener('resize', medir);
+    }
+    const ro = new ResizeObserver(medir);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const teto = limitePelaLargura(largura, limit);
+  const compact = text.length > teto;
 
   if (compact && !expanded) {
     return (
-      <div className="etx">
+      <div className="etx" ref={caixa}>
         <p className="entry-text">
-          <TextoComMencoes texto={cortar(text, limit)} porHandle={mencoes} />
-          <span className="etx-dots">…</span>
+          <TextoComMencoes texto={cortar(text, teto)} porHandle={mencoes} />
           <button type="button" className="etx-more" onClick={() => setExpanded(true)}>
-            {labels.moreText}
+            <span aria-hidden="true">…</span>{labels.moreText}
           </button>
         </p>
       </div>
     );
   }
   return (
-    <div className="etx">
+    <div className="etx" ref={caixa}>
       <p className="entry-text expanded"><TextoComMencoes texto={text} porHandle={mencoes} /></p>
       {compact && (
         <button type="button" className="entry-expand" onClick={() => setExpanded(false)}>

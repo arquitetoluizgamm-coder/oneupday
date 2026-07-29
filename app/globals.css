@@ -6546,3 +6546,45 @@ body{padding-bottom:calc(76px + var(--sa-bottom))}
     width:100%;margin-left:0;margin-right:0;margin-top:10px;border-radius:0;
   }
 }
+
+/* ============================================================
+   O TEXTO DO FEED — menor, e no máximo duas linhas
+
+   O tamanho caiu de 18/19px para 16 (17 no computador).
+
+   O corte em duas linhas NÃO é feito aqui: é o JavaScript que
+   calcula quantos caracteres cabem, a partir da largura medida do
+   elemento. A tentativa por `-webkit-line-clamp` foi descartada
+   depois de ver na tela — o clamp desenha as reticências DELE no
+   fim da linha, e sobrava um vão até o "…mais", com dois pares de
+   pontinhos aparecendo juntos numa coluna estreita.
+
+   O que fica aqui é o tamanho e a garantia de que nenhuma regra
+   antiga volte a recortar o parágrafo por fora: com o botão dentro
+   dele, um recorte de 3 linhas o engoliria.
+   ============================================================ */
+.feed-page .entry .etx .entry-text{
+  display:block;
+  -webkit-line-clamp:unset;
+  -webkit-box-orient:initial;
+  overflow:visible;
+  max-width:none;
+  margin:0;
+  font-size:16px;
+  line-height:1.55;
+}
+@media(min-width:861px){
+  .feed-page .entry .etx .entry-text{font-size:17px}
+}
+
+.feed-page .entry .etx .etx-more{
+  display:inline;margin:0;padding:0;
+  border:0;background:none;
+  font:inherit;font-weight:800;
+  color:var(--link,#27304a);
+  cursor:pointer;vertical-align:baseline;
+}
+.feed-page .entry .etx .etx-more:hover,
+.feed-page .entry .etx .etx-more:focus-visible{
+  color:var(--ink);text-decoration:underline;text-underline-offset:3px;outline:none;
+}
