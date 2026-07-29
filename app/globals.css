@@ -6063,3 +6063,95 @@ h1 { letter-spacing: -0.03em; }
   .feed-stream.focus-mode > article.entry .entry-media,.feed-stream.focus-mode > article.entry .entry-textcard{max-height:none}
 }
 .diary-entry-tools{display:flex;align-items:center;gap:14px;margin-left:90px}.diary-entry-delete{border:0;background:transparent;color:var(--muted);font:inherit;font-size:11px;padding:2px 0;cursor:pointer}.diary-entry-delete:hover{color:#a13b32}.diary-entry-comment{display:flex;align-items:flex-start;gap:9px;margin:8px 0 0 90px;padding:10px 12px;border-radius:10px;background:var(--sage-soft);color:var(--ink);font-size:13px;line-height:1.5}.diary-entry-comment img{width:28px;height:28px;object-fit:contain;flex:none}.diary-entry-comment p{margin:0}.diary-entry-wrap.on .diary-entry-tools,.diary-entry-wrap.on .diary-entry-comment{margin-left:0}
+
+/* ============================================================
+   O RODAPÉ — pílula flutuante
+
+   Três coisas estavam erradas, e a do meio era a que incomodava.
+
+   1. LARGURA TOTAL entre 641px e 860px. A regra que faz a barra
+      flutuar mora em @media(max-width:640px), e a de desktop em
+      @media(min-width:861px). Na faixa do meio sobrava a regra
+      original — left:0, right:0, bottom:0 — e a barra encostava
+      nas três bordas.
+
+   2. A SOBRA EMBAIXO era compensação dobrada. A barra nasceu
+      colada no rodapé da tela, e por isso ganhou
+      `padding-bottom: var(--sa-bottom)` para não ficar sob a
+      barrinha de gesto do celular. Depois ela virou flutuante e
+      subiu 14px — mas ninguém tirou o padding. Somando:
+
+        acima do ícone .... 13px
+        abaixo do ícone ... 14 + 34 = 48px
+
+      O ícone ficava 18px acima do centro da faixa. Agora a folga
+      do gesto está no `bottom` (onde a barra se posiciona), não
+      no `padding` (onde ela se preenche) — que é o lugar certo:
+      é distância até a borda da tela, não espaço interno.
+
+   3. Ícones pequenos para o tamanho da faixa. 26px dentro de
+      87px de altura.
+
+   Está tudo num bloco só, no fim do arquivo, de propósito: as
+   regras do rodapé estavam espalhadas por sete pontos do CSS
+   (linhas 502, 1341, 1903, 1944, 2027, 5187 e 6035), cada patch
+   somando uma camada. Mexer em sete lugares para mudar uma
+   altura é como isso vira um problema. Aqui uma regra só decide,
+   e ela ganha por ser a última — especificidade igual, ordem
+   maior.
+   ============================================================ */
+.bottom-nav{
+  position:fixed; left:50%; right:auto;
+  bottom:calc(12px + var(--sa-bottom));
+  transform:translateX(-50%) scale(1);
+  transform-origin:50% 100%;
+  width:min(320px, calc(100% - 56px));
+  grid-template-columns:repeat(4,1fr);
+  padding:0;
+  border:1px solid rgba(229,227,221,.9);
+  border-radius:22px;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 10px 30px rgba(16,19,45,.14);
+  opacity:1;
+  /* a mesma curva do resto da marca: sai rápido, chega devagar */
+  transition:transform .26s cubic-bezier(.22,1,.36,1),
+             opacity .22s ease,
+             box-shadow .26s ease;
+}
+
+/* 11 + 30 + 11 = 52px de alvo. O mínimo confortável é 44. */
+.bottom-nav a,.bottom-nav .bn-create{padding:11px 6px;gap:0}
+.bottom-nav a svg{width:30px;height:30px}
+.bn-profile-avatar{width:30px!important;height:30px!important}
+
+/* ------------------------------------------------------------
+   ENCOLHER AO ROLAR
+
+   O componente já marcava `.scrolling` durante a rolagem e tirava
+   a classe 180ms depois da última — o efeito de voltar já estava
+   pronto, só faltava o que ele deveria fazer. Era só opacidade.
+
+   Escolhi `transform` e não `width`/`padding`: animar largura
+   recalcula o layout a cada quadro de rolagem, e é exatamente aí
+   que a página menos pode engasgar.
+
+   O cuidado que isso exige: `scale` encolhe a ÁREA DE TOQUE
+   junto, não só o desenho. 52 × 0,86 = 44,7px — fica no limite
+   do confortável mesmo encolhido, e em repouso volta aos 52.
+   ------------------------------------------------------------ */
+.bottom-nav.scrolling{
+  transform:translateX(-50%) scale(.86);
+  opacity:.74;
+  box-shadow:0 6px 16px rgba(16,19,45,.10);
+}
+
+/* quem tiver pedido menos movimento no sistema não vê o encolher */
+@media(prefers-reduced-motion:reduce){
+  .bottom-nav{transition:opacity .2s ease}
+  .bottom-nav.scrolling{transform:translateX(-50%) scale(1);opacity:.8}
+}
+
+/* o conteúdo termina acima da pílula: 52 de altura + 12 de folga */
+body{padding-bottom:calc(76px + var(--sa-bottom))}
