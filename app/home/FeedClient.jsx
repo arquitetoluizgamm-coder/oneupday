@@ -21,39 +21,13 @@ import Percepcao from '../../components/Percepcao';
 import Andamento from '../../components/Andamento';
 import Espelho from '../../components/Espelho';
 import LoopMarca from '../../components/LoopMarca';
-import { MOODS, MOODS_TEXTO, moodGlow } from '../../lib/moods';
+import { MOODS, moodGlow } from '../../lib/moods';
 import { comCapa } from '../../lib/media';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
-// ============================================================
-// O SELO DE NÍVEL SAIU DO FEED
-//
-// Ele mostrava seis patentes ao lado de cada nome, dadas por dias
-// registrados: Começo · Passo · Ritmo · Presença · Inspira ·
-// Legado. Em 1, 3, 7, 15 e 30 dias.
-//
-// Isso é um ranking. Público, permanente, colado na identidade —
-// e o app é vendido dizendo que não existe ranking.
-//
-// Quem o app quer alcançar é quem parou de postar por se sentir
-// atrás. Para essa pessoa, chegar num feed onde todo mundo já tem
-// uma patente e ela não tem nenhuma é a confirmação exata do medo
-// que a fez calar.
-//
-// E o selo não carregava nada que a tela já não dissesse: o dia da
-// jornada aparece no cabeçalho do post, e o crescimento pessoal já
-// tem uma peça melhor e mais generosa — a Árvore da Vida, que é
-// privada, não tem degraus com nome e nunca volta para trás.
-//
-// Foi por isso que sobrou remover em vez de reescrever: o mesmo
-// dado já vive num lugar onde ele é espelho, e não patente.
-//
-// O `levelFor` continua na rota do feed. Não é código morto por
-// descuido: é o dado intacto, caso um dia ele volte no perfil da
-// própria pessoa — onde ninguém compara com ninguém.
-// ============================================================
-function OneLevel() {
-  return null;
+function OneLevel({ level, labels }) {
+  if (!level || !labels?.oneLevels?.[level.rank]) return null;
+  return <span className="one-level" style={{ color: level.color }} aria-label={`ONE ${labels.oneLevels[level.rank]}`}>ONE {labels.oneLevels[level.rank]}</span>;
 }
 
 function TrackTag({ track, float, hasBar }) {
@@ -736,7 +710,7 @@ export default function FeedClient({ labels }) {
                 </span>
                 <span className="entry-id">
                   <b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} />{item.historia && <span className="hist-selo">{labels.histSelo}</span>}</b>
-                  <small><span className="entry-journey">{item.journey.title}</span> · {dayLabel(item.day_number)}{item.owner.mood && (labels.moods || {})[item.owner.mood] && <span className="entry-mood" style={{ color: MOODS_TEXTO[item.owner.mood] || MOODS[item.owner.mood] }}> · {labels.moods[item.owner.mood]}</span>}</small>
+                  <small><span className="entry-journey">{item.journey.title}</span> · {dayLabel(item.day_number)}{item.owner.mood && (labels.moods || {})[item.owner.mood] && <span className="entry-mood" style={{ color: MOODS[item.owner.mood] }}> · {labels.moods[item.owner.mood]}</span>}</small>
                 </span>
               </a>
               {item.owner.id && !item.own && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
@@ -782,12 +756,11 @@ export default function FeedClient({ labels }) {
               // cartões são curtos. Lá a barra continua embaixo, com a
               // linha inteira.
               // ============================================================
-              const barraSobreFoto = total > 0 ? (
-                <div className="progress-over" aria-hidden="true">
-                  <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
-                  <span className="mp-pct">{pct}%</span>
-                </div>
-              ) : null;
+              // `barraSobreFoto` foi removida daqui. Ela montava um
+              // `.progress-over`, que o CSS esconde desde o Patch 170 —
+              // era trabalho por card para desenhar nada, e uma
+              // armadilha para quem viesse depois tentar entender por
+              // que a barra não aparecia.
               const progressEl = total > 0 ? (
                 <div className="progress-under" aria-hidden="true">
                   <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
@@ -804,19 +777,7 @@ export default function FeedClient({ labels }) {
                 // apagar o dia — mas mostra selo, não frase.
                 return (
                   <>
-                    {/* `curto` encolhe o cartão de 4:5 para 1:1.
-                        Medido: dos 12 posts do feed, 4 não cabiam na tela
-                        nem com o topo e o rodapé escondidos (763px úteis).
-                        O cartão 4:5 sozinho ocupa 469px dos 861 do pior
-                        deles; em 1:1 ele cai para 375 e o post cabe.
-
-                        Mas encolher SEMPRE cortaria texto longo, então a
-                        regra é por tamanho: até 140 caracteres o texto
-                        cabe folgado num quadrado (são ~6 linhas de 26px
-                        numa caixa de 331px de largura útil). Acima disso
-                        o cartão continua 4:5, porque ali a altura está
-                        sendo usada, não desperdiçada. */}
-                    <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText ? '' : ' so-selo'}${(cleanText || '').length <= 140 ? ' curto' : ''}`}>
+                    <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText ? '' : ' so-selo'}`}>
                       {cleanText
                         ? <CardText text={cleanText} labels={labels} mencoes={item.mencoes} />
                         : <SeloDoDia kind={item.kind} dia={item.day_number} labels={labels.selo} />}
@@ -827,9 +788,40 @@ export default function FeedClient({ labels }) {
                   </>
                 );
               }
+              // ============================================================
+              // A BARRA DOS POSTS COM FOTO — CONSERTO DO PATCH 185
+              //
+              // Ela sumiu, e a culpa é minha.
+              //
+              // Antes do 185, todo post com foto tinha `days` e ia pelo
+              // `DayPager`, que desenha a barra ABAIXO da mídia
+              // (`progress-under`). Ao tirar o folheador eu mandei esses
+              // posts para este caminho aqui — que passava
+              // `barraSobreFoto`, a versão que fica POR CIMA da imagem.
+              //
+              // E essa versão está desligada no CSS desde o Patch 170:
+              //
+              //     .progress-over{display:none}
+              //
+              // Ou seja: o componente continuava sendo montado, o React
+              // não reclamava de nada, e a barra simplesmente não
+              // aparecia. Defeito silencioso — o pior tipo.
+              //
+              // Por que ela foi desligada lá atrás, e continua valendo:
+              // fora da foto a barra mora no mesmo contêiner do texto e
+              // alinha com ele por CONSTRUÇÃO. Sobre a imagem, alinhar
+              // exigiria padding diferente de cada lado — número que
+              // acerta num card e quebra no próximo.
+              //
+              // Então o conserto não é reativar o `.progress-over`. É
+              // usar a mesma barra que o folheador usava.
+              // ============================================================
               return (
-                <MidiaComLegenda item={item} labels={labels} cleanText={cleanText}
-                  hasMedia={hasMedia} trackFloat={trackFloat} barra={barraSobreFoto} />
+                <>
+                  <MidiaComLegenda item={item} labels={labels} cleanText={cleanText}
+                    hasMedia={hasMedia} trackFloat={trackFloat} barra={null} />
+                  {progressEl}
+                </>
               );
             })()}
 
