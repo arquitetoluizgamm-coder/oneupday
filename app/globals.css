@@ -7870,3 +7870,104 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
   border-top:1px solid var(--line);
   font-size:14px;line-height:1.55;color:#4b5563;
 }
+
+/* ============================================================
+   PATCH 190 · /invite — RITMO, HIERARQUIA E MARCA
+
+   A página estava correta e genérica. Medi antes de mexer, e os
+   três problemas eram estes:
+
+   1 · A PERGUNTA ERA O ITEM MAIS FRACO DA PÁGINA
+
+       título ....... 28px / peso 700
+       subtítulo .... 17px / peso 650
+       PERGUNTA ..... 20px / peso 400   ← a única ação da tela
+
+       A coisa que a pessoa veio fazer pesava menos que o texto
+       que a antecedia.
+
+   2 · 367px DE PROSA ANTES DE QUALQUER AÇÃO
+
+       44% da altura de um iPhone 15. Num SE de 667px o botão
+       ficava fora da dobra.
+
+   3 · O ESPAÇO EM BRANCO ERA UNIFORME
+
+       ~16px entre absolutamente tudo. Espaço uniforme não agrupa
+       e não separa — só empilha. É o que fazia quatro blocos de
+       texto parecerem um documento.
+
+   O contraste passava em tudo (15,5 e 7,6). O problema nunca foi
+   acessibilidade: era ritmo.
+   ============================================================ */
+
+/* ---- 1 · o convite: menos e maior ---- */
+.cv-titulo{
+  font-size:clamp(30px,8.5vw,42px);
+  line-height:1.06;
+  margin:10px 0 14px;
+}
+.cv-sub{
+  font-size:17px;line-height:1.5;
+  font-weight:500;                 /* era 650: parou de brigar com o título */
+  color:#3c4454;
+  margin:0 0 4px;
+}
+
+/* ---- 2 · O LUGAR ----
+   Pergunta, campo, sigilo e botão dentro de um bloco só. É a
+   peça que faz o espaço em branco voltar a agrupar: dentro dele
+   as coisas são apertadas, fora dele são soltas. */
+.cv-form{
+  margin:26px 0 0;
+  padding:20px 18px 22px;
+  border:1.5px solid var(--sage,#87957A);
+  background:linear-gradient(180deg,#fff,var(--sage-soft,#EDF1E7));
+  box-shadow:var(--shadow-sm);
+}
+
+.cv-pergunta-linha{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.cv-upi{width:38px;height:38px;flex:0 0 auto;display:block;margin-top:-2px}
+
+/* A inversão de peso: a pergunta passa a ser o segundo maior
+   elemento da página, e o único em fonte de display além do
+   título. É ela que a pessoa tem que ler primeiro. */
+.cv-pergunta{
+  font-family:var(--display);
+  font-size:22px;font-weight:700;
+  letter-spacing:-.02em;line-height:1.2;
+  color:var(--ink);margin:0;
+}
+
+.cv-campo{
+  background:#fff;
+  border-color:rgba(93,123,105,.35);
+  min-height:104px;
+}
+.cv-campo:focus{border-color:var(--sage-deep,#5D7B69)}
+
+.cv-sigilo{margin:10px 2px 0}
+.cv-cta{margin-top:16px}
+
+/* ---- 3 · o rodapé: o que era o meio ---- */
+.cv-depois{
+  margin-top:30px;padding-top:22px;
+  border-top:1px solid var(--line);
+}
+.cv-depois .cv-p{
+  font-size:15px;line-height:1.65;
+  color:#5b6472;margin:0 0 12px;
+}
+.cv-depois .cv-p:last-child{margin-bottom:0}
+
+/* ---- a confirmação herda o mesmo bloco ----
+   Ela substitui o formulário no lugar dele, então precisa da
+   mesma moldura — senão a página "pula" de uma caixa para
+   nenhuma caixa no momento mais delicado. */
+.cv-pronto{
+  margin:26px 0 0;padding:22px 18px 24px;
+  border:1.5px solid var(--sage,#87957A);
+  background:linear-gradient(180deg,#fff,var(--sage-soft,#EDF1E7));
+  box-shadow:var(--shadow-sm);
+}
+.cv-pronto .cv-card{background:#fff;border-color:rgba(93,123,105,.3)}

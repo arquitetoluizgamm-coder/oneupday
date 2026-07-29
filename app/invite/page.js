@@ -59,15 +59,44 @@ export default async function Invite() {
       <header className="top land-top"><Logo href="/" size={40} /></header>
       <Track type="landing_view" meta={{ page: 'invite' }} />
 
+      {/* ============================================================
+          A ORDEM MUDOU, O TEXTO NÃO
+
+          Antes: título, subtítulo e DOIS parágrafos explicativos —
+          367px de prosa — e só então a pergunta. Numa tela de 390 a
+          ação começava a 44% da altura; num iPhone SE o botão ficava
+          fora da dobra.
+
+          Medido também: a pergunta, que é a única coisa que a pessoa
+          faz aqui, tinha peso 400 — mais leve que o subtítulo, que
+          tem 650. O item mais importante da página era o mais fraco
+          dela.
+
+          Agora a página tem três tempos claros:
+
+            1. o convite      título + uma linha
+            2. O LUGAR        pergunta, campo, botão — num bloco só
+            3. o rodapé       como funciona, para quem quiser ler
+
+          O que explica o app desceu para depois da ação. Não sumiu:
+          quem precisa de contexto rola dez centímetros. Quem já
+          entendeu no título escreve na hora.
+          ============================================================ */}
       <main className="landing convite-page">
         <section className="cv-intro">
           <h1 className="cv-titulo">{t.cvTitulo}</h1>
           <p className="cv-sub">{t.cvSub}</p>
-          <p className="cv-p">{t.cvComoFunciona}</p>
-          <p className="cv-p">{t.cvGradual}</p>
         </section>
 
         <FormConvite t={t} locale={locale} />
+
+        {/* Depois do bloco: o que era o meio da página. Aqui embaixo
+            ele deixa de competir com a ação e vira o que sempre foi —
+            explicação para quem quer. */}
+        <section className="cv-depois">
+          <p className="cv-p">{t.cvComoFunciona}</p>
+          <p className="cv-p">{t.cvGradual}</p>
+        </section>
       </main>
 
       <footer className="foot"><p>One <b>Up</b> Day · {t.tagline}</p></footer>

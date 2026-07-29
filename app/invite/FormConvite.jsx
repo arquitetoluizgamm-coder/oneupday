@@ -130,9 +130,26 @@ export default function FormConvite({ t, locale }) {
   }
 
   // ---------------- o formulário ----------------
+  // ============================================================
+  // O CAMPO VIROU UM LUGAR, NÃO UMA LINHA DO FORMULÁRIO
+  //
+  // Tudo o que a pessoa faz aqui — ler a pergunta, escrever,
+  // guardar — passou a viver dentro de um bloco só, com fundo e
+  // borda próprios. Antes esses elementos flutuavam soltos no meio
+  // de quatro parágrafos, com o mesmo espaçamento entre tudo: o
+  // espaço em branco não agrupava nada.
+  //
+  // E o Upi entra ao lado da pergunta. Ele é o personagem que
+  // acompanha a pessoa DENTRO do app — pôr ele aqui é a diferença
+  // entre "preencha este formulário" e "este lugar é o mesmo lugar
+  // que você vai usar amanhã".
+  // ============================================================
   return (
     <form className="cv-form" onSubmit={enviar} noValidate>
-      <label className="cv-pergunta" htmlFor="cv-jornada">{t.cvPergunta}</label>
+      <div className="cv-pergunta-linha">
+        <img className="cv-upi" src="/upi.svg" alt="" aria-hidden="true" />
+        <label className="cv-pergunta" htmlFor="cv-jornada">{t.cvPergunta}</label>
+      </div>
 
       <textarea
         id="cv-jornada"
