@@ -6539,7 +6539,7 @@ body{padding-bottom:calc(76px + var(--sa-bottom))}
   .feed-page .entry .etx,
   .feed-page .entry .dp-text,
   .feed-tabs,
-  .feed-invite{padding-left:16px;padding-right:16px}
+  .feed-invite{padding-left:var(--recuo-feed);padding-right:var(--recuo-feed)}
 
   .feed-page .entry-media,
   .feed-page .entry-textcard{
@@ -6790,15 +6790,31 @@ html.chrome-scrolling .feed-tabs{
    O véu escuro embaixo existe porque a foto pode ser clara: sem
    ele, uma barra sálvia sobre céu branco desaparece.
    ============================================================ */
+/* ------------------------------------------------------------
+   A BARRA COMEÇA E TERMINA ONDE O TEXTO COMEÇA E TERMINA
+
+   Ela estava com 14px de recuo e o texto com 16 — dois pixels de
+   diferença, que bastam para o olho ver que uma coisa não bate com
+   a outra. E o "%" ficava NA MESMA LINHA, roubando largura: a
+   barra terminava antes da borda direita do parágrafo.
+
+   Agora as duas leem `--recuo-feed`, a mesma variável. Se um dia
+   esse recuo mudar, ele muda nos dois de uma vez — que é a única
+   forma de isso não desalinhar de novo.
+
+   E o "%" subiu para cima da barra, encostado à direita. A barra
+   ganha a largura inteira, de ponta a ponta, igual ao parágrafo.
+   ------------------------------------------------------------ */
 .progress-over{
   position:absolute;left:0;right:0;bottom:0;z-index:2;
-  display:flex;align-items:center;gap:10px;
-  padding:22px 14px 10px;
+  display:flex;flex-direction:column;align-items:stretch;gap:5px;
+  padding:24px var(--recuo-feed) 12px;
   background:linear-gradient(to top, rgba(9,12,32,.55), rgba(9,12,32,0));
   pointer-events:none;
 }
+.progress-over .mp-pct{align-self:flex-end}
 .progress-over .mp-bar{
-  flex:1;height:4px;border-radius:2px;
+  width:100%;height:4px;border-radius:2px;
   background:rgba(255,255,255,.34);overflow:hidden;
 }
 .progress-over .mp-bar > span{
@@ -6902,3 +6918,16 @@ html.chrome-parado .bottom-nav{
 .feed-page .entry-media video{
   max-height:calc(100svh - 290px - var(--sa-top,0px) - var(--sa-bottom,0px));
 }
+
+/* ============================================================
+   O RECUO DO FEED, NUM LUGAR SÓ
+
+   O texto do post e a barra de progresso precisam começar e
+   terminar na mesma coluna. Enquanto cada um tinha o seu número
+   escrito à mão, bastava alguém mexer num para desalinhar.
+
+   16px no celular (onde a mídia sangra até a borda) e 2px no
+   computador (onde o próprio `.entry` já tem esse respiro).
+   ============================================================ */
+:root{ --recuo-feed:16px; }
+@media(min-width:861px){ :root{ --recuo-feed:2px; } }
