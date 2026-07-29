@@ -82,16 +82,38 @@ export default async function Invite() {
           quem precisa de contexto rola dez centÃ­metros. Quem jÃ¡
           entendeu no tÃ­tulo escreve na hora.
           ============================================================ */}
-      <main className="landing convite-page">
-        <section className="cv-intro">
-          <h1 className="cv-titulo">{t.cvTitulo}</h1>
-          <p className="cv-sub">{t.cvSub}</p>
+      <main className="landing convite-page invite-premium">
+        <section className="cv-shell">
+          <div className="cv-copy">
+            <p className="cv-kicker">ONE INVITE</p>
+            <h1 className="cv-titulo">{t.cvTitulo}</h1>
+            <p className="cv-sub">{t.cvSub}</p>
+            <div className="cv-microtrust">
+              <span>{t.cvSigilo}</span>
+              <span>{t.cvGradual}</span>
+            </div>
+          </div>
+
+          <div className="cv-stage">
+            <FormConvite t={t} locale={locale} />
+          </div>
+
+          <aside className="cv-proof" aria-label={t.cvProofLabel}>
+            <div className="cv-proof-top">
+              <img src="/upi.svg" alt="" aria-hidden="true" />
+              <span>{t.cvProofLabel}</span>
+            </div>
+            <ol>
+              <li>{t.cvProof1}</li>
+              <li>{t.cvProof2}</li>
+              <li>{t.cvProof3}</li>
+            </ol>
+            <p>{t.cvProofFoot}</p>
+          </aside>
         </section>
 
-        <FormConvite t={t} locale={locale} />
-
         {/* Depois do bloco: o que era o meio da pÃ¡gina. Aqui embaixo
-            ele deixa de competir com a aÃ§Ã£o e vira o que sempre foi â€”
+            ele deixa de competir com a aÃ§Ã£o e vira o que sempre foi â€” 
             explicaÃ§Ã£o para quem quer. */}
         <section className="cv-depois">
           <p className="cv-p">{t.cvComoFunciona}</p>
