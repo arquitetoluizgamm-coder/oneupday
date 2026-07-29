@@ -6920,3 +6920,39 @@ html.chrome-parado .bottom-nav{
    ============================================================ */
 :root{ --recuo-feed:16px; }
 @media(min-width:861px){ :root{ --recuo-feed:2px; } }
+
+/* ============================================================
+   OS ÍCONES ALINHADOS COM O TEXTO — alinhamento ÓTICO
+
+   A caixa do primeiro botão já começava em 16, igual à barra e ao
+   parágrafo. Mas o que o olho vê não é a caixa: é o DESENHO.
+
+   Medido no app:
+
+     caixa do botão .... 16 .. 60      (44px, o alvo de toque)
+     desenho (svg) ..... 26 .. 51      (25px, centralizado)
+
+   O ícone nasce 10px para dentro, e é por isso que a linha de
+   ícones parecia deslocada mesmo com tudo "alinhado".
+
+   A correção é puxar o primeiro item 10px para a esquerda: a
+   CAIXA passa a começar em 6, e o DESENHO em 16 — na mesma coluna
+   do texto e da barra.
+
+   O alvo de toque continua com 44px. Ele só se desloca; não
+   encolhe. Era o erro que eu quase repeti do Patch 76, quando um
+   `scale` comeu 7px de área clicável sem eu perceber.
+
+   10px não é chute: é (44 − 24) ÷ 2, a folga que o próprio botão
+   cria ao centralizar um ícone de 24 numa caixa de 44.
+   ============================================================ */
+.feed-page .entry .entry-actions > :first-child{
+  margin-left:calc((44px - 24px) / -2);
+}
+/* se o último item da linha também for um botão de ícone, ele
+   ganha o espelho — quando é texto (o caso de hoje), não ganha,
+   porque texto já alinha pela própria borda */
+.feed-page .entry .entry-actions > .icon-btn:last-child,
+.feed-page .entry .entry-actions > :last-child > .icon-btn:only-child{
+  margin-right:calc((44px - 24px) / -2);
+}
