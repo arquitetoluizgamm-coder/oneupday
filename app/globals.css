@@ -8557,7 +8557,289 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
   .home-upi-memory-head{padding:13px 14px}
   .home-upi-memory-body{padding:0 14px 14px}
   .home-upi-memory-body > div{display:grid}
-  .home-upi-memory-body .cta{width:100%}
+.home-upi-memory-body .cta{width:100%}
+}
+
+/* ============================================================
+   PATCH 206 · Jornada publica mais limpa
+
+   A página estava com cara de documento empilhado: capa, autor,
+   barra, antes/depois, régua de dias e posts brigavam pela atenção.
+   Aqui a jornada vira leitura: capa mais baixa, autor compacto, mapa
+   de dias discreto e cada dia como um capítulo/card.
+   ============================================================ */
+.journey-public{
+  max-width:620px;
+  padding-bottom:92px;
+}
+.journey-public .jcover-media{
+  aspect-ratio:16/8.5;
+  margin-top:6px;
+  border-radius:24px;
+  box-shadow:none;
+  border:1px solid rgba(24,36,59,.08);
+}
+.journey-public .jcover-media.jcm-cor{
+  height:120px;
+}
+.journey-public .jcover-text{
+  padding:18px 2px 4px;
+}
+.journey-public .jcover-text .eyebrow{
+  color:var(--muted);
+  letter-spacing:.18em;
+  font-size:10.5px;
+}
+.journey-public .jcover-text h1{
+  margin:10px 0 8px;
+  font-size:30px;
+  line-height:1.06;
+}
+.journey-public .jcover-text p{
+  max-width:38rem;
+  font-size:15px;
+  line-height:1.55;
+}
+.journey-public .jcover-plano{
+  display:inline-flex;
+  width:auto;
+  margin-top:10px;
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(132,145,122,.12);
+  color:#5f6b58;
+  font-size:12px;
+  font-weight:750;
+}
+.journey-public .who{
+  margin:14px 0 12px;
+  padding:12px 0;
+  border-top:1px solid rgba(24,36,59,.07);
+  border-bottom:1px solid rgba(24,36,59,.07);
+}
+.journey-public .who .ava,
+.journey-public .who .ava img{
+  width:42px;
+  height:42px;
+}
+.journey-public .who b{
+  font-size:15px;
+}
+.journey-public .who span{
+  font-size:12.5px;
+}
+.journey-public .follow-btn{
+  min-height:34px;
+  padding:7px 12px;
+  border-radius:999px;
+  font-size:12px;
+}
+.journey-public .bar{
+  height:5px;
+  border-radius:999px;
+  background:#ede9e1;
+}
+.journey-public .stats-linha{
+  margin:8px 0 18px;
+  font-size:12px;
+}
+.journey-public .before-now{
+  margin:8px 0 16px;
+  gap:10px;
+}
+.journey-public .before-now figure{
+  border-radius:16px;
+  box-shadow:none;
+}
+.journey-public .before-now img{
+  height:auto;
+  aspect-ratio:4/5;
+}
+
+/* A tira deixa de parecer uma peça técnica encaixada na página. */
+.journey-public .days-strip{
+  position:relative;
+  top:auto;
+  z-index:1;
+  margin:8px 0 20px;
+  padding:8px 0 4px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  backdrop-filter:none;
+}
+.journey-public .days-strip-head{
+  grid-template-columns:34px minmax(0,1fr) 34px;
+  min-height:30px;
+}
+.journey-public .days-strip-arrow{
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  font-size:22px;
+  color:#8a8f98;
+}
+.journey-public .days-strip-current b{
+  font-size:12px;
+  color:#667085;
+  font-family:var(--font-sans);
+}
+.journey-public .days-strip-current small,
+.journey-public .days-strip-legend,
+.journey-public .days-strip-keyhint{
+  display:none;
+}
+.journey-public .days-strip-track{
+  height:28px;
+  margin:0 2px;
+}
+.journey-public .days-strip-mark{
+  height:18px;
+}
+.journey-public .days-strip-mark::before{
+  width:2px;
+  height:7px;
+  background:#d8d4cb;
+}
+.journey-public .days-strip-mark.is-published::before{
+  height:10px;
+  background:#8a957e;
+}
+.journey-public .days-strip-mark.is-difficult::before{
+  height:10px;
+  background:#c58d76;
+}
+.journey-public .days-strip-mark.is-missed::before{
+  height:9px;
+  border-color:#c58d76;
+}
+.journey-public .days-strip-mark.is-active::before{
+  width:3px;
+  height:20px;
+  background:var(--ink);
+  border-color:var(--ink);
+}
+.journey-public .days-strip-tooltip{
+  bottom:92%;
+  border-radius:999px;
+  font-size:10px;
+}
+
+/* Dias como capítulos limpos. */
+.journey-public .timeline{
+  display:grid;
+  gap:16px;
+  margin-top:4px;
+}
+.journey-public .timeline article{
+  display:block;
+  padding:0;
+  scroll-margin-top:92px;
+}
+.journey-public .timeline .rail{
+  display:none;
+}
+.journey-public .timeline .body{
+  padding:18px 0 20px;
+  border-top:1px solid rgba(24,36,59,.08);
+}
+.journey-public .timeline h2.day,
+.journey-public .timeline .day{
+  margin:0 0 12px;
+  font-size:18px;
+  font-weight:800;
+}
+.journey-public .timeline .dia-item{
+  display:grid;
+  gap:10px;
+}
+.journey-public .timeline .dia-item.extra{
+  margin-top:18px;
+  padding-top:18px;
+  padding-left:0;
+  border-left:0;
+  border-top:1px solid rgba(24,36,59,.08);
+}
+.journey-public .timeline .tag{
+  width:max-content;
+  margin:0;
+  padding:4px 9px;
+  font-size:10px;
+  letter-spacing:.08em;
+}
+.journey-public .timeline p{
+  margin:0;
+  color:#30384a;
+  font-size:15.5px;
+  line-height:1.62;
+}
+.journey-public .update-photo{
+  width:100%;
+  max-width:none;
+  margin:0;
+  border-radius:18px;
+  background:#f3f0ea;
+}
+.journey-public .update-photo img,
+.journey-public .update-photo video{
+  width:100%;
+  aspect-ratio:4/5;
+  height:auto;
+  max-height:none;
+  object-fit:cover;
+  border:0;
+  border-radius:18px;
+}
+.journey-public .update-foot{
+  margin-top:0;
+  padding-top:2px;
+  border-top:0;
+}
+.journey-public .journey-icon-actions{
+  gap:16px;
+}
+
+@media(max-width:640px){
+  .journey-public{
+    padding-left:16px;
+    padding-right:16px;
+  }
+  .journey-public .jcover-media{
+    margin-left:-16px;
+    margin-right:-16px;
+    margin-top:0;
+    border-left:0;
+    border-right:0;
+    border-radius:0;
+    aspect-ratio:16/9;
+  }
+  .journey-public .jcover-media.jcm-cor{
+    height:92px;
+  }
+  .journey-public .jcover-text{
+    padding-top:16px;
+  }
+  .journey-public .jcover-text h1{
+    font-size:25px;
+    max-width:16ch;
+  }
+  .journey-public .jcover-text p{
+    font-size:14px;
+  }
+  .journey-public .before-now{
+    display:none;
+  }
+  .journey-public .days-strip{
+    margin-left:0;
+    margin-right:0;
+  }
+  .journey-public .timeline{
+    gap:10px;
+  }
+  .journey-public .timeline .body{
+    padding:16px 0 18px;
+  }
 }
 
 /* ============================================================

@@ -1,6 +1,7 @@
 import { createClient } from '../../lib/supabase/server';
 import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
+import { getDemoStory } from '../../lib/demoStories';
 import { comCapa } from '../../lib/media';
 import AppTop from '../../components/AppTop';
 import ShareButton from './ShareButton';
@@ -272,35 +273,104 @@ async function ProfilePage({ handle }) {
   );
 }
 
-// ============================================================
-// A JORNADA DE DEMONSTRACAO SAIU DAQUI
-//
-// `DemoJourneyPage` desenhava 12 jornadas de 10 pessoas que nao
-// existem — Marina Alves, Paulo Neri, Helena Duarte — cada uma
-// num endereco publico proprio, do mesmo formato de uma jornada
-// de verdade: oneupday.app/marina-run-again.
-//
-// Havia uma nota de rodape dizendo que era exemplo. Mas a peca
-// inteira — foto, barra de progresso, dias, apoios — era
-// indistinguivel de uma pessoa real ate a pessoa chegar naquela
-// linha. E um link desses compartilhado no WhatsApp chega sem
-// nota nenhuma.
-//
-// Num app cuja tese e que aqui ninguem precisa fingir, gente
-// inventada com endereco publico e a contradicao mais cara que
-// existia no codigo.
-//
-// O `lib/demoStories.js` continua no repositorio: as 12 jornadas
-// servem de material de campanha e de exemplo em tela de ajuda,
-// desde que assinadas como ficcao. O que nao podem e ter porta
-// de entrada propria dentro do produto.
-// ============================================================
+function DemoJourneyPage({ story, t, locale, viewerId }) {
+  const pct = Math.min(100, story.stats.progress_pct || 0);
+  const momentLabels = { starting: t.mStarting, notgiveup: t.mNotgiveup, rebuilding: t.mRebuilding, health: t.mHealth, courage: t.mCourage, hardphase: t.mHardphase, building: t.mBuilding };
+  const momentLabel = momentLabels[story.moment];
+  const tagFor = (kind) => kind === 'setback' ? t.tagSetback : kind === 'win' ? t.tagWin : null;
+  const demoNote = locale === 'pt'
+    ? 'Exemplo criado para mostrar como as jornadas podem aparecer no começo do app.'
+    : 'Sample journey created to show how stories can feel alive at the start of the app.';
+
+  return (
+    <>
+      <AppTop />
+
+      <Track type="demo_journey_view" meta={{ slug: story.slug }} />
+      <main className="wrap journey-public">
+        {/* Mesmo padrão da jornada real. Esta é a página que o visitante
+            sem conta vê primeiro — se ela usar um layout diferente, o
+            produto parece dois produtos. */}
+        <div className="jcover-media jcm-cor" style={{ background: `linear-gradient(135deg, var(--night), ${story.cover_color})` }} />
+        <section className="jcover-text">
+          <p className="eyebrow">{t.demoLabelDemo}</p>
+          {momentLabel && <a className="moment-tag jt-moment" href={`/grupo/${story.moment}`}>{momentLabel}</a>}
+          <h1>{story.title}</h1>
+          <p>{story.goal}</p>
+        </section>
+
+        <div className="demo-note">{demoNote}</div>
+
+        <div className="who">
+          <span className="ava" style={{ background: story.owner.avatarColor || 'var(--orange)' }}>
+            {story.owner.avatarUrl
+              ? <img src={story.owner.avatarUrl} alt="" />
+              : (story.owner.name || '?')[0]}
+          </span>
+          <div className="who-name">
+            <b>{story.owner.name}</b>
+            <span>{story.owner.handle} · {fill(t.dayXofY, { d: story.stats.current_day || 0, t: story.total_days })}</span>
+          </div>
+          <a className="follow-btn" href="/login">{t.follow}</a>
+        </div>
+
+        {/* Mesma limpeza da jornada real: o progresso sai daqui porque a
+            barra logo abaixo já o mostra. Esta é a página que o visitante
+            novo vê primeiro — se o exemplo for descuidado, ele decide o
+            que esperar do resto. */}
+        {/* Mesma hierarquia da jornada real. */}
+        <ProgressBar day={story.stats.current_day || 0} total={story.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+        <p className="stats-linha">
+          {story.stats.days_posted || 0} {plural(story.stats.days_posted || 0, t.daysPostedOne, t.daysPosted)}
+          <i aria-hidden="true">·</i>
+          {story.stats.streak || 0} {plural(story.stats.streak || 0, t.dayStreakLabelOne, t.dayStreakLabel)}
+        </p>
+
+        <section className="timeline">
+          {story.updates.slice().reverse().map((u, i, arr) => (
+            <article key={u.id}>
+              <div className="rail">
+                <div className={`dot ${u.kind === 'setback' ? 'setback' : u.kind === 'win' ? 'win' : ''}`} />
+                {i < arr.length - 1 && <div className="line" />}
+              </div>
+              <div className="body">
+                {/* Mesmo título semântico da jornada real: o visitante sem
+                    conta não pode encontrar uma estrutura diferente aqui. */}
+                <h2 className="day">{fill(t.dayShort, { d: u.day_number })}</h2>
+                {tagFor(u.kind) && <span className={`tag ${u.kind}`}>{tagFor(u.kind)}</span>}
+                <p>{u.text}</p>
+              </div>
+            </article>
+          ))}
+        </section>
+
+        {!viewerId && (
+          <section className="encourage">
+            <h3>{t.joinTitle}</h3>
+            <p>{t.joinSub}</p>
+            <a className="cta grow" href="/login">{t.encourageJoin}</a>
+          </section>
+        )}
+      </main>
+
+      <footer className="foot">One <b>Up</b> Day · {t.tagline} · oneupday.app/{story.slug}</footer>
+    </>
+  );
+}
 
 export async function generateMetadata({ params }) {
   let slug; try { slug = decodeURIComponent(params.slug); } catch { slug = params.slug; }
   if (slug.startsWith('@')) {
     const p = await loadProfile(slug);
     return { title: p ? `${p.profile.name} · One Up Day` : 'One Up Day' };
+  }
+  const demo = getDemoStory(slug, getLocale());
+  if (demo) {
+    return {
+      title: `${demo.title} · One Up Day`,
+      description: demo.goal,
+      twitter: { card: 'summary_large_image' },
+    };
   }
   const data = await loadJourney(slug);
   if (!data) {
@@ -325,6 +395,13 @@ export default async function JourneyPage({ params, searchParams }) {
   if (slug.startsWith('@')) return <ProfilePage handle={slug} />;
   const locale = getLocale();
   const t = getDict(locale);
+  const demo = getDemoStory(slug, locale);
+  if (demo) {
+    // A demonstração era devolvida antes de o app saber quem está
+    // olhando — por isso ela convidava a entrar até quem já entrou.
+    const { data: { user: quemOlha } } = await createClient().auth.getUser();
+    return <DemoJourneyPage story={demo} t={t} locale={locale} viewerId={quemOlha?.id || null} />;
+  }
   const data = await loadJourney(slug);
   if (!data) {
     const prof = await loadProfile(slug);
@@ -393,7 +470,7 @@ export default async function JourneyPage({ params, searchParams }) {
       <Track type="journey_view" meta={{ slug: journey.slug }} />
       <FechaMenus />
       {fromShare && <Track type="card_clicked" meta={{ slug: journey.slug }} />}
-      <main className="wrap">
+      <main className="wrap journey-public">
         {journey.cover_url ? (
           <>
             <div className="jcover-media" style={{ backgroundImage: `url(${journey.cover_url})` }} />
