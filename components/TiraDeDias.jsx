@@ -30,7 +30,11 @@ const calmo = () => typeof matchMedia === 'function'
 function scrollToDay(day, instantaneo = false) {
   const node = document.getElementById(`journey-day-${day}`);
   if (!node) return;
-  node.scrollIntoView({ behavior: (instantaneo || calmo()) ? 'auto' : 'smooth', block: 'start' });
+  node.scrollIntoView({
+    behavior: (instantaneo || calmo()) ? 'auto' : 'smooth',
+    block: 'start',
+    inline: 'center',
+  });
 }
 
 // fade + 8px, 180ms — o registro entra dizendo de onde veio

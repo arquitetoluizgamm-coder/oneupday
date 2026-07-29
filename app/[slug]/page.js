@@ -612,6 +612,13 @@ export default async function JourneyPage({ params, searchParams }) {
         {Number(journey.total_days) >= 5 && (
           <TiraDeDias dias={dias} hoje={hoje} total={journey.total_days} labels={stripLabels} />
         )}
+        <p className="journey-swipe-hint">
+          {locale === 'pt'
+            ? 'Deslize para o lado para passar pelos dias.'
+            : locale === 'es'
+              ? 'Desliza hacia el lado para recorrer los días.'
+              : 'Swipe sideways to move through the days.'}
+        </p>
 
         <section className="timeline">
           {porDia.slice().reverse().map((g, gi, garr) => {
@@ -619,7 +626,7 @@ export default async function JourneyPage({ params, searchParams }) {
             const tom = g.itens.some((x) => x.kind === 'setback') ? 'setback'
                       : g.itens.some((x) => x.kind === 'win') ? 'win' : '';
             return (
-            <article id={`journey-day-${g.dia}`} key={'d' + g.dia}>
+            <article id={`journey-day-${g.dia}`} key={'d' + g.dia} className={`journey-day-card ${tom || 'step'}`}>
               <div className="rail">
                 <div className={`dot ${tom}`} />
                 {gi < garr.length - 1 && <div className="line" />}
