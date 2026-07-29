@@ -1,16 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '../../../lib/supabase/server';
 import { getLocale } from '../../../lib/locale';
-import { buildHistoriaFeedItems } from '../../../lib/historias';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const PAGE = 8;
 const VALID_KINDS = new Set(['step', 'win', 'setback', 'learned']);
-
-// uma historia a cada 4 posts reais
-const CADENCIA_HISTORIA = 4;
 
 export async function GET(req) {
   const supabase = createClient();
@@ -64,9 +60,10 @@ export async function GET(req) {
       .map((journey) => journey.id);
   }
 
-  // pessoas de exemplo removidas do feed: só gente real aqui
-  const demoItems = [];
-  if (!targetIds.length && !demoItems.length) return NextResponse.json({ items: [] });
+  // Só gente real aqui. O `demoItems` que existia nesta linha era um
+  // array sempre vazio, sobra de quando as pessoas de exemplo
+  // entravam no feed — a condição já era só `!targetIds.length`.
+  if (!targetIds.length) return NextResponse.json({ items: [] });
 
   let updates = [];
   if (targetIds.length) {
@@ -379,31 +376,30 @@ export async function GET(req) {
   const merged = [...realItems, ...mediaFeed].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
   const pageItems = merged.slice(offset, offset + PAGE);
 
-  // ---- historias intercaladas: uma a cada 4 posts reais ----
-  // A conta usa o offset da pagina para a cadencia nao reiniciar a
-  // cada rolagem: sem isso, duas historias caem coladas na emenda.
-  const historias = buildHistoriaFeedItems(locale);
-  const comHistorias = [];
-  if (historias.length) {
-    for (let i = 0; i < pageItems.length; i++) {
-      comHistorias.push(pageItems[i]);
-      const posicao = offset + i + 1;
-      if (posicao % CADENCIA_HISTORIA === 0) {
-        const h = historias[Math.floor(posicao / CADENCIA_HISTORIA - 1) % historias.length];
-        if (h) comHistorias.push({ ...h, id: `${h.id}-${posicao}` });
-      }
-    }
-  } else {
-    comHistorias.push(...pageItems);
-  }
-
-  // quando os posts reais acabam, o resto da pagina vira historia:
-  // e melhor um feed com historia do que um feed vazio
-  const faltam = Math.max(0, PAGE - comHistorias.length);
-  const demoStart = Math.max(0, offset - merged.length);
-  const cauda = faltam > 0
-    ? [...demoItems, ...historias].slice(demoStart, demoStart + faltam)
-    : [];
-
-  return NextResponse.json({ items: [...comHistorias, ...cauda] });
+  // ============================================================
+  // AS HISTÓRIAS SAÍRAM DO FEED
+  //
+  // Entravam uma a cada 4 posts reais, e quando os posts reais
+  // acabavam elas preenchiam o resto da página. Eram bem-feitas e
+  // eram honestas: cada card levava o selo "história" e o último
+  // dia revelava que aquilo era ficção.
+  //
+  // Mesmo assim saíram, e a razão não é de qualidade — é de tese.
+  //
+  // O ONE se apresenta dizendo que aqui ninguém precisa fingir que
+  // está tudo bem. Um feed em que parte das pessoas não existe
+  // contradiz isso antes de qualquer texto. E quem o app quer
+  // alcançar é justamente quem parou de postar por achar que todo
+  // mundo estava indo bem — a última coisa de que essa pessoa
+  // precisa é de gente perfeita e inventada ao lado dela.
+  //
+  // O feed fica menor. Fica inteiro verdadeiro.
+  //
+  // As histórias continuam escritas em `lib/historias.js`. Não
+  // apaguei o arquivo: são 32 arcos de 7 dias, bem escritos, e
+  // servem para material de campanha, exemplo em tela de ajuda ou
+  // conteúdo de rede social — desde que assinados como ficção.
+  // O que não podem é dividir a página com gente de verdade.
+  // ============================================================
+  return NextResponse.json({ items: pageItems });
 }
