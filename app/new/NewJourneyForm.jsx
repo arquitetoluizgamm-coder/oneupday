@@ -219,27 +219,11 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
     // vale mais que um exemplo, e sobrescrever o que a pessoa
     // escreveu seria apagar trabalho dela.
     // ------------------------------------------------------------
-    //
-    // E vem também do CONVITE, por um caminho mais longo.
-    //
-    // Quem escreveu "voltar a correr" no /invite semanas atrás
-    // recebeu um link pessoal. Ao clicar, a frase foi guardada no
-    // navegador antes de a pessoa ser mandada para o login — porque
-    // o `?tema=` da URL não sobrevive à ida e volta da autenticação.
-    //
-    // Aqui a gente procura nos dois lugares: primeiro a URL (quem já
-    // estava logado chega direto), depois o armário (quem passou
-    // pelo login). E limpa o armário assim que usa: a promessa era
-    // guardar até ela entrar, não para sempre.
     try {
-      const daUrl = new URLSearchParams(window.location.search).get('tema');
-      let guardado = null;
-      try { guardado = localStorage.getItem('oud-tema-guardado'); } catch {}
-      const tema = daUrl || guardado;
+      const tema = new URLSearchParams(window.location.search).get('tema');
       if (tema) {
         const limpo = tema.trim().slice(0, 80);
         if (limpo) setTitle((atual) => (atual && atual.trim() ? atual : limpo));
-        try { localStorage.removeItem('oud-tema-guardado'); } catch {}
       }
     } catch {}
 
@@ -568,6 +552,29 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       upErr = retry;
     }
     if (upErr) { setSaving(false); setErro(t.createError); return; }
+
+    // Guarda a origem da jornada para a Upi lembrar depois.
+    // Nao bloqueia a criacao: se a tabela ainda nao existir ou falhar,
+    // a jornada continua publicada normalmente.
+    try {
+      const origem = [goal, pratica, plano, hoje, first]
+        .map((v) => String(v || '').trim())
+        .filter(Boolean)
+        .join('\n');
+      if (origem) {
+        await supabase.from('upi_memories').upsert({
+          user_id: userId,
+          source_type: 'journey_start',
+          source_id: String(journey.id),
+          kind: 'origin',
+          title: title.trim(),
+          body: origem.slice(0, 1200),
+          summary: (goal.trim() || pratica.trim() || first.trim() || origem).slice(0, 160),
+          happened_on: new Date().toISOString().slice(0, 10),
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id,source_type,source_id' });
+      }
+    } catch {}
 
     track('journey_created', { slug, visibility });
     track('day1_posted', { slug });
