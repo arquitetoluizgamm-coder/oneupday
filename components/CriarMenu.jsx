@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 // ============================================================
 // MENU DE CRIAR
@@ -7,6 +8,35 @@ import { useEffect, useState } from 'react';
 // Era código solto dentro do BottomNav. Virou componente porque
 // agora abre em dois lugares — rodapé e perfil — e duas cópias do
 // mesmo menu é como um deles fica para trás na próxima mudança.
+//
+// ------------------------------------------------------------
+// POR QUE ELE VAI PARA O <body> E NÃO FICA ONDE FOI CHAMADO
+//
+// O menu do topo não abria: aparecia só a última opção, espremida
+// no alto da tela. Medido no app no ar:
+//
+//   janela ............ 500 x 569
+//   fundo do menu ..... 485 x  74   <- é o cabeçalho, não a janela
+//   folha ............. y -246 a 98 (28% visível)
+//
+// A causa é uma regra de CSS a três arquivos de distância: o
+// cabeçalho tem `backdrop-filter: blur(14px)`. Pela especificação,
+// um elemento com backdrop-filter (assim como transform ou filter)
+// vira o **bloco de contenção** dos descendentes `position:fixed`.
+// O `inset:0` do fundo deixa de significar "a janela" e passa a
+// significar "o cabeçalho", de 74px de altura. A folha, de 344px,
+// alinhada pela base dessa caixa, sobe 246px para fora da tela.
+//
+// No computador a mesma conta dá outro resultado: acima de 520px a
+// folha é centralizada em vez de alinhada embaixo, então metade
+// dela cai dentro da tela e o menu "funciona". Por isso o defeito
+// parecia ser só do celular — não era: era do alinhamento.
+//
+// A correção poderia ser tirar o `backdrop-filter` do cabeçalho.
+// Não é o certo: aí eu conserto este menu e deixo a armadilha
+// armada para o próximo `position:fixed` que alguém colocar ali
+// dentro. O menu passa a ser filho do <body>, onde `fixed` volta a
+// significar a janela — e nenhum ancestral futuro pode capturá-lo.
 // ============================================================
 
 const ICONES = {
@@ -20,6 +50,10 @@ const ICONES = {
 
 export default function CriarMenu({ t, className = 'bn-create', tamanho = 26, rotulo }) {
   const [aberto, setAberto] = useState(false);
+  // O portal precisa do document, que não existe na renderização do
+  // servidor. Só depois de montar no navegador é que ele pode existir.
+  const [montado, setMontado] = useState(false);
+  useEffect(() => setMontado(true), []);
 
   useEffect(() => {
     if (!aberto) return;
@@ -47,8 +81,9 @@ export default function CriarMenu({ t, className = 'bn-create', tamanho = 26, ro
         </svg>
       </button>
 
-      {aberto && (
-        <div className="create-backdrop" onClick={() => setAberto(false)}>
+      {aberto && montado && createPortal(
+        <div className="create-backdrop" onClick={() => setAberto(false)}
+          role="dialog" aria-modal="true" aria-label={rotulo || t.navCreate}>
           <div className="create-menu" onClick={(e) => e.stopPropagation()}>
             {opcoes.map((o) => (
               <a key={o.href + o.icone} href={o.href} className={`cm-item${o.principal ? ' cm-main' : ''}`}>
@@ -60,7 +95,8 @@ export default function CriarMenu({ t, className = 'bn-create', tamanho = 26, ro
               </a>
             ))}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );

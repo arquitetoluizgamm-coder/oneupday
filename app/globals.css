@@ -6155,3 +6155,42 @@ h1 { letter-spacing: -0.03em; }
 
 /* o conteúdo termina acima da pílula: 52 de altura + 12 de folga */
 body{padding-bottom:calc(76px + var(--sa-bottom))}
+
+/* ============================================================
+   O MENU DE CRIAR — a folha nunca sai da tela
+
+   Duas garantias que faltavam, e a segunda é a que evita o
+   próximo defeito parecido:
+
+   1. ALTURA MÁXIMA. A folha tem 344px com seis opções. Numa tela
+      curta — celular deitado, ou um aparelho pequeno — ela é mais
+      alta que a janela, e como está alinhada pela base, o que
+      sobra sai por CIMA: as primeiras opções ficam inalcançáveis.
+      Agora ela para de crescer e rola por dentro.
+
+   2. FOLGA PARA A PÍLULA DO RODAPÉ. Ela ficava colada na borda de
+      baixo, por cima da barra de navegação. Agora termina acima
+      dela: 52px da pílula + 12 de folga + 12 de respiro.
+
+   O `dvh` vem depois do `vh` de propósito: quem não entender a
+   unidade nova ignora a segunda linha e fica com a primeira, que
+   funciona. Quem entender usa a altura real da janela, sem contar
+   a barra do navegador que aparece e some ao rolar.
+   ============================================================ */
+.create-backdrop{align-items:flex-end}
+.create-menu{
+  margin-bottom:calc(88px + var(--sa-bottom));
+  max-height:calc(100vh - 150px);
+  max-height:calc(100dvh - 150px);
+  overflow-y:auto;
+  /* rolar a folha não arrasta a página atrás dela */
+  overscroll-behavior:contain;
+}
+@media(min-width:520px){
+  .create-backdrop{align-items:center}
+  .create-menu{
+    margin-bottom:0;
+    max-height:calc(100vh - 96px);
+    max-height:calc(100dvh - 96px);
+  }
+}
