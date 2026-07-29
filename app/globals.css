@@ -7622,3 +7622,68 @@ html.chrome-top .top.top-feed{transform:translateY(0)}
   html.chrome-scrolling .top.top-feed,
   html.chrome-top .top.top-feed{transform:translateY(0)}
 }
+
+/* ============================================================
+   PATCH 183 · O TOPO PASSA A DECIDIR POR DIREÇÃO
+
+   Até aqui o topo decidia por MOVIMENTO: aparecia sempre que a
+   pessoa rolava, sumia quando ela parava. Agora decide por
+   DIREÇÃO, como o Instagram:
+
+       descendo ............. some
+       subindo .............. aparece
+       perto do topo ........ sempre visível
+
+   A diferença de fundo é que a direção carrega intenção. Descer
+   é consumir; subir é procurar saída — voltar ao começo, achar o
+   sino, criar alguma coisa. O topo aparece na hora em que a
+   pessoa quer navegar, e não toda vez que ela encosta na tela.
+
+   E resolve de raiz um problema que vinha se arrastando: o halo,
+   depois os discos brancos, depois a marca sumindo sobre foto
+   clara. Tudo isso existia porque o topo ficava por cima da
+   imagem ENQUANTO se descia o feed. Agora ele não está lá nessa
+   hora.
+
+   ------------------------------------------------------------
+   A CLASSE NOVA E POR QUE NÃO REAPROVEITEI A ANTIGA
+
+   `chrome-scrolling` quer dizer "está rolando agora" e continua
+   querendo. Ela ainda tira a sombra do topo, e o rodapé ainda
+   depende dela e de `chrome-parado` exatamente como antes —
+   nada do que você pediu para o rodapé mudou.
+
+   Quem manda no topo agora é `chrome-mostra`, que quer dizer
+   outra coisa: "o topo deve aparecer". Se eu tivesse torcido o
+   sentido de `chrome-scrolling` para caber, quem lesse este
+   arquivo daqui a três meses encontraria uma classe chamada
+   "rolando" que significa "subindo". Nome errado é dívida.
+
+   ------------------------------------------------------------
+   A REDE DE SEGURANÇA CONTINUA A MESMA
+
+   O topo do feed some por PRESENÇA de classe em `.top-feed`, e
+   `.top-feed` só existe onde o <ScrollChrome/> roda. Nas outras
+   17 páginas o cabeçalho não depende de classe nenhuma — foi o
+   erro do Patch 163 e ele não volta.
+   ============================================================ */
+html.chrome-mostra .top.top-feed,
+html.chrome-top .top.top-feed{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+  transition:opacity .16s ease, visibility 0s linear 0s, transform .28s ease;
+}
+
+/* `chrome-scrolling` sozinha não mostra mais o topo: durante a
+   descida ela está presente e o topo tem que estar fora. */
+html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(-100%);
+}
+
+@media(prefers-reduced-motion:reduce){
+  html.chrome-mostra .top.top-feed,
+  html.chrome-top .top.top-feed{transform:translateY(0)}
+}
