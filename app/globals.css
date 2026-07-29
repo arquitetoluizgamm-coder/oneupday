@@ -7145,7 +7145,34 @@ button.home-welcome-primary{border:0;font:inherit;cursor:pointer;width:100%}
 }
 
 /* alvo invisível de 44px, desenho intacto */
-.ptab,.ghost-btn,.feed-tabs button,.ver-jornada,.jd-links .view-link{position:relative}
+/* ------------------------------------------------------------
+   `.ver-jornada` SAIU DESTA LISTA — ERA UM DEFEITO MEU
+
+   No Patch 178 eu pus `position:relative` aqui para o alvo de
+   toque de 44px ter onde se ancorar. Só que `.ver-jornada` JÁ era
+   `position:absolute` — é a pílula que fica no canto inferior
+   direito da foto. Minha regra veio depois e trocou o absolute
+   por relative.
+
+   O efeito foi bonito de diagnosticar e feio na tela: em
+   `relative`, quando só `bottom` está declarado, o navegador
+   calcula `top = -bottom`. A regra original diz `bottom:10px`,
+   então a seta passou a ser empurrada 10px para CIMA a partir da
+   posição de fluxo dela — saiu do canto da imagem e foi parar
+   solta no meio do card.
+
+   Medido no app antes de consertar:
+
+     .ver-jornada   position: relative · top: -10px · left: -10px
+
+   E `relative` nunca foi necessário: um elemento `absolute` já
+   serve de bloco de contenção para o próprio `::after`. O alvo de
+   44px continua funcionando sem ela.
+
+   Conferi os outros quatro da lista no app: todos eram estáticos,
+   então `relative` com deslocamento zero não mexeu em nada neles.
+   ------------------------------------------------------------ */
+.ptab,.ghost-btn,.feed-tabs button,.jd-links .view-link{position:relative}
 .ptab::after,
 .ghost-btn::after,
 .feed-tabs button::after,
