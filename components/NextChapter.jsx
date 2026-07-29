@@ -81,7 +81,7 @@ export default function NextChapter({ mode, line, env, labels, dismissible = fal
           </svg>
         </div>
       )}
-      <a className="nc-cta" href="/perfil">{L.cta}</a>
+      <a className="nc-cta" href={L.ctaHref || '/perfil'}>{L.cta}</a>
     </section>
   );
 }

@@ -128,10 +128,6 @@ async function handler(req) {
     comeback: (n) => ({ title: 'Alguém voltou', body: `${n} voltou para a jornada.` }),
     mood_low: (n) => ({ title: 'Alguém pode precisar', body: `Que tal mandar um abraço pra ${n}?` }),
     welcome: () => ({ title: 'Bem-vindo ao One Up Day', body: 'Aqui, voltar é sempre bem-vindo.' }),
-    // Sem `actor_id`: quem se inscreveu no convite ainda não tem conta.
-    // Por isso o texto não usa nome — e não pode usar, senão sairia
-    // "undefined guardou uma jornada".
-    convite: () => ({ title: 'Alguém guardou uma jornada', body: 'Uma pessoa nova se inscreveu no convite.' }),
   };
 
   const subsByUser = {};
@@ -244,6 +240,27 @@ async function handler(req) {
         (ups || []).forEach((u) => postedToday.add(ownerOf[u.journey_id]));
       }
 
+      const envByUser = {};
+      try {
+        const { data: envs } = await sb.from('envelopes')
+          .select('id, user_id, journey_id, created_at, opened_at')
+          .in('user_id', ids)
+          .is('opened_at', null)
+          .order('created_at', { ascending: false })
+          .limit(500);
+        const jEnvIds = [...new Set((envs || []).map((e) => e.journey_id).filter(Boolean))];
+        const slugByJourney = {};
+        if (jEnvIds.length) {
+          const { data: js } = await sb.from('journeys').select('id, slug').in('id', jEnvIds);
+          (js || []).forEach((j) => { slugByJourney[j.id] = j.slug; });
+        }
+        for (const e of (envs || [])) {
+          if (envByUser[e.user_id]) continue;
+          if (new Date(e.created_at).toISOString().slice(0, 10) === dayKey) continue;
+          envByUser[e.user_id] = { ...e, slug: slugByJourney[e.journey_id] || null };
+        }
+      } catch {}
+
       const LINES = [
         { title: 'Upi', body: 'Seu próximo capítulo está esperando.' },
         { title: 'Upi', body: 'E aí, como foi o dia de hoje?' },
@@ -252,6 +269,18 @@ async function handler(req) {
       ];
       for (const p of people) {
         if (postedToday.has(p.id)) { continue; }
+        const env = envByUser[p.id];
+        if (env) {
+          const n = await deliver(p.id, {
+            title: 'Upi',
+            body: 'O passo que voce deixou para hoje esta esperando.',
+            url: env.slug ? `/perfil/jornada/${env.slug}` : '/home',
+            tag: 'oud-upi-envelope',
+          });
+          if (n) sentReminder++;
+          await sb.from('profiles').update({ last_reminder_key: dayKey }).eq('id', p.id);
+          continue;
+        }
         let h = 0; const seed = dayKey + p.id;
         for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
         const line = LINES[h % LINES.length];
