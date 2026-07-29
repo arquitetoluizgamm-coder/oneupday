@@ -8864,18 +8864,29 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
   }
   .journey-public .timeline article{
     flex:0 0 calc(100vw - 32px);
-    min-height:calc(100svh - 246px);
+    height:calc(100svh - 246px);
     scroll-margin-top:88px;
     scroll-snap-align:start;
     scroll-snap-stop:always;
   }
   .journey-public .timeline .body{
-    min-height:100%;
+    height:100%;
+    overflow-y:auto;
+    overscroll-behavior:contain;
     padding:18px 16px 16px;
     border:1px solid rgba(24,36,59,.09);
     border-radius:24px;
     background:linear-gradient(180deg,#fffefd 0%,#fbfaf6 100%);
     box-shadow:0 16px 38px rgba(18,24,42,.08);
+    scrollbar-width:thin;
+    scrollbar-color:rgba(24,36,59,.22) transparent;
+  }
+  .journey-public .timeline .body::-webkit-scrollbar{
+    width:4px;
+  }
+  .journey-public .timeline .body::-webkit-scrollbar-thumb{
+    border-radius:999px;
+    background:rgba(24,36,59,.20);
   }
   .journey-public .journey-day-card.win .body{
     border-color:rgba(132,149,126,.26);
@@ -8918,6 +8929,13 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
   .journey-public .update-photo video{
     max-height:calc(100svh - 360px);
     border-radius:20px;
+  }
+  .journey-public .journey-day-card:has(.dia-item.extra) .update-photo img,
+  .journey-public .journey-day-card:has(.dia-item.extra) .update-photo video{
+    max-height:42svh;
+  }
+  .journey-public .journey-day-card:has(.dia-item.extra) p{
+    font-size:15px;
   }
   .journey-public .journey-icon-actions{
     margin-top:10px;
