@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 // ============================================================
 // A TELA DE ENTRADA DE QUEM JÁ TEM JORNADA
@@ -51,12 +51,7 @@ function diaAtual(jornada) {
 export default function HomeWelcome({ journeys = [], name = '', naoLidas = 0, labels = {} }) {
   const [visivel, setVisivel] = useState(true);
 
-  useEffect(() => {
-    try { if (sessionStorage.getItem('oud-home-welcome-seen') === '1') setVisivel(false); } catch {}
-  }, []);
-
   function sair() {
-    try { sessionStorage.setItem('oud-home-welcome-seen', '1'); } catch {}
     setVisivel(false);
     requestAnimationFrame(() => document.getElementById('feed')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   }
@@ -95,6 +90,9 @@ export default function HomeWelcome({ journeys = [], name = '', naoLidas = 0, la
       <p className="home-welcome-copy">
         {!temJornadas ? L.newSub : (jaRegistrou ? L.doneSub : L.backSub)}
       </p>
+      <p className="home-welcome-memory">
+        {!temJornadas ? L.memoryNew : (jaRegistrou ? L.memoryDone : L.memoryBack)}
+      </p>
 
       {temJornadas ? (
         <div className="home-welcome-journeys">
@@ -125,6 +123,12 @@ export default function HomeWelcome({ journeys = [], name = '', naoLidas = 0, la
           ) : (
             <a className="home-welcome-primary" href={alvo}>{rotuloPrimario}</a>
           )}
+
+          <div className="home-ritual-links" aria-label={L.ritualLabel}>
+            <a href="/arvore"><span aria-hidden="true">♧</span><b>{L.tree}</b></a>
+            <a href="/diario"><span aria-hidden="true">✎</span><b>{L.diary}</b></a>
+            <a href="/futuro"><span aria-hidden="true">✉</span><b>{L.future}</b></a>
+          </div>
         </div>
       ) : (
         /* ============================================================

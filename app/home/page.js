@@ -146,6 +146,8 @@ export default async function Home() {
           choose: t.homeWelcomeChoose, seeFeed: t.homeWelcomeSeeFeed, feedWithNews: t.homeWelcomeFeedNews,
           exemplos: t.homeWelcomeExemplos, seeOthers: t.homeWelcomeSeeOthers, diaryLater: t.homeWelcomeDiaryLater,
           day: t.homeWelcomeDay, journeySub: t.homeWelcomeJourneySub, diaryTitle: t.navDiary, diarySub: t.diarySub,
+          memoryNew: t.homeWelcomeMemoryNew, memoryBack: t.homeWelcomeMemoryBack, memoryDone: t.homeWelcomeMemoryDone,
+          ritualLabel: t.homeWelcomeRitualLabel, tree: t.navTree, diary: t.navDiary, future: t.navFuture,
         }} />
         <a className="diary-shortcut" href="/diario">
           <span className="diary-shortcut-icon" aria-hidden="true">✎</span>
