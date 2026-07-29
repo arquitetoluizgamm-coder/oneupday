@@ -6743,3 +6743,74 @@ html.chrome-scrolling .feed-tabs{
 .upi-sino{color:#6E7C61}
 .upi-sino .upi-mini{width:34px;height:34px}
 .upi-sino .um-corpo{stroke-width:2.5}
+
+/* ============================================================
+   A BARRA DE PROGRESSO DENTRO DO CARD
+
+   Medi o post inteiro num celular de 390px:
+
+     cabeçalho ...  52      barra (fora) ..  36
+     mídia .......  464     ações .........  52
+     texto .......   50     card inteiro .. 780
+
+   Tela de 840, pílula do rodapé com 58: sobrava 2px. Cabia por
+   acidente, e qualquer linha extra — um marco, um retorno, o
+   próximo passo — derrubava.
+
+   Sobre a foto, a barra não custa altura nenhuma. E some uma
+   repetição: o cabeçalho já diz a jornada e o dia, então a linha
+   "Dia 7 · faltam 23" repetia o que estava dois dedos acima.
+   Ficam a barra e a porcentagem.
+
+   O véu escuro embaixo existe porque a foto pode ser clara: sem
+   ele, uma barra sálvia sobre céu branco desaparece.
+   ============================================================ */
+.progress-over{
+  position:absolute;left:0;right:0;bottom:0;z-index:2;
+  display:flex;align-items:center;gap:10px;
+  padding:22px 14px 10px;
+  background:linear-gradient(to top, rgba(9,12,32,.55), rgba(9,12,32,0));
+  pointer-events:none;
+}
+.progress-over .mp-bar{
+  flex:1;height:4px;border-radius:2px;
+  background:rgba(255,255,255,.34);overflow:hidden;
+}
+.progress-over .mp-bar > span{
+  display:block;height:100%;border-radius:2px;
+  background:linear-gradient(90deg,var(--sage,#87957A),var(--terra,#C47152));
+  transition:width .6s cubic-bezier(.22,1,.36,1);
+}
+.progress-over .mp-pct{
+  flex:0 0 auto;color:#fff;font-size:11px;font-weight:800;
+  text-shadow:0 1px 3px rgba(9,12,32,.6);
+}
+
+/* ============================================================
+   O TETO DA MÍDIA, AGORA CALCULADO PARA O CARD CABER
+
+   Era `100svh - 230px`. Com a barra fora do fluxo, o que sobra
+   além da foto é:
+
+     cabeçalho 52 + texto 50 + ações 52 + espaçamentos ~126 = 280
+     mais a pílula do rodapé ................................. 58
+                                                              ---
+                                                              338
+
+   Arredondei para 340. É um teto ADAPTATIVO, não uma mudança de
+   proporção: numa tela grande a foto continua 4:5 inteira (a 390px
+   ela tem 464 e o teto é 500 — não encosta). Só telas curtas
+   apertam, e apertam só o necessário.
+
+   Foi por isso que eu não recomendei trocar para 1:1: aquilo
+   cortaria 20% de TODA foto já postada, inclusive nas telas onde
+   sobrava espaço.
+   ============================================================ */
+.feed-page .entry-media img,
+.feed-page .entry-media video{
+  max-height:calc(100svh - 340px);
+}
+@media(max-width:640px){
+  .feed-page .entry-media img,
+  .feed-page .entry-media video{max-height:calc(100svh - 340px)}
+}

@@ -203,16 +203,16 @@ function LegendaSobreposta({ text, labels }) {
 // ---- Mídia + legenda do item solto do feed ----
 // Componente próprio, e não um trecho inline, porque hooks não podem
 // morar dentro de um .map(): a ordem mudaria a cada item da lista.
-function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat }) {
+function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat, barra }) {
   const [proporcao, setProporcao] = useState(null);
   const soVideo = !!(item.video_url && !item.photo_url);
   const legendaEmCima = soVideo && ehVertical(proporcao);
 
   return (
     <>
-      {item.photo_url && <Media photo={item.photo_url} alt={textoAlternativo(item.alt, { dia: item.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackFloat}<VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
+      {item.photo_url && <Media photo={item.photo_url} alt={textoAlternativo(item.alt, { dia: item.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackFloat}<VerJornada slug={item.journey.slug} label={labels.seeFullJourney} />{barra}</Media>}
       {item.video_url && !item.photo_url && (
-        <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackFloat}</Media>
+        <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackFloat}{barra}</Media>
       )}
       {!hasMedia && !cleanText && item.track && <TrackTag track={item.track} />}
       {cleanText && !legendaEmCima && (
@@ -692,7 +692,30 @@ export default function FeedClient({ labels }) {
               const day = item.journey.current_day || 0;
               const pct = total ? Math.min(100, Math.max(3, item.journey.progress_pct || Math.round((day / total) * 100))) : 0;
               const left = Math.max(0, total - day);
-              // a barra vive FORA do card, entre ele e os ícones
+              // ============================================================
+              // A BARRA DE PROGRESSO ENTROU NO CARD
+              //
+              // Ela vivia FORA, entre o card e os ícones, ocupando 36px de
+              // altura. Num celular de 840px o post inteiro dava 780 e a
+              // pílula do rodapé come 58: cabia por 2px. Qualquer linha a
+              // mais — um marco, um retorno, o próximo passo — derrubava.
+              //
+              // Sobre a foto ela não custa altura nenhuma. E some uma
+              // repetição: o cabeçalho do post já diz a jornada e o dia,
+              // então a linha "Dia 7 · faltam 23" dizia de novo o que já
+              // estava dito dois dedos acima. Fica a barra e a
+              // porcentagem, que são a informação que ainda não existia.
+              //
+              // Sem foto não há onde sobrepor — e nem precisa: esses
+              // cartões são curtos. Lá a barra continua embaixo, com a
+              // linha inteira.
+              // ============================================================
+              const barraSobreFoto = total > 0 ? (
+                <div className="progress-over" aria-hidden="true">
+                  <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
+                  <span className="mp-pct">{pct}%</span>
+                </div>
+              ) : null;
               const progressEl = total > 0 ? (
                 <div className="progress-under" aria-hidden="true">
                   <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
@@ -721,11 +744,8 @@ export default function FeedClient({ labels }) {
                 );
               }
               return (
-                <>
-                  <MidiaComLegenda item={item} labels={labels} cleanText={cleanText}
-                    hasMedia={hasMedia} trackFloat={trackFloat} />
-                  {progressEl}
-                </>
+                <MidiaComLegenda item={item} labels={labels} cleanText={cleanText}
+                  hasMedia={hasMedia} trackFloat={trackFloat} barra={barraSobreFoto} />
               );
             })()}
 
