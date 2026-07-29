@@ -83,15 +83,35 @@ export async function GET(req) {
       .order('id', { ascending: false })
       .limit(400);
 
-    const all = rows || [];
-    // uma linha por jornada (a mais recente), mantendo a ordem de recência
-    const seen = new Set();
-    updates = [];
-    for (const u of all) {
-      if (seen.has(u.journey_id)) continue;
-      seen.add(u.journey_id);
-      updates.push(u);
-    }
+    // ============================================================
+    // CADA DIA É UM POST
+    //
+    // Antes vinha uma linha por jornada — só o último dia — e os
+    // demais ficavam dentro do card, atrás de um folheador lateral.
+    // Isso mantinha o feed enxuto, e com pouca gente enxuto vira
+    // vazio: duas pessoas ativas produziam dois ou três posts.
+    //
+    // Os dias já vinham do banco de qualquer jeito (as 400 linhas
+    // logo acima existem justamente para o agrupamento não perder
+    // jornada nenhuma). A peneira jogava fora quase tudo o que já
+    // tinha sido buscado. Soltar não custa consulta nenhuma.
+    //
+    // Agora é o modelo de sempre, o que todo mundo entende: um
+    // registro é um post, e a ordem é a do relógio.
+    //
+    // ------------------------------------------------------------
+    // O RISCO, DITO AQUI PARA NÃO SE PERDER
+    //
+    // Sem teto, quem registra todo dia ocupa o feed na proporção do
+    // que escreve. Enquanto forem duas pessoas, o feed vai parecer
+    // muito com elas duas. Foi uma escolha consciente do Fernando —
+    // densidade agora vale mais que variedade.
+    //
+    // Se um dia isso incomodar, o conserto é aqui e cabe em poucas
+    // linhas: agrupar por jornada de novo, ou intercalar de modo que
+    // dois posts seguidos nunca sejam da mesma jornada.
+    // ============================================================
+    updates = rows || [];
   }
 
   const journeyIds = [...new Set(updates.map((item) => item.journey_id))];
@@ -275,8 +295,17 @@ export async function GET(req) {
   // estar velho se a pessoa trocou de handle depois.
   // ============================================================
   const idsParaMencao = [...new Set([...uids, ...dayIds])];
-  const [encAllR, tracksAllR, mencoesR] = await Promise.all([
-    dayIds.length ? guard(supabase.from('encouragements').select('update_id').eq('user_id', user.id).in('update_id', dayIds)) : { data: [] },
+  //
+  // A consulta de apoios sobre `dayIds` saiu daqui.
+  //
+  // Ela existia para saber se eu ja tinha apoiado os dias que
+  // apareciam DENTRO do folheador. Sem folheador, todo dia que vai
+  // para a tela e um item de primeiro nivel — e `uids`, la em cima,
+  // ja pergunta isso para todos eles. Era a mesma pergunta, feita
+  // duas vezes, sobre um conjunto maior.
+  //
+  // Uma consulta a menos por carregamento de feed.
+  const [tracksAllR, mencoesR] = await Promise.all([
     dayIds.length ? guard(supabase.from('updates').select('id, track_title, track_artist, track_audio_url').in('id', dayIds).not('track_audio_url', 'is', null)) : { data: [] },
     idsParaMencao.length ? guard(supabase.from('mentions').select('update_id, profile:profiles!mentions_profile_id_fkey(id, name, handle, avatar_color)').in('update_id', idsParaMencao)) : { data: [] },
   ]);
@@ -289,7 +318,6 @@ export async function GET(req) {
     const chave = String(p.handle).trim().toLowerCase().replace(/^@+/, '');
     (mencoesPorUpdate[m.update_id] ||= {})[chave] = p;
   });
-  const myEncAll = new Set((encAllR.data || []).map((e) => e.update_id));
   (tracksAllR.data || []).forEach((item) => { trackByUpdate[item.id] = { title: item.track_title, artist: item.track_artist, audio_url: item.track_audio_url }; });
 
   // capítulos: quais passos eu acompanho e qual passo cada dia fechou
@@ -309,16 +337,29 @@ export async function GET(req) {
   const realItems = updates.map((item) => {
     const journey = journeyMap[item.journey_id];
     if (!journey) return null;
-    const daysArr = (fullDaysByJourney[item.journey_id] || []).slice(-60).map((u) => ({
-      id: u.id, day_number: u.day_number, kind: u.kind, text: u.text, alt: u.alt || '', photo_url: u.photo_url, video_url: u.video_url, created_at: u.created_at,
-      encouraged: myEncAll.has(u.id), track: trackByUpdate[u.id] || null, comeback: comebackByUpdate[u.id] || null,
-      mencoes: mencoesPorUpdate[u.id] || null,
-      nextStep: u.closed_by ? null : (u.next_step || null), nextWhen: u.next_when || null,
-      stepFollowing: meusPassos.has(u.id), closes: passoFechadoPor[u.id] || null,
-    }));
     return {
       ...item,
-      days: daysArr.length > 1 ? daysArr : null,
+      // ============================================================
+      // O FOLHEADOR SAIU JUNTO, E NÃO É DETALHE
+      //
+      // Se cada dia virou post e o card continuasse com o folheador
+      // lateral, o MESMO dia apareceria duas vezes na tela: como
+      // post próprio e dentro do folheador do vizinho. A pessoa
+      // rolaria, veria o dia 4, arrastaria o card do dia 5 e
+      // encontraria o dia 4 de novo.
+      //
+      // Não é preferência, é correção: um ou outro, nunca os dois.
+      //
+      // O `daysArr` que montava essa lista foi removido junto: sem
+      // ninguém para consumi-lo, ele virava trabalho por página
+      // para nada — e variável atribuída e nunca lida é armadilha
+      // para quem vier depois.
+      //
+      // As consultas em lote NÃO dependiam dele: menções, apoios e
+      // faixas usam `dayIds`, montado bem antes a partir de
+      // `fullDaysByJourney`. Esse caminho continua intacto.
+      // ============================================================
+      days: null,
       challenge: challengeByOwner[journey.owner_id] || null,
       challengeable: canChallenge.has(journey.owner_id),
       journey: { slug: journey.slug, title: journey.title, category: journey.category, total_days: journey.total_days, current_day: (statsByJourney[journey.id] || {}).current_day || 0, progress_pct: (statsByJourney[journey.id] || {}).progress_pct || 0 },
