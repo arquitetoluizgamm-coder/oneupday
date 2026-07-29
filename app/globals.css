@@ -6476,3 +6476,45 @@ body{padding-bottom:calc(76px + var(--sa-bottom))}
    escuro), então ali o link é a própria tinta com um véu */
 .entry-textcard .dpc-more{color:inherit;opacity:.7;margin-left:0}
 .entry-textcard .dpc-more:hover{color:inherit;opacity:1}
+
+/* ============================================================
+   O FEED ENCOSTADO NA BORDA — fechando a faixa que faltava
+
+   As regras que fazem o post sangrar até a borda vivem em
+   `@media(max-width:640px)`. As de computador, em
+   `@media(min-width:861px)`.
+
+   Entre 641 e 860 não existe nenhuma das duas. Nessa faixa o feed
+   volta a ser uma coluna com 20px de cada lado — o post descola da
+   borda e vira um cartão no meio da tela.
+
+   É a MESMA faixa descoberta que fazia o rodapé virar barra de
+   ponta a ponta (Patch 152). O arquivo tem dois mundos, celular e
+   computador, e nada escrito para o que está no meio: tablet,
+   celular deitado, dobrável aberto, ou uma janela de navegador
+   arrastada para um tamanho intermediário.
+
+   Aqui a faixa é coberta: tudo abaixo do layout de computador se
+   comporta como celular. `max-width:860px` encosta exatamente onde
+   `min-width:861px` começa, sem sobra e sem sobreposição.
+   ============================================================ */
+@media(max-width:860px){
+  .wrap.feed-page{padding-left:0;padding-right:0}
+  .feed-page .entry{
+    width:auto;margin:0;padding:16px 0;
+    border-left:0;border-right:0;border-radius:0;
+  }
+  /* o texto não encosta: só a mídia é que vai até a borda */
+  .feed-page .entry .entry-head,
+  .feed-page .entry > .entry-text,
+  .feed-page .entry > .entry-kindline,
+  .feed-page .entry .entry-actions,
+  .feed-page .entry .etx,
+  .feed-tabs,
+  .feed-invite{padding-left:16px;padding-right:16px}
+
+  .feed-page .entry-media,
+  .feed-page .entry-textcard{
+    width:100%;margin-left:0;margin-right:0;margin-top:10px;border-radius:0;
+  }
+}
