@@ -98,7 +98,12 @@ export default async function AppTop({
   }
 
   return (
-    <header className="top top-3">
+    // `top-feed` só no feed. É ele que liga o comportamento de
+    // aparecer ao rolar e sumir ao parar — e esse comportamento
+    // depende do <ScrollChrome/>, que só existe em /home. Nas outras
+    // páginas o cabeçalho carrega o botão VOLTAR e não pode sumir
+    // nunca.
+    <header className={`top top-3${sino ? ' top-feed' : ''}`}>
       <div className="top-left">
         {sino
           ? <HeaderHeart likes={sinais.likes} follows={sinais.follows}
