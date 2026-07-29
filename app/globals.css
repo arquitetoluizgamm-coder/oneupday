@@ -6456,7 +6456,9 @@ body{padding-bottom:calc(76px + var(--sa-bottom))}
 .entry-expand,
 .dpc-more{
   display:inline;
-  margin:0 0 0 .3em;
+  /* zero de margem: o "mais" encosta nas reticências, sem espaço.
+     Fica "...mais", como uma palavra que continua a frase. */
+  margin:0;
   padding:0;border:0;background:none;
   font:inherit;font-weight:800;
   letter-spacing:normal;text-transform:none;
