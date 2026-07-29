@@ -6956,3 +6956,28 @@ html.chrome-parado .bottom-nav{
 .feed-page .entry .entry-actions > :last-child > .icon-btn:only-child{
   margin-right:calc((44px - 24px) / -2);
 }
+
+/* ============================================================
+   AS OPÇÕES DE RECONHECIMENTO, COM ÍCONE
+
+   Eram sete linhas de texto centralizado, todas iguais — a escolha
+   virava leitura, não reconhecimento. O ícone dá forma a cada uma,
+   e o olho passa a achar antes de ler.
+
+   O texto foi para a esquerda porque agora existe um ícone antes
+   dele: centralizado, cada linha começaria num ponto diferente e a
+   lista viraria um zigue-zague.
+
+   As duas últimas — "Estou acompanhando" e "Isso me inspirou" —
+   são terracota. Elas falam de quem MANDA, não de quem recebe, e
+   a cor separa as duas naturezas sem precisar de um título.
+   ============================================================ */
+.pc-opt{
+  display:flex;align-items:center;gap:12px;
+  text-align:left;
+  padding-left:16px;padding-right:16px;
+}
+.pc-opt > svg{flex:0 0 auto;color:var(--sage,#87957A)}
+.pc-opt > span{flex:1;min-width:0}
+.pc-opt.de-quem-manda > svg{color:var(--terra,#C47152)}
+.pc-opt.on > svg{color:var(--terra,#C47152)}
