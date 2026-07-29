@@ -30,6 +30,41 @@ function OneLevel({ level, labels }) {
   return <span className="one-level" style={{ color: level.color }} aria-label={`ONE ${labels.oneLevels[level.rank]}`}>ONE {labels.oneLevels[level.rank]}</span>;
 }
 
+function fillLabel(text, data = {}) {
+  return String(text || '').replace(/\{(\w+)\}/g, (_, key) => data[key] ?? '');
+}
+
+function nomeCurto(item) {
+  return (item?.owner?.name || '').trim().split(/\s+/)[0] || 'ONE';
+}
+
+function ultimoDia(item) {
+  if (item?.days?.length) return item.days[item.days.length - 1];
+  return item || {};
+}
+
+function storyLineText(item, labels) {
+  if (!item || item.historia) return '';
+  const d = ultimoDia(item);
+  const name = nomeCurto(item);
+  const day = d.day_number || item.day_number || item.journey?.current_day || 0;
+  const comeback = item.comeback || d.comeback;
+
+  if (d.nextStep || item.nextStep) return fillLabel(labels.feedStoryNext, { name });
+  if (comeback) return fillLabel(labels.feedStoryBack, { name, d: comeback });
+  if (d.kind === 'setback' || item.kind === 'setback') return fillLabel(labels.feedStoryHard, { name });
+  if ([7, 15, 30, 60, 100].includes(day)) return fillLabel(labels.feedStoryMilestone, { name, d: day });
+  if (day <= 1) return fillLabel(labels.feedStoryStart, { name });
+  if (d.photo_url || d.video_url || item.photo_url || item.video_url) return fillLabel(labels.feedStoryPhoto, { name });
+  return fillLabel(labels.feedStoryDefault, { name });
+}
+
+function StoryLine({ item, labels }) {
+  const text = storyLineText(item, labels);
+  if (!text) return null;
+  return <p className="entry-storyline">{text}</p>;
+}
+
 function TrackTag({ track, float, hasBar }) {
   const [playing, setPlaying] = useState(false);
   const audio = useRef(null);
@@ -717,6 +752,7 @@ export default function FeedClient({ labels }) {
               {item.own && !item.demo && !item.days && <EditUpdate update={{ id: item.id, text: item.text, alt: item.alt, photo_url: item.photo_url, day: item.day_number }} labels={labels.editUpdate}
                 onChanged={(patch) => setItems((prev) => patch === null ? prev.filter((x) => x.id !== item.id) : prev.map((x) => x.id === item.id ? { ...x, ...patch } : x))} />}
             </div>
+            <StoryLine item={item} labels={labels} />
             {item.days && !item.demo ? (
               <DayPager item={item} labels={labels} dayLabel={dayLabel} dark={idx % 3 === 2} />
             ) : (
@@ -756,11 +792,12 @@ export default function FeedClient({ labels }) {
               // cartões são curtos. Lá a barra continua embaixo, com a
               // linha inteira.
               // ============================================================
-              // `barraSobreFoto` foi removida daqui. Ela montava um
-              // `.progress-over`, que o CSS esconde desde o Patch 170 —
-              // era trabalho por card para desenhar nada, e uma
-              // armadilha para quem viesse depois tentar entender por
-              // que a barra não aparecia.
+              const barraSobreFoto = total > 0 ? (
+                <div className="progress-over" aria-hidden="true">
+                  <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
+                  <span className="mp-pct">{pct}%</span>
+                </div>
+              ) : null;
               const progressEl = total > 0 ? (
                 <div className="progress-under" aria-hidden="true">
                   <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
@@ -788,40 +825,9 @@ export default function FeedClient({ labels }) {
                   </>
                 );
               }
-              // ============================================================
-              // A BARRA DOS POSTS COM FOTO — CONSERTO DO PATCH 185
-              //
-              // Ela sumiu, e a culpa é minha.
-              //
-              // Antes do 185, todo post com foto tinha `days` e ia pelo
-              // `DayPager`, que desenha a barra ABAIXO da mídia
-              // (`progress-under`). Ao tirar o folheador eu mandei esses
-              // posts para este caminho aqui — que passava
-              // `barraSobreFoto`, a versão que fica POR CIMA da imagem.
-              //
-              // E essa versão está desligada no CSS desde o Patch 170:
-              //
-              //     .progress-over{display:none}
-              //
-              // Ou seja: o componente continuava sendo montado, o React
-              // não reclamava de nada, e a barra simplesmente não
-              // aparecia. Defeito silencioso — o pior tipo.
-              //
-              // Por que ela foi desligada lá atrás, e continua valendo:
-              // fora da foto a barra mora no mesmo contêiner do texto e
-              // alinha com ele por CONSTRUÇÃO. Sobre a imagem, alinhar
-              // exigiria padding diferente de cada lado — número que
-              // acerta num card e quebra no próximo.
-              //
-              // Então o conserto não é reativar o `.progress-over`. É
-              // usar a mesma barra que o folheador usava.
-              // ============================================================
               return (
-                <>
-                  <MidiaComLegenda item={item} labels={labels} cleanText={cleanText}
-                    hasMedia={hasMedia} trackFloat={trackFloat} barra={null} />
-                  {progressEl}
-                </>
+                <MidiaComLegenda item={item} labels={labels} cleanText={cleanText}
+                  hasMedia={hasMedia} trackFloat={trackFloat} barra={barraSobreFoto} />
               );
             })()}
 

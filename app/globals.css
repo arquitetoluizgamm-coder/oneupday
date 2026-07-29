@@ -8559,3 +8559,32 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
   .home-upi-memory-body > div{display:grid}
   .home-upi-memory-body .cta{width:100%}
 }
+
+/* ============================================================
+   Feed como historia, nao como lista fria
+   ============================================================ */
+.entry-storyline{
+  margin:4px 0 12px 52px;
+  color:#667085;
+  font-size:13px;
+  line-height:1.35;
+  font-weight:760;
+  letter-spacing:-.004em;
+}
+.entry-storyline::before{
+  content:"";
+  display:inline-block;
+  width:6px;
+  height:6px;
+  margin:0 7px 1px 0;
+  border-radius:999px;
+  background:var(--sage);
+  opacity:.82;
+}
+@media(max-width:640px){
+  .feed-page .entry > .entry-storyline{
+    margin:2px 0 12px;
+    padding-left:16px;
+    padding-right:16px;
+  }
+}
