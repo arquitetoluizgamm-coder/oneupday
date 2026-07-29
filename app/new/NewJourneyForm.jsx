@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 import { track } from '../../lib/track';
 import ImageCropper from '../../components/ImageCropper';
+import { saveUpiMemory } from '../../lib/upiMemoryClient';
 
 const MAX_VIDEO = 60 * 1024 * 1024;
 
@@ -562,7 +563,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
         .filter(Boolean)
         .join('\n');
       if (origem) {
-        await supabase.from('upi_memories').upsert({
+        await saveUpiMemory(supabase, {
           user_id: userId,
           source_type: 'journey_start',
           source_id: String(journey.id),
@@ -570,9 +571,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
           title: title.trim(),
           body: origem.slice(0, 1200),
           summary: (goal.trim() || pratica.trim() || first.trim() || origem).slice(0, 160),
-          happened_on: new Date().toISOString().slice(0, 10),
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id,source_type,source_id' });
+        });
       }
     } catch {}
 

@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { createClient } from '../../lib/supabase/client';
+import { saveUpiMemory } from '../../lib/upiMemoryClient';
 
 const KEY = 'oud_future_capsules_v1';
 const addDays = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
@@ -54,11 +55,23 @@ export default function FuturoClient({ labels, userId }) {
 
   useEffect(() => { try { setItems(JSON.parse(localStorage.getItem(KEY) || '[]')); } catch {} }, []);
   function persist(list) { setItems(list); try { localStorage.setItem(KEY, JSON.stringify(list)); } catch {} }
-  function create() {
+  async function create() {
     const text = kind === 'guided' ? answers.filter(Boolean).map((v, i) => `${labels.futureQuestions[i]}\n${v}`).join('\n\n') : body.trim();
     if (!text || !date) return;
     const created = { id: id(), kind, title: title.trim() || labels.futureDefaultTitle, body: text, unlock: date, created: new Date().toISOString(), opened: false, response: '' };
     persist([created, ...items]);
+    try {
+      const sb = createClient();
+      await saveUpiMemory(sb, {
+        user_id: userId,
+        source_type: 'future_capsule',
+        source_id: String(created.id),
+        kind: 'future',
+        title: created.title,
+        body: text,
+        summary: created.title,
+      });
+    } catch {}
     openCard(created);
     setTitle(''); setBody(''); setAnswers(['', '', '']); setSaved(true);
   }

@@ -9,6 +9,7 @@ import ImageCropper from '../../components/ImageCropper';
 import { track as trackEvent } from '../../lib/track';
 import CampoMencao from '../../components/CampoMencao';
 import { salvarMencoes } from '../../lib/mencoes';
+import { saveUpiMemory } from '../../lib/upiMemoryClient';
 
 // Frases que podem indicar sofrimento intenso — mostra apoio, nunca bloqueia.
 const RISK = [
@@ -291,7 +292,18 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       // rodado), `salvarMencoes` engole o erro: publicar o dia é a
       // ação central do app e não pode morrer por causa de um extra.
       const { data: { user: eu } } = await supabase.auth.getUser();
-      if (eu) await salvarMencoes(supabase, { texto: row.text, autorId: eu.id, alvo: { update_id: novo.id } });
+      if (eu) {
+        await salvarMencoes(supabase, { texto: row.text, autorId: eu.id, alvo: { update_id: novo.id } });
+        await saveUpiMemory(supabase, {
+          user_id: eu.id,
+          source_type: 'daily_update',
+          source_id: String(novo.id),
+          kind: row.kind || 'step',
+          title: `day_${dayNumber}`,
+          body: row.text,
+          summary: row.text,
+        });
+      }
     }
     trackEvent('update_posted', { journeyId, kind });
     setPostedKind(kind);
@@ -311,7 +323,18 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
         const sb = createClient();
         const { data: { user } } = await sb.auth.getUser();
         // carta pra si (o Próximo Capítulo continua funcionando)
-        if (user) await sb.from('envelopes').insert({ user_id: user.id, journey_id: journeyId, text: passo });
+        if (user) {
+          await sb.from('envelopes').insert({ user_id: user.id, journey_id: journeyId, text: passo });
+          await saveUpiMemory(sb, {
+            user_id: user.id,
+            source_type: 'next_step',
+            source_id: lastId ? String(lastId) : `${journeyId}:${Date.now()}`,
+            kind: 'next_step',
+            title: 'next_step',
+            body: passo,
+            summary: passo,
+          });
+        }
         // e o mesmo passo fica visível no post, abrindo o capítulo
         if (lastId) await sb.from('updates').update({ next_step: passo, next_when: quando || null }).eq('id', lastId);
       } catch {}
