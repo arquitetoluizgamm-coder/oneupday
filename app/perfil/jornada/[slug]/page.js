@@ -106,16 +106,21 @@ export default async function JornadaDoDono({ params }) {
             editLabels={{ altLabel: t.altLabel, altPh: t.altPh, altOk: t.altOk, altVazio: t.altVazio, btn: t.euBtn, title: t.euTitle, text: t.euText, photo: t.euPhoto, photoAdd: t.ejCoverAdd, photoChange: t.ejCoverChange, photoRemove: t.ejCoverRemove, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errSave: t.epErrSave, errEmpty: t.euErrEmpty, deletePost: t.euDeletePost, deleteConfirm: t.postDeleteConfirm, cropOriginal: t.cropOriginal, cropSquare: t.cropSquare, cropPortrait: t.cropPortrait, cropLandscape: t.cropLandscape, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropHintOriginal: t.cropHintOriginal, cropZoom: t.cropZoom }} />
         </section>
 
-        <section className="jd-bloco">
-          <p className="jd-titulo">{t.ejTitle}</p>
-          <EditarJornada journey={j} currentDay={day} t={t} />
-        </section>
+        <details className="jd-bloco jd-config">
+          <summary>
+            <span>{t.ejTitle}</span>
+            <small>{t.jdConfigHint}</small>
+          </summary>
+          <div className="jd-config-body">
+            <EditarJornada journey={j} currentDay={day} t={t} />
 
-        {/* excluir por último e sozinho: é a única coisa aqui sem volta */}
-        <section className="jd-perigo">
-          <DeleteJourney journeyId={j.id} title={j.title}
-            labels={{ btn: t.jDeleteBtn, confirm: t.jDeleteConfirm, error: t.jDeleteErr }} />
-        </section>
+            {/* excluir fica dentro de configuração: perigoso, mas fora do fluxo principal */}
+            <section className="jd-perigo">
+              <DeleteJourney journeyId={j.id} title={j.title}
+                labels={{ btn: t.jDeleteBtn, confirm: t.jDeleteConfirm, error: t.jDeleteErr }} />
+            </section>
+          </div>
+        </details>
 
       </main>
       <BottomNav active="profile" t={t} />

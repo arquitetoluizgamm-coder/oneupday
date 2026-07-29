@@ -8297,3 +8297,68 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
   .day-ritual-head b{font-size:15px}
   .day-ritual-head p{font-size:12.5px}
 }
+
+/* ============================================================
+   PATCH 196 · Configuração da jornada recolhida
+   ============================================================ */
+.jd-config{
+  padding-top:0;
+  border-top:1px solid rgba(24,36,59,.08);
+}
+.jd-config > summary{
+  list-style:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  min-height:54px;
+  cursor:pointer;
+  color:var(--ink);
+}
+.jd-config > summary::-webkit-details-marker{display:none}
+.jd-config > summary span{
+  font-family:var(--display);
+  font-size:13px;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.jd-config > summary small{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:650;
+  text-align:right;
+}
+.jd-config > summary::after{
+  content:"+";
+  flex:none;
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--line);
+  border-radius:999px;
+  color:var(--terracotta);
+  font-size:20px;
+  line-height:1;
+}
+.jd-config[open] > summary::after{content:"−"}
+.jd-config-body{
+  padding:8px 0 0;
+}
+.jd-config .jd-perigo{
+  margin:24px 0 0;
+  padding-top:18px;
+}
+@media(max-width:640px){
+  .jd-config > summary{
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+  .jd-config > summary small{
+    flex-basis:calc(100% - 44px);
+    text-align:left;
+    order:2;
+  }
+  .jd-config > summary::after{margin-left:auto}
+}
