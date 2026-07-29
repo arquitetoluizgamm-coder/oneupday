@@ -6437,3 +6437,42 @@ body{padding-bottom:calc(76px + var(--sa-bottom))}
   color:inherit;opacity:.72;cursor:pointer;
 }
 .dpc-more:hover{opacity:1;text-decoration:underline;text-underline-offset:3px}
+
+/* ============================================================
+   "mais" — texto, não botão
+
+   O rótulo virou uma palavra só e a aparência acompanhou: cor de
+   link, negrito, no corpo do texto. Nada de moldura, fundo ou
+   sombra — ele é a continuação da frase, não um controle ao lado
+   dela.
+
+   Continua sendo um <button> no HTML, e isso é de propósito: ele
+   abre e fecha o texto ali mesmo, não navega para lugar nenhum.
+   Um <a> sem destino seria mentira para quem usa leitor de tela,
+   que anuncia "link" e depois não sai do lugar. O elemento diz o
+   que a coisa FAZ; o CSS diz como ela parece.
+   ============================================================ */
+.etx-more,
+.entry-expand,
+.dpc-more{
+  display:inline;
+  margin:0 0 0 .3em;
+  padding:0;border:0;background:none;
+  font:inherit;font-weight:800;
+  letter-spacing:normal;text-transform:none;
+  color:var(--link,#27304a);
+  opacity:1;
+  cursor:pointer;
+  vertical-align:baseline;
+}
+.etx-more:hover,.etx-more:focus-visible,
+.entry-expand:hover,.entry-expand:focus-visible,
+.dpc-more:hover,.dpc-more:focus-visible{
+  color:var(--ink);
+  text-decoration:underline;text-underline-offset:3px;
+  outline:none;
+}
+/* no card de texto grande ele herda a cor do card (que pode ser
+   escuro), então ali o link é a própria tinta com um véu */
+.entry-textcard .dpc-more{color:inherit;opacity:.7;margin-left:0}
+.entry-textcard .dpc-more:hover{color:inherit;opacity:1}
