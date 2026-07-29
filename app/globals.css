@@ -7015,3 +7015,270 @@ button.home-welcome-primary{border:0;font:inherit;cursor:pointer;width:100%}
 }
 /* o diário agora vem depois do botão: é alternativa, não sugestão */
 .hw-depois{margin-top:12px}
+
+/* ============================================================
+   PATCH 178 · VISTORIA DE 29/07 — ALVO, CONTRASTE, NOME, ALTURA
+
+   Continuação direta do bloco do Patch 71 lá em cima. Mesma
+   disciplina: cada regra carrega o número medido que a
+   justifica, e o desenho só muda quando não havia como cumprir
+   a norma sem mudar.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1 · O NOME DA PESSOA PARAVA DE CABER COM ESPAÇO SOBRANDO
+
+   Medido no perfil, tela de 390px:
+
+     o nome pedia ......... 223px
+     o h1 recebia ......... 196px
+     havia disponível ..... 358px
+
+   `.pc-info` é uma grade de duas colunas: nome à esquerda, o +
+   e a engrenagem à direita. A coluna do nome parou em 235px e o
+   `text-overflow:ellipsis` fez o resto — "Fernando Gama…".
+
+   Cortar o nome de alguém para poupar 27 pixels é o pior
+   negócio da tela. Duas linhas custam 22px e não custam o nome.
+
+   A `.pc-name-line` continua flex (o ícone da árvore fica ao
+   lado), mas o h1 dentro dela passa a quebrar.
+   ------------------------------------------------------------ */
+.pc-name-line{align-items:flex-start}
+.pc-meta h1{
+  white-space:normal;          /* era nowrap */
+  overflow:visible;            /* era hidden */
+  text-overflow:clip;          /* era ellipsis */
+  overflow-wrap:anywhere;      /* nome de uma palavra só não estoura */
+  hyphens:none;
+}
+/* o ícone da árvore continua alinhado à PRIMEIRA linha do nome,
+   não ao centro do bloco de duas linhas */
+.pc-name-line .pc-tree-link{margin-top:2px}
+
+/* ------------------------------------------------------------
+   2 · CONTRASTE — cinco textos miúdos abaixo de 4,5:1
+
+   Todos entre 10 e 12,5px, que é onde contraste baixo dói mais.
+   Nenhuma cor de marca muda: mudam ESTES textos.
+
+     .upi-name ......... 2,83 → usa terracota-txt (4,71)
+     .one-level ........ 3,45 e 3,92 → escurecem
+     .ch-stag .......... 3,70 → terracota-txt
+     .progress-goal .... 4,27 → faltavam 0,23
+
+   `--terracota-txt` e `--dourado-txt` já existiam desde o
+   Patch 71. Reuso em vez de inventar tom novo.
+   ------------------------------------------------------------ */
+/* O `.upi-name` não está sobre branco: está dentro do balão de fala
+   do Upi, que é sage rgb(221,227,214). Com `--terracota-txt` ele
+   ficou em 3,84 — melhor que os 2,83 de antes, e ainda reprovado.
+   Medi de novo contra o fundo REAL e desci mais um degrau: 4,64
+   sobre o balão, 6,07 se algum dia ele aparecer sobre branco. */
+.upi-name{color:#954F3A}
+.ch-stag{color:var(--terracota-txt)}
+
+/* O selo de nível ONE (.one-level) NÃO está aqui de propósito.
+   A cor dele nasce em `app/api/feed/route.js` e chega na tela como
+   `style` embutido — e style embutido ganha de qualquer regra deste
+   arquivo. Escrevi a regra aqui primeiro e o selo continuou 3,92 na
+   tela. A correção foi na rota, junto com as outras cinco cores. */
+
+/* "META" — 4,27 vira 5,74 sem mudar de família de cor */
+.progress-goal{color:#5A6270}
+
+/* ------------------------------------------------------------
+   3 · ÁREA DE TOQUE
+
+   Apple pede 44×44, Google 48×48. Medido no app:
+
+     .icon-btn ....... 38×38   ← em TODAS as páginas: é o VOLTAR
+     .ritual-btn ..... 100×41
+     .ptab ........... 88×31
+     .ghost-btn ...... 76×33
+     .feed-tabs bt ... 46×35
+     .ver-jornada .... 39×29
+     .nc-close ....... 30×30   ← um X
+     .view-link ...... 85×19   ← "Ver público" / "Retrospectiva"
+
+   Onde a caixa É o desenho (uma aba, uma pílula), quem cresce é
+   a área invisível — a mesma técnica que os chips já usavam
+   desde o Patch 71. Onde a caixa é livre, ela cresce mesmo.
+
+   `.etx-more` (o "…mais") fica de fora de propósito: é um link
+   DENTRO de uma frase, e a própria WCAG 2.5.8 isenta alvo
+   embutido em linha de texto. Esticar a área dele para 44px
+   faria o toque na linha de cima disparar o "mais".
+   ------------------------------------------------------------ */
+
+/* o botão voltar, presente em 17 páginas */
+.icon-btn{width:44px;height:44px}
+
+/* os três do ritual: 41 → 44.
+
+   A forma do seletor tem que repetir a original. Existe, na linha
+   ~1435, `.ritual-btn,.ritual-btn.did,.ritual-btn.tried,
+   .ritual-btn.paused{min-height:40px}` — e como os três botões
+   sempre carregam uma dessas classes, o que vale para eles é a
+   versão de DUAS classes, (0,2,0). Uma regra minha com uma classe
+   só, (0,1,0), perde mesmo vindo depois.
+
+   Testei escrevendo `.ritual-btn{min-height:44px}` primeiro: os
+   três continuaram com 41px na tela. */
+.ritual-btn,
+.ritual-btn.did,
+.ritual-btn.tried,
+.ritual-btn.paused{min-height:44px}
+
+/* e o mesmo dentro da media query de 520px, que repete o 40px */
+@media(max-width:520px){
+  .ritual-btn,
+  .ritual-btn.did,
+  .ritual-btn.tried,
+  .ritual-btn.paused{min-height:44px}
+}
+
+/* alvo invisível de 44px, desenho intacto */
+.ptab,.ghost-btn,.feed-tabs button,.ver-jornada,.jd-links .view-link{position:relative}
+.ptab::after,
+.ghost-btn::after,
+.feed-tabs button::after,
+.ver-jornada::after,
+.jd-links .view-link::after{
+  content:"";position:absolute;left:0;right:0;
+  top:50%;transform:translateY(-50%);
+  height:44px;min-width:44px;
+}
+/* o alvo é invisível, mas não pode capturar o clique de quem
+   está atrás dele numa fila apertada */
+.ptab::after,.feed-tabs button::after{left:-2px;right:-2px}
+
+/* o X de fechar: 30 → 44. Aqui a caixa cresce de verdade,
+   porque é a ação que se faz com pressa e uma mão só. */
+.nc-close{width:44px;height:44px;font-size:15px}
+
+/* Estes dois só apareceram quando eu remedi a página DEPOIS de
+   aplicar as regras acima — não estavam no laudo. O + do topo
+   parava em 42 (dois pixels), e o ícone da árvore no perfil em 32. */
+.header-create{min-width:44px;min-height:44px}
+.pc-tree-link{position:relative}
+.pc-tree-link::after{content:"";position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);width:44px;height:44px}
+
+/* E mais tres no feed, achados na mesma releitura. `.entry-person`
+   e `.entry-head` sao a linha inteira do autor: largas, e paravam
+   em 40 de altura. `.feed-track-spk` (o alto-falante da musica) era
+   o menor de todos, 30x30. */
+.entry-person,.entry-head{min-height:44px}
+.feed-track-spk,.sl-title{position:relative}
+.feed-track-spk::after,.sl-title::after{content:"";position:absolute;
+  left:50%;top:50%;transform:translate(-50%,-50%);
+  width:100%;height:44px;min-width:44px}
+
+/* ------------------------------------------------------------
+   3b · A SEGUNDA VOLTA
+
+   Depois de aplicar as regras acima eu remedi TODAS as paginas de
+   novo, e nao so as do laudo. Apareceram mais nove — inclusive
+   dois botoes primarios que o laudo tinha deixado passar porque
+   eu so listava os primeiros achados de cada tela:
+
+     .post-btn ............ 84x33   <- PUBLICAR
+     .cta ................. 140x38  <- "Salvar registro" no diario
+     .future-kind button .. 148x37
+     .jdays-toggle ........ 242x39
+     .ej-cover-btn ........ 118x37
+     .wz-chip ............. 129x40
+     .composer-extra-toggle 311x34
+     .tiny-link ........... 176x26
+     .view-link (solto) ... 59x24
+     .wz-up-help-copy bt .. 81x29
+
+   Errar o botao de publicar e' pior do que errar qualquer um dos
+   que eu tinha listado. Vao todos juntos.
+   ------------------------------------------------------------ */
+.cta,.post-btn,.jdays-toggle,.ej-cover-btn,.wz-chip,
+.future-kind button{min-height:44px}
+
+.composer-extra-toggle,.tiny-link,.view-link,
+.wz-up-help-copy button{position:relative}
+.composer-extra-toggle::after,.tiny-link::after,
+.view-link::after,.wz-up-help-copy button::after{
+  content:"";position:absolute;left:0;right:0;top:50%;
+  transform:translateY(-50%);height:44px;min-width:44px;
+}
+
+/* ------------------------------------------------------------
+   4 · O CARTÃO DE TEXTO CURTO VIRA QUADRADO
+
+   Medido: dos 12 posts do feed, 4 passavam dos 763px úteis
+   (altura da tela menos notch e indicador, já com o topo e o
+   rodapé escondidos). O pior tinha 861px, e 469 deles eram o
+   cartão de texto em 4:5.
+
+   Em 1:1 esse cartão cai para 375 e o post fecha em 767.
+
+   Só que encolher SEMPRE cortaria os textos longos. A classe
+   `curto` vem do FeedClient e só existe até 140 caracteres —
+   o que cabe folgado num quadrado.
+
+   O `!important` acompanha o da regra original (linha ~3902),
+   que também usa. Sem ele esta regra não ganha.
+   ------------------------------------------------------------ */
+.feed-page .entry-textcard.curto{aspect-ratio:1/1!important;min-height:0}
+@media(max-width:640px){
+  .feed-page .entry-textcard.curto{aspect-ratio:1/1;min-height:0}
+}
+/* o cartão dentro do folheador de dias NÃO muda: ali os slides
+   precisam ter todos a mesma altura, senão o feed pula a cada
+   arrasto lateral. */
+.feed-page .dp-stage .entry-textcard.curto{aspect-ratio:4/5!important}
+
+/* ------------------------------------------------------------
+   5 · OS TRÊS DO RITUAL — mesma altura, cor certa
+
+   Medido: os três já tinham 100×41 iguais. O problema era a
+   COR: `.did` estava declarada verde e `.tried` laranja, mas os
+   três chegavam na tela em rgb(24,36,59) — uma regra posterior
+   derrubava as duas. Como o anel do selecionado é
+   `box-shadow: 0 0 0 2px currentColor`, o selecionado ficava
+   azul-marinho, a única coisa marinho daquela região.
+
+   Em vez de ressuscitar três cores, uma só: o selecionado usa
+   terracota, que é o que significa "ativo" no resto do app.
+   Os não selecionados ficam neutros — assim o que salta é a
+   escolha, não a paleta.
+   ------------------------------------------------------------ */
+.ritual-btn.selected{
+  color:var(--terracota-txt);
+  box-shadow:0 0 0 2px var(--terracota-txt),0 5px 14px rgba(16,19,45,.08);
+}
+.composer2 .ritual-btn.selected{
+  color:var(--terracota-txt);
+  box-shadow:0 0 0 2px var(--terracota-txt),0 5px 14px rgba(16,19,45,.08);
+}
+
+/* ------------------------------------------------------------
+   6 · "VER PÚBLICO" E "RETROSPECTIVA" PARECIAM TEXTO CORRIDO
+
+   Duas ações reais, 85×19 e 88×19, soltas entre parágrafos, sem
+   nada além da cor dizendo que eram clicáveis.
+
+   Viram pílulas discretas — a mesma linguagem que
+   `.jdays-row .view-link` já usa nesta mesma página. Não é
+   invenção nova, é a peça que já existia sendo aplicada onde
+   faltava.
+   ------------------------------------------------------------ */
+.jd-links{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+.jd-links .view-link{
+  display:inline-flex;align-items:center;gap:5px;
+  min-height:36px;padding:0 14px;border-radius:999px;
+  border:1.5px solid var(--line);background:var(--surface);
+  color:var(--ink);font-size:13px;font-weight:700;text-decoration:none;
+  transition:border-color .15s,background .15s;
+}
+.jd-links .view-link:hover,
+.jd-links .view-link:focus-visible{
+  border-color:var(--sage);background:var(--sage-soft);text-decoration:none;
+}
+@media(max-width:640px){ .jd-links{margin:14px 16px 4px} }

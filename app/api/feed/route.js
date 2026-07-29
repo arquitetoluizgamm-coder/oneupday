@@ -162,7 +162,21 @@ export async function GET(req) {
     const count = daysByLevelOwner[owner]?.size || 0;
     if (!count) return null;
     const rank = count >= 30 ? 6 : count >= 15 ? 5 : count >= 7 ? 4 : count >= 3 ? 3 : count >= 1 ? 2 : 1;
-    const colors = { 1: '#87957A', 2: '#6F927D', 3: '#5F8790', 4: '#5C7D86', 5: '#C47152', 6: '#B58A42' };
+    // As seis cores do nivel ONE, medidas sobre branco:
+    //
+    //   1  #87957A  3,18      4  #5C7D86  4,44
+    //   2  #6F927D  3,45      5  #C47152  3,60
+    //   3  #5F8790  3,92      6  #B58A42  3,14
+    //
+    // Todas reprovavam. O selo tem 10px e o minimo e 4,5:1 — e
+    // este e o unico lugar do app onde a cor esta em JAVASCRIPT,
+    // chegando na tela como `style` embutido no elemento. Por isso
+    // nenhuma regra de CSS conseguia corrigir: inline ganha de
+    // tudo que nao seja !important. Testei uma regra em globals.css
+    // primeiro e o selo continuou #5F8790 na tela.
+    //
+    // Mesmos matizes, luminosidade baixada em HLS ate cruzar 4,6.
+    const colors = { 1: '#6D7961', 2: '#5D7B69', 3: '#567A82', 4: '#5A7A82', 5: '#B25D3D', 6: '#916F35' };
     return { rank, color: colors[rank] };
   };
 

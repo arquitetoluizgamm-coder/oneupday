@@ -54,8 +54,13 @@ export default async function JornadaDoDono({ params }) {
       <AppTop backLabel={t.back} />
       <main className="wrap jornada-dono">
 
+        {/* O "Dia 2 de 30" saiu daqui.
+            Ele aparecia duas vezes na mesma tela, a 150px de
+            distância: uma aqui e outra dentro da barra de progresso,
+            ao lado do "7%". Lá é o lugar dele — é onde o número
+            significa alguma coisa, porque tem a barra do lado.
+            Aqui em cima era só repetição antes do título. */}
         <div className="create-head">
-          <p className="eyebrow">{fill(t.dayOf, { d: day, t: j.total_days, s: stats.streak || 0 })}</p>
           <h1>{j.title}</h1>
         </div>
 
@@ -71,7 +76,7 @@ export default async function JornadaDoDono({ params }) {
         <section className="jd-bloco">
           <p className="jd-titulo">{t.navToday}</p>
           <Composer journeyId={j.id} startDate={j.created_at} aiOn={aiOn} labels={kindLabels} t={{
-            placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
+            placeholder: t.composerPh, phLivre: t.phLivre, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
             addPhoto: t.addPhoto, uploading: t.uploading, photoAdded: t.photoAdded,
             addVideo: t.addVideo, videoAdded: t.videoAdded, videoTooBig: t.videoTooBig,
             crisisTitle: t.crisisTitle, crisisText: t.crisisText,

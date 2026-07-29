@@ -389,9 +389,17 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           quem manda no Enter é o CampoMencao: escolher a pessoa não
           pode publicar o registro sem querer. Por isso o onKeyDown de
           publicar checa se a lista está aberta antes de agir. */}
+      {/* Quando a pergunta do dia está logo acima, o placeholder repetia
+          ela palavra por palavra — o rótulo e o campo diziam "O que você
+          fez hoje, mesmo que pequeno?" ao mesmo tempo.
+
+          O placeholder é o único lugar da tela onde caberia dizer que uma
+          linha já basta, que é exatamente o que trava quem não sabe o que
+          escrever. Sem pergunta acima ele volta a ser `ph`, que aí não
+          repete nada. */}
       <CampoMencao textareaRef={inputRef} className="composer2-input" valor={text}
         onChange={e => setText(e.target.value)}
-        maxLength={500} placeholder={pergunta || ph} rows={1}
+        maxLength={500} placeholder={pergunta ? (t.phLivre || ph) : ph} rows={1}
         aria-describedby={pergunta ? 'perg-do-dia' : undefined}
         onKeyDown={e => {
           if (e.defaultPrevented) return;

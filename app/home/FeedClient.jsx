@@ -21,7 +21,7 @@ import Percepcao from '../../components/Percepcao';
 import Andamento from '../../components/Andamento';
 import Espelho from '../../components/Espelho';
 import LoopMarca from '../../components/LoopMarca';
-import { MOODS, moodGlow } from '../../lib/moods';
+import { MOODS, MOODS_TEXTO, moodGlow } from '../../lib/moods';
 import { comCapa } from '../../lib/media';
 import FollowUserButton from '../[slug]/FollowUserButton';
 
@@ -710,7 +710,7 @@ export default function FeedClient({ labels }) {
                 </span>
                 <span className="entry-id">
                   <b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} />{item.historia && <span className="hist-selo">{labels.histSelo}</span>}</b>
-                  <small><span className="entry-journey">{item.journey.title}</span> · {dayLabel(item.day_number)}{item.owner.mood && (labels.moods || {})[item.owner.mood] && <span className="entry-mood" style={{ color: MOODS[item.owner.mood] }}> · {labels.moods[item.owner.mood]}</span>}</small>
+                  <small><span className="entry-journey">{item.journey.title}</span> · {dayLabel(item.day_number)}{item.owner.mood && (labels.moods || {})[item.owner.mood] && <span className="entry-mood" style={{ color: MOODS_TEXTO[item.owner.mood] || MOODS[item.owner.mood] }}> · {labels.moods[item.owner.mood]}</span>}</small>
                 </span>
               </a>
               {item.owner.id && !item.own && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
@@ -778,7 +778,19 @@ export default function FeedClient({ labels }) {
                 // apagar o dia — mas mostra selo, não frase.
                 return (
                   <>
-                    <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText ? '' : ' so-selo'}`}>
+                    {/* `curto` encolhe o cartão de 4:5 para 1:1.
+                        Medido: dos 12 posts do feed, 4 não cabiam na tela
+                        nem com o topo e o rodapé escondidos (763px úteis).
+                        O cartão 4:5 sozinho ocupa 469px dos 861 do pior
+                        deles; em 1:1 ele cai para 375 e o post cabe.
+
+                        Mas encolher SEMPRE cortaria texto longo, então a
+                        regra é por tamanho: até 140 caracteres o texto
+                        cabe folgado num quadrado (são ~6 linhas de 26px
+                        numa caixa de 331px de largura útil). Acima disso
+                        o cartão continua 4:5, porque ali a altura está
+                        sendo usada, não desperdiçada. */}
+                    <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText ? '' : ' so-selo'}${(cleanText || '').length <= 140 ? ' curto' : ''}`}>
                       {cleanText
                         ? <CardText text={cleanText} labels={labels} mencoes={item.mencoes} />
                         : <SeloDoDia kind={item.kind} dia={item.day_number} labels={labels.selo} />}
