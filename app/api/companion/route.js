@@ -27,6 +27,16 @@ export async function POST() {
     .order('created_at', { ascending: false }).limit(24);
   const ups = updates || [];
 
+  let memories = [];
+  try {
+    const { data } = await supabase.from('upi_memories')
+      .select('kind, title, summary, body, happened_on, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(8);
+    memories = data || [];
+  } catch {}
+
   // Resumo compacto (fatos), sem expor nada de terceiros.
   const lines = [];
   for (const j of list) {
@@ -36,11 +46,22 @@ export async function POST() {
     lines.push(`Jornada "${j.title}" (meta ${j.total_days} dias, começou ${new Date(j.created_at).toISOString().slice(0,10)}): ${days} dias registrados, ${setbacks} recaídas. Motivo: ${j.goal || '-'}.`);
     ju.slice(0, 5).forEach(u => lines.push(`  - Dia ${u.day_number} [${u.kind}]: ${(u.text || '').slice(0, 110)}`));
   }
+  if (memories.length) {
+    lines.push('');
+    lines.push('Memorias privadas que a pessoa contou para a Upi:');
+    memories.forEach((m) => {
+      const when = m.happened_on || (m.created_at ? new Date(m.created_at).toISOString().slice(0, 10) : '');
+      const body = (m.summary || m.body || '').replace(/\s+/g, ' ').trim().slice(0, 140);
+      lines.push(`  - ${when}: ${m.title || 'memoria'} -> ${body}`);
+    });
+  }
   const facts = lines.join('\n');
 
   const locale = getLocale();
   const lang = locale === 'pt' ? 'português do Brasil' : locale === 'es' ? 'español' : 'English';
   const system = [
+    'Use as memorias privadas apenas para personalizar a resposta, sem expor detalhes sensiveis desnecessariamente.',
+    'Nao invente fatos que nao estejam nos dados.',
     'Você é uma companhia de progresso do app One Up Day.',
     'Você NÃO é terapeuta e não faz diagnóstico nem tratamento psicológico ou médico.',
     'Com base APENAS nos dados do próprio usuário abaixo, escreva de 2 a 4 frases curtas, calorosas e específicas que:',
