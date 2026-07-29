@@ -7547,3 +7547,78 @@ button.home-welcome-primary{border:0;font:inherit;cursor:pointer;width:100%}
    legível.
    ============================================================ */
 .one-level{display:none}
+
+/* ============================================================
+   PATCH 182 · O TOPO VOLTOU A SUMIR DE VERDADE — ERRO DO 181
+
+   O que o Fernando viu, e estava certo: depois do Patch 181 o
+   cabeçalho parou de sumir ao parar a rolagem.
+
+   ------------------------------------------------------------
+   POR QUE EU NÃO ACHEI MEDINDO
+
+   Porque o navegador dizia que estava tudo certo. Parado no meio
+   da página, com a rolagem encerrada, eu lia:
+
+       header .... opacity 0 · visibility hidden
+       sino ...... visibility hidden
+       + ......... visibility hidden
+       marca ..... visibility hidden
+
+   E o teste de toque em cima dos botões devolvia `ARTICLE.entry`
+   — o post ATRÁS deles. Ou seja: para o DOM, aquilo não existia
+   mais.
+
+   Só que a captura de tela mostrava os dois discos brancos e a
+   marca, pintados por cima da foto.
+
+   É camada composta que não repinta. Ao ganharem `background`
+   sólido, `border-radius` e `box-shadow` no Patch 181, aqueles
+   botões passaram a ter camada própria no compositor. Quando o
+   pai vai a `opacity:0`, o compositor deveria descartar o que
+   está desenhado — e em alguns casos ele mantém o último quadro
+   na tela. Fica um fantasma: invisível para o código, visível
+   para a pessoa.
+
+   Foi eu ter tornado os botões opacos que criou a condição. O
+   defeito é do 181.
+
+   ------------------------------------------------------------
+   A CORREÇÃO
+
+   Parar de depender de o compositor apagar alguma coisa. O
+   cabeçalho **sai de cima do conteúdo**: sobe 100% da própria
+   altura quando está escondido, e desce quando aparece.
+
+   Assim, mesmo que sobre um quadro velho em memória, ele está
+   desenhado FORA da área visível. Não existe fantasma possível.
+
+   E de brinde a animação fica melhor: em vez de só desbotar, ele
+   desliza para cima — que é o gesto que a pessoa já espera de um
+   topo que se recolhe.
+
+   O `transition: transform .28s ease` já existia na regra
+   original, esperando por isso.
+
+   ------------------------------------------------------------
+   CONFERIDO NA TELA, NÃO SÓ NO NÚMERO
+
+   Foi a lição do dia: eu tinha "verificado" pelo computed style
+   e dado como certo. Desta vez olhei a captura em cada estado.
+
+     parado no meio ...  caixa -78..0   nada pintado ✓
+     rolando .........   caixa  -6..72  deslizando  ✓
+     topo da página ..   caixa   0..78  inteiro     ✓
+   ============================================================ */
+.top.top-feed{transform:translateY(-100%)}
+html.chrome-scrolling .top.top-feed,
+html.chrome-top .top.top-feed{transform:translateY(0)}
+
+/* quem prefere menos movimento continua tendo só o desbotar —
+   mas aí o cabeçalho precisa sair do caminho na marra, senão
+   volta o fantasma */
+@media(prefers-reduced-motion:reduce){
+  .top.top-feed{transition:opacity .16s ease, visibility 0s linear .16s}
+  html.chrome-scrolling .top.top-feed,
+  html.chrome-top .top.top-feed{transform:translateY(0)}
+}
