@@ -68,7 +68,7 @@ export default function FormConvite({ t, locale }) {
       const r = await fetch('/api/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jornada: jornada.trim(), email: email.trim(), locale }),
+        body: JSON.stringify({ jornada: jornada.trim(), email: email.trim(), locale, origem: 'invite-premium' }),
       });
       const d = await r.json().catch(() => ({}));
       if (!r.ok || !d.ok) {

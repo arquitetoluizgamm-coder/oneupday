@@ -12,6 +12,12 @@ export default function DiarioClient({ labels }) {
   const [upText, setUpText] = useState('');
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [memReady, setMemReady] = useState(false);
+  const [memQuestion, setMemQuestion] = useState(null);
+  const [memAnswer, setMemAnswer] = useState('');
+  const [memToday, setMemToday] = useState(null);
+  const [memories, setMemories] = useState([]);
+  const [memSaving, setMemSaving] = useState(false);
   const current = useMemo(() => entries.find((e) => e.date === date), [entries, date]);
 
   useEffect(() => {
@@ -20,6 +26,22 @@ export default function DiarioClient({ labels }) {
       setEntries(Array.isArray(list) ? list : []);
       setUpOn(localStorage.getItem(UP_KEY) !== '0');
     } catch {}
+  }, []);
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const r = await fetch('/api/upi-memory', { cache: 'no-store' });
+        const data = await r.json();
+        if (!alive || !r.ok) return;
+        setMemQuestion(data.question || null);
+        setMemToday(data.today || null);
+        setMemAnswer(data.today?.body || '');
+        setMemories(Array.isArray(data.memories) ? data.memories : []);
+        setMemReady(true);
+      } catch {}
+    })();
+    return () => { alive = false; };
   }, []);
   useEffect(() => { setText(current?.text || ''); setUpText(current?.up || ''); setSaved(false); }, [current?.id, date]);
 
@@ -52,6 +74,24 @@ export default function DiarioClient({ labels }) {
     } catch { setUpText(labels.diaryUpUnavailable); }
     setBusy(false);
   }
+  async function saveMemory() {
+    const answer = memAnswer.trim();
+    if (!answer || memSaving) return;
+    setMemSaving(true);
+    try {
+      const r = await fetch('/api/upi-memory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answer }),
+      });
+      const data = await r.json();
+      if (r.ok && data.memory) {
+        setMemToday(data.memory);
+        setMemories((old) => [data.memory, ...old.filter((m) => m.id !== data.memory.id)]);
+      }
+    } catch {}
+    setMemSaving(false);
+  }
   function askUp() { if (current) askUpFor(current); }
   return (
     <div className="diary-shell">
@@ -64,6 +104,33 @@ export default function DiarioClient({ labels }) {
         </div>
         <p>{labels.diarySub}</p>
       </header>
+      {memReady && memQuestion && (
+        <section className="upi-memory-card">
+          <div className="upi-memory-head">
+            <img className="upi-char bob" src="/upi.svg" alt="Upi" />
+            <div>
+              <b>{labels.upiMemoryTitle}</b>
+              <p>{labels.upiMemorySub}</p>
+            </div>
+          </div>
+          <label className="upi-memory-question">
+            <span>{memQuestion.text}</span>
+            <textarea
+              value={memAnswer}
+              onChange={(e) => setMemAnswer(e.target.value)}
+              placeholder={labels.upiMemoryPh}
+              rows={3}
+              maxLength={1200}
+            />
+          </label>
+          <div className="upi-memory-actions">
+            <button type="button" className="cta" onClick={saveMemory} disabled={!memAnswer.trim() || memSaving}>
+              {memSaving ? labels.upiMemorySaving : memToday ? labels.upiMemoryUpdate : labels.upiMemorySave}
+            </button>
+            {memToday && <span>{labels.upiMemorySaved}</span>}
+          </div>
+        </section>
+      )}
       <section className="diary-card">
         <label className="diary-date">{labels.diaryDate}<input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></label>
         <textarea value={text} onChange={(e) => { setText(e.target.value); setSaved(false); }} placeholder={labels.diaryPh} rows={8} />
@@ -73,6 +140,18 @@ export default function DiarioClient({ labels }) {
         <div><b>{labels.diaryUpTitle}</b><p>{labels.diaryUpSub}</p></div>
         <button type="button" className="ghost-btn" onClick={toggleUp}>{upOn ? labels.diaryUpOn : labels.diaryUpOff}</button>
       </section>
+      {memories.length > 0 && (
+        <section className="upi-memory-list">
+          <h2>{labels.upiMemoryListTitle}</h2>
+          {memories.slice(0, 6).map((m) => (
+            <article key={m.id}>
+              <small>{m.happened_on ? new Date(`${m.happened_on}T12:00:00`).toLocaleDateString() : ''}</small>
+              <b>{m.title}</b>
+              <p>{m.summary || m.body}</p>
+            </article>
+          ))}
+        </section>
+      )}
       {entries.length > 0 && <section className="diary-history"><h2>{labels.diaryHistory}</h2>{entries.map((e) => <div className={`diary-entry-wrap${e.date === date ? ' on' : ''}`} key={e.id}><button type="button" className="diary-entry" onClick={() => setDate(e.date)}><time>{new Date(`${e.date}T12:00:00`).toLocaleDateString()}</time><span>{e.text}</span></button><div className="diary-entry-tools">{upOn && <button type="button" className="diary-entry-up" onClick={() => askUpFor(e)} disabled={busy}>{busy ? labels.diaryUpThinking : labels.diaryAsk}</button>}<button type="button" className="diary-entry-delete" onClick={() => removeEntry(e)}>{labels.diaryDelete}</button></div>{e.up && <div className="diary-entry-comment"><img src="/upi.svg" alt="Upi" /><p>{e.up}</p></div>}</div>)}</section>}
       <p className="diary-private-note">{labels.diaryPrivate}</p>
     </div>

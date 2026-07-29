@@ -1,4 +1,4 @@
-import { getLocale } from '../../lib/locale';
+﻿import { getLocale } from '../../lib/locale';
 import { getDict } from '../../lib/i18n';
 import Logo from '../../components/Logo';
 import Track from '../../components/Track';
@@ -10,42 +10,42 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata() {
   const t = getDict(getLocale());
-  return { title: `One Up Day — ${t.cvTitulo}`, description: t.cvSub };
+  return { title: `One Up Day - ${t.cvTitulo}`, description: t.cvSub };
 }
 
 // ============================================================
-// /invite — NÃO É UMA LISTA DE ESPERA
+// /invite â€” NÃƒO Ã‰ UMA LISTA DE ESPERA
 //
-// A página não tenta convencer ninguém de que o app é bom. Ela
-// tenta fazer uma pessoa pensar "esse lugar foi feito para alguém
-// como eu" — e a única ação que ela faz é escrever a própria
+// A pÃ¡gina nÃ£o tenta convencer ninguÃ©m de que o app Ã© bom. Ela
+// tenta fazer uma pessoa pensar "esse lugar foi feito para alguÃ©m
+// como eu" â€” e a Ãºnica aÃ§Ã£o que ela faz Ã© escrever a prÃ³pria
 // jornada.
 //
-// A sequência é deliberada:
+// A sequÃªncia Ã© deliberada:
 //
-//   1. começa pela dor, não pelo produto
-//   2. diz o que o ONE é, em uma frase
+//   1. comeÃ§a pela dor, nÃ£o pelo produto
+//   2. diz o que o ONE Ã©, em uma frase
 //   3. mostra como a comunidade funciona
 //   4. explica o acesso gradual sem falar em escassez
-//   5. convida a pessoa a falar dela, não de nós
+//   5. convida a pessoa a falar dela, nÃ£o de nÃ³s
 //
 // ------------------------------------------------------------
-// O QUE FOI CORTADO, E POR QUÊ
+// O QUE FOI CORTADO, E POR QUÃŠ
 //
-// "Você foi convidado" saiu: numa página pública, é falso no
-// instante em que alguém chega.
+// "VocÃª foi convidado" saiu: numa pÃ¡gina pÃºblica, Ã© falso no
+// instante em que alguÃ©m chega.
 //
-// "Vagas limitadas" saiu: é competição, e competição é o que fez
+// "Vagas limitadas" saiu: Ã© competiÃ§Ã£o, e competiÃ§Ã£o Ã© o que fez
 // essa pessoa parar de postar em outro lugar.
 //
-// "Não para competir, não para impressionar" saiu: nomear a
-// objeção é plantá-la — e "impressionar" é justamente a palavra
-// que ela carrega. Ficou só o lado de cá: continuar é progresso.
+// "NÃ£o para competir, nÃ£o para impressionar" saiu: nomear a
+// objeÃ§Ã£o Ã© plantÃ¡-la â€” e "impressionar" Ã© justamente a palavra
+// que ela carrega. Ficou sÃ³ o lado de cÃ¡: continuar Ã© progresso.
 //
-// O contador de pessoas saiu: número inventado, num app cuja marca
-// é não fingir que está tudo bem, seria a contradição mais cara
-// possível. E número real pequeno lê como produto morto. Nenhum
-// número é a única saída que é honesta e não se sabota.
+// O contador de pessoas saiu: nÃºmero inventado, num app cuja marca
+// Ã© nÃ£o fingir que estÃ¡ tudo bem, seria a contradiÃ§Ã£o mais cara
+// possÃ­vel. E nÃºmero real pequeno lÃª como produto morto. Nenhum
+// nÃºmero Ã© a Ãºnica saÃ­da que Ã© honesta e nÃ£o se sabota.
 // ============================================================
 export default async function Invite() {
   const supabase = createClient();
@@ -60,27 +60,27 @@ export default async function Invite() {
       <Track type="landing_view" meta={{ page: 'invite' }} />
 
       {/* ============================================================
-          A ORDEM MUDOU, O TEXTO NÃO
+          A ORDEM MUDOU, O TEXTO NÃƒO
 
-          Antes: título, subtítulo e DOIS parágrafos explicativos —
-          367px de prosa — e só então a pergunta. Numa tela de 390 a
-          ação começava a 44% da altura; num iPhone SE o botão ficava
+          Antes: tÃ­tulo, subtÃ­tulo e DOIS parÃ¡grafos explicativos â€”
+          367px de prosa â€” e sÃ³ entÃ£o a pergunta. Numa tela de 390 a
+          aÃ§Ã£o comeÃ§ava a 44% da altura; num iPhone SE o botÃ£o ficava
           fora da dobra.
 
-          Medido também: a pergunta, que é a única coisa que a pessoa
-          faz aqui, tinha peso 400 — mais leve que o subtítulo, que
-          tem 650. O item mais importante da página era o mais fraco
+          Medido tambÃ©m: a pergunta, que Ã© a Ãºnica coisa que a pessoa
+          faz aqui, tinha peso 400 â€” mais leve que o subtÃ­tulo, que
+          tem 650. O item mais importante da pÃ¡gina era o mais fraco
           dela.
 
-          Agora a página tem três tempos claros:
+          Agora a pÃ¡gina tem trÃªs tempos claros:
 
-            1. o convite      título + uma linha
-            2. O LUGAR        pergunta, campo, botão — num bloco só
-            3. o rodapé       como funciona, para quem quiser ler
+            1. o convite      tÃ­tulo + uma linha
+            2. O LUGAR        pergunta, campo, botÃ£o â€” num bloco sÃ³
+            3. o rodapÃ©       como funciona, para quem quiser ler
 
-          O que explica o app desceu para depois da ação. Não sumiu:
-          quem precisa de contexto rola dez centímetros. Quem já
-          entendeu no título escreve na hora.
+          O que explica o app desceu para depois da aÃ§Ã£o. NÃ£o sumiu:
+          quem precisa de contexto rola dez centÃ­metros. Quem jÃ¡
+          entendeu no tÃ­tulo escreve na hora.
           ============================================================ */}
       <main className="landing convite-page">
         <section className="cv-intro">
@@ -90,16 +90,17 @@ export default async function Invite() {
 
         <FormConvite t={t} locale={locale} />
 
-        {/* Depois do bloco: o que era o meio da página. Aqui embaixo
-            ele deixa de competir com a ação e vira o que sempre foi —
-            explicação para quem quer. */}
+        {/* Depois do bloco: o que era o meio da pÃ¡gina. Aqui embaixo
+            ele deixa de competir com a aÃ§Ã£o e vira o que sempre foi â€”
+            explicaÃ§Ã£o para quem quer. */}
         <section className="cv-depois">
           <p className="cv-p">{t.cvComoFunciona}</p>
           <p className="cv-p">{t.cvGradual}</p>
         </section>
       </main>
 
-      <footer className="foot"><p>One <b>Up</b> Day · {t.tagline}</p></footer>
+      <footer className="foot"><p>One <b>Up</b> Day Â· {t.tagline}</p></footer>
     </>
   );
 }
+
