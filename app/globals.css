@@ -6663,3 +6663,78 @@ html.chrome-scrolling .top{box-shadow:none}
 }
 /* o conteúdo acompanha a pílula que desceu */
 body{padding-bottom:calc(70px + var(--sa-bottom))}
+
+/* ============================================================
+   AS ABAS "TODOS / SEGUINDO" — o que quebrou e por quê
+
+   Elas são `position:sticky; top:0`, e o topo também para em 0.
+   Antes isso não colidia por dois motivos: o topo tinha fundo
+   opaco e cobria as abas, e a classe `chrome-hide` tirava as duas
+   da tela ao mesmo tempo.
+
+   O Patch 163 tirou o fundo do topo E parou de usar `chrome-hide`.
+   Resultado: as abas ficaram permanentemente grudadas em y=0, com
+   a marca ONE e o + por cima delas. Duas camadas de interface
+   disputando os mesmos pixels.
+
+   A correção trata as abas como o que elas são: parte do topo.
+
+     · param ABAIXO dele, não em cima;
+     · aparecem e somem pela mesma regra (começo da página ou
+       rolando);
+     · perdem a faixa de fundo em degradê, que só existia para
+       esconder o texto que passava atrás — com o topo
+       transparente, ela virava uma tarja no meio da tela.
+
+   Sem fundo, elas ganham o mesmo halo claro do topo para não
+   sumirem quando uma foto escura passar por baixo.
+   ============================================================ */
+/* A altura do topo, num lugar só. Ele é 16px de respiro em cima
+   (mais a área segura), 44px de botão e 16px embaixo = 76. Medido
+   no navegador dá 78 com o arredondamento da linha; 82 deixa 4px
+   de folga entre uma coisa e outra.
+
+   Vive numa variável porque duas peças dependem dela: as abas
+   param aqui embaixo, e qualquer coisa futura que precise ficar
+   abaixo do topo deve ler daqui em vez de repetir o número. */
+:root{ --topo-altura:calc(82px + var(--sa-top,0px)); }
+
+.feed-tabs{
+  top:var(--topo-altura);
+  background:transparent;
+  opacity:0;
+  transform:translateY(-6px);
+  pointer-events:none;
+  transition:opacity .22s ease, transform .28s ease;
+}
+html.chrome-top .feed-tabs,
+html.chrome-scrolling .feed-tabs{
+  opacity:1;
+  transform:none;
+  pointer-events:auto;
+}
+.feed-tabs button{
+  filter:drop-shadow(0 1px 2px rgba(250,247,242,.92))
+         drop-shadow(0 0 6px rgba(250,247,242,.6));
+}
+/* a regra antiga não manda mais: `chrome-hide` não é mais aplicada */
+html.chrome-hide .feed-tabs{transform:none;opacity:inherit}
+
+/* ============================================================
+   O ÍCONE DE NOTIFICAÇÕES, MAIOR E MAIS FIRME
+
+   A 30px, sobre fundo transparente, ele estava sumindo. Duas
+   mudanças, e a segunda importa tanto quanto a primeira:
+
+     · 30 -> 34px de desenho (o alvo de toque continua 44);
+     · o corpo do U passa da sálvia clara (#84917A) para a
+       escurecida (#6E7C61). Medi antes: 2,97:1 contra o creme na
+       clara, 4,16:1 na escura. Num ícone sem fundo atrás, esses
+       1,2 pontos são a diferença entre ver e adivinhar.
+
+   O pingo continua terracota: ele é o indicador, e mexer nele
+   mexeria no que a cor significa.
+   ============================================================ */
+.upi-sino{color:#6E7C61}
+.upi-sino .upi-mini{width:34px;height:34px}
+.upi-sino .um-corpo{stroke-width:2.5}
