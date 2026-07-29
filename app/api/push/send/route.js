@@ -17,37 +17,76 @@ function compactPushText(value, max = 86) {
   return clean.slice(0, Math.max(0, max - 1)).trimEnd() + '…';
 }
 
-function upiReminderFromMemory(mem) {
+const UPI_PUSH_TEXT = {
+  pt: {
+    nextTitle: 'Upi lembrou do seu passo',
+    nextBody: (s) => `Você deixou isto esperando: ${s}`,
+    capsuleTitle: 'Upi guardou uma parte sua',
+    capsuleBody: 'Sua cápsula continua aqui. Hoje pode ser um bom dia para dar mais um passo.',
+    originTitle: 'Upi lembrou do seu começo',
+    originBody: (s) => `Você começou por isso: ${s}`,
+    dailyTitle: 'Upi lembrou de ontem',
+    dailyBody: (s) => `Você apareceu aqui: ${s}`,
+    genericTitle: 'Upi lembrou de você',
+    envelopeBody: 'O passo que você deixou para hoje está esperando.',
+    lines: [
+      'Seu próximo capítulo está esperando.',
+      'E aí, como foi o dia de hoje?',
+      'Passei pra ver se você quer registrar hoje.',
+      'Um dia de cada vez. Hoje é um deles.',
+    ],
+  },
+  en: {
+    nextTitle: 'Upi remembered your next step',
+    nextBody: (s) => `You left this waiting: ${s}`,
+    capsuleTitle: 'Upi saved a piece of you',
+    capsuleBody: 'Your capsule is still here. Today may be a good day for one more step.',
+    originTitle: 'Upi remembered your beginning',
+    originBody: (s) => `You started because of this: ${s}`,
+    dailyTitle: 'Upi remembered yesterday',
+    dailyBody: (s) => `You showed up here: ${s}`,
+    genericTitle: 'Upi remembered you',
+    envelopeBody: 'The step you left for today is waiting.',
+    lines: [
+      'Your next chapter is waiting.',
+      'How did today go?',
+      'I came by to see if you want to register today.',
+      'One day at a time. Today is one of them.',
+    ],
+  },
+  es: {
+    nextTitle: 'Upi recordó tu próximo paso',
+    nextBody: (s) => `Dejaste esto esperando: ${s}`,
+    capsuleTitle: 'Upi guardó una parte de ti',
+    capsuleBody: 'Tu cápsula sigue aquí. Hoy puede ser un buen día para dar otro paso.',
+    originTitle: 'Upi recordó tu comienzo',
+    originBody: (s) => `Empezaste por esto: ${s}`,
+    dailyTitle: 'Upi recordó ayer',
+    dailyBody: (s) => `Apareciste aquí: ${s}`,
+    genericTitle: 'Upi se acordó de ti',
+    envelopeBody: 'El paso que dejaste para hoy está esperando.',
+    lines: [
+      'Tu próximo capítulo está esperando.',
+      '¿Cómo fue tu día?',
+      'Pasé para ver si quieres registrar hoy.',
+      'Un día a la vez. Hoy es uno de ellos.',
+    ],
+  },
+};
+
+function pushLang(locale) {
+  return UPI_PUSH_TEXT[locale] ? locale : 'pt';
+}
+
+function upiReminderFromMemory(mem, locale = 'pt') {
+  const L = UPI_PUSH_TEXT[pushLang(locale)];
   const resumo = compactPushText(mem?.summary || mem?.body || '', 72);
   if (!resumo) return null;
-  if (mem.kind === 'next_step') {
-    return {
-      title: 'Upi lembrou do seu passo',
-      body: `Você deixou isto esperando: ${resumo}`,
-    };
-  }
-  if (mem.source_type === 'future_capsule') {
-    return {
-      title: 'Upi guardou uma parte sua',
-      body: 'Sua cápsula continua aqui. Hoje pode ser um bom dia para dar mais um passo.',
-    };
-  }
-  if (mem.source_type === 'journey_origin') {
-    return {
-      title: 'Upi lembrou do seu começo',
-      body: `Você começou por isso: ${resumo}`,
-    };
-  }
-  if (mem.source_type === 'daily_update') {
-    return {
-      title: 'Upi lembrou de ontem',
-      body: `Você apareceu aqui: ${resumo}`,
-    };
-  }
-  return {
-    title: 'Upi lembrou de você',
-    body: resumo,
-  };
+  if (mem.kind === 'next_step') return { title: L.nextTitle, body: L.nextBody(resumo) };
+  if (mem.source_type === 'future_capsule') return { title: L.capsuleTitle, body: L.capsuleBody };
+  if (mem.source_type === 'journey_origin') return { title: L.originTitle, body: L.originBody(resumo) };
+  if (mem.source_type === 'daily_update') return { title: L.dailyTitle, body: L.dailyBody(resumo) };
+  return { title: L.genericTitle, body: resumo };
 }
 
 // ============================================================
@@ -189,6 +228,11 @@ async function handler(req) {
     return subs.length;
   };
 
+  const localeForUser = (userId) => {
+    const sub = (subsByUser[userId] || []).find((s) => ['pt', 'en', 'es'].includes(s.locale));
+    return pushLang(sub?.locale || 'pt');
+  };
+
   let sentNotif = 0, sentReminder = 0;
 
   // ---- 1. notificações novas ----
@@ -324,19 +368,15 @@ async function handler(req) {
         }
       } catch {}
 
-      const LINES = [
-        { title: 'Upi', body: 'Seu próximo capítulo está esperando.' },
-        { title: 'Upi', body: 'E aí, como foi o dia de hoje?' },
-        { title: 'Upi', body: 'Passei pra ver se você quer registrar hoje.' },
-        { title: 'Upi', body: 'Um dia de cada vez. Hoje é um deles.' },
-      ];
       for (const p of people) {
         if (postedToday.has(p.id)) { continue; }
+        const locale = localeForUser(p.id);
+        const copy = UPI_PUSH_TEXT[locale];
         const env = envByUser[p.id];
         if (env) {
           const n = await deliver(p.id, {
             title: 'Upi',
-            body: 'O passo que voce deixou para hoje esta esperando.',
+            body: copy.envelopeBody,
             url: env.slug ? `/perfil/jornada/${env.slug}` : '/home',
             tag: 'oud-upi-envelope',
           });
@@ -344,7 +384,7 @@ async function handler(req) {
           await sb.from('profiles').update({ last_reminder_key: dayKey }).eq('id', p.id);
           continue;
         }
-        const memoryLine = upiReminderFromMemory(memByUser[p.id]);
+        const memoryLine = upiReminderFromMemory(memByUser[p.id], locale);
         if (memoryLine) {
           const n = await deliver(p.id, { ...memoryLine, url: '/home', tag: 'oud-upi-memory' });
           if (n) sentReminder++;
@@ -353,8 +393,7 @@ async function handler(req) {
         }
         let h = 0; const seed = dayKey + p.id;
         for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-        const line = LINES[h % LINES.length];
-        const n = await deliver(p.id, { ...line, url: '/home', tag: 'oud-upi' });
+        const n = await deliver(p.id, { title: 'Upi', body: copy.lines[h % copy.lines.length], url: '/home', tag: 'oud-upi' });
         if (n) sentReminder++;
         await sb.from('profiles').update({ last_reminder_key: dayKey }).eq('id', p.id);
       }

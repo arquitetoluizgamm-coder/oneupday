@@ -11,6 +11,12 @@ function urlB64ToUint8Array(base64String) {
 }
 
 // Liga/desliga as notificações no aparelho
+function currentLocale() {
+  const m = document.cookie.match(/(?:^|;\s*)oud_locale=([^;]+)/);
+  const v = m ? decodeURIComponent(m[1]) : '';
+  return ['pt', 'en', 'es'].includes(v) ? v : 'pt';
+}
+
 export default function PushToggle({ vapidKey, labels }) {
   const L = labels || {};
   const [state, setState] = useState('loading'); // loading | off | on | unsupported | denied
@@ -51,7 +57,7 @@ export default function PushToggle({ vapidKey, labels }) {
       const json = sub.toJSON();
       const r = await fetch('/api/push/subscribe', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys }),
+        body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys, locale: currentLocale() }),
       });
       setState(r.ok ? 'on' : 'off');
     } catch { setState('off'); }

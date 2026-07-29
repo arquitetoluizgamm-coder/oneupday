@@ -12,11 +12,12 @@ export async function POST(req) {
 
   const body = await req.json().catch(() => ({}));
   const { endpoint, keys } = body || {};
+  const locale = ['pt', 'en', 'es'].includes(body?.locale) ? body.locale : 'pt';
   if (!endpoint || !keys?.p256dh || !keys?.auth) return NextResponse.json({ error: 'invalid' }, { status: 400 });
 
   await supabase.from('push_subs').delete().eq('endpoint', endpoint);
   const { error } = await supabase.from('push_subs')
-    .insert({ user_id: user.id, endpoint, p256dh: keys.p256dh, auth: keys.auth });
+    .insert({ user_id: user.id, endpoint, p256dh: keys.p256dh, auth: keys.auth, locale });
   if (error) return NextResponse.json({ error: 'db' }, { status: 500 });
 
   try { await supabase.from('profiles').update({ push_on: true }).eq('id', user.id); } catch {}
