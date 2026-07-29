@@ -11,6 +11,45 @@ export const dynamic = 'force-dynamic';
 // md5() é nativa e o sha256 precisaria do pgcrypto.
 const marca = (v) => (v ? crypto.createHash('md5').update(v).digest('hex').slice(0, 12) : '(vazio)');
 
+function compactPushText(value, max = 86) {
+  const clean = String(value || '').replace(/\s+/g, ' ').trim();
+  if (clean.length <= max) return clean;
+  return clean.slice(0, Math.max(0, max - 1)).trimEnd() + '…';
+}
+
+function upiReminderFromMemory(mem) {
+  const resumo = compactPushText(mem?.summary || mem?.body || '', 72);
+  if (!resumo) return null;
+  if (mem.kind === 'next_step') {
+    return {
+      title: 'Upi lembrou do seu passo',
+      body: `Você deixou isto esperando: ${resumo}`,
+    };
+  }
+  if (mem.source_type === 'future_capsule') {
+    return {
+      title: 'Upi guardou uma parte sua',
+      body: 'Sua cápsula continua aqui. Hoje pode ser um bom dia para dar mais um passo.',
+    };
+  }
+  if (mem.source_type === 'journey_origin') {
+    return {
+      title: 'Upi lembrou do seu começo',
+      body: `Você começou por isso: ${resumo}`,
+    };
+  }
+  if (mem.source_type === 'daily_update') {
+    return {
+      title: 'Upi lembrou de ontem',
+      body: `Você apareceu aqui: ${resumo}`,
+    };
+  }
+  return {
+    title: 'Upi lembrou de você',
+    body: resumo,
+  };
+}
+
 // ============================================================
 // COMO ESTA ROTA SE PROTEGE
 //
@@ -261,6 +300,30 @@ async function handler(req) {
         }
       } catch {}
 
+      const memByUser = {};
+      try {
+        const { data: mems } = await sb.from('upi_memories')
+          .select('user_id, source_type, kind, summary, body, happened_on, updated_at')
+          .in('user_id', ids)
+          .order('updated_at', { ascending: false })
+          .limit(Math.max(50, ids.length * 5));
+
+        const score = (m) => {
+          if (m.kind === 'next_step') return 5;
+          if (m.source_type === 'journey_origin') return 4;
+          if (m.source_type === 'future_capsule') return 3;
+          if (m.source_type === 'daily_update') return 2;
+          return 1;
+        };
+
+        for (const m of (mems || [])) {
+          if (!m?.user_id) continue;
+          if (m.happened_on === dayKey) continue;
+          const atual = memByUser[m.user_id];
+          if (!atual || score(m) > score(atual)) memByUser[m.user_id] = m;
+        }
+      } catch {}
+
       const LINES = [
         { title: 'Upi', body: 'Seu próximo capítulo está esperando.' },
         { title: 'Upi', body: 'E aí, como foi o dia de hoje?' },
@@ -277,6 +340,13 @@ async function handler(req) {
             url: env.slug ? `/perfil/jornada/${env.slug}` : '/home',
             tag: 'oud-upi-envelope',
           });
+          if (n) sentReminder++;
+          await sb.from('profiles').update({ last_reminder_key: dayKey }).eq('id', p.id);
+          continue;
+        }
+        const memoryLine = upiReminderFromMemory(memByUser[p.id]);
+        if (memoryLine) {
+          const n = await deliver(p.id, { ...memoryLine, url: '/home', tag: 'oud-upi-memory' });
           if (n) sentReminder++;
           await sb.from('profiles').update({ last_reminder_key: dayKey }).eq('id', p.id);
           continue;
