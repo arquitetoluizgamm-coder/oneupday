@@ -316,19 +316,45 @@ function DayPager({ item, labels, dayLabel, dark }) {
 // Dia marcado por botão: sem mídia e sem relato humano.
 const soSelo = (x) => !x.photo_url && !x.video_url && !textoDaPessoa(x.text);
 
+// ============================================================
+// "LER MAIS"
+//
+// Antes: o texto era recortado por `-webkit-line-clamp` e o botão
+// ficava posicionado por cima, no canto de baixo, com um degradê
+// cobrindo o texto atrás. Funcionava, mas era uma peça de layout
+// para resolver uma questão de texto — e o botão nunca encostava
+// nas reticências: ele ia para o canto direito, onde as reticências
+// só calham de estar quando a última linha está cheia.
+//
+// Agora o corte é no TEXTO: pega até `limit`, volta até o último
+// espaço para não partir palavra ao meio, e escreve "… ler mais"
+// em sequência. O botão fica no fluxo, colado nas reticências,
+// sem posição absoluta, sem degradê e sem z-index.
+// ============================================================
+function cortar(texto, limite) {
+  const s = String(texto || '');
+  if (s.length <= limite) return s;
+  const bruto = s.slice(0, limite);
+  const espaco = bruto.lastIndexOf(' ');
+  // só volta até o espaço se isso não comer metade do trecho
+  const corte = espaco > limite * 0.6 ? espaco : limite;
+  return s.slice(0, corte).replace(/[\s,;:.\-]+$/, '');
+}
+
 function EntryText({ text, labels, limit = 180, mencoes }) {
   const [expanded, setExpanded] = useState(false);
   const compact = text.length > limit;
 
-  // O "ler mais" flutua no fim da 2ª linha. Precisa ficar FORA do
-  // bloco recortado — senão o próprio recorte o esconde junto do texto.
   if (compact && !expanded) {
     return (
       <div className="etx">
-        <p className="entry-text clamp2"><TextoComMencoes texto={text} porHandle={mencoes} /></p>
-        <button type="button" className="etx-more" onClick={() => setExpanded(true)}>
-          {labels.moreText}
-        </button>
+        <p className="entry-text">
+          <TextoComMencoes texto={cortar(text, limit)} porHandle={mencoes} />
+          <span className="etx-dots">…</span>
+          <button type="button" className="etx-more" onClick={() => setExpanded(true)}>
+            {labels.moreText}
+          </button>
+        </p>
       </div>
     );
   }

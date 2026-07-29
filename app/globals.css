@@ -6380,3 +6380,60 @@ body{padding-bottom:calc(76px + var(--sa-bottom))}
 /* o trecho é uma amostra, não o registro: duas linhas e para */
 .mc-trecho{margin-top:4px;color:#4B4F5E;font-size:14px;line-height:1.5;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ============================================================
+   "LER MAIS" — simples, negrito, colado nas reticências
+
+   Antes o texto era recortado por `-webkit-line-clamp` e o botão
+   ficava POR CIMA, no canto de baixo, com um degradê cobrindo o
+   texto atrás. Três mecanismos (posição absoluta, z-index e
+   degradê) para resolver uma questão que é de texto, não de
+   layout. E o botão nunca encostava nas reticências: ia sempre
+   para o canto direito, onde elas só calham de estar quando a
+   última linha está cheia.
+
+   Agora o corte é no texto e o botão fica no fluxo, logo depois
+   do "…". Sem posição absoluta, sem z-index, sem degradê.
+
+   ------------------------------------------------------------
+   A ARMADILHA QUE ISSO DESTRAVA
+
+   `.entry-text` é recortado por OUTRAS regras — 3 linhas no
+   celular (linha 1350) e 2 dentro do paginador de dias (2581).
+   Com o botão agora dentro do parágrafo, esse recorte o
+   engoliria: ele cairia na 4ª linha e sumiria, e o texto ficaria
+   cortado sem nenhuma forma de abrir.
+
+   Por isso o recorte é desligado explicitamente aqui. Quem corta
+   agora é o JavaScript, e ele já corta na conta certa.
+   ============================================================ */
+.etx .entry-text{
+  display:block;
+  -webkit-line-clamp:unset;
+  -webkit-box-orient:initial;
+  overflow:visible;
+  max-width:none;
+}
+.etx-dots{color:inherit}
+.etx-more{
+  display:inline;
+  margin-left:.32em;
+  padding:0;border:0;background:none;
+  font:inherit;font-weight:800;
+  color:var(--ink);
+  cursor:pointer;
+}
+.etx-more:hover,.etx-more:focus-visible{
+  text-decoration:underline;text-underline-offset:3px;outline:none;
+}
+
+/* o "ler mais" do card de texto grande segue a mesma língua:
+   negrito, sem moldura, sem caixa alta */
+.dpc-more{
+  margin-top:10px;align-self:flex-start;
+  border:0;background:none;padding:0;
+  font-family:inherit;font-size:inherit;font-weight:800;
+  letter-spacing:normal;text-transform:none;
+  color:inherit;opacity:.72;cursor:pointer;
+}
+.dpc-more:hover{opacity:1;text-decoration:underline;text-underline-offset:3px}
