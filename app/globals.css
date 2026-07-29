@@ -6821,3 +6821,59 @@ html.chrome-scrolling .feed-tabs{
 .feed-page .entry-media video{
   max-height:calc(100svh - 340px - var(--sa-top,0px) - var(--sa-bottom,0px));
 }
+
+/* ============================================================
+   A PÍLULA DO RODAPÉ SOME AO PARAR
+
+   São 58px — mais que os 36 da barra de progresso e mais que os
+   39 que faltavam num iPhone comum. Com ela fora, o post cabe
+   inteiro SEM apertar a foto na maioria dos aparelhos.
+
+   ------------------------------------------------------------
+   POR QUE ELA SOME POR PRESENÇA DE CLASSE, E NÃO POR FALTA
+
+   Esta é a lição de dois erros meus nesta sequência. No Patch 163
+   eu escondi o topo por FALTA de classe, e ele sumiu nas 17
+   páginas que não têm o <ScrollChrome/> — junto com o botão
+   voltar.
+
+   Aqui a regra é ao contrário: o rodapé é visível por padrão e só
+   se esconde quando `chrome-parado` aparece. Essa classe é
+   adicionada por um código que só roda no feed. Numa página sem
+   ele, ela nunca existe — e o menu nunca some.
+
+   `visibility` em vez de `pointer-events` pelo mesmo motivo do
+   Patch 167: com a transição adiada, dá para tocar durante todo o
+   desaparecimento.
+   ============================================================ */
+html.chrome-parado .bottom-nav{
+  opacity:0;
+  visibility:hidden;
+  transform:translateX(-50%) scale(.92);
+  transition:opacity .3s ease, transform .3s ease, visibility 0s linear .3s;
+}
+@media(prefers-reduced-motion:reduce){
+  html.chrome-parado .bottom-nav{transform:translateX(-50%) scale(1)}
+}
+
+/* ============================================================
+   O TETO DA FOTO, RECALCULADO SEM A PÍLULA
+
+   Com o rodapé fora do caminho, os 58px que eu reservava para ele
+   voltam para a foto. A reserva cai de 340 para 290 — que é o
+   card sem a foto (280) mais uma folga pequena.
+
+   O efeito nos aparelhos:
+
+     iPhone 13/14/15 ... 473 de teto, 4:5 pede 464  -> SEM CORTE
+     Android comum ..... 462 de teto, 4:5 pede 464  -> corta 2px
+     iPhone 15 Pro Max . 549 de teto                -> SEM CORTE
+     iPhone SE ......... 357 de teto                -> corta 23%
+
+   Nos aparelhos comuns a foto fica inteira. Só a tela pequena
+   ainda aperta — e aperta menos do que apertava.
+   ============================================================ */
+.feed-page .entry-media img,
+.feed-page .entry-media video{
+  max-height:calc(100svh - 290px - var(--sa-top,0px) - var(--sa-bottom,0px));
+}

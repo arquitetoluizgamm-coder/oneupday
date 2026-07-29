@@ -44,15 +44,31 @@ export default function ScrollChrome() {
     let timer;
 
     const marcarTopo = () => {
-      if (window.scrollY <= TOPO) html.classList.add('chrome-top');
-      else html.classList.remove('chrome-top');
+      if (window.scrollY <= TOPO) {
+        html.classList.add('chrome-top');
+        html.classList.remove('chrome-parado');   // no topo, o rodapé fica
+      } else {
+        html.classList.remove('chrome-top');
+      }
     };
 
     const onScroll = () => {
       marcarTopo();
       html.classList.add('chrome-scrolling');
+      html.classList.remove('chrome-parado');
       clearTimeout(timer);
-      timer = setTimeout(() => html.classList.remove('chrome-scrolling'), ESPERA);
+      timer = setTimeout(() => {
+        html.classList.remove('chrome-scrolling');
+        // `chrome-parado` é ADICIONADA quando a rolagem para no meio
+        // da página. O rodapé se esconde por causa dela.
+        //
+        // A inversão é de propósito, e é a lição de dois erros meus
+        // nesta sequência: se o rodapé sumisse por FALTA de classe,
+        // ele sumiria em todas as páginas que não têm este
+        // componente — e são 17. Some por PRESENÇA de classe, e a
+        // classe só existe onde este código roda.
+        if (window.scrollY > TOPO) html.classList.add('chrome-parado');
+      }, ESPERA);
     };
 
     // no primeiro quadro a página pode nem ter rolado ainda:
@@ -65,7 +81,7 @@ export default function ScrollChrome() {
       clearTimeout(timer);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', marcarTopo);
-      html.classList.remove('chrome-hide', 'chrome-scrolling', 'chrome-top');
+      html.classList.remove('chrome-hide', 'chrome-scrolling', 'chrome-top', 'chrome-parado');
     };
   }, []);
   return null;
