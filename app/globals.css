@@ -6588,3 +6588,78 @@ body{padding-bottom:calc(76px + var(--sa-bottom))}
 .feed-page .entry .etx .etx-more:focus-visible{
   color:var(--ink);text-decoration:underline;text-underline-offset:3px;outline:none;
 }
+
+/* ============================================================
+   O TOPO SEM FUNDO, E QUE SÓ APARECE ENQUANTO SE ROLA
+
+   Três coisas, e a segunda tem uma armadilha que precisou de um
+   conserto junto.
+
+   1 · SEM FUNDO. O `.top` tinha `rgba(246,244,239,.82)` mais um
+       desfoque de 14px — uma faixa clara por cima do feed. Agora
+       é transparente: o conteúdo passa por baixo dele inteiro.
+
+   2 · APARECE AO ROLAR, SOME AO PARAR. É o contrário do padrão,
+       e é o que você pediu: parado, a tela é toda do feed.
+
+       A armadilha: se ele some sempre que a rolagem para, some
+       também numa tela que não rola — e o botão de criar fica
+       inalcançável para sempre, sem nenhum aviso. Por isso o
+       `ScrollChrome` ganhou a classe `chrome-top`, que marca "o
+       começo da página". As três situações:
+
+         no começo da página .... visível
+         rolando ................ visível
+         parado no meio ......... escondido
+
+       Quem quiser o topo sobe até em cima. Quem quiser ler o
+       feed inteiro simplesmente para de rolar.
+
+   3 · `pointer-events` acompanha. Um topo invisível que ainda
+       intercepta o toque é pior que um topo visível: a pessoa
+       tenta apoiar o primeiro post e nada acontece.
+   ============================================================ */
+.top{
+  background:transparent;
+  -webkit-backdrop-filter:none;backdrop-filter:none;
+  box-shadow:none;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .22s ease, transform .28s ease;
+  will-change:opacity;
+}
+html.chrome-scrolling .top,
+html.chrome-top .top{
+  opacity:1;
+  pointer-events:auto;
+}
+/* o `chrome-hide` de antes não manda mais em nada aqui */
+html.chrome-hide .top{transform:none}
+/* e a sombra que aparecia ao rolar sai junto com o fundo */
+html.chrome-scrolling .top{box-shadow:none}
+
+/* sem fundo, os elementos do topo precisam se defender sozinhos
+   contra a foto que passa por baixo */
+.top-3 .top-brand .one-mark,
+.top-3 .top-left > *,
+.top-3 .top-right > *{
+  filter:drop-shadow(0 1px 2px rgba(250,247,242,.9))
+         drop-shadow(0 0 6px rgba(250,247,242,.55));
+}
+
+/* ============================================================
+   O RODAPÉ MAIS PARA BAIXO E MAIS DISCRETO NA ROLAGEM
+   ============================================================ */
+.bottom-nav{
+  bottom:calc(6px + var(--sa-bottom));
+}
+.bottom-nav.scrolling{
+  transform:translateX(-50%) scale(.86);
+  opacity:.42;
+  box-shadow:0 4px 12px rgba(16,19,45,.08);
+}
+@media(prefers-reduced-motion:reduce){
+  .bottom-nav.scrolling{transform:translateX(-50%) scale(1);opacity:.55}
+}
+/* o conteúdo acompanha a pílula que desceu */
+body{padding-bottom:calc(70px + var(--sa-bottom))}
