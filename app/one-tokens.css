@@ -2,18 +2,27 @@
    As variáveis históricas permanecem em globals.css até cada componente migrar. */
 :root {
   --one-bg: #FAF7F2;
-  --one-bg-soft: #F3F0EA;
-  --one-surface: #FFFFFF;
-  --one-ink: #10132D;
-  --one-muted: #69707D;
-  --one-line: #E6E2DA;
+  --one-bg-soft: #F1E9DE;
+  --one-surface: #FDF9F3;
+  --one-surface-elevated: #FFFDF8;
+  --one-surface-pressed: #EEE6DB;
+  --one-ink: #2D2924;
+  --one-muted: #756C63;
+  --one-line: #E5D9CB;
   --one-terracotta: #C16F54;
   --one-terracotta-soft: #F4E3DC;
+  --one-primary: #C16F54;
+  --one-primary-light: #D88E72;
+  --one-primary-dark: #A95740;
+  --one-text: #2D2924;
+  --one-text-muted: #756C63;
+  --one-border-soft: #E5D9CB;
+  --one-highlight: #FFF7ED;
   --one-sage: #84957E;
   --one-sage-soft: #EEF3EA;
   --one-difficult: #C9A392;
-  --one-info: #61758A;
-  --one-danger: #A55C57;
+  --one-info: #806F63;
+  --one-danger: #9B584C;
   --one-focus: rgba(193, 111, 84, .25);
 
   --one-space-1: 4px;
@@ -29,9 +38,9 @@
   --one-radius-pill: 999px;
   --one-touch-min: 44px;
 
-  --one-shadow-card: 0 6px 18px rgba(16, 19, 45, .05);
-  --one-shadow-control: 0 8px 22px rgba(16, 19, 45, .08);
-  --one-shadow-sheet: 0 18px 48px rgba(16, 19, 45, .16);
+  --one-shadow-card: 0 8px 18px rgba(106, 81, 59, .10);
+  --one-shadow-control: 0 10px 22px rgba(106, 81, 59, .14);
+  --one-shadow-sheet: 0 20px 48px rgba(82, 61, 44, .20);
   --one-ease: cubic-bezier(.22, 1, .36, 1);
   --one-motion-fast: 160ms;
   --one-motion-base: 220ms;
@@ -51,6 +60,8 @@
   --support: var(--one-terracotta);
   --support-soft: var(--one-terracotta-soft);
   --up: linear-gradient(135deg, #C16F54, #D9916C 58%, #E2B66D);
+  --night: var(--one-ink);
+  --night-2: #493D35;
   --shadow: var(--one-shadow-card);
   --shadow-sm: 0 2px 8px rgba(16, 19, 45, .05);
   --shadow-md: var(--one-shadow-card);

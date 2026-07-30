@@ -10032,3 +10032,257 @@ body {
   background:linear-gradient(145deg,#FFFDF8,#EEE5D9)!important;
   box-shadow:var(--one-shadow-soft-raised)!important;
 }
+
+/* ============================================================
+   REDESENHO MATERIAL ONE — camada completa de Preview
+   A luz vem do alto à esquerda em todas as telas.
+   ============================================================ */
+
+/* Base e tipografia: o conteúdo passa a nascer de uma superfície quente. */
+body,
+.auth-wrap,
+.feed-page,
+.profile-page,
+.journey-public,
+.diary-page,
+.future-page,
+.tree-page {
+  color:var(--one-ink)!important;
+  background-color:var(--one-bg)!important;
+}
+p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted); }
+
+/* Peças elevadas compartilhadas: cartões, painéis e seções de apoio. */
+.auth-card,
+.profile-card,
+.pc-card,
+.pc-sheet,
+.entry-textcard,
+.feed-invite,
+.journey-public .cover,
+.journey-public .timeline .body,
+.diary-card,
+.diary-history,
+.future-create,
+.future-card,
+.future-edit-card,
+.future-share-card,
+.tree-growth,
+.tree-promise,
+.comment-panel,
+.comment-item,
+.crop-modal-card,
+.wz-body,
+.wz-up-modal,
+.create-menu,
+.pm-sheet {
+  background:linear-gradient(145deg,var(--one-surface-elevated),var(--one-surface))!important;
+  border:1px solid rgba(255,255,255,.94)!important;
+  box-shadow:var(--one-shadow-raised),inset 0 1px 0 rgba(255,255,255,.90)!important;
+}
+
+/* A imagem é o conteúdo: recebe só raio, nunca brilho artificial. */
+.entry-media,
+.entry-media img,
+.entry-media video,
+.feed-photo,
+.pc-banner,
+.profile-card .pc-banner {
+  border-radius:var(--one-radius-card)!important;
+  box-shadow:none!important;
+}
+
+/* Botões primários de verdade: terracota moldada, não bloco azul escuro. */
+.cta,
+.home-welcome-primary,
+.wz-go,
+.future-save,
+.elog-go,
+.cm-main,
+.pc-follow,
+.profile-card .pc-follow {
+  color:#FFFDF8!important;
+  background:linear-gradient(145deg,var(--one-primary-light,#D88E72),var(--one-primary-dark,#A95740))!important;
+  border:1px solid rgba(255,255,255,.42)!important;
+  border-radius:var(--one-radius-control)!important;
+  box-shadow:7px 9px 17px rgba(128,72,52,.28),-4px -4px 10px rgba(255,255,255,.55),inset 0 1px 0 rgba(255,255,255,.34)!important;
+  transition:transform var(--one-motion-fast) var(--one-ease),box-shadow var(--one-motion-fast) var(--one-ease)!important;
+}
+.cta:active,
+.home-welcome-primary:active,
+.wz-go:active,
+.future-save:active,
+.elog-go:active,
+.cm-main:active,
+.pc-follow:active {
+  transform:translateY(2px)!important;
+  box-shadow:var(--one-shadow-pressed)!important;
+}
+
+/* Botões secundários, pequenos atalhos e ícones: peça elevada na mesma argila. */
+.ghost-btn,
+.wz-back,
+.wz-draft-btn,
+.wz-choice,
+.wz-chip,
+.wz-aj-use,
+.future-kind button,
+.crop-aspects button,
+.crop-actions button,
+.comment-toggle,
+.comment-more,
+.comment-item-reply,
+.entry-actions button,
+.entry-actions a,
+.journey-icon-actions button,
+.pc-btn,
+.pc-opt,
+.profile-diary-link,
+.tree-shortcut,
+.diary-shortcut {
+  color:var(--one-ink)!important;
+  background:linear-gradient(145deg,#FFFDF8,#EDE4D8)!important;
+  border:1px solid rgba(255,255,255,.94)!important;
+  border-radius:var(--one-radius-control)!important;
+  box-shadow:var(--one-shadow-soft-raised),inset 0 1px 0 rgba(255,255,255,.90)!important;
+}
+.ghost-btn:active,
+.wz-back:active,
+.wz-draft-btn:active,
+.wz-choice:active,
+.wz-chip:active,
+.wz-aj-use:active,
+.future-kind button:active,
+.crop-aspects button:active,
+.crop-actions button:active,
+.comment-toggle:active,
+.comment-item-reply:active,
+.pc-btn:active,
+.pc-opt:active {
+  box-shadow:var(--one-shadow-pressed)!important;
+  transform:translateY(1px)!important;
+}
+
+/* Estado ativo tem argila terracota suave, e não cor solta. */
+.wz-choice.on,
+.wz-chip.on,
+.future-kind button.on,
+.ptab.on,
+.feed-tabs .on,
+.feed-filter-menu button.on,
+.pc-opt.on,
+.entry-actions .on {
+  color:var(--one-primary-dark,#A95740)!important;
+  background:linear-gradient(145deg,#F7E5DC,#EECDBD)!important;
+  border-color:rgba(193,111,84,.24)!important;
+  box-shadow:var(--one-shadow-pressed)!important;
+}
+
+/* Entradas e Wizard: a pessoa escreve dentro da matéria, com foco calmo. */
+.auth-card input,
+.elog-mail,
+.elog-code,
+.wz-field input,
+.wz-field textarea,
+.wz-grow-input,
+.future-card input,
+.future-card textarea,
+.diary-card textarea,
+.comment-form input,
+.crop-zoom input {
+  color:var(--one-ink)!important;
+  background:linear-gradient(145deg,var(--one-surface-pressed),#FFFDF8)!important;
+  border:1px solid rgba(222,213,199,.62)!important;
+  box-shadow:var(--one-shadow-pressed)!important;
+}
+.auth-card input:focus,
+.elog-mail:focus,
+.elog-code:focus,
+.wz-field input:focus,
+.wz-field textarea:focus,
+.wz-grow-input:focus,
+.future-card input:focus,
+.future-card textarea:focus,
+.diary-card textarea:focus,
+.comment-form input:focus {
+  border-color:rgba(193,111,84,.68)!important;
+  box-shadow:var(--one-shadow-pressed),0 0 0 3px rgba(193,111,84,.12)!important;
+}
+
+/* Feed: o relato é calmo e separado; ações parecem controles físicos discretos. */
+.feed-page .entry {
+  border-bottom:1px solid rgba(222,213,199,.72)!important;
+  padding-bottom:var(--one-space-5)!important;
+}
+.feed-page .entry-textcard {
+  background:linear-gradient(145deg,#FFFDF9,#F7F0E6)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.entry-head .entry-ava,
+.feed-ava,
+.entry-ava {
+  box-shadow:4px 5px 10px rgba(106,81,59,.18),-3px -3px 7px rgba(255,255,255,.88)!important;
+}
+.entry-tag,.feed-badge,.entry-mood,.entry-milestone {
+  background:linear-gradient(145deg,#F7E5DC,#F1D7C9)!important;
+  border:0!important;
+  color:var(--one-primary-dark,#A95740)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+
+/* Perfil e jornadas: cabeçalhos e métricas ganham um volume baixo e elegante. */
+.profile-card .pc-info,
+.pc-bar,
+.pc-consistency,
+.journey-public .stats article,
+.journey-public .who,
+.journey-public .bar,
+.journey-public .timeline .tag,
+.tree-metric {
+  background:linear-gradient(145deg,#FFFDF8,#EEE5D9)!important;
+  border-color:rgba(255,255,255,.92)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.journey-public .bar { box-shadow:var(--one-shadow-pressed)!important; }
+.journey-public .bar span { background:linear-gradient(90deg,#D9916C,#C16F54)!important; }
+.journey-public .timeline .day { color:var(--one-ink)!important; }
+
+/* Diário, Futuro e Árvore: materiais íntimos e quentes. */
+.diary-entry,
+.diary-private-note,
+.future-card-preview,
+.future-response,
+.future-reply {
+  background:linear-gradient(145deg,#FFFDF8,#F4EBDD)!important;
+  border-color:rgba(222,213,199,.54)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.diary-entry-comment,
+.diary-up-bubble,
+.future-up {
+  background:linear-gradient(145deg,#F1F5ED,#DDE8D6)!important;
+  border-color:rgba(132,149,126,.24)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.tree-scene {
+  background:radial-gradient(circle at 28% 18%,#FFFDF8 0,transparent 40%),linear-gradient(145deg,#EAF0E5,#F5EDE1)!important;
+  border:1px solid rgba(255,255,255,.92)!important;
+  box-shadow:var(--one-shadow-raised)!important;
+}
+
+/* A abertura pública continua sendo a peça de destaque, em terracota ONE. */
+.journey-public .cover {
+  color:#FFFDF8!important;
+  background:linear-gradient(145deg,#D88E72,#A95740)!important;
+  border-color:rgba(255,255,255,.34)!important;
+  box-shadow:var(--one-shadow-raised),inset 0 1px 0 rgba(255,255,255,.26)!important;
+}
+.journey-public .cover h1,
+.journey-public .cover p,
+.journey-public .cover .eyebrow { color:#FFFDF8!important; }
+
+/* Redução de movimento não perde acessibilidade nem cria saltos. */
+@media (prefers-reduced-motion: reduce) {
+  .cta,.home-welcome-primary,.wz-go,.future-save,.elog-go,.cm-main,
+  .ghost-btn,.wz-back,.wz-draft-btn,.wz-choice,.wz-chip,.wz-aj-use,.pc-btn,.pc-opt { transition:none!important;transform:none!important; }
+}
