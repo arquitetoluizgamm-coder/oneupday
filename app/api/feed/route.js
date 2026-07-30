@@ -330,11 +330,16 @@ export async function GET(req) {
   // Jornadas editoriais entram dia a dia no feed. Assim a Lia não aparece
   // como um bloco único com sete capítulos escondidos: cada dia pode ocupar
   // seu lugar na cadência, exatamente como um post real.
-  const editorialItems = merged
+  // Primeiro separamos por jornada. Sem isso, como os seeds costumam ser
+  // inseridos juntos, o feed entrega os sete dias da mesma história em fila
+  // e as outras demonstrações ficam escondidas atrás da primeira página.
+  const editorialQueues = new Map();
+  merged
     .filter((item) => item.journey?.editorial_seed)
-    .flatMap((item) => {
+    .forEach((item) => {
       const days = item.days?.length ? item.days : [item];
-      return days.map((day) => ({
+      const key = item.journey?.slug || item.journey_id || item.id;
+      const queue = days.map((day) => ({
         ...item,
         id: day.id,
         day_number: day.day_number,
@@ -360,8 +365,23 @@ export async function GET(req) {
         encouraged: !!day.encouraged,
         comeback: day.comeback || null,
         mencoes: day.mencoes || null,
-      }));
+      })).sort((a, b) => {
+        const time = new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        return time || ((b.day_number || 0) - (a.day_number || 0));
+      });
+      editorialQueues.set(key, [...(editorialQueues.get(key) || []), ...queue]);
     });
+
+  // Round-robin entre jornadas: Paulo, Lia, Davi... só depois volta para o
+  // próximo dia de Paulo. Assim a demonstração mostra caminhos diferentes,
+  // em vez de parecer uma única história repetida.
+  const editorialItems = [];
+  const queues = [...editorialQueues.values()];
+  while (queues.some((queue) => queue.length)) {
+    for (const queue of queues) {
+      if (queue.length) editorialItems.push(queue.shift());
+    }
+  }
   const organicItems = merged.filter((item) => !item.journey?.editorial_seed);
   const mixed = [];
   let editorialIndex = 0;
