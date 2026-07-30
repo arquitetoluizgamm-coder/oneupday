@@ -9781,3 +9781,31 @@ summary:focus-visible {
   .profile-notification-bell.has-notifications svg,
   .journey-day-card.win .body { animation:none!important; }
 }
+
+/* Regra estrutural final da navegação. Uma versão anterior mantinha quatro
+   colunas; como agora existem cinco destinos, o avatar acabava em outra linha. */
+@media (max-width: 767px) {
+  .bottom-nav {
+    display:grid!important;
+    grid-template-columns:repeat(5, minmax(0, 1fr))!important;
+    grid-template-rows:56px!important;
+    grid-auto-flow:column;
+    align-items:center;
+    width:min(320px, calc(100% - 32px))!important;
+    min-height:56px!important;
+    height:56px!important;
+    padding:5px 8px!important;
+    border-radius:28px!important;
+    overflow:visible!important;
+  }
+  .bottom-nav a,
+  .bottom-nav .bn-create {
+    width:44px!important;
+    height:44px!important;
+    min-width:44px!important;
+    min-height:44px!important;
+    align-self:center;
+    justify-self:center;
+  }
+  .bottom-nav .bn-create { margin-top:-10px!important; }
+}
