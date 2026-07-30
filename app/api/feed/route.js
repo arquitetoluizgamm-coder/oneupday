@@ -327,7 +327,41 @@ export async function GET(req) {
   // nas outras. A cada dois posts de pessoas reais, uma jornada editorial
   // aparece. O cursor continua sendo o offset do feed, então a cadência não
   // reinicia quando a próxima página é carregada.
-  const editorialItems = merged.filter((item) => item.journey?.editorial_seed);
+  // Jornadas editoriais entram dia a dia no feed. Assim a Lia não aparece
+  // como um bloco único com sete capítulos escondidos: cada dia pode ocupar
+  // seu lugar na cadência, exatamente como um post real.
+  const editorialItems = merged
+    .filter((item) => item.journey?.editorial_seed)
+    .flatMap((item) => {
+      const days = item.days?.length ? item.days : [item];
+      return days.map((day) => ({
+        ...item,
+        id: day.id,
+        day_number: day.day_number,
+        kind: day.kind,
+        text: day.text,
+        alt: day.alt || '',
+        photo_url: day.photo_url,
+        video_url: day.video_url,
+        created_at: day.created_at,
+        days: null,
+        journey: {
+          ...item.journey,
+          current_day: day.day_number || item.journey.current_day,
+          progress_pct: item.journey.total_days
+            ? Math.min(100, Math.round(((day.day_number || 0) / item.journey.total_days) * 100))
+            : item.journey.progress_pct,
+        },
+        track: day.track || null,
+        nextStep: day.nextStep || null,
+        nextWhen: day.nextWhen || null,
+        stepFollowing: !!day.stepFollowing,
+        closes: day.closes || null,
+        encouraged: !!day.encouraged,
+        comeback: day.comeback || null,
+        mencoes: day.mencoes || null,
+      }));
+    });
   const organicItems = merged.filter((item) => !item.journey?.editorial_seed);
   const mixed = [];
   let editorialIndex = 0;
