@@ -9302,6 +9302,64 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
   }
 }
 
+/* Notificação da marca: o Upi fica dentro de uma pequena lente de vidro.
+   Sem novidades ela é calma; com novidades, o pingo terracota respira. */
+@media (max-width: 767px) {
+  .top-feed .upi-sino {
+    display: grid !important;
+    place-items: center;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px;
+    min-height: 44px;
+    border: 1px solid rgba(255, 255, 255, .82) !important;
+    border-radius: 50% !important;
+    background: rgba(250, 247, 242, .72) !important;
+    color: #84917a;
+    box-shadow: 0 6px 18px rgba(16, 19, 45, .10), inset 0 1px 0 rgba(255, 255, 255, .9);
+    -webkit-backdrop-filter: blur(16px) saturate(125%);
+    backdrop-filter: blur(16px) saturate(125%);
+    transition: color .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+
+  .top-feed .upi-sino.tem {
+    color: var(--orange, #c16f54);
+    border-color: rgba(193, 111, 84, .38) !important;
+    animation: upiGlassPulse 2.6s ease-in-out infinite;
+  }
+
+  .top-feed .upi-sino:focus-visible {
+    color: var(--orange, #c16f54);
+    outline: 3px solid rgba(193, 111, 84, .18);
+    outline-offset: 3px;
+  }
+}
+
+@keyframes upiGlassPulse {
+  0%, 100% { box-shadow: 0 6px 18px rgba(16, 19, 45, .10), inset 0 1px 0 rgba(255, 255, 255, .9); }
+  50% { box-shadow: 0 7px 22px rgba(193, 111, 84, .20), 0 0 0 5px rgba(193, 111, 84, .07), inset 0 1px 0 rgba(255, 255, 255, .9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .top-feed .upi-sino.tem { animation: none; }
+}
+
+/* A mesma assinatura visual permanece no cabeçalho maior. */
+.top-feed .upi-sino {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, .82);
+  border-radius: 50%;
+  background: rgba(250, 247, 242, .72);
+  color: #84917a;
+  box-shadow: 0 6px 18px rgba(16, 19, 45, .10), inset 0 1px 0 rgba(255, 255, 255, .9);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+  backdrop-filter: blur(16px) saturate(125%);
+}
+.top-feed .upi-sino.tem { color: var(--orange, #c16f54); border-color: rgba(193, 111, 84, .38); }
+
 /* A área segura do celular acompanha o fundo da marca durante a rolagem.
    Evita que o recorte da câmera revele uma faixa branca acima do feed. */
 @media (max-width: 767px) {
