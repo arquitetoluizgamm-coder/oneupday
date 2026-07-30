@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createClient } from '../../lib/supabase/client';
 import { track } from '../../lib/track';
 
@@ -11,6 +11,23 @@ export default function EncourageBar({ updateId, mediaId, labelIdle, labelActive
   const [people, setPeople] = useState(null);
   const [loadingPeople, setLoadingPeople] = useState(false);
   const [supportersOpen, setSupportersOpen] = useState(false);
+  const wrapRef = useRef(null);
+
+  useEffect(() => {
+    if (!supportersOpen) return undefined;
+    const closeOutside = (event) => {
+      if (!wrapRef.current?.contains(event.target)) setSupportersOpen(false);
+    };
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setSupportersOpen(false);
+    };
+    document.addEventListener('pointerdown', closeOutside, true);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOutside, true);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [supportersOpen]);
 
   async function toggle() {
     if (busy) return;
@@ -45,7 +62,7 @@ export default function EncourageBar({ updateId, mediaId, labelIdle, labelActive
 
   // Apoio silencioso: envia incentivo, mas nunca mostra número público.
   return (
-    <div className="support-wrap">
+    <div className="support-wrap" ref={wrapRef}>
       <button className={`support-pill${active ? ' on' : ''}`} onClick={toggle} disabled={busy} aria-label={active ? labelActive : labelIdle}>
         <svg className="sp-heart" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1 7.8 7.8 7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
         <span className="action-label">{active ? labelActive : labelIdle}</span>

@@ -68,6 +68,19 @@ export default function TiraDeDias({ dias = [], hoje = 0, total = 0, labels = {}
     previewRef.current = next;
   }, [maxDay]);
 
+  useEffect(() => {
+    const onChapterVisible = (event) => {
+      const day = Number(event.detail?.day);
+      if (!Number.isFinite(day)) return;
+      const next = clamp(day, 1, maxDay);
+      setSelected(next);
+      setPreview(next);
+      previewRef.current = next;
+    };
+    window.addEventListener('oneupday:journey-day', onChapterVisible);
+    return () => window.removeEventListener('oneupday:journey-day', onChapterVisible);
+  }, [maxDay]);
+
   if (!totalDays || !maxDay) return null;
 
   const byDay = new Map((dias || []).map((item) => [Number(item.n), item.tipo]));

@@ -24,6 +24,7 @@ import Comments from '../../components/Comments';
 import { notFound } from 'next/navigation';
 import Track from '../../components/Track';
 import TiraDeDias from '../../components/TiraDeDias';
+import JourneyScrollSync from '../../components/JourneyScrollSync';
 import FechaMenus from '../../components/FechaMenus';
 import SeloDoDia from '../../components/SeloDoDia';
 import { textoDaPessoa } from '../../lib/registro';
@@ -468,12 +469,18 @@ export default async function JourneyPage({ params, searchParams }) {
     ? {
         title: 'Navegação da jornada', day: 'Dia', of: 'de', published: 'Publicado', difficult: 'Dia difícil',
         missed: 'Não deu', future: 'Ainda não veio', previous: 'Dia anterior', next: 'Próximo dia',
-        hint: 'Arraste para percorrer', release: 'Solte para ficar aqui', keyHint: '← → 1 dia · PageUp / PageDown 7 dias',
+        hint: 'Deslize para avançar', release: 'Solte para ficar neste capítulo', keyHint: '← → 1 dia · PageUp / PageDown 7 dias',
       }
-    : {
+    : locale === 'es'
+      ? {
+        title: 'Navegación de la jornada', day: 'Día', of: 'de', published: 'Publicado', difficult: 'Día difícil',
+        missed: 'No sucedió', future: 'Todavía no', previous: 'Día anterior', next: 'Próximo día',
+        hint: 'Desliza para avanzar', release: 'Suelta para quedarte en este capítulo', keyHint: '← → 1 día · PageUp / PageDown 7 días',
+      }
+      : {
         title: 'Journey navigation', day: 'Day', of: 'of', published: 'Published', difficult: 'Hard day',
         missed: 'Didn’t happen', future: 'Not yet', previous: 'Previous day', next: 'Next day',
-        hint: 'Drag to move through the journey', release: 'Release to stay here', keyHint: '← → 1 day · PageUp / PageDown 7 days',
+        hint: 'Swipe to move forward', release: 'Release to stay in this chapter', keyHint: '← → 1 day · PageUp / PageDown 7 days',
       };
 
   return (
@@ -625,12 +632,13 @@ export default async function JourneyPage({ params, searchParams }) {
         {Number(journey.total_days) >= 5 && (
           <TiraDeDias dias={dias} hoje={hoje} total={journey.total_days} labels={stripLabels} />
         )}
+        <JourneyScrollSync />
         <p className="journey-swipe-hint">
           {locale === 'pt'
-            ? 'Use a linha do tempo para pular entre os dias.'
+            ? 'Deslize para ler o próximo capítulo.'
             : locale === 'es'
-              ? 'Usa la línea de tiempo para saltar entre los días.'
-              : 'Use the timeline to jump between days.'}
+              ? 'Desliza para leer el próximo capítulo.'
+              : 'Swipe to read the next chapter.'}
         </p>
 
         <section className="timeline">

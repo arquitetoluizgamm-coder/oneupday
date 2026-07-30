@@ -129,7 +129,7 @@ export default async function Home() {
     editUpdate: { altLabel: t.altLabel, altPh: t.altPh, altOk: t.altOk, altVazio: t.altVazio, btn: t.euBtn, title: t.euTitle, text: t.euText, photo: t.euPhoto, photoAdd: t.ejCoverAdd, photoChange: t.ejCoverChange, photoRemove: t.ejCoverRemove, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errSave: t.epErrSave, errEmpty: t.euErrEmpty, deletePost: t.euDeletePost, deleteConfirm: t.postDeleteConfirm, cropOriginal: t.cropOriginal, cropSquare: t.cropSquare, cropPortrait: t.cropPortrait, cropLandscape: t.cropLandscape, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropHintOriginal: t.cropHintOriginal, cropZoom: t.cropZoom },
     dp: { prev: t.dpPrev, next: t.dpNext }, dayOfShort: t.dayOfShort,
     ch: { btn: t.chBtn, modalTitle: t.chModalTitle, what: t.chWhat, ph: t.chPh, daysFmt: t.chDays, together: t.chTogether, send: t.chSend, sending: t.chSending, sent: t.chSent, cancel: t.epCancel, errExists: t.chErrExists, errConn: t.chErrConn, err: t.chErr, stripTag: t.chStripTag, stripSee: t.chStripSee },
-    filterLabel: t.filterLabel, filterAll: t.filterAll, moreText: t.moreText, lessText: t.lessText, follow: t.follow, following: t.following, followBack: t.followBack, kinds: { step: t.kindStep, win: t.kindWin, setback: t.kindSetback, learned: t.kindLearned },
+    filterLabel: t.filterLabel, filterAll: t.filterAll, moreText: t.moreText, lessText: t.lessText, focusFree: t.focusFree, focusPresence: t.focusPresence, follow: t.follow, following: t.following, followBack: t.followBack, kinds: { step: t.kindStep, win: t.kindWin, setback: t.kindSetback, learned: t.kindLearned },
   };
 
   return (

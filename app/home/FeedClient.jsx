@@ -705,7 +705,7 @@ export default function FeedClient({ labels }) {
         <button className={scope === 'all' ? 'on' : ''} onClick={() => switchScope('all')}>{labels.tabAll}</button>
         <button className={scope === 'following' ? 'on' : ''} onClick={() => switchScope('following')}>{labels.tabFollowing}</button>
         <button type="button" className={`focus-toggle${focusMode ? ' on' : ''}`} onClick={() => setFocusMode((v) => !v)} aria-pressed={focusMode}>
-          {focusMode ? 'Feed livre' : 'Modo presença'}
+          {focusMode ? (labels.focusFree || 'Free feed') : (labels.focusPresence || 'Presence mode')}
         </button>
       </div>
 
