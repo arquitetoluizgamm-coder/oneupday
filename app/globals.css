@@ -9988,3 +9988,47 @@ body {
 .journey-public .entry-actions {
   border-top-color:rgba(222,213,199,.62)!important;
 }
+
+/* Relevo legível nas peças que a pessoa realmente toca. */
+.home-welcome-journey,
+.hw-exemplo {
+  background:linear-gradient(145deg,#FFFDF8,#EEE5D9)!important;
+  border:1px solid rgba(255,255,255,.96)!important;
+  box-shadow:8px 9px 18px rgba(112,92,69,.15),-6px -6px 14px rgba(255,255,255,.94),inset 0 1px 0 rgba(255,255,255,.92)!important;
+}
+.home-welcome-journey:active,
+.hw-exemplo:active {
+  box-shadow:var(--one-shadow-pressed)!important;
+  transform:translateY(1px);
+}
+.home-welcome-diary,
+.home-welcome-journey.feito {
+  background:linear-gradient(145deg,#EFF4EB,#DDE8D6)!important;
+}
+.home-welcome-primary {
+  min-height:52px!important;
+  background:linear-gradient(145deg,#DD9272,#B65D43)!important;
+  box-shadow:8px 9px 17px rgba(130,71,50,.30),-4px -4px 10px rgba(255,255,255,.52),inset 0 1px 0 rgba(255,255,255,.38)!important;
+}
+.home-welcome-primary:active { box-shadow:var(--one-shadow-pressed)!important; }
+
+.home-ritual-links a {
+  width:44px;height:44px;
+  display:grid!important;place-items:center;
+  border:0!important;border-radius:50%!important;
+  background:linear-gradient(145deg,#FFFCF7,#ECE3D7)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.home-ritual-links a:active { box-shadow:var(--one-shadow-pressed)!important; }
+.home-ritual-links a b { position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap; }
+
+/* Cards de resumo e opções curtas usam o mesmo volume, sem contaminar o feed. */
+.stats article,
+.journey-public .who,
+.tree-metric,
+.profile-card .pc-acoes > a,
+.profile-card .pc-acoes > button {
+  border:1px solid rgba(255,255,255,.90)!important;
+  background:linear-gradient(145deg,#FFFDF8,#EEE5D9)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
