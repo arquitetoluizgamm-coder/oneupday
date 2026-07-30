@@ -626,7 +626,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
   );
 
   return (
-    <div className="wz" onKeyDown={onKeyDown}>
+    <div className="wz wz-material-pilot" onKeyDown={onKeyDown}>
       <div className="wz-rail" aria-hidden="true">
         {Array.from({ length: STEPS }).map((_, i) => (
           <span key={i} className={`wz-bar${i === step ? ' on' : ''}${i < step ? ' done' : ''}`} />

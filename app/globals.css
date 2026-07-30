@@ -9925,6 +9925,140 @@ body {
 }
 .bottom-nav > * { grid-row:1!important; }
 
+/* ============================================================
+   PILOTO SOFT UI — Wizard de criação
+   Esta é a tela de validação do material antes de levá-lo ao app inteiro.
+   ============================================================ */
+.wz-material-pilot {
+  position:relative;
+  isolation:isolate;
+  padding:28px;
+  border-radius:30px;
+  background:#F5F0E8;
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.88),inset -1px -1px 0 rgba(207,194,180,.36);
+}
+.wz-material-pilot .wz-rail {
+  display:flex;
+  gap:8px;
+  padding:8px;
+  border-radius:999px;
+  background:#EEE5D9;
+  box-shadow:inset 4px 4px 8px rgba(119,94,69,.14),inset -4px -4px 8px rgba(255,255,255,.82);
+}
+.wz-material-pilot .wz-bar {
+  height:7px;
+  border-radius:999px;
+  background:#DED4C7;
+  box-shadow:inset 1px 1px 2px rgba(92,72,54,.16),inset -1px -1px 2px rgba(255,255,255,.72);
+}
+.wz-material-pilot .wz-bar.done,
+.wz-material-pilot .wz-bar.on {
+  background:linear-gradient(145deg,#DA9274,#B25A42);
+  box-shadow:-1px -1px 2px rgba(255,255,255,.55),2px 3px 5px rgba(137,76,53,.25),inset 0 1px 1px rgba(255,255,255,.32);
+}
+.wz-material-pilot .wz-head { margin-top:28px; }
+.wz-material-pilot .wz-count {
+  display:inline-flex;
+  padding:7px 11px;
+  border-radius:999px;
+  color:#8B4D3C;
+  background:#F3E2D8;
+  box-shadow:inset 2px 2px 4px rgba(142,83,59,.12),inset -2px -2px 4px rgba(255,255,255,.74);
+}
+.wz-material-pilot .wz-head h1 { color:#2D2924; letter-spacing:-.045em; }
+.wz-material-pilot .wz-explain { color:#756C63; }
+.wz-material-pilot .wz-up-help {
+  margin-top:20px;
+  padding:14px;
+  border:0;
+  border-radius:20px;
+  background:linear-gradient(145deg,#FFFDF8,#EEE5D9);
+  box-shadow:-7px -7px 14px rgba(255,255,255,.84),8px 10px 19px rgba(104,82,61,.15),inset 0 1px 0 rgba(255,255,255,.88);
+}
+.wz-material-pilot .wz-up-help-copy button {
+  padding:8px 12px;
+  border-radius:12px;
+  color:#8B4D3C;
+  background:#F4E3D9;
+  box-shadow:inset 2px 2px 4px rgba(142,83,59,.11),inset -2px -2px 4px rgba(255,255,255,.72);
+}
+.wz-material-pilot .wz-body {
+  margin-top:24px;
+  padding:20px;
+  border:0;
+  border-radius:24px;
+  background:linear-gradient(145deg,#FFFDF8,#F1E8DD);
+  box-shadow:-9px -9px 18px rgba(255,255,255,.90),11px 13px 24px rgba(104,82,61,.16),inset 0 1px 0 rgba(255,255,255,.90);
+}
+.wz-material-pilot .wz-input,
+.wz-material-pilot .wz-grow-input {
+  padding:15px 16px;
+  border:0!important;
+  border-radius:15px;
+  color:#2D2924!important;
+  background:#EFE6DB!important;
+  box-shadow:inset 4px 4px 8px rgba(112,88,66,.16),inset -4px -4px 8px rgba(255,255,255,.86)!important;
+}
+.wz-material-pilot .wz-input:focus,
+.wz-material-pilot .wz-grow-input:focus {
+  outline:0;
+  box-shadow:inset 4px 4px 8px rgba(112,88,66,.16),inset -4px -4px 8px rgba(255,255,255,.86),0 0 0 3px rgba(193,111,84,.16)!important;
+}
+.wz-material-pilot .wz-choice-grid { gap:14px; }
+.wz-material-pilot .wz-choice,
+.wz-material-pilot .wz-suggestion-row button,
+.wz-material-pilot .wz-sug,
+.wz-material-pilot .wz-media-action {
+  min-height:52px;
+  border:0!important;
+  border-radius:16px!important;
+  color:#4D4036!important;
+  background:linear-gradient(145deg,#FFFDF8,#EDE4D8)!important;
+  box-shadow:-6px -6px 12px rgba(255,255,255,.86),7px 8px 15px rgba(106,82,61,.16),inset 0 1px 0 rgba(255,255,255,.92)!important;
+}
+.wz-material-pilot .wz-choice.on,
+.wz-material-pilot .wz-media-action.on {
+  color:#8B4D3C!important;
+  background:linear-gradient(145deg,#F6E3D8,#EAC8B8)!important;
+  box-shadow:inset 4px 4px 8px rgba(139,77,60,.16),inset -4px -4px 8px rgba(255,255,255,.72)!important;
+}
+.wz-material-pilot .wz-choice:active,
+.wz-material-pilot .wz-suggestion-row button:active,
+.wz-material-pilot .wz-sug:active,
+.wz-material-pilot .wz-media-action:active {
+  transform:translate(2px,2px);
+  box-shadow:inset 5px 5px 9px rgba(112,88,66,.18),inset -4px -4px 8px rgba(255,255,255,.74)!important;
+}
+.wz-material-pilot .wz-nav { margin-top:28px; gap:16px; }
+.wz-material-pilot .wz-back,
+.wz-material-pilot .wz-draft-btn,
+.wz-material-pilot .wz-skip {
+  min-height:52px;
+  border:0!important;
+  border-radius:16px!important;
+  color:#4D4036!important;
+  background:linear-gradient(145deg,#FFFDF8,#EDE4D8)!important;
+  box-shadow:-6px -6px 12px rgba(255,255,255,.86),7px 8px 15px rgba(106,82,61,.16)!important;
+}
+.wz-material-pilot .wz-go {
+  min-height:52px;
+  border:0!important;
+  border-radius:16px!important;
+  background:linear-gradient(145deg,#D88E72,#A95740)!important;
+  box-shadow:-5px -5px 10px rgba(255,255,255,.48),8px 10px 18px rgba(130,70,49,.31),inset 0 1px 1px rgba(255,255,255,.34)!important;
+}
+.wz-material-pilot .wz-go:active {
+  transform:translate(2px,2px);
+  box-shadow:inset 5px 5px 9px rgba(112,59,42,.28),inset -3px -3px 7px rgba(255,255,255,.23)!important;
+}
+@media (max-width:640px) {
+  .wz-material-pilot { margin:0 -4px;padding:22px 18px;border-radius:24px; }
+  .wz-material-pilot .wz-body { padding:16px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .wz-material-pilot .wz-choice:active,.wz-material-pilot .wz-suggestion-row button:active,.wz-material-pilot .wz-sug:active,.wz-material-pilot .wz-media-action:active,.wz-material-pilot .wz-go:active { transform:none; }
+}
+
 /* Acabamento material: menos contorno, mais luz e sombra. */
 .icon-btn,
 .profile-notification-bell,
