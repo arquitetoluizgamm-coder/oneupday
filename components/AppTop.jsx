@@ -1,7 +1,6 @@
 import { createClient } from '../lib/supabase/server';
 import { getLocale } from '../lib/locale';
 import { getDict } from '../lib/i18n';
-import HeaderHeart from './HeaderHeart';
 import BackBtn from './BackBtn';
 import Logo, { Wordmark } from './Logo';
 import LanguagePicker from './LanguagePicker';
@@ -90,12 +89,6 @@ export default async function AppTop({
 
   // Contar sinal só faz sentido onde o sino aparece. Fora do feed
   // isso seria meia dúzia de consultas por página para desenhar nada.
-  let sinais = null;
-  if (sino) {
-    const jaTem = unread !== undefined && likes !== undefined && follows !== undefined;
-    sinais = jaTem ? { unread, likes, follows } : await contarSinais(supabase, user.id);
-  }
-
   return (
     // `top-feed` só no feed. É ele que liga o comportamento de
     // aparecer ao rolar e sumir ao parar — e esse comportamento
@@ -105,8 +98,7 @@ export default async function AppTop({
     <header className={`top top-3${sino ? ' top-feed' : ''}`}>
       <div className="top-left">
         {sino
-          ? <HeaderHeart likes={sinais.likes} follows={sinais.follows}
-              unread={sinais.unread} ariaLabel={t.notifications} />
+          ? <span className="top-left-spacer" aria-hidden="true" />
           : <BackBtn fallback={backHref} label={backLabel || t.back} />}
       </div>
 

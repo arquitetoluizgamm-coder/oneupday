@@ -9360,6 +9360,56 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
 }
 .top-feed .upi-sino.tem { color: var(--orange, #c16f54); border-color: rgba(193, 111, 84, .38); }
 
+/* A notificação sai do topo: o avatar do rodapé recebe o sinal de novidade. */
+.bn-profile-avatar-wrap { position: relative; display: grid; place-items: center; width: 44px; height: 44px; }
+.bn-notify-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--bg, #faf7f2);
+  border-radius: 50%;
+  background: var(--support, #c16f54);
+  animation: oneNotifyDot 1.5s ease-in-out infinite;
+}
+.profile-notification-bell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 255, 255, .86);
+  border-radius: 50%;
+  color: var(--muted);
+  background: rgba(250, 247, 242, .68);
+  box-shadow: 0 8px 20px rgba(16, 19, 45, .10), inset 0 1px 0 rgba(255, 255, 255, .9);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+  backdrop-filter: blur(16px) saturate(125%);
+  text-decoration: none;
+}
+.profile-notification-bell.has-notifications {
+  color: var(--orange, #c16f54);
+  border-color: rgba(193, 111, 84, .38);
+  animation: oneBellSwing 1.8s ease-in-out infinite;
+}
+.profile-notification-ping {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--support, #c16f54);
+  box-shadow: 0 0 0 3px rgba(193, 111, 84, .12);
+}
+@keyframes oneNotifyDot { 0%,100% { opacity: .55; transform: scale(.82); } 50% { opacity: 1; transform: scale(1.12); } }
+@keyframes oneBellSwing { 0%,100% { transform: rotate(0); } 12% { transform: rotate(8deg); } 24% { transform: rotate(-7deg); } 36% { transform: rotate(4deg); } 48% { transform: rotate(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .bn-notify-dot,
+  .profile-notification-bell.has-notifications { animation: none; }
+}
+
 /* Material mais visível: transparência real, brilho interno e desfoque.
    Os elementos de conteúdo continuam fora desta regra. */
 .ptabs,

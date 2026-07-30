@@ -13,7 +13,7 @@ import ProgressBar from '../../components/ProgressBar';
 import MediaGallery from '../../components/MediaGallery';
 import Track from '../../components/Track';
 import AppTop from '../../components/AppTop';
-import { Wordmark } from '../../components/Logo';
+import ProfileNotificationBell from '../../components/ProfileNotificationBell';
 import NextChapter from '../../components/NextChapter';
 import Espelho, { PorQue } from '../../components/Espelho';
 import Capacidades from '../../components/Capacidades';
@@ -163,39 +163,14 @@ export default async function Perfil() {
   // ---- Capacidades em construção: o que ela aprendeu a fazer ----
   // Roda sobre os registros que já existem. Nenhum dado novo é pedido.
   let capacidades = [];
-
-  // ---- A árvore: em que estágio ela está ----
-  //
-  // O estágio sai de `presence` — quantos DIAS distintos a pessoa
-  // registrou, contando cada jornada em separado. É exatamente a
-  // mesma conta que a página /arvore faz, e por isso o nome do
-  // estágio aqui e lá são sempre o mesmo.
-  //
-  // Nenhuma consulta nova: a busca abaixo já existia para as
-  // capacidades. Só pedi mais uma coluna, `journey_id`, que é o
-  // que faltava para saber se dois registros de "dia 3" são a
-  // mesma jornada ou duas diferentes.
-  //
-  // O `limit(400)` também já existia. Ele limita o número bruto de
-  // dias, não o estágio: o último degrau da árvore é aos 30, muito
-  // antes de 400. Quem passar de 400 dias vê o número parado e a
-  // árvore certa — e nesse dia eu prefiro pagar uma consulta a
-  // mais do que agora.
-  let arvorePresenca = 0;
   try {
     if (jIds.length) {
       const { data: todos } = await supabase.from('updates')
-        .select('journey_id, day_number, kind, created_at').in('journey_id', jIds)
+        .select('day_number, kind, created_at').in('journey_id', jIds)
         .order('created_at', { ascending: true }).limit(400);
       capacidades = analisarCapacidades(todos || []);
-      arvorePresenca = new Set((todos || []).map((u) => `${u.journey_id}:${u.day_number}`)).size;
     }
   } catch {}
-
-  const arvoreEstagio = arvorePresenca === 0 ? 0
-    : arvorePresenca < 4 ? 1
-      : arvorePresenca < 10 ? 2
-        : arvorePresenca < 30 ? 3 : 4;
 
   // ---- O que as pessoas percebem em você ----
   let percebido = [];
@@ -273,12 +248,11 @@ export default async function Perfil() {
               {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : profile.name[0]}
             </div>
             <div className="pc-meta">
-              {/* A árvore saiu daqui. Era um ícone de 30px ao lado do
-                  nome, sem rótulo, e ninguém adivinha que um desenho de
-                  30px leva a uma tela inteira. Virou um cartão logo
-                  abaixo, com nome e com o estágio dela. */}
               <div className="pc-name-line">
                 <h1>{profile.name}</h1>
+                <a className="pc-tree-link" href="/arvore" aria-label={t.treeTab} title={t.treeTab}>
+                  <img src="/tree-one.svg" alt="" />
+                </a>
               </div>
               <div className="pc-sub">
                 <span>{profile.handle}</span>
@@ -290,6 +264,7 @@ export default async function Perfil() {
                 na mesma linha do nome. Fora do card elas competiam com o
                 Upi pela largura e empurravam a fala dele para baixo. */}
             <div className="pc-acoes">
+              <ProfileNotificationBell label={t.notifications} />
               <CriarMenu t={t} className="pf-add" tamanho={21} rotulo={t.navCreate} />
 
               <ProfileMenu
@@ -326,51 +301,6 @@ export default async function Perfil() {
             </div>
           </div>
         </section>
-
-        {/* ============================================================
-            A ÁRVORE DA EVOLUÇÃO
-
-            Ela vem ANTES do diário porque não é o mesmo tipo de coisa.
-            O diário é um cômodo ao lado — um lugar para onde se vai
-            escrever. A árvore é o retrato do que a pessoa já fez: ela
-            pertence ao bloco de identidade, junto do nome e da foto.
-
-            O subtítulo usa `treeStages`, a MESMA lista de nomes que a
-            página /arvore mostra. Então quem toca aqui lendo "Criando
-            raízes" chega lá e encontra "Criando raízes" — o cartão é
-            uma janela para a tela, não um resumo paralelo dela.
-
-            E o número vem junto de propósito: "Criando raízes" sozinho
-            é bonito e não diz o que fazer. Com "· 12 dias registrados"
-            a pessoa entende que o desenho responde à presença dela.
-            ============================================================ */}
-        <a className="tree-shortcut" href="/arvore">
-          <span className="tree-shortcut-icon" aria-hidden="true">
-            <img src="/tree-one.svg" alt="" />
-          </span>
-          <span className="tree-shortcut-txt">
-            {/* A marca entra AQUI, ao lado do título, e não no lugar
-                dele. "Minha árvore da vida" é o que a pessoa procura;
-                o ONE diz de quem é a árvore.
-
-                Vem do mesmo `<Wordmark/>` do topo do app — não é uma
-                imagem separada nem um texto escrito "ONE". Se a marca
-                mudar um dia, muda aqui junto, sozinha.
-
-                `height={13}` porque o título tem 15px: a marca fica um
-                degrau abaixo da palavra, que é o que a faz ler como
-                assinatura em vez de competir com o nome. */}
-            <b className="tree-shortcut-titulo">
-              {t.treeShortcut || t.treeTab}
-              <Wordmark height={13} />
-            </b>
-            <small>
-              {(t.treeStages || [])[arvoreEstagio] || t.treeTitle}
-              {arvorePresenca > 0 && ` · ${fill(t.treeDays, { n: arvorePresenca })}`}
-            </small>
-          </span>
-          <span className="tree-shortcut-arrow" aria-hidden="true">›</span>
-        </a>
 
         <a className="diary-shortcut profile-diary-shortcut" href="/diario">
           <span className="diary-shortcut-icon" aria-hidden="true">✎</span>
