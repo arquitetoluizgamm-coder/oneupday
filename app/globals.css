@@ -9284,6 +9284,24 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
   .bottom-nav.scrolling { opacity: .72; }
 }
 
+/* O + precisa permanecer um círculo mesmo com as regras históricas da barra. */
+@media (max-width: 767px) {
+  .bottom-nav > .bn-create,
+  .bottom-nav .bn-create {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    aspect-ratio: 1 / 1;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    overflow: hidden;
+    clip-path: circle(50% at 50% 50%);
+    background: var(--orange, #c16f54) !important;
+  }
+}
+
 /* A área segura do celular acompanha o fundo da marca durante a rolagem.
    Evita que o recorte da câmera revele uma faixa branca acima do feed. */
 @media (max-width: 767px) {
