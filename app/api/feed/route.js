@@ -366,8 +366,10 @@ export async function GET(req) {
         comeback: day.comeback || null,
         mencoes: day.mencoes || null,
       })).sort((a, b) => {
-        const time = new Date(b.created_at || 0) - new Date(a.created_at || 0);
-        return time || ((b.day_number || 0) - (a.day_number || 0));
+        // Demonstrações são capítulos: o feed começa pelo Dia 1 para a
+        // pessoa entender a transformação antes de chegar ao desfecho.
+        const day = (a.day_number || 0) - (b.day_number || 0);
+        return day || (new Date(a.created_at || 0) - new Date(b.created_at || 0));
       });
       editorialQueues.set(key, [...(editorialQueues.get(key) || []), ...queue]);
     });
