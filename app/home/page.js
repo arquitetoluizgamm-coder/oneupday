@@ -111,6 +111,7 @@ export default async function Home() {
     feedStoryBack: t.feedStoryBack, feedStoryMilestone: t.feedStoryMilestone, feedStoryStart: t.feedStoryStart,
     feedStoryHard: t.feedStoryHard, feedStoryNext: t.feedStoryNext, feedStoryPhoto: t.feedStoryPhoto,
     feedStoryDefault: t.feedStoryDefault,
+    upiRecommendation: { title: t.upiRecTitle, started: t.upiRecStarted, hard: t.upiRecHard, moving: t.upiRecMoving, day: t.upiRecDay },
     videoFill: t.videoFill, videoFit: t.videoFit,
     histSelo: t.histSelo, histTitle: t.histTitle, histSub: t.histSub, histCta: t.histCta,
     meuNome: profile.name || '',

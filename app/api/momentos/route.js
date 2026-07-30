@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 // Momentos do feed: transformação, o amanhã dos outros e quem voltou.
 // Três blocos que dão temperaturas diferentes ao feed.
 export async function GET() {
-  const vazio = { transformacoes: [], amanha: [], retornos: [] };
+  const vazio = { transformacoes: [], amanha: [], retornos: [], recomendacoes: [] };
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -21,7 +21,7 @@ export async function GET() {
 
     // jornadas visíveis (a RLS já corta o que não pode ser visto)
     const { data: js } = await supabase.from('journeys')
-      .select('id, slug, title, owner_id, category, total_days, created_at')
+      .select('id, slug, title, owner_id, category, total_days, created_at, editorial_seed')
       .in('visibility', ['public', 'followers'])
       .order('created_at', { ascending: false })
       .limit(80);
@@ -125,10 +125,43 @@ export async function GET() {
     }
     retornos.sort((a, b) => new Date(b.quando || 0) - new Date(a.quando || 0));
 
+    // ---------- 4. RECOMENDAÇÕES DA UPI ----------
+    // A primeira versão é factual de propósito: recomenda apenas jornadas
+    // públicas reais e usa texto já publicado. A Upi não inventa emoções,
+    // não transforma demonstrações editoriais em depoimentos e não chama
+    // alguém de "inspirador" sem uma frase que sustente isso.
+    const recomendacoes = [];
+    for (const j of journeys) {
+      if (j.owner_id === user.id || j.editorial_seed === true) continue;
+      const lista = (porJornada[j.id] || []).slice().sort((a, b) =>
+        (Number(a.day_number) || 0) - (Number(b.day_number) || 0) || new Date(a.created_at || 0) - new Date(b.created_at || 0));
+      if (!lista.length) continue;
+      const ultimo = lista[lista.length - 1];
+      const p = dono(j);
+      if (!p.name) continue;
+      const dia = Number(ultimo.day_number) || 1;
+      const tipo = dia <= 1 ? 'comecou' : ultimo.kind === 'setback' ? 'dificil' : 'andamento';
+      recomendacoes.push({
+        tipo,
+        journeySlug: j.slug,
+        journeyTitle: j.title,
+        owner: p,
+        dia,
+        total: j.total_days || 0,
+        trecho: textoDaPessoa(ultimo.text || '').slice(0, 150),
+        quando: ultimo.created_at || j.created_at,
+      });
+    }
+    recomendacoes.sort((a, b) => {
+      const prioridade = { comecou: 0, dificil: 1, andamento: 2 };
+      return (prioridade[a.tipo] - prioridade[b.tipo]) || new Date(b.quando || 0) - new Date(a.quando || 0);
+    });
+
     return NextResponse.json({
       transformacoes: transformacoes.slice(0, 4),
       amanha: amanha.slice(0, 5),
       retornos: retornos.slice(0, 4),
+      recomendacoes: recomendacoes.slice(0, 4),
     });
   } catch {
     return NextResponse.json(vazio);

@@ -24,6 +24,7 @@ import LoopMarca from '../../components/LoopMarca';
 import { MOODS, moodGlow } from '../../lib/moods';
 import { comCapa } from '../../lib/media';
 import FollowUserButton from '../[slug]/FollowUserButton';
+import UpiRecommendation from '../../components/UpiRecommendation';
 
 function OneLevel({ level, labels }) {
   if (!level || !labels?.oneLevels?.[level.rank]) return null;
@@ -598,7 +599,7 @@ export default function FeedClient({ labels }) {
   const scopeRef = useRef('all');
   const busy = useRef(false);
   const [suggestions, setSuggestions] = useState([]);
-  const [momentos, setMomentos] = useState({ transformacoes: [], amanha: [], retornos: [] });
+  const [momentos, setMomentos] = useState({ transformacoes: [], amanha: [], retornos: [], recomendacoes: [] });
   const [andamento, setAndamento] = useState([]);
   const [needs, setNeeds] = useState([]);
   useEffect(() => {
@@ -629,7 +630,7 @@ export default function FeedClient({ labels }) {
   useEffect(() => { fetch('/api/suggestions').then((r) => r.json()).then((j) => setSuggestions(j.people || [])).catch(() => {}); }, []);
   useEffect(() => { fetch('/api/eco', { method: 'POST' }).catch(() => {}); }, []);
   useEffect(() => { fetch('/api/andamento').then((r) => r.json()).then((j) => setAndamento(j.andamento || [])).catch(() => {}); }, []);
-  useEffect(() => { fetch('/api/momentos').then((r) => r.json()).then((j) => setMomentos({ transformacoes: j.transformacoes || [], amanha: j.amanha || [], retornos: j.retornos || [] })).catch(() => {}); }, []);
+  useEffect(() => { fetch('/api/momentos').then((r) => r.json()).then((j) => setMomentos({ transformacoes: j.transformacoes || [], amanha: j.amanha || [], retornos: j.retornos || [], recomendacoes: j.recomendacoes || [] })).catch(() => {}); }, []);
 
   async function load() {
     if (busy.current || doneRef.current) return;
@@ -861,6 +862,9 @@ export default function FeedClient({ labels }) {
           )}
           {idx === 1 && needs.length > 0 && (
             <NeedsSupport people={needs} labels={labels.needs} />
+          )}
+          {idx === 1 && needs.length === 0 && momentos.recomendacoes[0] && (
+            <UpiRecommendation item={momentos.recomendacoes[0]} labels={labels.upiRecommendation} />
           )}
           {idx === 2 && momentos.transformacoes[0] && (
             <Transformacao item={momentos.transformacoes[0]} labels={labels.transf} />
