@@ -32,41 +32,9 @@ import LanguagePicker from './LanguagePicker';
 // Os números do sino. Ficam aqui para nenhuma página precisar
 // saber como se conta um "novo" — e podem vir de fora quando a
 // página já os calculou (é o caso da home).
-async function contarSinais(sb, userId) {
-  let unread = 0, likes = 0;
-  const seguidores = new Set();
-  try {
-    const { count } = await sb.from('notifications')
-      .select('*', { count: 'exact', head: true })
-      .eq('recipient_id', userId).eq('read', false);
-    unread = count || 0;
-  } catch { }
-  try {
-    const { data: js } = await sb.from('journeys').select('id').eq('owner_id', userId);
-    const jIds = (js || []).map((j) => j.id);
-    if (jIds.length) {
-      const { data: ups } = await sb.from('updates').select('id').in('journey_id', jIds);
-      const uIds = (ups || []).map((u) => u.id);
-      if (uIds.length) {
-        const { count } = await sb.from('encouragements')
-          .select('*', { count: 'exact', head: true })
-          .in('update_id', uIds).neq('user_id', userId);
-        likes = count || 0;
-      }
-      const { data: jf } = await sb.from('follows').select('user_id').in('journey_id', jIds);
-      (jf || []).forEach((f) => seguidores.add(f.user_id));
-    }
-    const { data: pf } = await sb.from('profile_follows').select('follower_id').eq('following_id', userId);
-    (pf || []).forEach((f) => seguidores.add(f.follower_id));
-  } catch { }
-  seguidores.delete(userId);
-  return { unread, likes, follows: seguidores.size };
-}
-
 export default async function AppTop({
   sino = false,            // true só no feed
   backHref = '/home', backLabel,
-  likes, follows, unread,
 }) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();

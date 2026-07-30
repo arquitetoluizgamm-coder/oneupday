@@ -1,0 +1,58 @@
+/* Fonte única para decisões novas de interface.
+   As variáveis históricas permanecem em globals.css até cada componente migrar. */
+:root {
+  --one-bg: #FAF7F2;
+  --one-bg-soft: #F3F0EA;
+  --one-surface: #FFFFFF;
+  --one-ink: #10132D;
+  --one-muted: #69707D;
+  --one-line: #E6E2DA;
+  --one-terracotta: #C16F54;
+  --one-terracotta-soft: #F4E3DC;
+  --one-sage: #84957E;
+  --one-sage-soft: #EEF3EA;
+  --one-difficult: #C9A392;
+  --one-info: #61758A;
+  --one-danger: #A55C57;
+  --one-focus: rgba(193, 111, 84, .25);
+
+  --one-space-1: 4px;
+  --one-space-2: 8px;
+  --one-space-3: 12px;
+  --one-space-4: 16px;
+  --one-space-5: 24px;
+  --one-space-6: 32px;
+
+  --one-radius-control: 12px;
+  --one-radius-card: 18px;
+  --one-radius-sheet: 24px;
+  --one-radius-pill: 999px;
+  --one-touch-min: 44px;
+
+  --one-shadow-card: 0 6px 18px rgba(16, 19, 45, .05);
+  --one-shadow-control: 0 8px 22px rgba(16, 19, 45, .08);
+  --one-shadow-sheet: 0 18px 48px rgba(16, 19, 45, .16);
+  --one-ease: cubic-bezier(.22, 1, .36, 1);
+  --one-motion-fast: 160ms;
+  --one-motion-base: 220ms;
+
+  /* Ponte de migração: os nomes históricos passam a usar a paleta oficial. */
+  --bg: var(--one-bg);
+  --surface: var(--one-surface);
+  --ink: var(--one-ink);
+  --muted: var(--one-muted);
+  --line: var(--one-line);
+  --orange: var(--one-terracotta);
+  --pink: var(--one-terracotta);
+  --yellow: #E2B66D;
+  --violet: var(--one-info);
+  --sage: var(--one-sage);
+  --sage-soft: var(--one-sage-soft);
+  --support: var(--one-terracotta);
+  --support-soft: var(--one-terracotta-soft);
+  --up: linear-gradient(135deg, #C16F54, #D9916C 58%, #E2B66D);
+  --shadow: var(--one-shadow-card);
+  --shadow-sm: 0 2px 8px rgba(16, 19, 45, .05);
+  --shadow-md: var(--one-shadow-card);
+  --shadow-lg: var(--one-shadow-sheet);
+}

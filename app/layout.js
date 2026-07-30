@@ -1,4 +1,5 @@
 import './globals.css';
+import './one-tokens.css';
 import { getLocale } from '../lib/locale';
 import { getDict } from '../lib/i18n';
 import SwRegister from '../components/SwRegister';

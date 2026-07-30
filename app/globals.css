@@ -9302,6 +9302,78 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
   }
 }
 
+/* Navegação ONE: vidro só na barra inferior e em painéis flutuantes. */
+.bottom-nav {
+  border-radius: 28px !important;
+  background: rgba(250, 247, 242, .78) !important;
+  border-color: rgba(255, 255, 255, .86) !important;
+  box-shadow: var(--one-shadow-sheet), inset 0 1px 0 rgba(255, 255, 255, .86) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  backdrop-filter: blur(18px) saturate(120%);
+}
+.bottom-nav a,
+.bottom-nav .bn-create { min-width: var(--one-touch-min); min-height: var(--one-touch-min); }
+.bottom-nav a.on {
+  color: var(--one-terracotta) !important;
+  background: var(--one-terracotta-soft) !important;
+  border-radius: var(--one-radius-pill) !important;
+}
+.bottom-nav .bn-create {
+  background: var(--one-terracotta) !important;
+  box-shadow: 0 8px 18px rgba(193, 111, 84, .24) !important;
+}
+
+/* Cabeçalhos são limpos: marca, voltar e contexto, sem um segundo painel de vidro. */
+.top .icon-btn,
+.top .header-create,
+.top .lang-picker {
+  background: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.top .icon-btn:focus-visible,
+.top .header-create:focus-visible,
+.top .lang-picker:focus-within {
+  outline: 3px solid var(--one-focus);
+  outline-offset: 2px;
+}
+
+/* Filtros e abas organizam conteúdo; não devem parecer janelas sobrepostas. */
+.ptabs,
+.feed-tabs,
+.feed-filter-menu {
+  background: var(--one-bg-soft) !important;
+  border: 1px solid var(--one-line) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.ptab.on,
+.feed-tabs .on,
+.feed-filter-menu button.on {
+  color: var(--one-ink) !important;
+  background: var(--one-surface) !important;
+  box-shadow: var(--one-shadow-card) !important;
+}
+
+/* Menus e escolhas podem flutuar, mas com opacidade suficiente para leitura. */
+.create-menu,
+.pm-sheet,
+.supporters-popover,
+.crop-modal-card,
+.wz-up-modal,
+.cit-final {
+  background: rgba(250, 247, 242, .94) !important;
+  border: 1px solid rgba(255, 255, 255, .86) !important;
+  border-radius: var(--one-radius-sheet) !important;
+  box-shadow: var(--one-shadow-sheet), inset 0 1px 0 rgba(255, 255, 255, .88) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(110%);
+  backdrop-filter: blur(12px) saturate(110%);
+}
+.comment-panel { background: var(--one-surface) !important; box-shadow: none !important; }
+
+
 /* Notificação da marca: o Upi fica dentro de uma pequena lente de vidro.
    Sem novidades ela é calma; com novidades, o pingo terracota respira. */
 @media (max-width: 767px) {
@@ -9595,4 +9667,117 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
     background: rgba(250, 247, 242, .74) !important;
     border: 1px solid rgba(255, 255, 255, .78) !important;
   }
+}
+
+/* Base final da migração visual. Estas regras vencem os patches históricos. */
+.bottom-nav { border-radius:28px!important; background:rgba(250,247,242,.78)!important; border-color:rgba(255,255,255,.86)!important; box-shadow:var(--one-shadow-sheet),inset 0 1px 0 rgba(255,255,255,.86)!important; -webkit-backdrop-filter:blur(18px) saturate(120%);backdrop-filter:blur(18px) saturate(120%); }
+.bottom-nav a.on { color:var(--one-terracotta)!important;background:var(--one-terracotta-soft)!important;border-radius:var(--one-radius-pill)!important; }
+.bottom-nav .bn-create { background:var(--one-terracotta)!important;box-shadow:0 8px 18px rgba(193,111,84,.24)!important; }
+.top .icon-btn,.top .header-create,.top .lang-picker { background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important; }
+.ptabs,.feed-tabs,.feed-filter-menu { background:var(--one-bg-soft)!important;border:1px solid var(--one-line)!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important; }
+.ptab.on,.feed-tabs .on,.feed-filter-menu button.on { color:var(--one-ink)!important;background:var(--one-surface)!important;box-shadow:var(--one-shadow-card)!important; }
+.create-menu,.pm-sheet,.supporters-popover,.crop-modal-card,.wz-up-modal,.cit-final { background:rgba(250,247,242,.94)!important;border:1px solid rgba(255,255,255,.86)!important;border-radius:var(--one-radius-sheet)!important;box-shadow:var(--one-shadow-sheet),inset 0 1px 0 rgba(255,255,255,.88)!important;-webkit-backdrop-filter:blur(12px) saturate(110%);backdrop-filter:blur(12px) saturate(110%); }
+.comment-panel { background:var(--one-surface)!important;box-shadow:none!important; }
+.profile-card .pc-info,.share-card-section,.future-share-card,.tree-scene,.tree-growth { background:var(--one-surface)!important;border-color:var(--one-line)!important;box-shadow:var(--one-shadow-card)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important; }
+
+/* Recursos emocionais: papel para intimidade, argila suave para crescimento. */
+.diary-page { background:linear-gradient(180deg,transparent 0,var(--one-bg-soft) 100%); }
+.diary-card,
+.diary-history {
+  background:#FFFEFA !important;
+  border:1px solid var(--one-line) !important;
+  border-radius:var(--one-radius-card) !important;
+  box-shadow:var(--one-shadow-card) !important;
+}
+.diary-card textarea,
+.diary-card input,
+.diary-entry {
+  background:#FFFEFA !important;
+  border-color:var(--one-line) !important;
+}
+.diary-entry-wrap.on { border-left-color:var(--one-terracotta) !important; }
+.diary-entry-comment { background:var(--one-sage-soft) !important;border-radius:var(--one-radius-control)!important; }
+
+.future-create,
+.future-card {
+  background:#FFFEFA !important;
+  border:1px solid var(--one-line) !important;
+  border-radius:var(--one-radius-card) !important;
+  box-shadow:var(--one-shadow-card) !important;
+}
+.future-kind { background:var(--one-bg-soft)!important;border-radius:var(--one-radius-pill)!important;padding:4px; }
+.future-kind button.on { background:var(--one-surface)!important;color:var(--one-ink)!important;box-shadow:var(--one-shadow-card)!important; }
+.future-card.ready { border-color:rgba(193,111,84,.42)!important; }
+.future-card-preview {
+  border:1px solid rgba(193,111,84,.20) !important;
+  box-shadow:var(--one-shadow-control),inset 0 1px 0 rgba(255,255,255,.88) !important;
+}
+
+.tree-scene { background:linear-gradient(145deg,#F7F3EC,#EEF3EA)!important; }
+.tree-growth { background:#FFFEFA!important; }
+.tree-metric { background:var(--one-bg-soft)!important;border-color:transparent!important; }
+.tree-metric.on { background:var(--one-sage-soft)!important;border-color:rgba(132,149,126,.42)!important;box-shadow:var(--one-shadow-card)!important; }
+
+/* Conteúdo principal: plano, legível e com profundidade apenas quando ajuda. */
+.feed-page .entry {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: var(--one-line) !important;
+}
+.feed-page .entry + .entry { margin-top: var(--one-space-4); }
+.feed-page .entry-textcard {
+  border-radius: var(--one-radius-card) !important;
+  box-shadow: var(--one-shadow-card) !important;
+}
+.feed-page .entry-actions { min-height: var(--one-touch-min); align-items:center; }
+.feed-page .entry-actions .support-pill.on { color:var(--one-terracotta)!important;background:var(--one-terracotta-soft)!important; }
+
+.profile-card {
+  border-color: var(--one-line) !important;
+  box-shadow: var(--one-shadow-card) !important;
+}
+.profile-card .pc-info { border-top:1px solid var(--one-line)!important; }
+.pc-acoes > * { min-width:var(--one-touch-min);min-height:var(--one-touch-min); }
+
+.journey-public .timeline .body {
+  background: var(--one-surface) !important;
+  border-color: var(--one-line) !important;
+  box-shadow: var(--one-shadow-card) !important;
+}
+.journey-public .journey-day-card.win .body {
+  background: var(--one-sage-soft) !important;
+  border-color: rgba(132,149,126,.30) !important;
+}
+.journey-public .journey-day-card.setback .body {
+  background: #FBF4F0 !important;
+  border-color: rgba(201,163,146,.42) !important;
+}
+.journey-public .timeline .day { color:var(--one-ink); }
+.journey-public .timeline .tag.setback { color:var(--one-ink);background:#F1E3DC; }
+
+.comment-panel,
+.comment-item,
+.comment-replies { border-color:var(--one-line)!important; }
+.comment-form input { border-color:var(--one-line)!important;background:var(--one-surface)!important; }
+.comment-form input:focus { border-color:var(--one-terracotta)!important;box-shadow:0 0 0 3px var(--one-focus)!important;outline:0; }
+
+/* A camada de leitura permanece serena. Gradientes e brilho ficam somente
+   nas ações e nos momentos especiais, não atrás das histórias. */
+body { background:var(--one-bg)!important; }
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline:3px solid var(--one-focus)!important;
+  outline-offset:2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior:auto!important; }
+  .bn-notify-dot,
+  .profile-notification-bell.has-notifications svg,
+  .journey-day-card.win .body { animation:none!important; }
 }
