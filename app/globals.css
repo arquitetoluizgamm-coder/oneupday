@@ -9360,6 +9360,72 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
 }
 .top-feed .upi-sino.tem { color: var(--orange, #c16f54); border-color: rgba(193, 111, 84, .38); }
 
+/* ============================================================
+   LIQUID GLASS DO PRODUTO
+
+   O vidro fica restrito a navegação, escolhas e momentos especiais.
+   Textos de jornada e fotos continuam em superfícies sólidas.
+   ============================================================ */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .profile-card .pc-info,
+  .journey-public > .profile-card .pc-info {
+    background: rgba(250, 247, 242, .78);
+    border-top: 1px solid rgba(255, 255, 255, .78);
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+    backdrop-filter: blur(18px) saturate(120%);
+  }
+
+  .create-menu,
+  .feed-filter-menu,
+  .supporters-popover,
+  .comment-panel,
+  .pm-sheet,
+  .crop-modal-card,
+  .wz-up-modal,
+  .cit-final {
+    background: rgba(250, 247, 242, .84) !important;
+    border: 1px solid rgba(255, 255, 255, .82) !important;
+    box-shadow: 0 22px 58px rgba(16, 19, 45, .16), inset 0 1px 0 rgba(255, 255, 255, .8) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(125%);
+    backdrop-filter: blur(22px) saturate(125%);
+  }
+
+  .feed-filter-menu button,
+  .supporters-popover span,
+  .supporters-popover a,
+  .comment-more,
+  .wz-up-modal-close,
+  .pm-x {
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .54);
+  }
+
+  .share-card-section,
+  .future-share-card,
+  .tree-scene,
+  .tree-growth {
+    background: linear-gradient(145deg, rgba(255, 255, 255, .76), rgba(240, 243, 235, .72));
+    border-color: rgba(255, 255, 255, .82);
+    box-shadow: 0 18px 48px rgba(16, 19, 45, .09), inset 0 1px 0 rgba(255, 255, 255, .8);
+    -webkit-backdrop-filter: blur(14px) saturate(115%);
+    backdrop-filter: blur(14px) saturate(115%);
+  }
+}
+
+/* O estado positivo tem uma confirmação curta, sem transformar o feed em jogo. */
+.journey-day-card.win .body {
+  animation: oneDayComplete .52s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes oneDayComplete {
+  from { opacity: .72; transform: translateY(5px); box-shadow: 0 0 0 rgba(193, 111, 84, 0); }
+  to { opacity: 1; transform: none; box-shadow: 0 14px 34px rgba(132, 149, 126, .08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-day-card.win .body { animation: none; }
+}
+
 /* A área segura do celular acompanha o fundo da marca durante a rolagem.
    Evita que o recorte da câmera revele uma faixa branca acima do feed. */
 @media (max-width: 767px) {
