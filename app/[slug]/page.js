@@ -82,6 +82,18 @@ async function loadJourney(slug) {
     sb.from('updates').select('*').eq('journey_id', journey.id).order('day_number', { ascending: true }),
     sb.from('journey_stats').select('*').eq('journey_id', journey.id).maybeSingle(),
   ]);
+  // A lista é opcional: bancos anteriores ao patch continuam funcionando.
+  // Quando existir, ela permite que dois usuários de produção preparem as
+  // imagens das jornadas editoriais sem transformar esses registros em
+  // propriedade de uma conta real.
+  let editorialEditor = false;
+  if (user && journey.editorial_seed === true) {
+    try {
+      const { data: allowed } = await sb.from('editorial_image_editors')
+        .select('user_id').eq('user_id', user.id).maybeSingle();
+      editorialEditor = !!allowed;
+    } catch {}
+  }
   const ups = updates || [];
   const encById = {};
   const myEnc = [];
@@ -100,7 +112,7 @@ async function loadJourney(slug) {
       (mts || []).forEach((m) => { (meTooByUpdate[m.update_id] ||= []).push(m.msg_key); });
     } catch {}
   }
-  return { journey, owner, updates: ups, stats: stats || {}, encById, viewerId: user?.id || null, myEnc, meTooByUpdate };
+  return { journey, owner, updates: ups, stats: stats || {}, encById, viewerId: user?.id || null, myEnc, meTooByUpdate, editorialEditor };
   } catch (e) { return null; }
 }
 
@@ -408,8 +420,9 @@ export default async function JourneyPage({ params, searchParams }) {
     if (prof) return <ProfilePage handle={prof.profile.handle} />;
     notFound();
   }
-  const { journey, owner, updates, stats, encById, viewerId, myEnc, meTooByUpdate = {} } = data;
+  const { journey, owner, updates, stats, encById, viewerId, myEnc, meTooByUpdate = {}, editorialEditor = false } = data;
   const isOwner = viewerId && viewerId === journey.owner_id;
+  const canEditUpdate = !!isOwner || !!editorialEditor;
   const meTooMsg = { back: t.meTooBack, trying: t.meTooTrying, hard: t.meTooHard };
   const myEncSet = new Set(myEnc || []);
   const fromShare = searchParams?.r === 's';
@@ -657,10 +670,10 @@ export default async function JourneyPage({ params, searchParams }) {
                 {g.itens.map((u, ii) => (
                 <div className={`dia-item${ii > 0 ? ' extra' : ''}`} key={u.id}>
                 {tagFor(u.kind) && !soSelo(u) && <span className={`tag ${u.kind}`}>{tagFor(u.kind)}</span>}
-                {u.photo_url && (isOwner
+                {u.photo_url && (canEditUpdate
                   ? <OwnerMedia updateId={u.id} url={u.photo_url} kind="photo" alt={textoAlternativo(u.alt, { dia: u.day_number, titulo: journey.title }, t)} labels={{ remove: t.mediaRemove, confirm: t.mediaRemoveConfirm, error: t.postError }} />
                   : <div className="update-photo"><img src={u.photo_url} alt={textoAlternativo(u.alt, { dia: u.day_number, titulo: journey.title }, t)} /></div>)}
-                {u.video_url && (isOwner
+                {u.video_url && (canEditUpdate
                   ? <OwnerMedia updateId={u.id} url={u.video_url} kind="video" labels={{ remove: t.mediaRemove, confirm: t.mediaRemoveConfirm, error: t.postError }} />
                   : <div className="update-photo"><video src={comCapa(u.video_url)} controls playsInline preload="metadata" /></div>)}
                 {textoDaPessoa(u.text)
@@ -679,7 +692,7 @@ export default async function JourneyPage({ params, searchParams }) {
                 <div className="update-foot journey-icon-actions">
                   <EncourageBar updateId={u.id} initialActive={myEncSet.has(u.id)} labelIdle={t.withYouIdle} labelActive={t.withYouActive} supportersLabel={t.supporters} supportersLoading={t.supportersLoading} supportersEmpty={t.supportersEmpty} closeLabel={t.commentClose} />
                   <Comments updateId={u.id} labels={{ comment: t.comment, close: t.commentClose, empty: t.commentEmpty, placeholder: t.commentPlaceholder, send: t.commentSend, sending: t.commentSending, unsafe: t.commentUnsafe, pendente: t.commentPendente, error: t.commentError, someone: t.commentSomeone, reply: t.commentReply, more: t.commentMore, less: t.commentLess, replying: t.commentReplying, cancel: t.commentCancel }} />
-                  {isOwner
+                  {canEditUpdate
                     ? <EditUpdate update={{ id: u.id, text: u.text, alt: u.alt, photo_url: u.photo_url, day: u.day_number }} labels={{ altLabel: t.altLabel, altPh: t.altPh, altOk: t.altOk, altVazio: t.altVazio, btn: t.euBtn, title: t.euTitle, text: t.euText, photo: t.euPhoto, photoAdd: t.ejCoverAdd, photoChange: t.ejCoverChange, photoRemove: t.ejCoverRemove, save: t.epSave, saving: t.epSaving, cancel: t.epCancel, errSave: t.epErrSave, errEmpty: t.euErrEmpty, deletePost: t.euDeletePost, deleteConfirm: t.postDeleteConfirm, cropOriginal: t.cropOriginal, cropSquare: t.cropSquare, cropPortrait: t.cropPortrait, cropLandscape: t.cropLandscape, cropUse: t.cropUse, cropCancel: t.cropCancel, cropHint: t.cropHint, cropHintOriginal: t.cropHintOriginal, cropZoom: t.cropZoom }} />
                     : (
                       /* Dez posts com quatro controles cada davam quarenta
