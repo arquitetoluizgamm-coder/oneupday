@@ -490,7 +490,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
         aria-describedby={pergunta ? 'perg-do-dia' : undefined}
         onKeyDown={e => {
           if (e.defaultPrevented) return;
-          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); post(); }
+          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); post(); }
         }} />
       {aiOn && kind && text.trim().length >= 3 && (
         <div className="upi-polish">
