@@ -5,7 +5,6 @@ import HeaderHeart from './HeaderHeart';
 import BackBtn from './BackBtn';
 import Logo, { Wordmark } from './Logo';
 import LanguagePicker from './LanguagePicker';
-import CriarMenu from './CriarMenu';
 
 // ============================================================
 // TOPO — um só, para todo o app
@@ -117,9 +116,8 @@ export default async function AppTop({
         <Wordmark height={26} />
       </a>
 
-      <div className="top-right">
-        <CriarMenu t={t} className="header-create" tamanho={25} rotulo={t.navCreate} />
-      </div>
+      {/* A criação fica concentrada no botão + da navegação inferior. */}
+      <div className="top-right" aria-hidden="true" />
     </header>
   );
 }
