@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { createClient } from '../lib/supabase/client';
+import CriarMenu from './CriarMenu';
 
 function ProfileNavAvatar() {
   const [profile, setProfile] = useState(null);
@@ -50,7 +51,13 @@ export default function BottomNav({ active, t }) {
 
   return (
     <nav className={`bottom-nav${scrolling ? ' scrolling' : ''}`} aria-label="Navigation">
-      {items.map((it) => (
+      {items.slice(0, 2).map((it) => (
+        <a key={it.key} href={it.href} className={active === it.key ? 'on' : ''} aria-label={it.label} title={it.label}>
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={it.d} /></svg>
+        </a>
+      ))}
+      <CriarMenu t={t} className="bn-create" tamanho={26} />
+      {items.slice(2).map((it) => (
         <a key={it.key} href={it.href} className={active === it.key ? 'on' : ''} aria-label={it.label} title={it.label}>
           {it.avatar
             ? <ProfileNavAvatar />
