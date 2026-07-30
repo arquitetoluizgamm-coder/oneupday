@@ -634,7 +634,10 @@ export default async function JourneyPage({ params, searchParams }) {
         </p>
 
         <section className="timeline">
-          {porDia.slice().reverse().map((g, gi, garr) => {
+          {/* A leitura de uma jornada começa no Dia 1. O último dia continua
+              destacado pela barra e pela tira, mas não deve aparecer antes
+              dos capítulos que explicam como a pessoa chegou até ele. */}
+          {porDia.map((g, gi, garr) => {
             // o dia herda o tom do registro mais forte: recaida vence, depois vitoria
             const tom = g.itens.some((x) => x.kind === 'setback') ? 'setback'
                       : g.itens.some((x) => x.kind === 'win') ? 'win' : '';
