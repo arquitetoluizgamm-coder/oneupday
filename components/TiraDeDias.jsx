@@ -53,14 +53,16 @@ export default function TiraDeDias({ dias = [], hoje = 0, total = 0, labels = {}
   const totalDays = Math.max(Number(total) || 0, maxDay);
   const trackRef = useRef(null);
   const draggingRef = useRef(false);
-  const previewRef = useRef(maxDay || 1);
-  const [selected, setSelected] = useState(maxDay || 1);
-  const [preview, setPreview] = useState(maxDay || 1);
+  const previewRef = useRef(1);
+  // A leitura começa sempre no primeiro capítulo. O dia atual continua
+  // limitado pelo presente, mas não deve substituir a entrada da história.
+  const [selected, setSelected] = useState(1);
+  const [preview, setPreview] = useState(1);
   const [dragging, setDragging] = useState(false);
   const [focado, setFocado] = useState(false);
 
   useEffect(() => {
-    const next = clamp(maxDay || 1, 1, Math.max(maxDay, 1));
+    const next = 1;
     setSelected(next);
     setPreview(next);
     previewRef.current = next;

@@ -9205,3 +9205,24 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
 /* Recomendação factual da Upi, entre os blocos do feed. */
 .upi-recommendation{margin:18px 0;padding:16px 18px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,var(--surface),var(--sage-soft));box-shadow:var(--shadow-sm)}
 .upi-recommendation-head{display:flex;align-items:center;gap:10px}.upi-recommendation-head img{width:34px;height:34px;object-fit:contain}.upi-recommendation-head b{display:block;color:var(--ink);font-size:13px}.upi-recommendation-head span{display:block;color:var(--muted);font-size:11px;margin-top:2px}.upi-recommendation>p{margin:12px 0 8px;color:var(--ink);font-size:14px;line-height:1.45;font-weight:650}.upi-recommendation blockquote{margin:0 0 12px;padding-left:10px;border-left:2px solid var(--orange);color:var(--muted);font:italic 14px/1.45 var(--serif);white-space:normal}.upi-recommendation-link{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:11px;border-top:1px solid color-mix(in srgb,var(--line) 72%,transparent);color:var(--ink);text-decoration:none}.upi-recommendation-link strong{display:block;font-size:13px}.upi-recommendation-link small{display:block;margin-top:3px;color:var(--muted);font-size:11px}.upi-recommendation-link>span:last-child{color:var(--orange);font-size:24px;line-height:1}
+/* ============================================================
+   PATCH 223 · jornada por capítulos
+
+   A linha do tempo é um mapa, não a leitura inteira. Cada dia ocupa
+   uma página horizontal e os registros do mesmo dia permanecem dentro
+   do capítulo. Assim a pessoa entende o começo, troca de dia com gesto
+   e não enfrenta uma coluna interminável de posts.
+   ============================================================ */
+.journey-public .timeline{display:flex;gap:16px;overflow-x:auto;overflow-y:visible;margin-top:0;padding:0 2px 22px;scroll-snap-type:x mandatory;scroll-padding-inline:2px;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.journey-public .timeline::-webkit-scrollbar{display:none}
+.journey-public .timeline article{flex:0 0 100%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always;scroll-margin-top:118px}
+.journey-public .timeline .body{max-height:min(680px,calc(100svh - 300px));overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(24,36,59,.2) transparent}
+.journey-public .timeline .body::-webkit-scrollbar{width:4px}
+.journey-public .timeline .body::-webkit-scrollbar-thumb{border-radius:999px;background:rgba(24,36,59,.2)}
+.journey-public .journey-swipe-hint{display:block}
+@media(max-width:640px){
+  .journey-public .timeline{gap:14px;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px;scroll-padding-inline:16px}
+  .journey-public .timeline article{flex-basis:calc(100vw - 32px);height:calc(100svh - 246px)}
+  .journey-public .timeline .body{height:100%;max-height:none}
+}
+@media(prefers-reduced-motion:reduce){.journey-public .timeline{scroll-behavior:auto;scroll-snap-type:none}}
