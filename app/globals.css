@@ -9809,3 +9809,182 @@ summary:focus-visible {
   }
   .bottom-nav .bn-create { margin-top:-10px!important; }
 }
+
+/* ============================================================
+   ONE MATERIAL UI
+   Relevo moderno: luz suave, bordas quentes e profundidade curta.
+   Não é vidro sobre toda a tela; é uma interface que parece feita de
+   matéria, deixando relatos e fotos como o centro da experiência.
+   ============================================================ */
+html { background:#F5F0E8; }
+body {
+  background:
+    radial-gradient(circle at 9% 4%, rgba(255,255,255,.82), transparent 28%),
+    radial-gradient(circle at 92% 94%, rgba(222,213,199,.42), transparent 30%),
+    #F5F0E8!important;
+}
+
+.top {
+  background:rgba(245,240,232,.88);
+  border-bottom:1px solid rgba(255,255,255,.74);
+  box-shadow:0 1px 0 rgba(222,213,199,.55);
+}
+
+/* Navegação: uma bandeja flutuante, não uma faixa plana. */
+.bottom-nav {
+  background:linear-gradient(145deg,#FFFCF6,#EEE7DC)!important;
+  border:1px solid rgba(255,255,255,.92)!important;
+  box-shadow:var(--one-shadow-raised),inset 0 1px 0 rgba(255,255,255,.92)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+.bottom-nav a { color:#687080!important; }
+.bottom-nav a.on {
+  color:var(--one-terracotta)!important;
+  background:linear-gradient(145deg,#FDF7F0,#EDE1D4)!important;
+  box-shadow:var(--one-shadow-pressed)!important;
+}
+.bottom-nav .bn-create {
+  background:linear-gradient(145deg,#D78768,#B75F45)!important;
+  border:1px solid rgba(255,255,255,.42)!important;
+  box-shadow:5px 7px 13px rgba(132,72,51,.27),-3px -3px 8px rgba(255,255,255,.55),inset 0 1px 0 rgba(255,255,255,.34)!important;
+}
+.bottom-nav .bn-create:active { box-shadow:var(--one-shadow-pressed)!important; }
+.bottom-nav .bn-profile-avatar { box-shadow:0 2px 5px rgba(90,77,60,.22),0 0 0 2px #FFFCF6!important; }
+
+/* Controles de escolha parecem peças do mesmo conjunto. */
+.ptabs,.feed-tabs,.feed-filter-menu,.future-kind {
+  background:linear-gradient(145deg,#EEE8DE,#FAF7F1)!important;
+  border-color:rgba(255,255,255,.82)!important;
+  box-shadow:var(--one-shadow-pressed)!important;
+}
+.ptab.on,.feed-tabs .on,.feed-filter-menu button.on,.future-kind button.on {
+  background:linear-gradient(145deg,#FFFDF8,#EDE4D8)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+
+/* Superfícies de apoio ganham profundidade curta. Os relatos continuam planos. */
+.home-welcome-journey,
+.profile-card,
+.journey-public .timeline .body,
+.diary-card,
+.diary-history,
+.future-create,
+.future-card,
+.tree-growth {
+  background:linear-gradient(145deg,#FFFCF7,#F4EDE3)!important;
+  border:1px solid rgba(255,255,255,.92)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.home-welcome-journey:hover,
+.profile-card:hover {
+  transform:translateY(-1px);
+  box-shadow:var(--one-shadow-raised)!important;
+}
+
+.home-welcome-primary,
+.cta,
+.profile-card .pc-follow,
+.journey-public .cta {
+  background:linear-gradient(145deg,#D78768,#B75F45)!important;
+  border:1px solid rgba(255,255,255,.42)!important;
+  box-shadow:5px 7px 14px rgba(132,72,51,.21),inset 0 1px 0 rgba(255,255,255,.32)!important;
+}
+.home-welcome-primary:active,
+.cta:active { transform:translateY(1px);box-shadow:var(--one-shadow-pressed)!important; }
+
+/* Cartões de texto continuam leves; a foto nunca recebe efeito de plástico. */
+.feed-page .entry-textcard,
+.journey-public .timeline .body .entry-textcard {
+  background:#FFFDF9!important;
+  border-color:rgba(222,213,199,.76)!important;
+  box-shadow:0 5px 13px rgba(103,88,68,.08)!important;
+}
+.entry-media,
+.entry-media img,
+.entry-media video { box-shadow:none!important; }
+
+/* Modais são a camada elevada mais forte da interface. */
+.create-menu,.pm-sheet,.supporters-popover,.crop-modal-card,.wz-up-modal,.cit-final {
+  background:linear-gradient(145deg,#FFFCF7,#F1E9DE)!important;
+  border-color:rgba(255,255,255,.94)!important;
+  box-shadow:18px 20px 46px rgba(83,67,49,.22),-7px -7px 18px rgba(255,255,255,.72)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-welcome-journey:hover,.profile-card:hover,.home-welcome-primary:active,.cta:active { transform:none; }
+}
+
+/* Proteção contra regras antigas: nunca há uma segunda linha no footer. */
+.bottom-nav {
+  grid-template-columns:repeat(5, minmax(0, 1fr))!important;
+  grid-template-rows:56px!important;
+  grid-auto-rows:56px!important;
+}
+.bottom-nav > * { grid-row:1!important; }
+
+/* Acabamento material: menos contorno, mais luz e sombra. */
+.icon-btn,
+.profile-notification-bell,
+.header-create {
+  border:0!important;
+  border-radius:50%!important;
+  background:linear-gradient(145deg,#FFFCF7,#ECE4D8)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.icon-btn:active,
+.profile-notification-bell:active,
+.header-create:active { box-shadow:var(--one-shadow-pressed)!important; }
+
+.home-welcome-journey,
+.profile-card,
+.journey-public .timeline .body,
+.diary-card,
+.diary-history,
+.future-create,
+.future-card,
+.tree-growth,
+.comment-panel,
+.supporters-popover {
+  border-color:rgba(222,213,199,.44)!important;
+}
+
+.ep-field input,
+.ep-field textarea,
+.comment-form input,
+.diary-card textarea,
+.diary-card input,
+.future-create input,
+.future-create textarea {
+  background:linear-gradient(145deg,#EEE7DD,#FFFCF7)!important;
+  border:1px solid rgba(222,213,199,.48)!important;
+  box-shadow:var(--one-shadow-pressed)!important;
+}
+
+.ep-field input:focus,
+.ep-field textarea:focus,
+.comment-form input:focus,
+.diary-card textarea:focus,
+.diary-card input:focus,
+.future-create input:focus,
+.future-create textarea:focus {
+  border-color:rgba(193,111,84,.60)!important;
+  box-shadow:var(--one-shadow-pressed),0 0 0 3px rgba(193,111,84,.12)!important;
+}
+
+/* Terracota é uma peça elevada; sálvia comunica continuidade, nunca competição. */
+.support-pill.on,
+.journey-public .timeline .tag.win,
+.tree-metric.on {
+  border:0!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.journey-public .timeline .tag.win,
+.tree-metric.on { background:linear-gradient(145deg,#F5F9F1,#DCE7D7)!important; }
+
+.feed-page .entry-actions,
+.journey-public .entry-actions {
+  border-top-color:rgba(222,213,199,.62)!important;
+}

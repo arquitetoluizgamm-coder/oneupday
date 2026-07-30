@@ -55,4 +55,13 @@
   --shadow-sm: 0 2px 8px rgba(16, 19, 45, .05);
   --shadow-md: var(--one-shadow-card);
   --shadow-lg: var(--one-shadow-sheet);
+
+  /* Matéria visual ONE: superfícies claras, moldadas e táteis. */
+  --one-material: #F5F0E8;
+  --one-material-light: #FFFCF6;
+  --one-material-deep: #DED5C7;
+  --one-terracotta-deep: #A95740;
+  --one-shadow-raised: 9px 10px 22px rgba(103, 88, 68, .16), -7px -7px 16px rgba(255, 255, 255, .86);
+  --one-shadow-soft-raised: 5px 6px 14px rgba(103, 88, 68, .11), -4px -4px 10px rgba(255, 255, 255, .78);
+  --one-shadow-pressed: inset 3px 3px 7px rgba(103, 88, 68, .15), inset -3px -3px 7px rgba(255, 255, 255, .75);
 }
