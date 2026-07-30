@@ -3,11 +3,28 @@
 
 alter table public.journeys add column if not exists editorial_seed boolean not null default false;
 alter table public.journeys add column if not exists cover_url text;
+alter table public.profiles add column if not exists avatar_url text;
+
+insert into public.profiles (id, handle, name, bio, avatar_color, avatar_url)
+values (
+  'cb1615b5-e40a-4577-83f8-d5526187f2f8'::uuid,
+  '@historias.one',
+  'Lia',
+  'Um passo de cada vez.',
+  '#8b9b83',
+  '/demo-stories/lia-avatar.png'
+)
+on conflict (id) do update set
+  handle = excluded.handle,
+  name = excluded.name,
+  bio = excluded.bio,
+  avatar_color = excluded.avatar_color,
+  avatar_url = excluded.avatar_url;
 
 with owner as (
-  select p.id
-  from public.profiles p
-  where lower(p.handle) = lower('@historias.one')
+  select id
+  from public.profiles
+  where id = 'cb1615b5-e40a-4577-83f8-d5526187f2f8'::uuid
   limit 1
 )
 insert into public.journeys
@@ -38,9 +55,9 @@ on conflict (id) do update set
   editorial_seed = true;
 
 with owner as (
-  select p.id
-  from public.profiles p
-  where lower(p.handle) = lower('@historias.one')
+  select id
+  from public.profiles
+  where id = 'cb1615b5-e40a-4577-83f8-d5526187f2f8'::uuid
   limit 1
 ), posts (id, day_number, kind, text, photo_url) as (
   values
