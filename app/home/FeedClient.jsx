@@ -238,21 +238,22 @@ function LegendaSobreposta({ text, labels }) {
 // ---- Mídia + legenda do item solto do feed ----
 // Componente próprio, e não um trecho inline, porque hooks não podem
 // morar dentro de um .map(): a ordem mudaria a cada item da lista.
-function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat, barra }) {
+function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat, progressEl }) {
   const [proporcao, setProporcao] = useState(null);
   const soVideo = !!(item.video_url && !item.photo_url);
   const legendaEmCima = soVideo && ehVertical(proporcao);
 
   return (
     <>
-      {item.photo_url && <Media photo={item.photo_url} alt={textoAlternativo(item.alt, { dia: item.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackFloat}<VerJornada slug={item.journey.slug} label={labels.seeFullJourney} />{barra}</Media>}
+      {item.photo_url && <Media photo={item.photo_url} alt={textoAlternativo(item.alt, { dia: item.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackFloat}<VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
       {item.video_url && !item.photo_url && (
-        <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackFloat}{barra}</Media>
+        <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackFloat}</Media>
       )}
       {!hasMedia && !cleanText && item.track && <TrackTag track={item.track} />}
       {cleanText && !legendaEmCima && (
         <div className="dp-text under"><EntryText text={cleanText} labels={labels} limit={100} mencoes={item.mencoes} /></div>
       )}
+      {progressEl}
     </>
   );
 }
@@ -792,12 +793,6 @@ export default function FeedClient({ labels }) {
               // cartões são curtos. Lá a barra continua embaixo, com a
               // linha inteira.
               // ============================================================
-              const barraSobreFoto = total > 0 ? (
-                <div className="progress-over" aria-hidden="true">
-                  <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
-                  <span className="mp-pct">{pct}%</span>
-                </div>
-              ) : null;
               const progressEl = total > 0 ? (
                 <div className="progress-under" aria-hidden="true">
                   <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
@@ -826,8 +821,8 @@ export default function FeedClient({ labels }) {
                 );
               }
               return (
-                <MidiaComLegenda item={item} labels={labels} cleanText={cleanText}
-                  hasMedia={hasMedia} trackFloat={trackFloat} barra={barraSobreFoto} />
+              <MidiaComLegenda item={item} labels={labels} cleanText={cleanText}
+                  hasMedia={hasMedia} trackFloat={trackFloat} progressEl={progressEl} />
               );
             })()}
 
