@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '../../../lib/supabase/server';
 import { getLocale } from '../../../lib/locale';
+import { buildHistoriaFeedItems } from '../../../lib/historias';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const PAGE = 8;
 const VALID_KINDS = new Set(['step', 'win', 'setback', 'learned']);
+
+// uma historia a cada 4 posts reais
+const CADENCIA_HISTORIA = 4;
 
 export async function GET(req) {
   const supabase = createClient();
@@ -60,10 +64,9 @@ export async function GET(req) {
       .map((journey) => journey.id);
   }
 
-  // Só gente real aqui. O `demoItems` que existia nesta linha era um
-  // array sempre vazio, sobra de quando as pessoas de exemplo
-  // entravam no feed — a condição já era só `!targetIds.length`.
-  if (!targetIds.length) return NextResponse.json({ items: [] });
+  // pessoas de exemplo removidas do feed: só gente real aqui
+  const demoItems = [];
+  if (!targetIds.length && !demoItems.length) return NextResponse.json({ items: [] });
 
   let updates = [];
   if (targetIds.length) {
@@ -80,40 +83,20 @@ export async function GET(req) {
       .order('id', { ascending: false })
       .limit(400);
 
-    // ============================================================
-    // CADA DIA É UM POST
-    //
-    // Antes vinha uma linha por jornada — só o último dia — e os
-    // demais ficavam dentro do card, atrás de um folheador lateral.
-    // Isso mantinha o feed enxuto, e com pouca gente enxuto vira
-    // vazio: duas pessoas ativas produziam dois ou três posts.
-    //
-    // Os dias já vinham do banco de qualquer jeito (as 400 linhas
-    // logo acima existem justamente para o agrupamento não perder
-    // jornada nenhuma). A peneira jogava fora quase tudo o que já
-    // tinha sido buscado. Soltar não custa consulta nenhuma.
-    //
-    // Agora é o modelo de sempre, o que todo mundo entende: um
-    // registro é um post, e a ordem é a do relógio.
-    //
-    // ------------------------------------------------------------
-    // O RISCO, DITO AQUI PARA NÃO SE PERDER
-    //
-    // Sem teto, quem registra todo dia ocupa o feed na proporção do
-    // que escreve. Enquanto forem duas pessoas, o feed vai parecer
-    // muito com elas duas. Foi uma escolha consciente do Fernando —
-    // densidade agora vale mais que variedade.
-    //
-    // Se um dia isso incomodar, o conserto é aqui e cabe em poucas
-    // linhas: agrupar por jornada de novo, ou intercalar de modo que
-    // dois posts seguidos nunca sejam da mesma jornada.
-    // ============================================================
-    updates = rows || [];
+    const all = rows || [];
+    // uma linha por jornada (a mais recente), mantendo a ordem de recência
+    const seen = new Set();
+    updates = [];
+    for (const u of all) {
+      if (seen.has(u.journey_id)) continue;
+      seen.add(u.journey_id);
+      updates.push(u);
+    }
   }
 
   const journeyIds = [...new Set(updates.map((item) => item.journey_id))];
   const { data: journeys } = journeyIds.length
-    ? await supabase.from('journeys').select('id, slug, title, category, owner_id, cover_color, total_days').in('id', journeyIds)
+    ? await supabase.from('journeys').select('id, slug, title, category, owner_id, cover_color, total_days, editorial_seed').in('id', journeyIds)
     : { data: [] };
   const journeyMap = {};
   (journeys || []).forEach((journey) => { journeyMap[journey.id] = journey; });
@@ -179,21 +162,7 @@ export async function GET(req) {
     const count = daysByLevelOwner[owner]?.size || 0;
     if (!count) return null;
     const rank = count >= 30 ? 6 : count >= 15 ? 5 : count >= 7 ? 4 : count >= 3 ? 3 : count >= 1 ? 2 : 1;
-    // As seis cores do nivel ONE, medidas sobre branco:
-    //
-    //   1  #87957A  3,18      4  #5C7D86  4,44
-    //   2  #6F927D  3,45      5  #C47152  3,60
-    //   3  #5F8790  3,92      6  #B58A42  3,14
-    //
-    // Todas reprovavam. O selo tem 10px e o minimo e 4,5:1 — e
-    // este e o unico lugar do app onde a cor esta em JAVASCRIPT,
-    // chegando na tela como `style` embutido no elemento. Por isso
-    // nenhuma regra de CSS conseguia corrigir: inline ganha de
-    // tudo que nao seja !important. Testei uma regra em globals.css
-    // primeiro e o selo continuou #5F8790 na tela.
-    //
-    // Mesmos matizes, luminosidade baixada em HLS ate cruzar 4,6.
-    const colors = { 1: '#6D7961', 2: '#5D7B69', 3: '#567A82', 4: '#5A7A82', 5: '#B25D3D', 6: '#916F35' };
+    const colors = { 1: '#87957A', 2: '#6F927D', 3: '#5F8790', 4: '#5C7D86', 5: '#C47152', 6: '#B58A42' };
     return { rank, color: colors[rank] };
   };
 
@@ -292,17 +261,8 @@ export async function GET(req) {
   // estar velho se a pessoa trocou de handle depois.
   // ============================================================
   const idsParaMencao = [...new Set([...uids, ...dayIds])];
-  //
-  // A consulta de apoios sobre `dayIds` saiu daqui.
-  //
-  // Ela existia para saber se eu ja tinha apoiado os dias que
-  // apareciam DENTRO do folheador. Sem folheador, todo dia que vai
-  // para a tela e um item de primeiro nivel — e `uids`, la em cima,
-  // ja pergunta isso para todos eles. Era a mesma pergunta, feita
-  // duas vezes, sobre um conjunto maior.
-  //
-  // Uma consulta a menos por carregamento de feed.
-  const [tracksAllR, mencoesR] = await Promise.all([
+  const [encAllR, tracksAllR, mencoesR] = await Promise.all([
+    dayIds.length ? guard(supabase.from('encouragements').select('update_id').eq('user_id', user.id).in('update_id', dayIds)) : { data: [] },
     dayIds.length ? guard(supabase.from('updates').select('id, track_title, track_artist, track_audio_url').in('id', dayIds).not('track_audio_url', 'is', null)) : { data: [] },
     idsParaMencao.length ? guard(supabase.from('mentions').select('update_id, profile:profiles!mentions_profile_id_fkey(id, name, handle, avatar_color)').in('update_id', idsParaMencao)) : { data: [] },
   ]);
@@ -315,6 +275,7 @@ export async function GET(req) {
     const chave = String(p.handle).trim().toLowerCase().replace(/^@+/, '');
     (mencoesPorUpdate[m.update_id] ||= {})[chave] = p;
   });
+  const myEncAll = new Set((encAllR.data || []).map((e) => e.update_id));
   (tracksAllR.data || []).forEach((item) => { trackByUpdate[item.id] = { title: item.track_title, artist: item.track_artist, audio_url: item.track_audio_url }; });
 
   // capítulos: quais passos eu acompanho e qual passo cada dia fechou
@@ -334,32 +295,19 @@ export async function GET(req) {
   const realItems = updates.map((item) => {
     const journey = journeyMap[item.journey_id];
     if (!journey) return null;
+    const daysArr = (fullDaysByJourney[item.journey_id] || []).slice(-60).map((u) => ({
+      id: u.id, day_number: u.day_number, kind: u.kind, text: u.text, alt: u.alt || '', photo_url: u.photo_url, video_url: u.video_url, created_at: u.created_at,
+      encouraged: myEncAll.has(u.id), track: trackByUpdate[u.id] || null, comeback: comebackByUpdate[u.id] || null,
+      mencoes: mencoesPorUpdate[u.id] || null,
+      nextStep: u.closed_by ? null : (u.next_step || null), nextWhen: u.next_when || null,
+      stepFollowing: meusPassos.has(u.id), closes: passoFechadoPor[u.id] || null,
+    }));
     return {
       ...item,
-      // ============================================================
-      // O FOLHEADOR SAIU JUNTO, E NÃO É DETALHE
-      //
-      // Se cada dia virou post e o card continuasse com o folheador
-      // lateral, o MESMO dia apareceria duas vezes na tela: como
-      // post próprio e dentro do folheador do vizinho. A pessoa
-      // rolaria, veria o dia 4, arrastaria o card do dia 5 e
-      // encontraria o dia 4 de novo.
-      //
-      // Não é preferência, é correção: um ou outro, nunca os dois.
-      //
-      // O `daysArr` que montava essa lista foi removido junto: sem
-      // ninguém para consumi-lo, ele virava trabalho por página
-      // para nada — e variável atribuída e nunca lida é armadilha
-      // para quem vier depois.
-      //
-      // As consultas em lote NÃO dependiam dele: menções, apoios e
-      // faixas usam `dayIds`, montado bem antes a partir de
-      // `fullDaysByJourney`. Esse caminho continua intacto.
-      // ============================================================
-      days: null,
+      days: daysArr.length > 1 ? daysArr : null,
       challenge: challengeByOwner[journey.owner_id] || null,
       challengeable: canChallenge.has(journey.owner_id),
-      journey: { slug: journey.slug, title: journey.title, category: journey.category, total_days: journey.total_days, current_day: (statsByJourney[journey.id] || {}).current_day || 0, progress_pct: (statsByJourney[journey.id] || {}).progress_pct || 0 },
+      journey: { slug: journey.slug, title: journey.title, category: journey.category, total_days: journey.total_days, editorial_seed: journey.editorial_seed === true, current_day: (statsByJourney[journey.id] || {}).current_day || 0, progress_pct: (statsByJourney[journey.id] || {}).progress_pct || 0 },
       owner: { ...(profileMap[journey.owner_id] || {}), mood: ownerMoodById[journey.owner_id] || null, one_level: levelFor(journey.owner_id) },
       own: journey.owner_id === user.id,
       track: trackByUpdate[item.id] || null,
@@ -374,32 +322,50 @@ export async function GET(req) {
   }).filter(Boolean);
 
   const merged = [...realItems, ...mediaFeed].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-  const pageItems = merged.slice(offset, offset + PAGE);
 
-  // ============================================================
-  // AS HISTÓRIAS SAÍRAM DO FEED
-  //
-  // Entravam uma a cada 4 posts reais, e quando os posts reais
-  // acabavam elas preenchiam o resto da página. Eram bem-feitas e
-  // eram honestas: cada card levava o selo "história" e o último
-  // dia revelava que aquilo era ficção.
-  //
-  // Mesmo assim saíram, e a razão não é de qualidade — é de tese.
-  //
-  // O ONE se apresenta dizendo que aqui ninguém precisa fingir que
-  // está tudo bem. Um feed em que parte das pessoas não existe
-  // contradiz isso antes de qualquer texto. E quem o app quer
-  // alcançar é justamente quem parou de postar por achar que todo
-  // mundo estava indo bem — a última coisa de que essa pessoa
-  // precisa é de gente perfeita e inventada ao lado dela.
-  //
-  // O feed fica menor. Fica inteiro verdadeiro.
-  //
-  // As histórias continuam escritas em `lib/historias.js`. Não
-  // apaguei o arquivo: são 32 arcos de 7 dias, bem escritos, e
-  // servem para material de campanha, exemplo em tela de ajuda ou
-  // conteúdo de rede social — desde que assinados como ficção.
-  // O que não podem é dividir a página com gente de verdade.
-  // ============================================================
-  return NextResponse.json({ items: pageItems });
+  // Histórias editoriais entram no mesmo fluxo, mas não ficam coladas umas
+  // nas outras. A cada dois posts de pessoas reais, uma jornada editorial
+  // aparece. O cursor continua sendo o offset do feed, então a cadência não
+  // reinicia quando a próxima página é carregada.
+  const editorialItems = merged.filter((item) => item.journey?.editorial_seed);
+  const organicItems = merged.filter((item) => !item.journey?.editorial_seed);
+  const mixed = [];
+  let editorialIndex = 0;
+  organicItems.forEach((item, index) => {
+    mixed.push(item);
+    if ((index + 1) % 2 === 0 && editorialItems[editorialIndex]) {
+      mixed.push(editorialItems[editorialIndex++]);
+    }
+  });
+  mixed.push(...editorialItems.slice(editorialIndex));
+  const feedSource = editorialItems.length ? mixed : merged;
+  const pageItems = feedSource.slice(offset, offset + PAGE);
+
+  // ---- historias intercaladas: uma a cada 4 posts reais ----
+  // A conta usa o offset da pagina para a cadencia nao reiniciar a
+  // cada rolagem: sem isso, duas historias caem coladas na emenda.
+  const historias = editorialItems.length ? [] : buildHistoriaFeedItems(locale);
+  const comHistorias = [];
+  if (historias.length) {
+    for (let i = 0; i < pageItems.length; i++) {
+      comHistorias.push(pageItems[i]);
+      const posicao = offset + i + 1;
+      if (posicao % CADENCIA_HISTORIA === 0) {
+        const h = historias[Math.floor(posicao / CADENCIA_HISTORIA - 1) % historias.length];
+        if (h) comHistorias.push({ ...h, id: `${h.id}-${posicao}` });
+      }
+    }
+  } else {
+    comHistorias.push(...pageItems);
+  }
+
+  // quando os posts reais acabam, o resto da pagina vira historia:
+  // e melhor um feed com historia do que um feed vazio
+  const faltam = Math.max(0, PAGE - comHistorias.length);
+  const demoStart = Math.max(0, offset - feedSource.length);
+  const cauda = faltam > 0
+    ? [...demoItems, ...historias].slice(demoStart, demoStart + faltam)
+    : [];
+
+  return NextResponse.json({ items: [...comHistorias, ...cauda] });
 }
