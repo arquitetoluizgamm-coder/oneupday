@@ -10702,6 +10702,82 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
   }
 }
 
+/* Feed: título da jornada onde o olho já está, sem virar chamada grande. */
+.feed-journey-pill {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 3;
+  max-width: calc(100% - 24px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid rgba(255,255,255,.72);
+  border-radius: 999px;
+  background: rgba(250,247,242,.78);
+  color: var(--one-ink, #2d2924);
+  box-shadow: 0 10px 24px rgba(16,19,45,.16), inset 0 1px 0 rgba(255,255,255,.86);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
+  padding: 7px 11px;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.1;
+  letter-spacing: .01em;
+  pointer-events: none;
+}
+
+.entry-textcard .feed-journey-pill {
+  top: 14px;
+  bottom: auto;
+  max-width: calc(100% - 28px);
+}
+
+/* Feed: antes/depois acompanha a margem do texto e vira duas miniaturas
+   tocáveis, com canto arredondado e relevo material ONE. */
+@media (max-width: 860px) {
+  .feed-stream > .tr-card {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+  }
+
+  .feed-stream > .tr-card .tr-head,
+  .feed-stream > .tr-card .tr-foot {
+    padding-left: var(--recuo-feed) !important;
+    padding-right: var(--recuo-feed) !important;
+  }
+
+  .feed-stream > .tr-card .tr-pair {
+    padding-left: var(--recuo-feed);
+    padding-right: var(--recuo-feed);
+    gap: 10px;
+  }
+}
+
+.feed-stream > .tr-card .tr-side {
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.88);
+  box-shadow: 8px 9px 20px rgba(151,132,110,.22), -7px -7px 16px rgba(255,255,255,.72), inset 1px 1px 0 rgba(255,255,255,.72);
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+
+.feed-stream > .tr-card .tr-side:active {
+  transform: translate(2px, 2px);
+  box-shadow: inset 6px 6px 13px rgba(151,132,110,.22), inset -6px -6px 13px rgba(255,255,255,.64);
+}
+
+.feed-stream > .tr-card .tr-arrow {
+  width: 38px;
+  height: 38px;
+  border-radius: 15px;
+  background: var(--one-bg-soft, #faf7f2);
+  color: var(--one-terracotta, #c16f54);
+  box-shadow: 5px 6px 13px rgba(151,132,110,.18), -5px -5px 12px rgba(255,255,255,.72);
+}
+
 /* Jornada pública: leitura por capítulo. Sai a régua/arraste e entra um
    navegador simples: começa no Dia 1, avança pelas setas ou pelas abas. */
 .journey-public .days-pager {
