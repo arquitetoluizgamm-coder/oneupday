@@ -96,6 +96,17 @@ export default async function Home() {
           <p className="land-onde">{t.heroOnde}</p>
         </section>
 
+        <section className="land-emotion" aria-labelledby="land-emotion-title">
+          <div className="land-emotion-path" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <h2 id="land-emotion-title">{t.landEmotionTitle}</h2>
+          <p className="land-emotion-sub">{t.landEmotionSub}</p>
+          <p className="land-emotion-copy">{t.landEmotionCopy}</p>
+        </section>
+
         {/* ═══ 2 · O PRODUTO, IMEDIATAMENTE ════════════════════════
             Vem antes de qualquer explicação: a pessoa precisa ver como é
             usar antes de ler por que importa. Tela real, não maquete
@@ -190,8 +201,11 @@ export default async function Home() {
 
         {/* ═══ 6 · CTA FINAL ══════════════════════════════════════ */}
         <section className="land-close">
+          <p className="close-kicker">{t.landCloseKicker}</p>
+          <p className="close-soft">{t.landCloseSoft}</p>
+          <p className="close-soft">{t.landCloseStep}</p>
+          <p className="close-memory">{t.landCloseMemory}</p>
           <p className="close-1">{t.landClose1}</p>
-          <p className="close-2">{t.landClose2}</p>
           <a className="cta grow land-cta" href="/login">{t.landCloseCta}</a>
         </section>
 

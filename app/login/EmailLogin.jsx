@@ -142,7 +142,7 @@ export default function EmailLogin({ t }) {
 
       {erro && <p className="elog-erro" role="alert">{erro}</p>}
 
-      <button type="button" className="ghost-btn elog-go"
+      <button type="button" className="cta grow elog-go"
         onClick={() => pedirCodigo(false)} disabled={!emailOk || ocupado}>
         {ocupado ? t.mailSending : t.mailSend}
       </button>
