@@ -11825,3 +11825,12 @@ body:has(.auth-wrap){
     transform:none!important;
   }
 }
+
+/* Perfil: sem a árvore ao lado do nome, não precisa quebrar agressivamente. */
+.profile-card .pc-name-line{
+  width:100%;
+}
+.profile-card .pc-meta h1{
+  overflow-wrap:normal!important;
+  word-break:normal!important;
+}
