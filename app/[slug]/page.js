@@ -6,7 +6,6 @@ import { comCapa } from '../../lib/media';
 import AppTop from '../../components/AppTop';
 import ShareButton from './ShareButton';
 import Dia1Card from './Dia1Card';
-import ChallengeButton from './ChallengeButton';
 import ConviteCard from './ConviteCard';
 import EncourageBar from './EncourageBar';
 import FollowButton from './FollowButton';
@@ -35,6 +34,7 @@ import { textoAlternativo } from '../../lib/alt';
 // arquivo isso ficava implicito — e um cache errado aqui serviria o
 // avatar de uma pessoa para outra. Agora esta declarado.
 export const dynamic = 'force-dynamic';
+const CHALLENGES_ENABLED = false;
 
 // "1 dias postados" é o tipo de detalhe que faz o produto parecer
 // descuidado justamente na tela em que a pessoa está mostrando o
@@ -185,7 +185,7 @@ async function ProfilePage({ handle }) {
   let canChallenge = false;
   let pubChallenges = [];
   const chProf = {};
-  try {
+  if (CHALLENGES_ENABLED) try {
     if (viewer && viewer.id !== profile.id) {
       const [a, b, open] = await Promise.all([
         sb2.from('profile_follows').select('follower_id').eq('follower_id', viewer.id).eq('following_id', profile.id).maybeSingle(),
@@ -223,7 +223,7 @@ async function ProfilePage({ handle }) {
             </div>
             <div className="pc-follow">
               <FollowUserButton profileId={profile.id} labelFollow={t.follow} labelFollowing={t.following} labelBack={t.followBack} />
-              {canChallenge && (
+              {CHALLENGES_ENABLED && canChallenge && (
                 <DuoChallengeButton toId={profile.id} toName={profile.name}
                   labels={{ btn: t.chBtn, modalTitle: t.chModalTitle, what: t.chWhat, ph: t.chPh, daysFmt: t.chDays, together: t.chTogether, send: t.chSend, sending: t.chSending, sent: t.chSent, cancel: t.epCancel, errExists: t.chErrExists, errConn: t.chErrConn, err: t.chErr }} />
               )}
@@ -231,7 +231,7 @@ async function ProfilePage({ handle }) {
           </div>
         </section>
 
-        {pubChallenges.length > 0 && (
+        {CHALLENGES_ENABLED && pubChallenges.length > 0 && (
           <section className="ch-block">
             <p className="eyebrow">{t.chTitle}</p>
             {pubChallenges.map((c) => { const pa = chProf[c.from_id] || {}; const pb = chProf[c.to_id] || {}; return (

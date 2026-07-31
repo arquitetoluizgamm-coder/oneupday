@@ -89,13 +89,13 @@ export default async function Home() {
   const kindLabels = { step: t.kindStep, win: t.kindWin, setback: t.kindSetback, learned: t.kindLearned };
 
   const feedLabels = {
-    dayShort: t.dayShort, tagSetback: t.tagSetback, tagWin: t.tagWin,
+    dayShort: t.dayShort, journeyStatusFmt: t.journeyStatusFmt, tagSetback: t.tagSetback, tagWin: t.tagWin,
     selo: { fiz: t.seloFiz, tentei: t.seloTentei, parei: t.seloParei, comecei: t.seloComecei },
     altReserva: t.altReserva,
     viewPublic: t.viewPublic, muteTopic: t.muteTopic,
     inviteTitle: t.feedInviteTitle, inviteSub: t.feedInviteSub, inviteCta: t.feedInviteCta, loading: '',
     tabAll: t.tabAll, tabFollowing: t.tabFollowing, followingEmptyTitle: t.followingEmptyTitle, followingEmptySub: t.followingEmptySub,
-    supportIdle: t.withYouIdle, supportActive: t.withYouActive, supporters: t.supporters, supportersLoading: t.supportersLoading, supportersEmpty: t.supportersEmpty, supportStrip: t.supportStrip, supporting: t.supportingFmt, progressFmt: t.progressFmt, suggest: { title: t.suggestTitle, sub: t.suggestSub, follow: t.follow, following: t.following, followBack: t.followBack, newcomer: t.suggestNewcomer, dayFmt: t.dayShort }, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful },
+    supportIdle: t.withYouIdle, supportActive: t.withYouActive, supporters: t.supporters, supportersLoading: t.supportersLoading, supportersEmpty: t.supportersEmpty, supportStrip: t.supportStrip, supporting: t.supportingFmt, progressFmt: t.progressFmt, suggest: { title: t.suggestTitle, sub: t.suggestSub, follow: t.follow, following: t.following, followBack: t.followBack, newcomer: t.suggestNewcomer, dayFmt: t.dayShort }, moodLineFmt: t.moodLineFmt, moodFeed: t.moodFeed, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful },
     share: t.shareShort, linkCopied: t.linkCopied, quoteLabel: t.quoteLabel, oneLevels: t.oneLevels,
     feedStoryBack: t.feedStoryBack, feedStoryMilestone: t.feedStoryMilestone, feedStoryStart: t.feedStoryStart,
     feedStoryHard: t.feedStoryHard, feedStoryNext: t.feedStoryNext, feedStoryPhoto: t.feedStoryPhoto,

@@ -1798,6 +1798,30 @@ html.chrome-scrolling .top{ box-shadow:0 1px 0 rgba(16,19,45,.05) }
 .mood-chip i{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
 .mood-chip.on{background:rgba(16,19,45,.03);font-weight:700}
 .entry-mood{font-size:12.5px;font-weight:700;letter-spacing:.01em}
+.entry-mood-line{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  width:fit-content;
+  max-width:100%;
+  margin-top:2px;
+  font-size:11.5px;
+  font-weight:750;
+  line-height:1.25;
+  letter-spacing:.005em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.entry-mood-line::before{
+  content:'';
+  width:6px;
+  height:6px;
+  border-radius:999px;
+  flex:0 0 auto;
+  background:var(--mood,var(--sage));
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--mood,var(--sage)) 18%,transparent);
+}
 .entry-ava{transition:box-shadow .25s ease}
 /* ---- Pergunta diária de sentimento ---- */
 .dm-backdrop{position:fixed;inset:0;z-index:90;background:rgba(16,19,45,.42);display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .18s ease}
@@ -10678,6 +10702,131 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
   }
 }
 
+/* Feed: os avisos auxiliares precisam respirar na mesma coluna dos posts.
+   Antes "Alguém precisa de você hoje" e "Amanhã por aqui" usavam padding
+   próprio, então texto e ícones ficavam desalinhados do feed. */
+@media (max-width: 860px) {
+  .feed-stream > .aux-post.needs,
+  .feed-stream > .aux-post.am-block {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .feed-stream > .aux-post.needs > .aux-post-head,
+  .feed-stream > .aux-post.am-block > .aux-post-head,
+  .feed-stream > .aux-post.needs > .needs-list,
+  .feed-stream > .aux-post.am-block > .am-list {
+    padding-left: var(--recuo-feed) !important;
+    padding-right: var(--recuo-feed) !important;
+  }
+
+  .feed-stream > .aux-post.needs > .needs-list {
+    scroll-padding-left: var(--recuo-feed);
+    scroll-padding-right: var(--recuo-feed);
+  }
+}
+
+/* Feed: título da jornada vira uma pequena chamada ONE antes do conteúdo.
+   Sai do metadado embaixo do nome, onde passava batido. */
+.feed-journey-pill {
+  display: inline-grid;
+  gap: 2px;
+  width: fit-content;
+  max-width: calc(100% - 2 * var(--recuo-feed, 16px));
+  margin: 12px var(--recuo-feed, 16px) 0;
+  overflow: hidden;
+  text-decoration: none;
+  border: 0;
+  border-left: 3px solid var(--one-terracotta, #c16f54);
+  border-radius: 0;
+  background: transparent;
+  color: var(--one-ink, #2d2924);
+  box-shadow: none;
+  padding: 1px 0 4px 9px;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: .01em;
+  transition: color .16s ease, border-color .16s ease;
+}
+
+.feed-journey-pill b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.8px;
+  font-weight: 850;
+}
+
+.feed-journey-pill small {
+  color: var(--one-terracotta, #c16f54);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.feed-journey-pill:hover,
+.feed-journey-pill:focus-visible {
+  color: var(--one-terracotta, #c16f54);
+  border-color: var(--one-primary-dark, #a95740);
+  outline: none;
+}
+
+.feed-journey-pill + .entry-media,
+.feed-journey-pill + .entry-textcard,
+.feed-journey-pill + .dp-stage .entry-media,
+.feed-journey-pill + .dp-stage .entry-textcard {
+  margin-top: 0 !important;
+}
+
+/* Feed: antes/depois acompanha a margem do texto e vira duas miniaturas
+   tocáveis, com canto arredondado e relevo material ONE. */
+@media (max-width: 860px) {
+  .feed-stream > .tr-card {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+  }
+
+  .feed-stream > .tr-card .tr-head,
+  .feed-stream > .tr-card .tr-foot {
+    padding-left: var(--recuo-feed) !important;
+    padding-right: var(--recuo-feed) !important;
+  }
+
+  .feed-stream > .tr-card .tr-pair {
+    padding-left: var(--recuo-feed);
+    padding-right: var(--recuo-feed);
+    gap: 10px;
+  }
+}
+
+.feed-stream > .tr-card .tr-side {
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.88);
+  box-shadow: 8px 9px 20px rgba(151,132,110,.22), -7px -7px 16px rgba(255,255,255,.72), inset 1px 1px 0 rgba(255,255,255,.72);
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+
+.feed-stream > .tr-card .tr-side:active {
+  transform: translate(2px, 2px);
+  box-shadow: inset 6px 6px 13px rgba(151,132,110,.22), inset -6px -6px 13px rgba(255,255,255,.64);
+}
+
+.feed-stream > .tr-card .tr-arrow {
+  width: 38px;
+  height: 38px;
+  border-radius: 15px;
+  background: var(--one-bg-soft, #faf7f2);
+  color: var(--one-terracotta, #c16f54);
+  box-shadow: 5px 6px 13px rgba(151,132,110,.18), -5px -5px 12px rgba(255,255,255,.72);
+}
+
 /* Jornada pública: leitura por capítulo. Sai a régua/arraste e entra um
    navegador simples: começa no Dia 1, avança pelas setas ou pelas abas. */
 .journey-public .days-pager {
@@ -10750,4 +10899,11 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
 
 .journey-public .journey-swipe-hint {
   display: none !important;
+}
+
+/* Avatar do feed: o relevo padrão usa !important mais acima.
+   Quando há sentimento do dia, este halo vence e fica visível. */
+.entry-head .entry-ava.has-mood,
+.entry-ava.has-mood {
+  box-shadow: var(--mood-shadow) !important;
 }
