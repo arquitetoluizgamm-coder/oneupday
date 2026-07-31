@@ -1,3 +1,353 @@
-/* A entrada e uma tela completa: o feed so aparece quando a pessoa escolhe continuar. */
-.home-welcome{min-height:min(500px,calc(100svh - 128px))!important;padding-top:26px!important;padding-bottom:24px!important}.home-welcome-mark{width:72px!important;height:72px!important;margin-bottom:8px!important}.home-welcome-mark .upi-char{width:68px!important;height:68px!important}.home-welcome h1{margin:8px 0!important}.home-welcome-lead{max-width:430px;margin:0 auto 8px;color:var(--ink);font-family:var(--serif);font-size:15.5px;line-height:1.45}.home-welcome-copy{margin-bottom:18px!important}.home-welcome-journeys{gap:10px!important}.home-welcome-journey{min-height:68px!important}.home-welcome-primary{margin-top:6px!important}.home-welcome-skip{margin-top:14px!important}.feed-page > .home-upi-memory,.feed-page > .nc{display:none!important}
-@media(max-width:640px){.home-welcome{min-height:100svh!important;min-height:100dvh!important;box-sizing:border-box!important;padding:22px 20px calc(96px + var(--sa-bottom))!important}.home-welcome-mark{width:58px!important;height:58px!important;margin-bottom:5px!important}.home-welcome-mark .upi-char{width:56px!important;height:56px!important}.home-welcome-eyebrow{font-size:9px!important}.home-welcome h1{font-size:28px!important;line-height:1.04!important}.home-welcome-lead{font-size:14px!important;line-height:1.38!important;margin-bottom:7px!important}.home-welcome-copy{font-size:13px!important;line-height:1.42!important}.home-welcome-journey{min-height:62px!important;padding:11px 13px!important}.home-welcome-primary{min-height:48px!important}.home-welcome-skip{font-size:11px!important}}
+/* Entrada do feed: ritual breve antes das publicações. */
+.feed-page > .home-upi-memory,
+.feed-page > .nc{
+  display:none!important;
+}
+
+.feed-page .home-welcome{
+  position:relative!important;
+  width:min(calc(100% - 32px),640px)!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  overflow:hidden!important;
+  margin:18px auto 30px!important;
+  padding:34px 34px 30px!important;
+  text-align:center!important;
+  background:
+    radial-gradient(circle at 86% -12%,rgba(132,149,126,.15),transparent 34%),
+    radial-gradient(circle at 8% 110%,rgba(193,111,84,.10),transparent 36%),
+    #fffdf8!important;
+  border:1px solid rgba(193,111,84,.16)!important;
+  border-radius:24px!important;
+  box-shadow:0 18px 46px rgba(16,19,45,.08)!important;
+}
+
+.feed-page .home-welcome::after{
+  content:''!important;
+  position:absolute!important;
+  inset:auto -58px -74px auto!important;
+  width:190px!important;
+  height:190px!important;
+  border-radius:999px!important;
+  background:rgba(132,149,126,.11)!important;
+  pointer-events:none!important;
+}
+
+.feed-page .home-welcome > *{
+  position:relative!important;
+  z-index:1!important;
+}
+
+.feed-page .home-welcome-mark{
+  width:54px!important;
+  height:54px!important;
+  display:grid!important;
+  place-items:center!important;
+  margin:0 0 10px!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  border:1px solid rgba(193,111,84,.16)!important;
+  box-shadow:0 10px 24px rgba(16,19,45,.08)!important;
+}
+
+.feed-page .home-welcome-mark .upi-char{
+  width:43px!important;
+  height:43px!important;
+  object-fit:contain!important;
+}
+
+.feed-page .home-welcome-eyebrow{
+  display:block!important;
+  max-width:100%!important;
+  margin:0 auto 8px!important;
+  color:#6f7e66!important;
+  font-family:var(--font-sans,Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif)!important;
+  font-size:13px!important;
+  line-height:1.3!important;
+  font-weight:760!important;
+  letter-spacing:.01em!important;
+  text-transform:none!important;
+}
+
+.feed-page .home-welcome h1{
+  max-width:500px!important;
+  margin:0 auto 10px!important;
+  color:#10132D!important;
+  font-family:var(--display,Georgia,serif)!important;
+  font-size:clamp(31px,4.4vw,40px)!important;
+  line-height:1.02!important;
+  letter-spacing:-.045em!important;
+}
+
+.feed-page .home-welcome-lead,
+.feed-page .home-welcome-copy{
+  max-width:470px!important;
+  margin:0 auto 22px!important;
+  color:#667086!important;
+  font-family:var(--font-sans,Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif)!important;
+  font-size:15px!important;
+  line-height:1.52!important;
+  font-weight:520!important;
+}
+
+.feed-page .home-welcome-journeys{
+  width:min(100%,500px)!important;
+  display:grid!important;
+  gap:12px!important;
+  margin:0 auto!important;
+  text-align:left!important;
+}
+
+.feed-page .home-welcome-journey{
+  min-height:76px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:16px!important;
+  padding:16px 18px!important;
+  color:#10132D!important;
+  text-decoration:none!important;
+  background:rgba(255,255,255,.82)!important;
+  border:1px solid rgba(132,149,126,.22)!important;
+  border-radius:18px!important;
+  box-shadow:0 10px 22px rgba(16,19,45,.045)!important;
+  transition:background .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease!important;
+}
+
+.feed-page .home-welcome-journey:hover{
+  background:#f6f8f1!important;
+  border-color:rgba(132,149,126,.34)!important;
+  box-shadow:0 14px 28px rgba(16,19,45,.065)!important;
+  transform:translateY(-1px)!important;
+  text-decoration:none!important;
+}
+
+.feed-page .home-welcome-journey:focus-visible{
+  outline:3px solid rgba(193,111,84,.34)!important;
+  outline-offset:3px!important;
+}
+
+.feed-page .home-welcome-journey:active{
+  transform:translateY(0) scale(.992)!important;
+}
+
+.feed-page .home-welcome-journey span{
+  min-width:0!important;
+  display:grid!important;
+  gap:6px!important;
+}
+
+.feed-page .home-welcome-journey b{
+  display:block!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  color:#10132D!important;
+  font-size:15.5px!important;
+  line-height:1.24!important;
+  font-weight:760!important;
+}
+
+.feed-page .home-welcome-journey small{
+  color:#7a6570!important;
+  font-size:12.5px!important;
+  line-height:1.25!important;
+  font-weight:650!important;
+}
+
+.feed-page .home-welcome-journey strong{
+  width:32px!important;
+  min-width:32px!important;
+  height:32px!important;
+  display:grid!important;
+  place-items:center!important;
+  color:#8b97a9!important;
+  font-size:25px!important;
+  line-height:1!important;
+  font-weight:360!important;
+  transition:color .2s ease,transform .2s ease!important;
+}
+
+.feed-page .home-welcome-journey:hover strong{
+  color:#a85d45!important;
+  transform:translateX(2px)!important;
+}
+
+.feed-page .home-welcome-journey.feito{
+  opacity:.76!important;
+}
+
+.feed-page .hw-feito{
+  font-style:normal!important;
+  color:#6f7e66!important;
+  font-weight:780!important;
+}
+
+.feed-page .home-welcome-primary{
+  width:100%!important;
+  min-height:54px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:2px 0 0!important;
+  padding:0 22px!important;
+  border:0!important;
+  border-radius:17px!important;
+  background:linear-gradient(180deg,#C7785C,#AF6046)!important;
+  color:#fff!important;
+  font-family:var(--font-sans,Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif)!important;
+  font-size:14px!important;
+  font-weight:830!important;
+  text-decoration:none!important;
+  box-shadow:0 13px 26px rgba(175,96,70,.24)!important;
+  cursor:pointer!important;
+  transition:transform .2s ease,box-shadow .2s ease,filter .2s ease!important;
+}
+
+.feed-page .home-welcome-primary:hover{
+  color:#fff!important;
+  text-decoration:none!important;
+  filter:saturate(1.04)!important;
+  transform:translateY(-1px)!important;
+  box-shadow:0 16px 30px rgba(175,96,70,.27)!important;
+}
+
+.feed-page .home-welcome-primary:focus-visible{
+  outline:3px solid rgba(193,111,84,.34)!important;
+  outline-offset:3px!important;
+}
+
+.feed-page .home-welcome-primary:active{
+  transform:translateY(0) scale(.992)!important;
+}
+
+.feed-page .home-welcome-skip{
+  min-height:40px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:14px auto 0!important;
+  padding:0 12px!important;
+  border:0!important;
+  border-radius:999px!important;
+  background:transparent!important;
+  color:#657186!important;
+  font-size:12.5px!important;
+  line-height:1.2!important;
+  font-weight:720!important;
+  text-decoration:none!important;
+  text-underline-offset:3px!important;
+  cursor:pointer!important;
+}
+
+.feed-page .home-welcome-skip:hover{
+  color:#10132D!important;
+  background:rgba(132,149,126,.10)!important;
+}
+
+.feed-page .home-welcome-diary-link::before{
+  content:'✎'!important;
+  margin-right:7px!important;
+  color:#a85d45!important;
+  font-size:13px!important;
+}
+
+.feed-page .hw-exemplos{
+  width:min(100%,500px)!important;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+  margin:3px auto 14px!important;
+}
+
+.feed-page .hw-exemplo{
+  min-height:44px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:9px 12px!important;
+  border:1px solid rgba(132,149,126,.22)!important;
+  border-radius:15px!important;
+  background:rgba(255,255,255,.75)!important;
+  color:#10132D!important;
+  font-size:12.5px!important;
+  font-weight:760!important;
+  text-align:center!important;
+  text-decoration:none!important;
+}
+
+.feed-page .hw-exemplo:hover{
+  background:#f6f8f1!important;
+  border-color:rgba(132,149,126,.34)!important;
+  text-decoration:none!important;
+}
+
+@media(max-width:640px){
+  .feed-page .home-welcome{
+    width:auto!important;
+    margin:10px 12px 22px!important;
+    padding:26px 18px 22px!important;
+    border-radius:22px!important;
+  }
+
+  .feed-page .home-welcome-mark{
+    width:48px!important;
+    height:48px!important;
+    margin-bottom:9px!important;
+  }
+
+  .feed-page .home-welcome-mark .upi-char{
+    width:38px!important;
+    height:38px!important;
+  }
+
+  .feed-page .home-welcome-eyebrow{
+    font-size:12.5px!important;
+  }
+
+  .feed-page .home-welcome h1{
+    max-width:320px!important;
+    font-size:29px!important;
+    line-height:1.04!important;
+  }
+
+  .feed-page .home-welcome-lead,
+  .feed-page .home-welcome-copy{
+    max-width:315px!important;
+    margin-bottom:19px!important;
+    font-size:14px!important;
+    line-height:1.48!important;
+  }
+
+  .feed-page .home-welcome-journeys{
+    width:100%!important;
+    gap:11px!important;
+  }
+
+  .feed-page .home-welcome-journey{
+    min-height:70px!important;
+    padding:14px 14px!important;
+    border-radius:17px!important;
+  }
+
+  .feed-page .home-welcome-journey b{
+    font-size:14.5px!important;
+  }
+
+  .feed-page .home-welcome-journey small{
+    font-size:12px!important;
+  }
+
+  .feed-page .home-welcome-primary{
+    min-height:52px!important;
+    border-radius:16px!important;
+  }
+
+  .feed-page .hw-exemplos{
+    grid-template-columns:1fr!important;
+  }
+}

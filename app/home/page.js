@@ -110,7 +110,7 @@ export default async function Home() {
     pc: { title: t.pcTitle, sub: t.pcSub, done: t.pcDone, cancel: t.epCancel, tipos: t.pcTipos },
     step: { back: t.stepBack, follow: t.stepFollow, following: t.stepFollowing, decided: t.stepDecided, result: t.stepResult, open: t.stepOpen },
     transf: { tag: t.trTag, dayFmt: t.trDayFmt, gap: t.trGap, see: t.trSee },
-    amanha: { title: t.amTitle, sub: t.amSub, comecou: t.amComecou, termina: t.amTermina, chegou: t.amChegou, marco: t.amMarco },
+    amanha: { title: t.amTitle, sub: t.amSub, comecou: t.amComecou, termina: t.amTermina, chegou: t.amChegou, marco: t.amMarco, doneDay: t.amDoneDay, reachedDay: t.amReachedDay },
     retornos: { title: t.rtTitle, came: t.rtCame, cta: t.rtCta, sent: t.rtSent },
     hug: { hug: t.hugLabel, toast: t.hugToast }, metoo: { meToo: t.meToo, meTooQ: t.meTooQ, meTooBack: t.meTooBack, meTooTrying: t.meTooTrying, meTooHard: t.meTooHard, meTooJust: t.meTooJust, meTooDone: t.meTooDone }, milestoneFmt: t.milestoneFmt, needs: { title: t.needsTitle, sub: t.needsSub, cta: t.needsCta, sent: t.needsSent }, comebackFmt: t.comebackFmt,
     popoverClose: t.commentClose,
@@ -139,7 +139,7 @@ export default async function Home() {
           doneTitle: t.homeWelcomeDoneTitle, doneSub: t.homeWelcomeDoneSub, doneToday: t.homeWelcomeDoneToday,
           choose: t.homeWelcomeChoose, seeFeed: t.homeWelcomeSeeFeed, feedWithNews: t.homeWelcomeFeedNews,
           exemplos: t.homeWelcomeExemplos, seeOthers: t.homeWelcomeSeeOthers, diaryLater: t.homeWelcomeDiaryLater,
-          day: t.homeWelcomeDay, journeySub: t.homeWelcomeJourneySub, diaryTitle: t.navDiary, diarySub: t.diarySub,
+          day: t.homeWelcomeDay, journeySub: t.homeWelcomeJourneySub, diaryTitle: t.navDiary, diaryWrite: t.homeWelcomeDiaryWrite, diarySub: t.diarySub,
           memoryNew: t.homeWelcomeMemoryNew, memoryBack: t.homeWelcomeMemoryBack, memoryDone: t.homeWelcomeMemoryDone,
           ritualLabel: t.homeWelcomeRitualLabel, tree: t.navTree, diary: t.navDiary, future: t.navFuture,
         }} />

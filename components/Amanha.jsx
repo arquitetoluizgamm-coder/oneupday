@@ -7,17 +7,26 @@ export default function Amanha({ people, labels }) {
   const list = people || [];
   if (!list.length) return null;
 
-  const frase = (x) => {
-    const nome = (x.owner.name || '').split(' ')[0];
-    if (x.tipo === 'comecou') return (L.comecou || '{name} começou hoje').replace('{name}', nome);
-    if (x.tipo === 'chegou') return (L.chegou || '{name} chegou ao dia {t}').replace('{name}', nome).replace('{t}', x.total);
-    if (x.tipo === 'termina') return (L.termina || '{name} termina amanhã').replace('{name}', nome);
-    return (L.marco || '{name} chega ao dia {d} amanhã').replace('{name}', nome).replace('{d}', x.dia);
+  const numeroDoDia = (x) => {
+    if (x.tipo === 'chegou' && x.total) return x.total;
+    return x.dia || x.total || 1;
+  };
+
+  const selo = (x) => {
+    const numero = numeroDoDia(x);
+    if (x.tipo === 'chegou') return (L.doneDay || 'Dia {d} concluído').replace('{d}', numero);
+    return (L.reachedDay || 'Chegou ao dia {d}').replace('{d}', numero);
   };
 
   return (
     <article className="entry aux-post am-block">
-      <header className="aux-post-head"><span className="aux-post-mark" aria-hidden="true">↗</span><div><b>{L.title || 'Tomorrow around here'}</b><small>{L.sub || 'Some journeys continue tomorrow.'}</small></div></header>
+      <header className="aux-post-head am-head">
+        <span className="aux-post-mark am-mark" aria-hidden="true"><span /></span>
+        <div>
+          <b>{L.title || 'Amanhã, a jornada continua.'}</b>
+          <small>{L.sub || 'Hoje, essas pessoas deram mais um passo.'}</small>
+        </div>
+      </header>
       <div className="am-list">
         {list.map((x, i) => {
           const p = x.owner || {};
@@ -28,10 +37,17 @@ export default function Amanha({ people, labels }) {
                 {p.avatar_url ? <img src={p.avatar_url} alt="" /> : first[0]}
               </span>
               <span className="am-txt">
-                <b>{frase(x)}</b>
+                <span className="am-line">
+                  <b>{first}</b>
+                  <em>{selo(x)}</em>
+                </span>
                 <small>{x.journeyTitle}</small>
               </span>
-              <span className="am-go" aria-hidden="true">›</span>
+              <span className="am-go" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </span>
             </a>
           );
         })}

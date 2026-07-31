@@ -1,0 +1,342 @@
+diff --git a/app/globals.css b/app/globals.css
+index 9e9a6bd..030a655 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -3282,23 +3282,159 @@ h1 { letter-spacing: -0.03em; }
+   text-transform:uppercase;color:var(--ink);white-space:nowrap}
+ 
+ /* ---------- 2. O AMANHA DOS OUTROS ---------- */
+-.am-block{margin:22px 0 6px;padding:14px 14px 8px;background:var(--surface);border:1px solid var(--line)}
+-@media(max-width:640px){ .am-block{border-left:0;border-right:0} }
++.am-block{
++  position:relative;
++  overflow:hidden;
++  margin:22px 0 10px;
++  padding:18px 18px 12px;
++  background:linear-gradient(145deg,#fffaf4 0%,#f8f2ea 100%);
++  border:1px solid rgba(193,111,84,.18);
++  border-radius:20px;
++  box-shadow:0 10px 28px rgba(16,19,45,.06);
++}
++.am-block::before{
++  content:'';
++  position:absolute;
++  inset:0 auto 0 0;
++  width:4px;
++  background:linear-gradient(180deg,rgba(193,111,84,.9),rgba(132,149,126,.55));
++  opacity:.9;
++}
++@media(max-width:640px){
++  .am-block{
++    margin:18px 0 10px;
++    padding:16px 14px 10px;
++    border-left:0;
++    border-right:0;
++    border-radius:0;
++    box-shadow:none;
++  }
++  .am-block::before{width:3px}
++}
+ .am-title{margin:0 0 10px;font-family:var(--display);font-weight:800;font-size:10px;
+   letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+-.am-list{display:flex;flex-direction:column}
+-.am-row{display:flex;align-items:center;gap:11px;padding:9px 0;text-decoration:none;color:var(--ink);
+-  border-top:1px solid #f2f0eb}
++.am-head{position:relative;z-index:1;margin-bottom:16px}
++.am-head .aux-post-head>div,
++.am-head>div{gap:4px}
++.am-head b{font-size:17px;letter-spacing:-.025em;color:var(--one-ink,var(--ink))}
++.am-head small{font-size:12.5px;color:var(--one-muted,var(--muted));line-height:1.4}
++.am-mark{
++  width:34px;
++  height:34px;
++  flex-basis:34px;
++  border-radius:14px;
++  background:linear-gradient(145deg,rgba(193,111,84,.16),rgba(132,149,126,.13));
++  color:var(--one-terracotta,var(--orange));
++  box-shadow:inset 0 0 0 1px rgba(193,111,84,.12);
++}
++.am-mark span{
++  display:block;
++  width:13px;
++  height:13px;
++  border-radius:999px 999px 999px 3px;
++  background:currentColor;
++  transform:rotate(45deg);
++  opacity:.9;
++}
++.am-list{position:relative;z-index:1;display:flex;flex-direction:column}
++.am-row{
++  position:relative;
++  display:flex;
++  align-items:center;
++  gap:12px;
++  min-height:58px;
++  padding:10px 8px 10px 0;
++  text-decoration:none;
++  color:var(--one-ink,var(--ink));
++  border-top:1px solid rgba(227,222,212,.72);
++  border-radius:14px;
++  transition:background .2s ease,transform .2s ease,box-shadow .2s ease;
++}
+ .am-row:first-child{border-top:0}
+-.am-ava{width:32px;height:32px;border-radius:50%;overflow:hidden;flex:0 0 auto;
+-  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
++.am-row:hover{
++  background:rgba(255,255,255,.42);
++  box-shadow:0 4px 14px rgba(16,19,45,.035);
++}
++.am-row:active{transform:scale(.992)}
++.am-row:focus-visible{
++  outline:3px solid var(--one-focus,rgba(193,111,84,.25));
++  outline-offset:2px;
++}
++.am-row + .am-row::before{
++  content:'';
++  position:absolute;
++  top:-1px;
++  left:52px;
++  right:8px;
++  height:1px;
++  background:rgba(227,222,212,.72);
++}
++.am-row + .am-row{border-top:0}
++.am-ava{width:40px;height:40px;border-radius:50%;overflow:hidden;flex:0 0 40px;
++  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:750;font-size:14px;
++  border:1px solid rgba(255,255,255,.78);box-shadow:0 0 0 1px rgba(16,19,45,.06)}
+ .am-ava img{width:100%;height:100%;object-fit:cover}
+-.am-txt{flex:1;min-width:0;display:flex;flex-direction:column}
+-.am-txt b{font-size:14px;font-weight:650;line-height:1.3}
+-.am-txt small{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+-.am-go{color:var(--muted);font-size:17px;flex:0 0 auto}
+-.am-row.comecou .am-txt b{color:#84917A}
+-.am-row.termina .am-txt b,.am-row.chegou .am-txt b{color:#C16F54}
++.am-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
++.am-line{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
++.am-txt b{
++  min-width:0;
++  max-width:100%;
++  color:var(--one-ink,var(--ink));
++  font-size:14.5px;
++  font-weight:760;
++  line-height:1.25;
++  overflow:hidden;
++  text-overflow:ellipsis;
++  white-space:nowrap;
++}
++.am-txt em{
++  flex:0 0 auto;
++  max-width:100%;
++  padding:3px 8px;
++  border-radius:999px;
++  background:rgba(132,149,126,.16);
++  color:#58664f;
++  font-size:11px;
++  font-style:normal;
++  font-weight:780;
++  line-height:1.15;
++  white-space:nowrap;
++}
++.am-row.chegou .am-txt em{background:rgba(193,111,84,.14);color:#9b533d}
++.am-txt small{
++  color:var(--one-muted,var(--muted));
++  font-size:12.5px;
++  line-height:1.35;
++  display:-webkit-box;
++  -webkit-line-clamp:2;
++  -webkit-box-orient:vertical;
++  overflow:hidden;
++}
++.am-go{
++  display:grid;
++  place-items:center;
++  width:30px;
++  height:30px;
++  border-radius:50%;
++  color:rgba(16,19,45,.48);
++  background:rgba(255,255,255,.44);
++  flex:0 0 30px;
++  transition:transform .2s ease,color .2s ease,background .2s ease;
++}
++.am-row:hover .am-go{transform:translateX(2px);color:var(--one-terracotta,var(--orange));background:rgba(255,255,255,.7)}
++@media(max-width:420px){
++  .am-row{gap:10px;padding-right:4px}
++  .am-ava{width:38px;height:38px;flex-basis:38px}
++  .am-line{gap:5px}
++  .am-txt b{font-size:14px}
++  .am-txt em{font-size:10.5px;padding:3px 7px}
++  .am-go{width:28px;height:28px;flex-basis:28px}
++}
++@media(prefers-reduced-motion:reduce){
++  .am-row,.am-go{transition:none}
++  .am-row:hover .am-go{transform:none}
++  .am-row:active{transform:none}
++}
+ 
+ /* ---------- 3. RETORNOS ---------- */
+ .rt-block{margin:22px 0 6px;padding:14px;background:linear-gradient(160deg,#10132D 0%,#171d4d 100%);color:#FAF7F2}
+@@ -6046,14 +6182,14 @@ h1 { letter-spacing: -0.03em; }
+ .composer-extra-toggle b{font-size:20px;line-height:1;font-weight:500}
+ .composer-extra-panel:not(.open) .tools{display:none}
+ .composer-extra-panel:not(.open){justify-content:flex-end}
+-.feed-stream > .aux-post{margin:0 0 14px;padding:18px 16px;background:var(--surface,#fff);border:1px solid var(--line);border-radius:16px;box-shadow:0 7px 22px rgba(24,36,59,.045)}
++.feed-stream > .aux-post:not(.am-block){margin:0 0 14px;padding:18px 16px;background:var(--surface,#fff);border:1px solid var(--line);border-radius:16px;box-shadow:0 7px 22px rgba(24,36,59,.045)}
+ .aux-post-head{display:flex;align-items:flex-start;gap:11px;margin:0 0 14px}
+ .aux-post-head>div{display:grid;gap:3px;min-width:0}
+ .aux-post-head b{color:var(--ink);font-family:var(--display);font-size:15px;font-weight:850;line-height:1.2}
+ .aux-post-head small{color:var(--muted);font-size:11px;line-height:1.35}
+ .aux-post-mark{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:50%;background:var(--support-soft,#f2ded4);color:var(--orange,#c16f54);font-size:16px}
+ .aux-post .needs-title,.aux-post .sg-head,.aux-post .am-title,.aux-post .an-title{display:none}
+-@media(max-width:640px){.feed-stream > .aux-post{margin-inline:0;border-radius:0;border-left:0;border-right:0;box-shadow:none;padding:18px 16px}}
++@media(max-width:640px){.feed-stream > .aux-post:not(.am-block){margin-inline:0;border-radius:0;border-left:0;border-right:0;box-shadow:none;padding:18px 16px}}
+ .ej-section{padding:18px 0;border-bottom:1px solid var(--line,#ece9e2)}
+ .ej-section:first-child{padding-top:0}
+ .ej-section-title{margin:0;color:var(--ink);font-family:var(--display);font-size:16px;font-weight:850;letter-spacing:-.01em}
+@@ -10706,16 +10842,13 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
+    Antes "Alguém precisa de você hoje" e "Amanhã por aqui" usavam padding
+    próprio, então texto e ícones ficavam desalinhados do feed. */
+ @media (max-width: 860px) {
+-  .feed-stream > .aux-post.needs,
+-  .feed-stream > .aux-post.am-block {
++  .feed-stream > .aux-post.needs {
+     padding-left: 0 !important;
+     padding-right: 0 !important;
+   }
+ 
+   .feed-stream > .aux-post.needs > .aux-post-head,
+-  .feed-stream > .aux-post.am-block > .aux-post-head,
+-  .feed-stream > .aux-post.needs > .needs-list,
+-  .feed-stream > .aux-post.am-block > .am-list {
++  .feed-stream > .aux-post.needs > .needs-list {
+     padding-left: var(--recuo-feed) !important;
+     padding-right: var(--recuo-feed) !important;
+   }
+diff --git a/app/home/page.js b/app/home/page.js
+index 9588cb6..523ba72 100644
+--- a/app/home/page.js
++++ b/app/home/page.js
+@@ -110,7 +110,7 @@ export default async function Home() {
+     pc: { title: t.pcTitle, sub: t.pcSub, done: t.pcDone, cancel: t.epCancel, tipos: t.pcTipos },
+     step: { back: t.stepBack, follow: t.stepFollow, following: t.stepFollowing, decided: t.stepDecided, result: t.stepResult, open: t.stepOpen },
+     transf: { tag: t.trTag, dayFmt: t.trDayFmt, gap: t.trGap, see: t.trSee },
+-    amanha: { title: t.amTitle, sub: t.amSub, comecou: t.amComecou, termina: t.amTermina, chegou: t.amChegou, marco: t.amMarco },
++    amanha: { title: t.amTitle, sub: t.amSub, comecou: t.amComecou, termina: t.amTermina, chegou: t.amChegou, marco: t.amMarco, doneDay: t.amDoneDay, reachedDay: t.amReachedDay },
+     retornos: { title: t.rtTitle, came: t.rtCame, cta: t.rtCta, sent: t.rtSent },
+     hug: { hug: t.hugLabel, toast: t.hugToast }, metoo: { meToo: t.meToo, meTooQ: t.meTooQ, meTooBack: t.meTooBack, meTooTrying: t.meTooTrying, meTooHard: t.meTooHard, meTooJust: t.meTooJust, meTooDone: t.meTooDone }, milestoneFmt: t.milestoneFmt, needs: { title: t.needsTitle, sub: t.needsSub, cta: t.needsCta, sent: t.needsSent }, comebackFmt: t.comebackFmt,
+     popoverClose: t.commentClose,
+diff --git a/components/Amanha.jsx b/components/Amanha.jsx
+index 149c2c1..8680168 100644
+--- a/components/Amanha.jsx
++++ b/components/Amanha.jsx
+@@ -7,17 +7,26 @@ export default function Amanha({ people, labels }) {
+   const list = people || [];
+   if (!list.length) return null;
+ 
+-  const frase = (x) => {
+-    const nome = (x.owner.name || '').split(' ')[0];
+-    if (x.tipo === 'comecou') return (L.comecou || '{name} começou hoje').replace('{name}', nome);
+-    if (x.tipo === 'chegou') return (L.chegou || '{name} chegou ao dia {t}').replace('{name}', nome).replace('{t}', x.total);
+-    if (x.tipo === 'termina') return (L.termina || '{name} termina amanhã').replace('{name}', nome);
+-    return (L.marco || '{name} chega ao dia {d} amanhã').replace('{name}', nome).replace('{d}', x.dia);
++  const numeroDoDia = (x) => {
++    if (x.tipo === 'chegou' && x.total) return x.total;
++    return x.dia || x.total || 1;
++  };
++
++  const selo = (x) => {
++    const numero = numeroDoDia(x);
++    if (x.tipo === 'chegou') return (L.doneDay || 'Dia {d} concluído').replace('{d}', numero);
++    return (L.reachedDay || 'Chegou ao dia {d}').replace('{d}', numero);
+   };
+ 
+   return (
+     <article className="entry aux-post am-block">
+-      <header className="aux-post-head"><span className="aux-post-mark" aria-hidden="true">↗</span><div><b>{L.title || 'Tomorrow around here'}</b><small>{L.sub || 'Some journeys continue tomorrow.'}</small></div></header>
++      <header className="aux-post-head am-head">
++        <span className="aux-post-mark am-mark" aria-hidden="true"><span /></span>
++        <div>
++          <b>{L.title || 'Amanhã, a jornada continua.'}</b>
++          <small>{L.sub || 'Hoje, essas pessoas deram mais um passo.'}</small>
++        </div>
++      </header>
+       <div className="am-list">
+         {list.map((x, i) => {
+           const p = x.owner || {};
+@@ -28,10 +37,17 @@ export default function Amanha({ people, labels }) {
+                 {p.avatar_url ? <img src={p.avatar_url} alt="" /> : first[0]}
+               </span>
+               <span className="am-txt">
+-                <b>{frase(x)}</b>
++                <span className="am-line">
++                  <b>{first}</b>
++                  <em>{selo(x)}</em>
++                </span>
+                 <small>{x.journeyTitle}</small>
+               </span>
+-              <span className="am-go" aria-hidden="true">›</span>
++              <span className="am-go" aria-hidden="true">
++                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
++                  <path d="M9 18l6-6-6-6" />
++                </svg>
++              </span>
+             </a>
+           );
+         })}
+diff --git a/lib/i18n.js b/lib/i18n.js
+index 75301d9..55936c8 100644
+--- a/lib/i18n.js
++++ b/lib/i18n.js
+@@ -42,7 +42,7 @@ export const dictionaries = {
+     managePost: 'Manage', mediaReplace: 'Replace media', mediaRemove: 'Remove media', postDelete: 'Delete post', postDeleteConfirm: "Delete this post? This can't be undone.",
+     followersTitle: 'Followers', followersNone: "No one follows your journeys yet — when someone does, they'll show up here.", followersWho: 'People walking with you', supportersMineTitle: 'People supporting you', supportersMineWho: 'They hugged you or supported your posts:',
+ 
+-    trTag: 'Before & after', trDayFmt: 'Day {d}', trGap: '{n} days between the two', trSee: 'see the journey', amTitle: 'Tomorrow around here', amComecou: '{name} started today', amTermina: '{name} finishes tomorrow', amChegou: '{name} reached day {t}', amMarco: '{name} reaches day {d} tomorrow', rtTitle: 'Came back this week', rtCame: '{name} came back after {d} days', rtCta: 'welcome them back', rtSent: 'sent 💛', 
++    trTag: 'Before & after', trDayFmt: 'Day {d}', trGap: '{n} days between the two', trSee: 'see the journey', amTitle: 'Tomorrow, the journey continues.', amComecou: '{name} started today', amTermina: '{name} finishes tomorrow', amChegou: '{name} reached day {t}', amMarco: '{name} reaches day {d} tomorrow', amDoneDay: 'Day {d} completed', amReachedDay: 'Reached day {d}', rtTitle: 'Came back this week', rtCame: '{name} came back after {d} days', rtCta: 'welcome them back', rtSent: 'sent 💛', 
+     stepQ: 'What is your next step?', stepPh: 'e.g., walk 25 minutes', stepWhenQ: 'When?', stepWhens: ['tomorrow morning','tomorrow evening','tomorrow','this week'], stepSave: 'Open the chapter', stepNote: 'Optional. It appears on your post so people can follow how it goes.', stepBack: 'comes back with the result', stepFollow: 'I want to see how it goes', stepFollowing: 'following this step', stepDecided: 'Yesterday {name} decided:', stepResult: 'Result', stepOpen: 'This chapter is still open', stepResume: 'Pick up where I left off', notifStepResult: '{name} came back with the result 👀', 
+     espTeaser: 'I noticed something.', espEyebrow: 'Upi', espClose: 'close', espPalavra: 'The word “{t}” showed up in {n} of your first days. It hasn’t appeared in {d} days.', espTempo: 'You used to write “I wanted to”. Now you write “I did”.', espTom: 'The weight left your sentences.', espRitmo: 'At first you showed up every {a} days. Now it is almost every day.', pqEyebrow: 'On day 1 you wrote why this mattered:', 
+     capTitle: 'Skills you are building', capNote: 'This comes from your own records. Nothing here is compared to anyone else.', capVoltar: 'Your ability to come back is growing.', capVoltarAntes: 'Before, a pause lasted {d} days on average.', capVoltarAgora: 'In the last {n} times, you came back within {d} days.', capVoltarMaior: 'The longest pause you crossed was {d} days — and you came back.', capDificil: 'You are learning to keep going on the hard day.', capDificilProva: 'After {t} hard days you recorded, you came back the next day in {n} of them.', capPresenca: 'Your consistency is becoming routine.', capPresencaProva: '{d} days in a row without a single pause.', 
+@@ -412,7 +412,7 @@ export const dictionaries = {
+     managePost: 'Gerenciar', mediaReplace: 'Trocar mídia', mediaRemove: 'Remover mídia', postDelete: 'Excluir publicação', postDeleteConfirm: 'Excluir esta publicação? Não dá pra desfazer.',
+     followersTitle: 'Seguidores', followersNone: 'Ainda ninguém segue suas jornadas — quando alguém seguir, aparece aqui.', followersWho: 'Pessoas que caminham com você', supportersMineTitle: 'Quem te apoia', supportersMineWho: 'Mandaram apoio ou apoiaram seus posts:',
+ 
+-    trTag: 'Antes & depois', trDayFmt: 'Dia {d}', trGap: '{n} dias entre as duas', trSee: 'ver a jornada', amTitle: 'Amanhã por aqui', amComecou: '{name} começou hoje', amTermina: '{name} termina amanhã', amChegou: '{name} chegou ao dia {t}', amMarco: '{name} chega ao dia {d} amanhã', rtTitle: 'Voltaram esta semana', rtCame: '{name} voltou depois de {d} dias', rtCta: 'dar as boas-vindas', rtSent: 'enviado 💛', 
++    trTag: 'Antes & depois', trDayFmt: 'Dia {d}', trGap: '{n} dias entre as duas', trSee: 'ver a jornada', amTitle: 'Amanhã, a jornada continua.', amComecou: '{name} começou hoje', amTermina: '{name} termina amanhã', amChegou: '{name} chegou ao dia {t}', amMarco: '{name} chega ao dia {d} amanhã', amDoneDay: 'Dia {d} concluído', amReachedDay: 'Chegou ao dia {d}', rtTitle: 'Voltaram esta semana', rtCame: '{name} voltou depois de {d} dias', rtCta: 'dar as boas-vindas', rtSent: 'enviado 💛', 
+     stepQ: 'Qual é o seu próximo passo?', stepPh: 'ex.: caminhar 25 minutos', stepWhenQ: 'Quando?', stepWhens: ['amanhã de manhã','amanhã à noite','amanhã','esta semana'], stepSave: 'Abrir o capítulo', stepNote: 'Opcional. Aparece no seu post para as pessoas acompanharem como foi.', stepBack: 'volta com o resultado', stepFollow: 'quero ver como foi', stepFollowing: 'acompanhando este passo', stepDecided: 'Ontem {name} decidiu:', stepResult: 'Resultado', stepOpen: 'Este capítulo continua em aberto', stepResume: 'Retomar de onde parei', notifStepResult: '{name} voltou com o resultado 👀', 
+     espTeaser: 'Reparei numa coisa.', espEyebrow: 'Upi', espClose: 'fechar', espPalavra: 'A palavra “{t}” aparecia em {n} dos seus primeiros dias. Não aparece há {d} dias.', espTempo: 'Você escrevia no “queria”. Agora escreve no “fiz”.', espTom: 'O peso saiu das suas frases.', espRitmo: 'No começo você aparecia a cada {a} dias. Agora é quase todo dia.', pqEyebrow: 'No dia 1 você escreveu por que isso importava:', 
+     capTitle: 'Capacidades em construção', capNote: 'Isto vem dos seus próprios registros. Nada aqui é comparado com outra pessoa.', capVoltar: 'Sua capacidade de voltar está crescendo.', capVoltarAntes: 'Antes, uma pausa durava em média {d} dias.', capVoltarAgora: 'Nas últimas {n} vezes, você voltou em até {d} dias.', capVoltarMaior: 'A maior pausa que você atravessou foi de {d} dias — e você voltou.', capDificil: 'Você está aprendendo a continuar no dia ruim.', capDificilProva: 'Depois de {t} dias difíceis registrados, você voltou no dia seguinte em {n} deles.', capPresenca: 'Sua constância está virando rotina.', capPresencaProva: '{d} dias seguidos sem uma única pausa.', 
+@@ -772,7 +772,7 @@ const SPANISH_CORE = {
+   milestoneFmt: 'Hito · Día {d}', tagSetback: 'DÍA DIFÍCIL', tagWin: 'VICTORIA',
+   hjOi: 'Hola, {name}.', hjPergunta: '¿Qué merece hoy un paso tuyo?', hjDisse: 'Ayer dijiste que harías:', hjFeito: 'Hoy ya registraste tu día.', hjCta: 'Registrar el día',
+   anTitle: 'En proceso', anVoltou: '{name} volvió con el resultado', anQuase: '{name} está en el día {d} de {t}', anEsperando: '{name} aún no ha vuelto', anVer: 'ver resultado', anAcompanhar: 'acompañar',
+-  amTitle: 'Mañana por aquí', amComecou: '{name} comenzó hoy', amTermina: '{name} termina mañana', amChegou: '{name} llegó al día {t}', amMarco: '{name} llega al día {d} mañana',
++  amTitle: 'Mañana, la jornada continúa.', amComecou: '{name} comenzó hoy', amTermina: '{name} termina mañana', amChegou: '{name} llegó al día {t}', amMarco: '{name} llega al día {d} mañana', amDoneDay: 'Día {d} concluido', amReachedDay: 'Llegó al día {d}',
+   fjEyebrow: 'TU TURNO', fjTitle: 'Comienza tu jornada, {name}', fjSub: 'Un paso pequeño, compartido. Vuelve mañana y continúa.', fjCta: 'Comenzar mi primera jornada', fjHint: 'Toma un minuto. Tú eliges quién puede verla.',
+   successTitle: 'Día 1 publicado. Tu jornada ya existe.', successSub: 'Apareciste. Así comienza: un día a la vez.', successShare: 'Compartir tu tarjeta', successView: 'Ver página pública', successExplore: 'Explorar jornadas',
+   feedInviteTitle: 'No estás comenzando a solas.', feedInviteSub: 'Mira jornadas reales y acompaña a alguien que lo está intentando.', feedInviteCta: 'Explorar jornadas',
+@@ -1115,7 +1115,7 @@ Object.assign(dictionaries.en, {
+   wzBackEdit: 'Go back and edit',
+   wzOrganizing: 'Organizing your journey…',
+   anSub: 'Stories people are still following.',
+-  amSub: 'Some journeys continue tomorrow.',
++  amSub: 'Today, these people took another step.',
+   needsSub: 'Showing up can change someone’s day.',
+   profileMediaHint: 'Personalize your photo and cover',
+   avatarUpdateError: 'Could not update the photo. Try again.',
+@@ -1152,7 +1152,7 @@ Object.assign(dictionaries.pt, {
+   wzBackEdit: 'Voltar e editar',
+   wzOrganizing: 'Organizando sua jornada…',
+   anSub: 'Histórias que continuam sendo acompanhadas.',
+-  amSub: 'Algumas jornadas continuam amanhã.',
++  amSub: 'Hoje, essas pessoas deram mais um passo.',
+   needsSub: 'Uma presença pode mudar o dia de alguém.',
+   profileMediaHint: 'Personalize sua foto e sua capa',
+   avatarUpdateError: 'Não foi possível atualizar a foto. Tente novamente.',
+@@ -1189,7 +1189,7 @@ Object.assign(SPANISH_CORE, {
+   wzBackEdit: 'Volver y editar',
+   wzOrganizing: 'Organizando tu jornada…',
+   anSub: 'Historias que las personas siguen acompañando.',
+-  amSub: 'Algunas jornadas continúan mañana.',
++  amSub: 'Hoy, estas personas dieron un paso más.',
+   needsSub: 'Estar presente puede cambiar el día de alguien.',
+   profileMediaHint: 'Personaliza tu foto y tu portada',
+   avatarUpdateError: 'No se pudo actualizar la foto. Inténtalo de nuevo.',
