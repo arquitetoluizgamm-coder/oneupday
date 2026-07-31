@@ -87,7 +87,7 @@ export default function Comments({ updateId, mediaId, challengeId, labels, own }
         })()}
         {replyTo && <div className="comment-replying">{(L.replying || '{name}').replace('{name}', replyTo.author?.name || L.someone || '')} <button type="button" onClick={() => setReplyTo(null)}>{L.cancel}</button></div>}
         <form className="comment-form" onSubmit={submit}>
-          <input value={text} onChange={e => setText(e.target.value)} maxLength={500} placeholder={L.placeholder} />
+          <textarea value={text} onChange={e => setText(e.target.value)} maxLength={500} rows={2} placeholder={L.placeholder} />
           <button type="submit" disabled={busy || !text.trim()}>{busy ? L.sending : L.send}</button>
         </form>
         {message && <p className="comment-message">{message}</p>}

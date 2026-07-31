@@ -10648,3 +10648,32 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
     font-size: 12px;
   }
 }
+
+/* Comentários: Enter deve quebrar linha. O envio fica no botão, então o campo
+   precisa ser textarea sem perder o formato compacto do composer. */
+.comment-form textarea {
+  min-width: 0;
+  flex: 1;
+  min-height: 38px;
+  max-height: 120px;
+  resize: vertical;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--one-ink, var(--ink));
+  padding: 8px 8px 8px 0;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.35;
+}
+
+.comment-form textarea:focus {
+  outline: none;
+}
+
+@media (max-width: 560px) {
+  .comment-form {
+    align-items: flex-end;
+    border-radius: 18px;
+    padding: 5px 5px 5px 14px;
+  }
+}
