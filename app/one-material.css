@@ -23,3 +23,24 @@ html,body,.feed-page,.wrap.feed-page,.home-welcome{background:#fff!important}.to
     background:transparent!important;
   }
 }
+
+/* Navegação compacta: uma cápsula, não uma barra de largura inteira. */
+@media(max-width:767px){
+  .bottom-nav{
+    width:min(320px,calc(100vw - 72px))!important;
+    height:58px!important;
+    min-height:58px!important;
+    padding:5px!important;
+    border-radius:999px!important;
+  }
+  .bottom-nav a,.bottom-nav .bn-create{
+    width:42px!important;
+    height:42px!important;
+    min-width:42px!important;
+    min-height:42px!important;
+    border-radius:50%!important;
+  }
+  .bottom-nav a.on,.bottom-nav .bn-create{
+    border-radius:50%!important;
+  }
+}
