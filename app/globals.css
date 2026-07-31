@@ -10678,6 +10678,30 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
   }
 }
 
+/* Feed: os avisos auxiliares precisam respirar na mesma coluna dos posts.
+   Antes "Alguém precisa de você hoje" e "Amanhã por aqui" usavam padding
+   próprio, então texto e ícones ficavam desalinhados do feed. */
+@media (max-width: 860px) {
+  .feed-stream > .aux-post.needs,
+  .feed-stream > .aux-post.am-block {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .feed-stream > .aux-post.needs > .aux-post-head,
+  .feed-stream > .aux-post.am-block > .aux-post-head,
+  .feed-stream > .aux-post.needs > .needs-list,
+  .feed-stream > .aux-post.am-block > .am-list {
+    padding-left: var(--recuo-feed) !important;
+    padding-right: var(--recuo-feed) !important;
+  }
+
+  .feed-stream > .aux-post.needs > .needs-list {
+    scroll-padding-left: var(--recuo-feed);
+    scroll-padding-right: var(--recuo-feed);
+  }
+}
+
 /* Jornada pública: leitura por capítulo. Sai a régua/arraste e entra um
    navegador simples: começa no Dia 1, avança pelas setas ou pelas abas. */
 .journey-public .days-pager {
