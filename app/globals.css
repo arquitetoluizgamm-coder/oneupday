@@ -5201,10 +5201,15 @@ h1 { letter-spacing: -0.03em; }
 
 /* telas cheias e sobreposicoes tambem respeitam as bordas */
 .pm-back,.create-backdrop,.crop-modal{
+  padding-top:var(--sa-top);
   padding-bottom:var(--sa-bottom);
   padding-left:var(--sa-left);padding-right:var(--sa-right);
 }
 .create-menu{margin-bottom:var(--sa-bottom)}
+.pm-sheet{
+  max-height:calc(100svh - var(--sa-top) - var(--sa-bottom) - 16px);
+  max-height:calc(100dvh - var(--sa-top) - var(--sa-bottom) - 16px);
+}
 
 /* em paisagem, o entalhe fica na lateral */
 @media(orientation:landscape){

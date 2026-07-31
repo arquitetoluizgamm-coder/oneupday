@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 // ============================================================
 // MENU DO PERFIL
@@ -18,6 +19,9 @@ import { useEffect, useState } from 'react';
 // ============================================================
 export default function ProfileMenu({ label, closeLabel, children, sair }) {
   const [aberto, setAberto] = useState(false);
+  const [montado, setMontado] = useState(false);
+
+  useEffect(() => setMontado(true), []);
 
   // Esc fecha, e o fundo para de rolar enquanto o painel está aberto
   useEffect(() => {
@@ -48,7 +52,7 @@ export default function ProfileMenu({ label, closeLabel, children, sair }) {
         </svg>
       </button>
 
-      {aberto && (
+      {aberto && montado && createPortal(
         <div className="pm-back" role="dialog" aria-modal="true" onClick={() => setAberto(false)}>
           <div className="pm-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="pm-head">
@@ -65,7 +69,8 @@ export default function ProfileMenu({ label, closeLabel, children, sair }) {
 
             {sair && <div className="pm-sair">{sair}</div>}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
