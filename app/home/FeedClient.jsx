@@ -60,12 +60,12 @@ function storyLineText(item, labels) {
   return fillLabel(labels.feedStoryDefault, { name });
 }
 
-function JourneyTitlePill({ title, slug }) {
+function JourneyTitlePill({ title, slug, day }) {
   if (!title || !slug) return null;
   return (
     <a className="feed-journey-pill" href={`/${slug}`}>
-      <span aria-hidden="true">ONE</span>
       <b>{title}</b>
+      {day && <small>{day}</small>}
     </a>
   );
 }
@@ -256,7 +256,7 @@ function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat, progre
 
   return (
     <>
-      <JourneyTitlePill title={item.journey?.title} slug={item.journey?.slug} />
+      <JourneyTitlePill title={item.journey?.title} slug={item.journey?.slug} day={fillLabel(labels.dayShort, { d: item.day_number })} />
       {item.photo_url && <Media photo={item.photo_url} alt={textoAlternativo(item.alt, { dia: item.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackFloat}<VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
       {item.video_url && !item.photo_url && (
         <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackFloat}</Media>
@@ -309,7 +309,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
         <StepResult decided={d.closes.step} name={(item.owner.name || '').split(' ')[0]} labels={labels.step} />
       )}
 
-      <JourneyTitlePill title={item.journey?.title} slug={item.journey?.slug} />
+      <JourneyTitlePill title={item.journey?.title} slug={item.journey?.slug} day={dayLabel(d.day_number)} />
       <div className={`dp-stage${hasMedia ? '' : ' is-text'}`}>
         <div className="dp-slide" key={d.id}>
           {hasMedia ? (
@@ -822,7 +822,7 @@ export default function FeedClient({ labels }) {
                 // apagar o dia — mas mostra selo, não frase.
                 return (
                   <>
-                    <JourneyTitlePill title={item.journey?.title} slug={item.journey?.slug} />
+                    <JourneyTitlePill title={item.journey?.title} slug={item.journey?.slug} day={dayLabel(item.day_number)} />
                     <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText ? '' : ' so-selo'}`}>
                       {cleanText
                         ? <CardText text={cleanText} labels={labels} mencoes={item.mencoes} />

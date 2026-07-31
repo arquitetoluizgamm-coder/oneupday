@@ -10707,38 +10707,25 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
 .feed-journey-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 12px;
   width: fit-content;
   max-width: calc(100% - 2 * var(--recuo-feed, 16px));
-  margin: 11px var(--recuo-feed, 16px) 8px;
+  margin: 12px var(--recuo-feed, 16px) 0;
   overflow: hidden;
   text-decoration: none;
-  border: 1px solid rgba(255,255,255,.72);
-  border-radius: 999px;
-  background: linear-gradient(145deg, rgba(255,253,248,.88), rgba(241,233,222,.72));
+  border: 0;
+  border-left: 3px solid var(--one-terracotta, #c16f54);
+  border-radius: 0;
+  background: transparent;
   color: var(--one-ink, #2d2924);
-  box-shadow: 5px 6px 14px rgba(151,132,110,.16), -4px -4px 10px rgba(255,255,255,.78), inset 1px 1px 0 rgba(255,255,255,.9);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
-  backdrop-filter: blur(16px) saturate(120%);
-  padding: 7px 12px 7px 8px;
-  font-size: 12px;
-  font-weight: 850;
-  line-height: 1.1;
+  box-shadow: none;
+  padding: 2px 0 3px 9px;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.15;
   letter-spacing: .01em;
-  transition: transform .16s ease, box-shadow .16s ease;
-}
-
-.feed-journey-pill span {
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  min-width: 34px;
-  height: 22px;
-  border-radius: 999px;
-  background: var(--one-terracotta, #c16f54);
-  color: #fffdf8;
-  font-size: 9px;
-  letter-spacing: .12em;
+  transition: color .16s ease, border-color .16s ease;
 }
 
 .feed-journey-pill b {
@@ -10746,14 +10733,22 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-weight: 850;
+}
+
+.feed-journey-pill small {
+  flex: 0 0 auto;
+  color: var(--one-terracotta, #c16f54);
+  font-size: 11px;
+  font-weight: 850;
+  white-space: nowrap;
 }
 
 .feed-journey-pill:hover,
 .feed-journey-pill:focus-visible {
-  transform: translateY(-1px);
-  box-shadow: 7px 8px 18px rgba(151,132,110,.20), -5px -5px 12px rgba(255,255,255,.82), inset 1px 1px 0 rgba(255,255,255,.92);
+  color: var(--one-terracotta, #c16f54);
+  border-color: var(--one-primary-dark, #a95740);
   outline: none;
 }
 
