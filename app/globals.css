@@ -10907,3 +10907,275 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
 .entry-ava.has-mood {
   box-shadow: var(--mood-shadow) !important;
 }
+
+/* ============================================================
+   Landing clean white
+   Página de entrada mais silenciosa: fundo branco, terracota/sálvia,
+   botões ONE atuais e sem o rosa antigo da marca inicial.
+   ============================================================ */
+body:has(.landing){
+  background:#fff!important;
+}
+
+.land-top{
+  background:#fff!important;
+  box-shadow:none!important;
+  border-bottom:0!important;
+}
+
+.landing{
+  --pink:var(--one-terracotta,#C16F54);
+  --orange:var(--one-terracotta,#C16F54);
+  --yellow:var(--one-gold,#E8A64C);
+  max-width:1120px!important;
+  padding:0 24px 72px!important;
+  background:#fff!important;
+}
+
+.land-hero{
+  max-width:780px!important;
+  padding:52px 0 28px!important;
+  text-align:center;
+}
+
+.land-hero h1.land-brand{
+  margin:0 0 18px!important;
+  color:var(--one-muted,#7b746b)!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  letter-spacing:.22em!important;
+  text-transform:uppercase!important;
+}
+
+.land-hero .land-headline{
+  max-width:780px!important;
+  margin:0 auto 8px!important;
+  color:var(--one-ink,#2d2924)!important;
+  font-family:var(--display)!important;
+  font-size:clamp(42px,8vw,76px)!important;
+  line-height:.95!important;
+  letter-spacing:-.065em!important;
+  font-weight:850!important;
+}
+
+.land-sub{
+  max-width:680px!important;
+  margin:0 auto 18px!important;
+  color:var(--one-terracotta,#C16F54)!important;
+  font-family:var(--display)!important;
+  font-size:clamp(24px,4vw,38px)!important;
+  line-height:1.04!important;
+  letter-spacing:-.045em!important;
+  font-weight:760!important;
+}
+
+.land-desc{
+  max-width:590px!important;
+  margin:0 auto 26px!important;
+  color:var(--one-muted,#6f675e)!important;
+  font-size:17px!important;
+  line-height:1.62!important;
+}
+
+.landing .land-cta,
+.landing .cta.grow.land-cta{
+  min-height:52px!important;
+  padding:0 28px!important;
+  border:1px solid rgba(255,240,230,.72)!important;
+  border-radius:999px!important;
+  background:linear-gradient(145deg,var(--one-primary-light,#d98568),var(--one-terracotta,#C16F54) 58%,var(--one-primary-dark,#a95740))!important;
+  color:#fffdf8!important;
+  box-shadow:7px 8px 18px rgba(169,87,64,.22),-5px -5px 12px rgba(255,255,255,.78),inset 1px 1px 0 rgba(255,245,237,.52)!important;
+  text-shadow:0 1px 0 rgba(88,47,35,.18);
+}
+
+.landing .land-cta:hover{
+  transform:translateY(-1px);
+}
+
+.land-onde{
+  margin-top:16px!important;
+  color:var(--one-muted,#7b746b)!important;
+  font-size:12.5px!important;
+  font-weight:750!important;
+}
+
+.landing .sec-titulo{
+  color:var(--one-ink,#2d2924)!important;
+  font-size:clamp(24px,3vw,34px)!important;
+  font-weight:760!important;
+}
+
+.land-acao{
+  margin-top:58px!important;
+}
+
+.acao-palco{
+  grid-template-columns:minmax(0,1fr) minmax(220px,280px)!important;
+  gap:42px!important;
+}
+
+.acao-tela .jex,
+.jex{
+  border-color:var(--one-line,#e8dfd3)!important;
+  background:#fff!important;
+  box-shadow:0 22px 60px rgba(93,72,54,.10)!important;
+}
+
+.jex-capa{
+  background:linear-gradient(145deg,#f6f1e9 0%,#fffaf2 100%)!important;
+  color:var(--one-ink,#2d2924)!important;
+}
+
+.jex-capa h3{
+  color:var(--one-ink,#2d2924)!important;
+}
+
+.jex-capa p{
+  color:var(--one-muted,#6f675e)!important;
+}
+
+.jex-selo,
+.jex-cat,
+.jex-rotulo{
+  color:var(--one-terracotta,#C16F54)!important;
+  background:#fff7f1!important;
+  border-color:rgba(193,111,84,.20)!important;
+}
+
+.jex-barra i,
+.lt-barra{
+  background:linear-gradient(90deg,var(--one-sage,#84957e),var(--one-terracotta,#C16F54))!important;
+}
+
+.acao-chamadas li{
+  padding:14px 0 14px 18px!important;
+  border-bottom:1px solid var(--one-line,#e8dfd3);
+  color:var(--one-ink,#2d2924)!important;
+  font-weight:720!important;
+}
+
+.acao-chamadas li::before{
+  background:var(--one-sage,#84957e)!important;
+}
+
+.passo,
+.land-seg,
+.land-sobre,
+.landing .examples{
+  background:#fff!important;
+}
+
+.passo{
+  border-color:var(--one-line,#e8dfd3)!important;
+  box-shadow:none!important;
+}
+
+.passo-ico,
+.idea-ico{
+  background:var(--one-sage-soft,#eef2e8)!important;
+  border-color:rgba(132,149,126,.22)!important;
+  color:var(--one-sage-deep,#5f6f58)!important;
+  box-shadow:none!important;
+}
+
+.dif-lista li,
+.example-pill{
+  border-color:var(--one-line,#e8dfd3)!important;
+  background:#fffdf8!important;
+  color:var(--one-ink,#2d2924)!important;
+  box-shadow:none!important;
+}
+
+.example-pill:hover{
+  border-color:rgba(193,111,84,.34)!important;
+  color:var(--one-terracotta,#C16F54)!important;
+}
+
+.land-see{
+  padding:34px 26px!important;
+  border:1px solid var(--one-line,#e8dfd3);
+  border-radius:28px;
+  background:#fffdf8!important;
+}
+
+.see-1,
+.close-1{
+  color:var(--one-ink,#2d2924)!important;
+}
+
+.see-2,
+.close-2{
+  color:var(--one-terracotta,#C16F54)!important;
+}
+
+.land-tese{
+  max-width:620px!important;
+}
+
+.lt-trilho{
+  background:var(--one-sand,#efe8dc)!important;
+}
+
+.tese-frase{
+  color:var(--one-ink,#2d2924)!important;
+}
+
+.seg-lista li{
+  color:var(--one-ink,#2d2924)!important;
+}
+
+.seg-lista svg{
+  color:var(--one-sage,#84957e)!important;
+}
+
+.land-close{
+  max-width:720px!important;
+  margin-top:76px!important;
+  padding:44px 26px!important;
+  text-align:center;
+  border-top:1px solid var(--one-line,#e8dfd3);
+  border-bottom:1px solid var(--one-line,#e8dfd3);
+  background:#fff!important;
+}
+
+.land-sobre{
+  border-top:0!important;
+  color:var(--one-muted,#6f675e)!important;
+}
+
+@media(max-width:860px){
+  .acao-palco{
+    grid-template-columns:1fr!important;
+    gap:26px!important;
+  }
+}
+
+@media(max-width:640px){
+  .landing{
+    padding:0 16px 54px!important;
+  }
+  .land-hero{
+    padding:34px 0 18px!important;
+  }
+  .land-hero .land-headline{
+    font-size:42px!important;
+    line-height:.98!important;
+  }
+  .land-sub{
+    font-size:25px!important;
+  }
+  .land-desc{
+    font-size:15.5px!important;
+  }
+  .land-see,
+  .land-close{
+    border-left:0;
+    border-right:0;
+    border-radius:0;
+    margin-left:-16px!important;
+    margin-right:-16px!important;
+    padding-left:16px!important;
+    padding-right:16px!important;
+  }
+}
