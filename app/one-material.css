@@ -22,7 +22,4 @@ html,body,.feed-page,.wrap.feed-page,.home-welcome{background:#fff!important}.to
     margin:0!important;
     background:transparent!important;
   }
-  .feed-page .home-welcome{
-    padding-top:calc(var(--sa-top) + 30px)!important;
-  }
 }
