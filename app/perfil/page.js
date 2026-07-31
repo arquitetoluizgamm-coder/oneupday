@@ -23,7 +23,6 @@ import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
 import ProfileTabs from '../../components/ProfileTabs';
 import EditProfileInfo from '../../components/EditProfileInfo';
 import ProfileMenu from '../../components/ProfileMenu';
-import CriarMenu from '../../components/CriarMenu';
 import DeleteJourney from '../../components/DeleteJourney';
 import EditJourney from '../../components/EditJourney';
 import JourneyDays from '../../components/JourneyDays';
@@ -265,7 +264,12 @@ export default async function Perfil() {
                 Upi pela largura e empurravam a fala dele para baixo. */}
             <div className="pc-acoes">
               <ProfileNotificationBell label={t.notifications} />
-              <CriarMenu t={t} className="pf-add" tamanho={21} rotulo={t.navCreate} />
+              <a className="pf-add" href="/new" aria-label={t.newJourney} title={t.newJourney}>
+                <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor"
+                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </a>
 
               <ProfileMenu
                 label={t.settings}
