@@ -7,11 +7,15 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "categories": ["social", "lifestyle", "health"],
+  "categories": [
+    "social",
+    "lifestyle",
+    "health"
+  ],
   "prefer_related_applications": false,
   "lang": "pt-BR",
   "dir": "ltr",
-  "theme_color": "#FAF7F2",
+  "theme_color": "#FFFFFF",
   "background_color": "#FAF7F2",
   "icons": [
     {
@@ -27,7 +31,7 @@
       "purpose": "any"
     },
     {
-      "src": "/app-icon-maskable-512.png",
+      "src": "/app-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
