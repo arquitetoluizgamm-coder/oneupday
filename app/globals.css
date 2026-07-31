@@ -13158,3 +13158,113 @@ body:has(.feed-page),
     background:#10131d!important;
   }
 }
+
+/* Feed · ajuste responsivo do controle "Apoiando..."
+   Mantém os ícones na primeira linha no celular e leva o apoio para a segunda. */
+.feed-page .entry-actions.feed-acts{
+  overflow:visible!important;
+}
+
+.feed-page .feed-acts .sl-title{
+  box-sizing:border-box!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  text-decoration:none!important;
+  cursor:pointer!important;
+  transition:background .2s ease,border-color .2s ease,color .2s ease,box-shadow .2s ease,transform .2s ease!important;
+}
+
+.feed-page .feed-acts .sl-title::before,
+.feed-page .feed-acts .sl-chev{
+  flex:0 0 auto!important;
+}
+
+.feed-page .feed-acts .sl-text{
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  font-weight:760!important;
+}
+
+.feed-page .feed-acts .sl-title:hover,
+.feed-page .feed-acts .sl-title:focus-visible{
+  border-color:rgba(132,149,126,.36)!important;
+  background:#F3F8EF!important;
+  color:#465642!important;
+}
+
+.feed-page .feed-acts .sl-title:focus-visible{
+  outline:3px solid rgba(132,149,126,.24)!important;
+  outline-offset:2px!important;
+}
+
+.feed-page .feed-acts .sl-title:active{
+  transform:translateY(1px) scale(.992)!important;
+}
+
+@media(min-width:521px){
+  .feed-page .feed-acts .sl-title{
+    flex:1 1 210px!important;
+    width:auto!important;
+    max-width:280px!important;
+    min-height:42px!important;
+    margin-top:0!important;
+    margin-left:auto!important;
+    padding:0 14px!important;
+    gap:7px!important;
+    box-shadow:0 2px 7px rgba(20,24,36,.025),inset 0 1px 0 rgba(255,255,255,.72)!important;
+  }
+}
+
+@media(max-width:520px){
+  .feed-page .entry-actions.feed-acts{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    column-gap:9px!important;
+    row-gap:0!important;
+    overflow:hidden!important;
+  }
+
+  .feed-page .feed-acts .sl-title{
+    order:10!important;
+    flex:1 0 100%!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-height:50px!important;
+    height:50px!important;
+    margin:11px 0 0!important;
+    padding:0 16px!important;
+    gap:8px!important;
+    border-radius:18px!important;
+    background:#EEF4EA!important;
+    box-shadow:0 1px 4px rgba(20,24,36,.025),inset 0 1px 0 rgba(255,255,255,.66)!important;
+    color:#51614C!important;
+  }
+
+  .feed-page .feed-acts .sl-title::before{
+    width:16px!important;
+    height:16px!important;
+    flex-basis:16px!important;
+    opacity:.72!important;
+  }
+
+  .feed-page .feed-acts .sl-text{
+    flex:0 1 auto!important;
+    max-width:calc(100% - 56px)!important;
+    font-size:14px!important;
+    line-height:1.2!important;
+    letter-spacing:-.01em!important;
+  }
+
+  .feed-page .feed-acts .sl-chev{
+    width:15px!important;
+    height:15px!important;
+    margin-left:1px!important;
+  }
+}
