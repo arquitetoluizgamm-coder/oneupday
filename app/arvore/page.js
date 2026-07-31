@@ -5,6 +5,7 @@ import { getDict } from '../../lib/i18n';
 import AppTop from '../../components/AppTop';
 import BottomNav from '../../components/BottomNav';
 import ArvoreDaVida from './ArvoreDaVida';
+import './tree-redesign.css';
 
 export const dynamic = 'force-dynamic';
 
