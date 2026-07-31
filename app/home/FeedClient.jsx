@@ -19,7 +19,7 @@ import Percepcao from '../../components/Percepcao';
 import Andamento from '../../components/Andamento';
 import Espelho from '../../components/Espelho';
 import LoopMarca from '../../components/LoopMarca';
-import { MOODS, moodGlow } from '../../lib/moods';
+import { MOODS, MOODS_TEXTO, moodGlow } from '../../lib/moods';
 import { comCapa } from '../../lib/media';
 import FollowUserButton from '../[slug]/FollowUserButton';
 import UpiRecommendation from '../../components/UpiRecommendation';
@@ -40,6 +40,17 @@ function JourneyTitlePill({ title, slug, day }) {
       <b>{title}</b>
       {day && <small>{day}</small>}
     </a>
+  );
+}
+
+function MoodLine({ mood, labels }) {
+  const text = mood && ((labels.moodFeed || {})[mood] || (labels.moods || {})[mood]);
+  if (!text) return null;
+  const phrase = fillLabel(labels.moodLineFmt || 'Sentindo {mood} hoje', { mood: text });
+  return (
+    <small className="entry-mood-line" style={{ '--mood': MOODS[mood], color: MOODS_TEXTO[mood] || MOODS[mood] }}>
+      {phrase}
+    </small>
   );
 }
 
@@ -709,7 +720,7 @@ export default function FeedClient({ labels }) {
                 </span>
                 <span className="entry-id">
                   <b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} />{item.historia && <span className="hist-selo">{labels.histSelo}</span>}</b>
-                  {item.owner.mood && (labels.moods || {})[item.owner.mood] && <small><span className="entry-mood" style={{ color: MOODS[item.owner.mood] }}>{labels.moods[item.owner.mood]}</span></small>}
+                  <MoodLine mood={item.owner.mood} labels={labels} />
                 </span>
               </a>
               {item.owner.id && !item.own && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
