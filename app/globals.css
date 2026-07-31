@@ -2404,11 +2404,26 @@ h1 { letter-spacing: -0.03em; }
 .comment-more{font-weight:600;color:var(--muted);margin:8px 0 0;display:block;text-align:left}
 .comment-replying{background:transparent;border-left:2px solid var(--line);border-radius:0;padding:4px 0 4px 10px}
 
-/* ---- Visual reto: cantos quadrados em todo o app ---- */
-/* tudo que tinha borda arredondada vira canto reto; círculos verdadeiros
-   (avatares, pontos, botões redondos de ícone) são preservados abaixo */
-:root{--r-card:0px}
-*,*::before,*::after{border-radius:0!important}
+/* ---- O VISUAL RETO FOI DESATIVADO (Patch 244) ----
+
+   Aqui vivia `*,*::before,*::after{border-radius:0!important}` — a
+   decisão que deixou o app inteiro de cantos quadrados.
+
+   Ela saiu por decisão do Fernando, para a migração ao material
+   tátil (o Soft UI dos pilotos 242/243). E saiu também porque este
+   arquivo tinha virado uma guerra: o Liquid Glass (231) e o sistema
+   ONE (239/241) já venciam o reset a golpes de !important, peça por
+   peça. Três linguagens brigando é pior do que qualquer uma delas.
+
+   Com o reset fora, os border-radius históricos do arquivo voltam a
+   valer sozinhos — e os !important que existiam só para vencê-lo
+   podem, aos poucos, ser removidos.
+
+   As fotos do feed continuam retas: as regras edge-to-edge declaram
+   `border-radius:0` explicitamente e não dependiam do reset.
+
+   A lista de círculos abaixo fica — 50% num círculo é inofensivo. */
+:root{--r-card:16px}
 
 /* círculos preservados */
 .ava,.timeline .dot,.cover::after,.ob-steps li span,.feed-ava,.me-ava,.pc-avatar,
@@ -9302,6 +9317,84 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
   }
 }
 
+/* Navegação ONE: vidro só na barra inferior e em painéis flutuantes. */
+.bottom-nav {
+  /* Patch 244: o vidro deu lugar ao material tátil do piloto 243 —
+     cápsula clara quase opaca, sombra quente embaixo/direita e luz
+     em cima/esquerda. O blur cai de 18 para 14: com fundo a 94% ele
+     trabalha menos, e é o rodapé que mais pesa na rolagem. */
+  border-radius: 28px !important;
+  background: rgba(250, 247, 242, .94) !important;
+  border-color: rgba(255, 255, 255, .86) !important;
+  box-shadow: 15px 15px 30px rgba(151, 132, 110, .25),
+              -14px -14px 28px rgba(255, 255, 255, .9),
+              inset 1px 1px 0 rgba(255, 255, 255, .75) !important;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+.bottom-nav a,
+.bottom-nav .bn-create { min-width: var(--one-touch-min); min-height: var(--one-touch-min); }
+.bottom-nav a.on {
+  color: var(--one-terracotta) !important;
+  background: var(--one-terracotta-soft) !important;
+  border-radius: var(--one-radius-pill) !important;
+}
+.bottom-nav .bn-create {
+  background: var(--one-terracotta) !important;
+  box-shadow: 0 8px 18px rgba(193, 111, 84, .24) !important;
+}
+
+/* Cabeçalhos são limpos: marca, voltar e contexto, sem um segundo painel de vidro. */
+.top .icon-btn,
+.top .header-create,
+.top .lang-picker {
+  background: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.top .icon-btn:focus-visible,
+.top .header-create:focus-visible,
+.top .lang-picker:focus-within {
+  outline: 3px solid var(--one-focus);
+  outline-offset: 2px;
+}
+
+/* Filtros e abas organizam conteúdo; não devem parecer janelas sobrepostas. */
+.ptabs,
+.feed-tabs,
+.feed-filter-menu {
+  background: var(--one-bg-soft) !important;
+  border: 1px solid var(--one-line) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.ptab.on,
+.feed-tabs .on,
+.feed-filter-menu button.on {
+  color: var(--one-ink) !important;
+  background: var(--one-surface) !important;
+  box-shadow: var(--one-shadow-card) !important;
+}
+
+/* Menus e escolhas podem flutuar, mas com opacidade suficiente para leitura. */
+.create-menu,
+.pm-sheet,
+.supporters-popover,
+.crop-modal-card,
+.wz-up-modal,
+.cit-final {
+  background: rgba(250, 247, 242, .94) !important;
+  border: 1px solid rgba(255, 255, 255, .86) !important;
+  border-radius: var(--one-radius-sheet) !important;
+  box-shadow: var(--one-shadow-sheet), inset 0 1px 0 rgba(255, 255, 255, .88) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(110%);
+  backdrop-filter: blur(12px) saturate(110%);
+}
+.comment-panel { background: var(--one-surface) !important; box-shadow: none !important; }
+
+
 /* Notificação da marca: o Upi fica dentro de uma pequena lente de vidro.
    Sem novidades ela é calma; com novidades, o pingo terracota respira. */
 @media (max-width: 767px) {
@@ -9595,4 +9688,861 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
     background: rgba(250, 247, 242, .74) !important;
     border: 1px solid rgba(255, 255, 255, .78) !important;
   }
+}
+
+/* Base final da migração visual. Estas regras vencem os patches históricos. */
+.bottom-nav { border-radius:28px!important; background:rgba(250,247,242,.78)!important; border-color:rgba(255,255,255,.86)!important; box-shadow:var(--one-shadow-sheet),inset 0 1px 0 rgba(255,255,255,.86)!important; -webkit-backdrop-filter:blur(18px) saturate(120%);backdrop-filter:blur(18px) saturate(120%); }
+.bottom-nav a.on { color:var(--one-terracotta)!important;background:var(--one-terracotta-soft)!important;border-radius:var(--one-radius-pill)!important; }
+.bottom-nav .bn-create { background:var(--one-terracotta)!important;box-shadow:0 8px 18px rgba(193,111,84,.24)!important; }
+.top .icon-btn,.top .header-create,.top .lang-picker { background:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important; }
+.ptabs,.feed-tabs,.feed-filter-menu { background:var(--one-bg-soft)!important;border:1px solid var(--one-line)!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important; }
+.ptab.on,.feed-tabs .on,.feed-filter-menu button.on { color:var(--one-ink)!important;background:var(--one-surface)!important;box-shadow:var(--one-shadow-card)!important; }
+.create-menu,.pm-sheet,.supporters-popover,.crop-modal-card,.wz-up-modal,.cit-final { background:rgba(250,247,242,.94)!important;border:1px solid rgba(255,255,255,.86)!important;border-radius:var(--one-radius-sheet)!important;box-shadow:var(--one-shadow-sheet),inset 0 1px 0 rgba(255,255,255,.88)!important;-webkit-backdrop-filter:blur(12px) saturate(110%);backdrop-filter:blur(12px) saturate(110%); }
+.comment-panel { background:var(--one-surface)!important;box-shadow:none!important; }
+.profile-card .pc-info,.share-card-section,.future-share-card,.tree-scene,.tree-growth { background:var(--one-surface)!important;border-color:var(--one-line)!important;box-shadow:var(--one-shadow-card)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important; }
+
+/* Recursos emocionais: papel para intimidade, argila suave para crescimento. */
+.diary-page { background:linear-gradient(180deg,transparent 0,var(--one-bg-soft) 100%); }
+.diary-card,
+.diary-history {
+  background:#FFFEFA !important;
+  border:1px solid var(--one-line) !important;
+  border-radius:var(--one-radius-card) !important;
+  box-shadow:var(--one-shadow-card) !important;
+}
+.diary-card textarea,
+.diary-card input,
+.diary-entry {
+  background:#FFFEFA !important;
+  border-color:var(--one-line) !important;
+}
+.diary-entry-wrap.on { border-left-color:var(--one-terracotta) !important; }
+.diary-entry-comment { background:var(--one-sage-soft) !important;border-radius:var(--one-radius-control)!important; }
+
+.future-create,
+.future-card {
+  background:#FFFEFA !important;
+  border:1px solid var(--one-line) !important;
+  border-radius:var(--one-radius-card) !important;
+  box-shadow:var(--one-shadow-card) !important;
+}
+.future-kind { background:var(--one-bg-soft)!important;border-radius:var(--one-radius-pill)!important;padding:4px; }
+.future-kind button.on { background:var(--one-surface)!important;color:var(--one-ink)!important;box-shadow:var(--one-shadow-card)!important; }
+.future-card.ready { border-color:rgba(193,111,84,.42)!important; }
+.future-card-preview {
+  border:1px solid rgba(193,111,84,.20) !important;
+  box-shadow:var(--one-shadow-control),inset 0 1px 0 rgba(255,255,255,.88) !important;
+}
+
+.tree-scene { background:linear-gradient(145deg,#F7F3EC,#EEF3EA)!important; }
+.tree-growth { background:#FFFEFA!important; }
+.tree-metric { background:var(--one-bg-soft)!important;border-color:transparent!important; }
+.tree-metric.on { background:var(--one-sage-soft)!important;border-color:rgba(132,149,126,.42)!important;box-shadow:var(--one-shadow-card)!important; }
+
+/* Conteúdo principal: plano, legível e com profundidade apenas quando ajuda. */
+.feed-page .entry {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: var(--one-line) !important;
+}
+.feed-page .entry + .entry { margin-top: var(--one-space-4); }
+.feed-page .entry-textcard {
+  border-radius: var(--one-radius-card) !important;
+  box-shadow: var(--one-shadow-card) !important;
+}
+.feed-page .entry-actions { min-height: var(--one-touch-min); align-items:center; }
+.feed-page .entry-actions .support-pill.on { color:var(--one-terracotta)!important;background:var(--one-terracotta-soft)!important; }
+
+.profile-card {
+  border-color: var(--one-line) !important;
+  box-shadow: var(--one-shadow-card) !important;
+}
+.profile-card .pc-info { border-top:1px solid var(--one-line)!important; }
+.pc-acoes > * { min-width:var(--one-touch-min);min-height:var(--one-touch-min); }
+
+.journey-public .timeline .body {
+  background: var(--one-surface) !important;
+  border-color: var(--one-line) !important;
+  box-shadow: var(--one-shadow-card) !important;
+}
+.journey-public .journey-day-card.win .body {
+  background: var(--one-sage-soft) !important;
+  border-color: rgba(132,149,126,.30) !important;
+}
+.journey-public .journey-day-card.setback .body {
+  background: #FBF4F0 !important;
+  border-color: rgba(201,163,146,.42) !important;
+}
+.journey-public .timeline .day { color:var(--one-ink); }
+.journey-public .timeline .tag.setback { color:var(--one-ink);background:#F1E3DC; }
+
+.comment-panel,
+.comment-item,
+.comment-replies { border-color:var(--one-line)!important; }
+.comment-form input { border-color:var(--one-line)!important;background:var(--one-surface)!important; }
+.comment-form input:focus { border-color:var(--one-terracotta)!important;box-shadow:0 0 0 3px var(--one-focus)!important;outline:0; }
+
+/* A camada de leitura permanece serena. Gradientes e brilho ficam somente
+   nas ações e nos momentos especiais, não atrás das histórias. */
+body { background:var(--one-bg)!important; }
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline:3px solid var(--one-focus)!important;
+  outline-offset:2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior:auto!important; }
+  .bn-notify-dot,
+  .profile-notification-bell.has-notifications svg,
+  .journey-day-card.win .body { animation:none!important; }
+}
+
+/* Regra estrutural final da navegação. Uma versão anterior mantinha quatro
+   colunas; como agora existem cinco destinos, o avatar acabava em outra linha. */
+@media (max-width: 767px) {
+  .bottom-nav {
+    display:grid!important;
+    grid-template-columns:repeat(5, minmax(0, 1fr))!important;
+    grid-template-rows:56px!important;
+    grid-auto-flow:column;
+    align-items:center;
+    width:min(320px, calc(100% - 32px))!important;
+    min-height:56px!important;
+    height:56px!important;
+    padding:5px 8px!important;
+    border-radius:28px!important;
+    overflow:visible!important;
+  }
+  .bottom-nav a,
+  .bottom-nav .bn-create {
+    width:44px!important;
+    height:44px!important;
+    min-width:44px!important;
+    min-height:44px!important;
+    align-self:center;
+    justify-self:center;
+  }
+  .bottom-nav .bn-create { margin-top:-10px!important; }
+}
+
+/* ============================================================
+   ONE MATERIAL UI
+   Relevo moderno: luz suave, bordas quentes e profundidade curta.
+   Não é vidro sobre toda a tela; é uma interface que parece feita de
+   matéria, deixando relatos e fotos como o centro da experiência.
+   ============================================================ */
+html { background:#F5F0E8; }
+body {
+  background:
+    radial-gradient(circle at 9% 4%, rgba(255,255,255,.82), transparent 28%),
+    radial-gradient(circle at 92% 94%, rgba(222,213,199,.42), transparent 30%),
+    #F5F0E8!important;
+}
+
+.top {
+  background:rgba(245,240,232,.88);
+  border-bottom:1px solid rgba(255,255,255,.74);
+  box-shadow:0 1px 0 rgba(222,213,199,.55);
+}
+
+/* Navegação: uma bandeja flutuante, não uma faixa plana. */
+.bottom-nav {
+  background:linear-gradient(145deg,#FFFCF6,#EEE7DC)!important;
+  border:1px solid rgba(255,255,255,.92)!important;
+  box-shadow:var(--one-shadow-raised),inset 0 1px 0 rgba(255,255,255,.92)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+.bottom-nav a { color:#687080!important; }
+.bottom-nav a.on {
+  color:var(--one-terracotta)!important;
+  background:linear-gradient(145deg,#FDF7F0,#EDE1D4)!important;
+  box-shadow:var(--one-shadow-pressed)!important;
+}
+.bottom-nav .bn-create {
+  background:linear-gradient(145deg,#D78768,#B75F45)!important;
+  border:1px solid rgba(255,255,255,.42)!important;
+  box-shadow:5px 7px 13px rgba(132,72,51,.27),-3px -3px 8px rgba(255,255,255,.55),inset 0 1px 0 rgba(255,255,255,.34)!important;
+}
+.bottom-nav .bn-create:active { box-shadow:var(--one-shadow-pressed)!important; }
+.bottom-nav .bn-profile-avatar { box-shadow:0 2px 5px rgba(90,77,60,.22),0 0 0 2px #FFFCF6!important; }
+
+/* Controles de escolha parecem peças do mesmo conjunto. */
+.ptabs,.feed-tabs,.feed-filter-menu,.future-kind {
+  background:linear-gradient(145deg,#EEE8DE,#FAF7F1)!important;
+  border-color:rgba(255,255,255,.82)!important;
+  box-shadow:var(--one-shadow-pressed)!important;
+}
+.ptab.on,.feed-tabs .on,.feed-filter-menu button.on,.future-kind button.on {
+  background:linear-gradient(145deg,#FFFDF8,#EDE4D8)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+
+/* Superfícies de apoio ganham profundidade curta. Os relatos continuam planos. */
+.home-welcome-journey,
+.profile-card,
+.journey-public .timeline .body,
+.diary-card,
+.diary-history,
+.future-create,
+.future-card,
+.tree-growth {
+  background:linear-gradient(145deg,#FFFCF7,#F4EDE3)!important;
+  border:1px solid rgba(255,255,255,.92)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.home-welcome-journey:hover,
+.profile-card:hover {
+  transform:translateY(-1px);
+  box-shadow:var(--one-shadow-raised)!important;
+}
+
+.home-welcome-primary,
+.cta,
+.profile-card .pc-follow,
+.journey-public .cta {
+  background:linear-gradient(145deg,#D78768,#B75F45)!important;
+  border:1px solid rgba(255,255,255,.42)!important;
+  box-shadow:5px 7px 14px rgba(132,72,51,.21),inset 0 1px 0 rgba(255,255,255,.32)!important;
+}
+.home-welcome-primary:active,
+.cta:active { transform:translateY(1px);box-shadow:var(--one-shadow-pressed)!important; }
+
+/* Cartões de texto continuam leves; a foto nunca recebe efeito de plástico. */
+.feed-page .entry-textcard,
+.journey-public .timeline .body .entry-textcard {
+  background:#FFFDF9!important;
+  border-color:rgba(222,213,199,.76)!important;
+  box-shadow:0 5px 13px rgba(103,88,68,.08)!important;
+}
+.entry-media,
+.entry-media img,
+.entry-media video { box-shadow:none!important; }
+
+/* Modais são a camada elevada mais forte da interface. */
+.create-menu,.pm-sheet,.supporters-popover,.crop-modal-card,.wz-up-modal,.cit-final {
+  background:linear-gradient(145deg,#FFFCF7,#F1E9DE)!important;
+  border-color:rgba(255,255,255,.94)!important;
+  box-shadow:18px 20px 46px rgba(83,67,49,.22),-7px -7px 18px rgba(255,255,255,.72)!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-welcome-journey:hover,.profile-card:hover,.home-welcome-primary:active,.cta:active { transform:none; }
+}
+
+/* Proteção contra regras antigas: nunca há uma segunda linha no footer. */
+.bottom-nav {
+  grid-template-columns:repeat(5, minmax(0, 1fr))!important;
+  grid-template-rows:56px!important;
+  grid-auto-rows:56px!important;
+}
+.bottom-nav > * { grid-row:1!important; }
+
+/* ============================================================
+   PILOTO SOFT UI — Wizard de criação
+   Esta é a tela de validação do material antes de levá-lo ao app inteiro.
+   ============================================================ */
+.wz-material-pilot {
+  position:relative;
+  isolation:isolate;
+  padding:28px;
+  border-radius:30px;
+  background:#F5F0E8;
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.88),inset -1px -1px 0 rgba(207,194,180,.36);
+}
+.wz-material-pilot .wz-rail {
+  display:flex;
+  gap:8px;
+  padding:8px;
+  border-radius:999px;
+  background:#EEE5D9;
+  box-shadow:inset 4px 4px 8px rgba(119,94,69,.14),inset -4px -4px 8px rgba(255,255,255,.82);
+}
+.wz-material-pilot .wz-bar {
+  height:7px;
+  border-radius:999px;
+  background:#DED4C7;
+  box-shadow:inset 1px 1px 2px rgba(92,72,54,.16),inset -1px -1px 2px rgba(255,255,255,.72);
+}
+.wz-material-pilot .wz-bar.done,
+.wz-material-pilot .wz-bar.on {
+  background:linear-gradient(145deg,#DA9274,#B25A42);
+  box-shadow:-1px -1px 2px rgba(255,255,255,.55),2px 3px 5px rgba(137,76,53,.25),inset 0 1px 1px rgba(255,255,255,.32);
+}
+.wz-material-pilot .wz-head { margin-top:28px; }
+.wz-material-pilot .wz-count {
+  display:inline-flex;
+  padding:7px 11px;
+  border-radius:999px;
+  color:#8B4D3C;
+  background:#F3E2D8;
+  box-shadow:inset 2px 2px 4px rgba(142,83,59,.12),inset -2px -2px 4px rgba(255,255,255,.74);
+}
+.wz-material-pilot .wz-head h1 { color:#2D2924; letter-spacing:-.045em; }
+.wz-material-pilot .wz-explain { color:#756C63; }
+.wz-material-pilot .wz-up-help {
+  margin-top:20px;
+  padding:14px;
+  border:0;
+  border-radius:20px;
+  background:linear-gradient(145deg,#FFFDF8,#EEE5D9);
+  box-shadow:-7px -7px 14px rgba(255,255,255,.84),8px 10px 19px rgba(104,82,61,.15),inset 0 1px 0 rgba(255,255,255,.88);
+}
+.wz-material-pilot .wz-up-help-copy button {
+  padding:8px 12px;
+  border-radius:12px;
+  color:#8B4D3C;
+  background:#F4E3D9;
+  box-shadow:inset 2px 2px 4px rgba(142,83,59,.11),inset -2px -2px 4px rgba(255,255,255,.72);
+}
+.wz-material-pilot .wz-body {
+  margin-top:24px;
+  padding:20px;
+  border:0;
+  border-radius:24px;
+  background:linear-gradient(145deg,#FFFDF8,#F1E8DD);
+  box-shadow:-9px -9px 18px rgba(255,255,255,.90),11px 13px 24px rgba(104,82,61,.16),inset 0 1px 0 rgba(255,255,255,.90);
+}
+.wz-material-pilot .wz-input,
+.wz-material-pilot .wz-grow-input {
+  padding:15px 16px;
+  border:0!important;
+  border-radius:15px;
+  color:#2D2924!important;
+  background:#EFE6DB!important;
+  box-shadow:inset 4px 4px 8px rgba(112,88,66,.16),inset -4px -4px 8px rgba(255,255,255,.86)!important;
+}
+.wz-material-pilot .wz-input:focus,
+.wz-material-pilot .wz-grow-input:focus {
+  outline:0;
+  box-shadow:inset 4px 4px 8px rgba(112,88,66,.16),inset -4px -4px 8px rgba(255,255,255,.86),0 0 0 3px rgba(193,111,84,.16)!important;
+}
+.wz-material-pilot .wz-choice-grid { gap:14px; }
+.wz-material-pilot .wz-choice,
+.wz-material-pilot .wz-suggestion-row button,
+.wz-material-pilot .wz-sug,
+.wz-material-pilot .wz-media-action {
+  min-height:52px;
+  border:0!important;
+  border-radius:16px!important;
+  color:#4D4036!important;
+  background:linear-gradient(145deg,#FFFDF8,#EDE4D8)!important;
+  box-shadow:-6px -6px 12px rgba(255,255,255,.86),7px 8px 15px rgba(106,82,61,.16),inset 0 1px 0 rgba(255,255,255,.92)!important;
+}
+.wz-material-pilot .wz-choice.on,
+.wz-material-pilot .wz-media-action.on {
+  color:#8B4D3C!important;
+  background:linear-gradient(145deg,#F6E3D8,#EAC8B8)!important;
+  box-shadow:inset 4px 4px 8px rgba(139,77,60,.16),inset -4px -4px 8px rgba(255,255,255,.72)!important;
+}
+.wz-material-pilot .wz-choice:active,
+.wz-material-pilot .wz-suggestion-row button:active,
+.wz-material-pilot .wz-sug:active,
+.wz-material-pilot .wz-media-action:active {
+  transform:translate(2px,2px);
+  box-shadow:inset 5px 5px 9px rgba(112,88,66,.18),inset -4px -4px 8px rgba(255,255,255,.74)!important;
+}
+.wz-material-pilot .wz-nav { margin-top:28px; gap:16px; }
+.wz-material-pilot .wz-back,
+.wz-material-pilot .wz-draft-btn,
+.wz-material-pilot .wz-skip {
+  min-height:52px;
+  border:0!important;
+  border-radius:16px!important;
+  color:#4D4036!important;
+  background:linear-gradient(145deg,#FFFDF8,#EDE4D8)!important;
+  box-shadow:-6px -6px 12px rgba(255,255,255,.86),7px 8px 15px rgba(106,82,61,.16)!important;
+}
+.wz-material-pilot .wz-go {
+  min-height:52px;
+  border:0!important;
+  border-radius:16px!important;
+  background:linear-gradient(145deg,#D88E72,#A95740)!important;
+  box-shadow:-5px -5px 10px rgba(255,255,255,.48),8px 10px 18px rgba(130,70,49,.31),inset 0 1px 1px rgba(255,255,255,.34)!important;
+}
+.wz-material-pilot .wz-go:active {
+  transform:translate(2px,2px);
+  box-shadow:inset 5px 5px 9px rgba(112,59,42,.28),inset -3px -3px 7px rgba(255,255,255,.23)!important;
+}
+@media (max-width:640px) {
+  .wz-material-pilot { margin:0 -4px;padding:22px 18px;border-radius:24px; }
+  .wz-material-pilot .wz-body { padding:16px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .wz-material-pilot .wz-choice:active,.wz-material-pilot .wz-suggestion-row button:active,.wz-material-pilot .wz-sug:active,.wz-material-pilot .wz-media-action:active,.wz-material-pilot .wz-go:active { transform:none; }
+}
+
+/* Acabamento material: menos contorno, mais luz e sombra. */
+.icon-btn,
+.profile-notification-bell,
+.header-create {
+  border:0!important;
+  border-radius:50%!important;
+  background:linear-gradient(145deg,#FFFCF7,#ECE4D8)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.icon-btn:active,
+.profile-notification-bell:active,
+.header-create:active { box-shadow:var(--one-shadow-pressed)!important; }
+
+.home-welcome-journey,
+.profile-card,
+.journey-public .timeline .body,
+.diary-card,
+.diary-history,
+.future-create,
+.future-card,
+.tree-growth,
+.comment-panel,
+.supporters-popover {
+  border-color:rgba(222,213,199,.44)!important;
+}
+
+.ep-field input,
+.ep-field textarea,
+.comment-form input,
+.diary-card textarea,
+.diary-card input,
+.future-create input,
+.future-create textarea {
+  background:linear-gradient(145deg,#EEE7DD,#FFFCF7)!important;
+  border:1px solid rgba(222,213,199,.48)!important;
+  box-shadow:var(--one-shadow-pressed)!important;
+}
+
+.ep-field input:focus,
+.ep-field textarea:focus,
+.comment-form input:focus,
+.diary-card textarea:focus,
+.diary-card input:focus,
+.future-create input:focus,
+.future-create textarea:focus {
+  border-color:rgba(193,111,84,.60)!important;
+  box-shadow:var(--one-shadow-pressed),0 0 0 3px rgba(193,111,84,.12)!important;
+}
+
+/* Terracota é uma peça elevada; sálvia comunica continuidade, nunca competição. */
+.support-pill.on,
+.journey-public .timeline .tag.win,
+.tree-metric.on {
+  border:0!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.journey-public .timeline .tag.win,
+.tree-metric.on { background:linear-gradient(145deg,#F5F9F1,#DCE7D7)!important; }
+
+.feed-page .entry-actions,
+.journey-public .entry-actions {
+  border-top-color:rgba(222,213,199,.62)!important;
+}
+
+/* Relevo legível nas peças que a pessoa realmente toca. */
+.home-welcome-journey,
+.hw-exemplo {
+  background:linear-gradient(145deg,#FFFDF8,#EEE5D9)!important;
+  border:1px solid rgba(255,255,255,.96)!important;
+  box-shadow:8px 9px 18px rgba(112,92,69,.15),-6px -6px 14px rgba(255,255,255,.94),inset 0 1px 0 rgba(255,255,255,.92)!important;
+}
+.home-welcome-journey:active,
+.hw-exemplo:active {
+  box-shadow:var(--one-shadow-pressed)!important;
+  transform:translateY(1px);
+}
+.home-welcome-diary,
+.home-welcome-journey.feito {
+  background:linear-gradient(145deg,#EFF4EB,#DDE8D6)!important;
+}
+.home-welcome-primary {
+  min-height:52px!important;
+  background:linear-gradient(145deg,#DD9272,#B65D43)!important;
+  box-shadow:8px 9px 17px rgba(130,71,50,.30),-4px -4px 10px rgba(255,255,255,.52),inset 0 1px 0 rgba(255,255,255,.38)!important;
+}
+.home-welcome-primary:active { box-shadow:var(--one-shadow-pressed)!important; }
+
+.home-ritual-links a {
+  width:44px;height:44px;
+  display:grid!important;place-items:center;
+  border:0!important;border-radius:50%!important;
+  background:linear-gradient(145deg,#FFFCF7,#ECE3D7)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.home-ritual-links a:active { box-shadow:var(--one-shadow-pressed)!important; }
+.home-ritual-links a b { position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap; }
+
+/* Cards de resumo e opções curtas usam o mesmo volume, sem contaminar o feed. */
+.stats article,
+.journey-public .who,
+.tree-metric,
+.profile-card .pc-acoes > a,
+.profile-card .pc-acoes > button {
+  border:1px solid rgba(255,255,255,.90)!important;
+  background:linear-gradient(145deg,#FFFDF8,#EEE5D9)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+
+/* ============================================================
+   REDESENHO MATERIAL ONE — camada completa de Preview
+   A luz vem do alto à esquerda em todas as telas.
+   ============================================================ */
+
+/* Base e tipografia: o conteúdo passa a nascer de uma superfície quente. */
+body,
+.auth-wrap,
+.feed-page,
+.profile-page,
+.journey-public,
+.diary-page,
+.future-page,
+.tree-page {
+  color:var(--one-ink)!important;
+  background-color:var(--one-bg)!important;
+}
+p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted); }
+
+/* Peças elevadas compartilhadas: cartões, painéis e seções de apoio. */
+.auth-card,
+.profile-card,
+.pc-card,
+.pc-sheet,
+.entry-textcard,
+.feed-invite,
+.journey-public .cover,
+.journey-public .timeline .body,
+.diary-card,
+.diary-history,
+.future-create,
+.future-card,
+.future-edit-card,
+.future-share-card,
+.tree-growth,
+.tree-promise,
+.comment-panel,
+.comment-item,
+.crop-modal-card,
+.wz-body,
+.wz-up-modal,
+.create-menu,
+.pm-sheet {
+  background:linear-gradient(145deg,var(--one-surface-elevated),var(--one-surface))!important;
+  border:1px solid rgba(255,255,255,.94)!important;
+  box-shadow:var(--one-shadow-raised),inset 0 1px 0 rgba(255,255,255,.90)!important;
+}
+
+/* A imagem é o conteúdo: recebe só raio, nunca brilho artificial. */
+.entry-media,
+.entry-media img,
+.entry-media video,
+.feed-photo,
+.pc-banner,
+.profile-card .pc-banner {
+  border-radius:var(--one-radius-card)!important;
+  box-shadow:none!important;
+}
+
+/* Botões primários de verdade: terracota moldada, não bloco azul escuro. */
+.cta,
+.home-welcome-primary,
+.wz-go,
+.future-save,
+.elog-go,
+.cm-main,
+.pc-follow,
+.profile-card .pc-follow {
+  color:#FFFDF8!important;
+  background:linear-gradient(145deg,var(--one-primary-light,#D88E72),var(--one-primary-dark,#A95740))!important;
+  border:1px solid rgba(255,255,255,.42)!important;
+  border-radius:var(--one-radius-control)!important;
+  box-shadow:7px 9px 17px rgba(128,72,52,.28),-4px -4px 10px rgba(255,255,255,.55),inset 0 1px 0 rgba(255,255,255,.34)!important;
+  transition:transform var(--one-motion-fast) var(--one-ease),box-shadow var(--one-motion-fast) var(--one-ease)!important;
+}
+.cta:active,
+.home-welcome-primary:active,
+.wz-go:active,
+.future-save:active,
+.elog-go:active,
+.cm-main:active,
+.pc-follow:active {
+  transform:translateY(2px)!important;
+  box-shadow:var(--one-shadow-pressed)!important;
+}
+
+/* Botões secundários, pequenos atalhos e ícones: peça elevada na mesma argila. */
+.ghost-btn,
+.wz-back,
+.wz-draft-btn,
+.wz-choice,
+.wz-chip,
+.wz-aj-use,
+.future-kind button,
+.crop-aspects button,
+.crop-actions button,
+.comment-toggle,
+.comment-more,
+.comment-item-reply,
+.entry-actions button,
+.entry-actions a,
+.journey-icon-actions button,
+.pc-btn,
+.pc-opt,
+.profile-diary-link,
+.tree-shortcut,
+.diary-shortcut {
+  color:var(--one-ink)!important;
+  background:linear-gradient(145deg,#FFFDF8,#EDE4D8)!important;
+  border:1px solid rgba(255,255,255,.94)!important;
+  border-radius:var(--one-radius-control)!important;
+  box-shadow:var(--one-shadow-soft-raised),inset 0 1px 0 rgba(255,255,255,.90)!important;
+}
+.ghost-btn:active,
+.wz-back:active,
+.wz-draft-btn:active,
+.wz-choice:active,
+.wz-chip:active,
+.wz-aj-use:active,
+.future-kind button:active,
+.crop-aspects button:active,
+.crop-actions button:active,
+.comment-toggle:active,
+.comment-item-reply:active,
+.pc-btn:active,
+.pc-opt:active {
+  box-shadow:var(--one-shadow-pressed)!important;
+  transform:translateY(1px)!important;
+}
+
+/* Estado ativo tem argila terracota suave, e não cor solta. */
+.wz-choice.on,
+.wz-chip.on,
+.future-kind button.on,
+.ptab.on,
+.feed-tabs .on,
+.feed-filter-menu button.on,
+.pc-opt.on,
+.entry-actions .on {
+  color:var(--one-primary-dark,#A95740)!important;
+  background:linear-gradient(145deg,#F7E5DC,#EECDBD)!important;
+  border-color:rgba(193,111,84,.24)!important;
+  box-shadow:var(--one-shadow-pressed)!important;
+}
+
+/* Entradas e Wizard: a pessoa escreve dentro da matéria, com foco calmo. */
+.auth-card input,
+.elog-mail,
+.elog-code,
+.wz-field input,
+.wz-field textarea,
+.wz-grow-input,
+.future-card input,
+.future-card textarea,
+.diary-card textarea,
+.comment-form input,
+.crop-zoom input {
+  color:var(--one-ink)!important;
+  background:linear-gradient(145deg,var(--one-surface-pressed),#FFFDF8)!important;
+  border:1px solid rgba(222,213,199,.62)!important;
+  box-shadow:var(--one-shadow-pressed)!important;
+}
+.auth-card input:focus,
+.elog-mail:focus,
+.elog-code:focus,
+.wz-field input:focus,
+.wz-field textarea:focus,
+.wz-grow-input:focus,
+.future-card input:focus,
+.future-card textarea:focus,
+.diary-card textarea:focus,
+.comment-form input:focus {
+  border-color:rgba(193,111,84,.68)!important;
+  box-shadow:var(--one-shadow-pressed),0 0 0 3px rgba(193,111,84,.12)!important;
+}
+
+/* Feed: o relato é calmo e separado; ações parecem controles físicos discretos. */
+.feed-page .entry {
+  border-bottom:1px solid rgba(222,213,199,.72)!important;
+  padding-bottom:var(--one-space-5)!important;
+}
+.feed-page .entry-textcard {
+  background:linear-gradient(145deg,#FFFDF9,#F7F0E6)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.entry-head .entry-ava,
+.feed-ava,
+.entry-ava {
+  box-shadow:4px 5px 10px rgba(106,81,59,.18),-3px -3px 7px rgba(255,255,255,.88)!important;
+}
+.entry-tag,.feed-badge,.entry-mood,.entry-milestone {
+  background:linear-gradient(145deg,#F7E5DC,#F1D7C9)!important;
+  border:0!important;
+  color:var(--one-primary-dark,#A95740)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+
+/* Perfil e jornadas: cabeçalhos e métricas ganham um volume baixo e elegante. */
+.profile-card .pc-info,
+.pc-bar,
+.pc-consistency,
+.journey-public .stats article,
+.journey-public .who,
+.journey-public .bar,
+.journey-public .timeline .tag,
+.tree-metric {
+  background:linear-gradient(145deg,#FFFDF8,#EEE5D9)!important;
+  border-color:rgba(255,255,255,.92)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.journey-public .bar { box-shadow:var(--one-shadow-pressed)!important; }
+.journey-public .bar span { background:linear-gradient(90deg,#D9916C,#C16F54)!important; }
+.journey-public .timeline .day { color:var(--one-ink)!important; }
+
+/* Diário, Futuro e Árvore: materiais íntimos e quentes. */
+.diary-entry,
+.diary-private-note,
+.future-card-preview,
+.future-response,
+.future-reply {
+  background:linear-gradient(145deg,#FFFDF8,#F4EBDD)!important;
+  border-color:rgba(222,213,199,.54)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.diary-entry-comment,
+.diary-up-bubble,
+.future-up {
+  background:linear-gradient(145deg,#F1F5ED,#DDE8D6)!important;
+  border-color:rgba(132,149,126,.24)!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.tree-scene {
+  background:radial-gradient(circle at 28% 18%,#FFFDF8 0,transparent 40%),linear-gradient(145deg,#EAF0E5,#F5EDE1)!important;
+  border:1px solid rgba(255,255,255,.92)!important;
+  box-shadow:var(--one-shadow-raised)!important;
+}
+
+/* A abertura pública continua sendo a peça de destaque, em terracota ONE. */
+.journey-public .cover {
+  color:#FFFDF8!important;
+  background:linear-gradient(145deg,#D88E72,#A95740)!important;
+  border-color:rgba(255,255,255,.34)!important;
+  box-shadow:var(--one-shadow-raised),inset 0 1px 0 rgba(255,255,255,.26)!important;
+}
+.journey-public .cover h1,
+.journey-public .cover p,
+.journey-public .cover .eyebrow { color:#FFFDF8!important; }
+
+/* Redução de movimento não perde acessibilidade nem cria saltos. */
+@media (prefers-reduced-motion: reduce) {
+  .cta,.home-welcome-primary,.wz-go,.future-save,.elog-go,.cm-main,
+  .ghost-btn,.wz-back,.wz-draft-btn,.wz-choice,.wz-chip,.wz-aj-use,.pc-btn,.pc-opt { transition:none!important;transform:none!important; }
+}
+
+/* ============================================================
+   PATCH 244 · MATERIAL TÁTIL — GRUPO 1: TOKENS, BOTÕES E RODAPÉ
+
+   Primeiro grupo da migração para o Soft UI validado nos pilotos
+   242 (/new) e 243 (/material-pilot). Este grupo cobre só o que a
+   mão toca: botões, campos de entrada e o rodapé. Cards do feed e
+   telas internas vêm nos grupos seguintes.
+
+   ------------------------------------------------------------
+   O QUE MUDOU EM RELAÇÃO AOS TOKENS DO PILOTO, E POR QUÊ
+
+   O piloto foi medido antes de ser copiado, e dois valores dele
+   reprovavam no mesmo critério que o Patch 178 usou para zerar o
+   contraste do app:
+
+     rótulo #84957E sobre o fundo ..... 3,00:1  (mínimo 4,5)
+     sage-deep #5D7B69 ................ 4,39:1  (por um fio)
+
+   Aqui os rótulos usam #597665 — mesmo matiz, 4,70:1.
+
+   E os elementos elevados de superfície (botão secundário, chip)
+   ganham uma borda de 1px quase invisível: relevo por sombra
+   falha a WCAG 1.4.11 quando a sombra é o ÚNICO limite do
+   controle. A borda não aparece — mas garante o contorno.
+
+   O fundo dos tokens é var(--bg) #F8F8F6 — o do app — e não o
+   #FAF7F2 do piloto: sombra de neumorfismo só funde com a
+   superfície se for calculada sobre a superfície real.
+   ============================================================ */
+:root{
+  --tat-sombra: rgba(151,132,110,.25);   /* quente, embaixo/direita */
+  --tat-sombra-forte: rgba(151,132,110,.30);
+  --tat-luz: rgba(255,255,255,.92);      /* fria, cima/esquerda */
+  --tat-rotulo: #597665;                 /* 4,70:1 sobre --bg */
+  --tat-secundario: #5E564D;             /* 6,78:1 */
+  --tat-r-controle: 18px;
+  --tat-elev: 9px 9px 19px var(--tat-sombra), -8px -8px 17px var(--tat-luz);
+  --tat-elev-alta: 12px 12px 25px var(--tat-sombra), -12px -12px 25px var(--tat-luz);
+  --tat-fundo-inset: inset 6px 6px 13px var(--tat-sombra), inset -6px -6px 13px var(--tat-luz);
+}
+
+/* ---- o botão primário: elevado, e afunda ao tocar ---- */
+.cta{
+  border-radius:var(--tat-r-controle);
+  box-shadow:8px 9px 18px rgba(16,19,45,.22),
+             -6px -6px 14px var(--tat-luz),
+             inset 1px 1px 0 rgba(255,255,255,.14);
+  transition:transform 150ms ease, box-shadow 150ms ease;
+}
+.cta:active{
+  transform:translate(2px,2px);
+  box-shadow:2px 2px 6px rgba(16,19,45,.22),
+             inset 3px 3px 8px rgba(0,0,0,.22);
+}
+
+/* ---- o secundário: superfície elevada + a borda da 1.4.11 ---- */
+.ghost-btn{
+  border:1px solid rgba(151,132,110,.28);
+  border-radius:var(--tat-r-controle);
+  background:var(--bg,#F8F8F6);
+  box-shadow:var(--tat-elev);
+  transition:transform 150ms ease, box-shadow 150ms ease;
+}
+.ghost-btn:active{
+  transform:translate(2px,2px);
+  box-shadow:var(--tat-fundo-inset);
+}
+
+/* ---- os três do ritual: elevados; o escolhido afunda ----
+   É a inversão que o piloto 242 validou no wizard: escolher é
+   PRESSIONAR — o selecionado fica afundado na superfície, não
+   flutuando com anel. O anel de box-shadow do Patch 178 é
+   substituído por este estado. */
+.ritual-btn,.ritual-btn.did,.ritual-btn.tried,.ritual-btn.paused{
+  border:1px solid rgba(151,132,110,.28);
+  border-radius:16px;
+  background:var(--bg,#F8F8F6);
+  box-shadow:6px 6px 13px var(--tat-sombra), -6px -6px 13px var(--tat-luz);
+  transition:transform 140ms ease, box-shadow 140ms ease, color 140ms ease;
+}
+.ritual-btn.selected,
+.composer2 .ritual-btn.selected{
+  background:var(--bg,#F8F8F6) !important;   /* o !important herdado do 5983 */
+  color:var(--terracota-txt,#A85941);
+  box-shadow:var(--tat-fundo-inset);
+  transform:translate(1px,1px);
+}
+
+/* ---- campos de texto: rebaixados na superfície ----
+   Só os dois de uso diário por enquanto (composer e comentário).
+   O resto entra no grupo 2 com o wizard. */
+.composer2-input,
+.comment-form{
+  border-radius:16px;
+  box-shadow:var(--tat-fundo-inset);
+  background:var(--bg,#F8F8F6);
+}
+.comment-form{border-radius:999px}
+
+/* ---- toque respeitoso ---- */
+@media(prefers-reduced-motion:reduce){
+  .cta,.ghost-btn,.ritual-btn{transition:none}
+  .cta:active,.ghost-btn:active,.ritual-btn.selected{transform:none}
 }

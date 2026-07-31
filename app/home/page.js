@@ -57,7 +57,6 @@ export default async function Home() {
     welcomeJourneys = list.map((j) => ({ ...j, current_day: byId[j.id] || 0 }));
   }
 
-  let heartLikes = 0; const heartFollowers = new Set();
   if (list.length) {
     const jIds = list.map((j) => j.id);
     // `created_at` entra aqui de graça: a consulta já existia, só não
@@ -65,7 +64,6 @@ export default async function Home() {
     // pessoa JÁ registrou hoje — a informação mais importante que esta
     // página tem, e que ela vinha ignorando.
     const { data: myUps } = await supabase.from('updates').select('id, journey_id, created_at').in('journey_id', jIds);
-    const uIds = (myUps || []).map((u) => u.id);
 
     // dia local, não UTC: quem registra às 22h de Brasília não pode
     // ver o app dizer que ainda não registrou.
@@ -76,16 +74,7 @@ export default async function Home() {
         .map((u) => u.journey_id),
     );
     welcomeJourneys = welcomeJourneys.map((j) => ({ ...j, hoje: registradasHoje.has(j.id) }));
-    if (uIds.length) {
-      const { count: lc } = await supabase.from('encouragements').select('*', { count: 'exact', head: true }).in('update_id', uIds).neq('user_id', user.id);
-      heartLikes = lc || 0;
-    }
-    const { data: jf } = await supabase.from('follows').select('user_id').in('journey_id', jIds);
-    (jf || []).forEach((f) => heartFollowers.add(f.user_id));
   }
-  try { const { data: pf } = await supabase.from('profile_follows').select('follower_id').eq('following_id', user.id); (pf || []).forEach((f) => heartFollowers.add(f.follower_id)); } catch {}
-  heartFollowers.delete(user.id);
-  const heartFollows = heartFollowers.size;
 
   let moodToday = false;
   try { const { data: mp } = await supabase.from('profiles').select('mood, mood_at').eq('id', user.id).maybeSingle(); if (mp?.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) moodToday = !!mp.mood; } catch {}
@@ -136,7 +125,7 @@ export default async function Home() {
     <>
       {/* mesmo topo do resto do app. A home passa os numeros do sino
           porque ja os calculou aqui — evita repetir as consultas. */}
-      <AppTop sino likes={heartLikes} follows={heartFollows} unread={unread || 0} />
+      <AppTop sino />
 
       <Track type="visit" meta={{ page: "home" }} />
       <Origem />
