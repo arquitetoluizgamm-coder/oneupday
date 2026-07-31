@@ -57,3 +57,39 @@ html,body,.feed-page,.wrap.feed-page,.home-welcome{background:#fff!important}.to
   color:var(--one-primary-dark,#A95740)!important;
   box-shadow:inset 0 -2px 0 var(--one-terracotta,#C16F54)!important;
 }
+
+/* Login sem fundo rosa: este arquivo carrega depois de globals.css,
+   então a neutralização precisa ficar aqui para vencer o material global. */
+body:has(.auth-wrap){
+  background:#fff!important;
+}
+.auth-wrap{
+  background:
+    radial-gradient(circle at 50% 18%,rgba(132,149,126,.10),transparent 27rem),
+    linear-gradient(180deg,#fff 0%,#fbfaf6 100%)!important;
+}
+.auth-card{
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+.auth-wrap::before{
+  border-top-color:rgba(132,149,126,.18)!important;
+}
+.auth-wrap::after{
+  background:var(--one-sage,#84957e)!important;
+  box-shadow:
+    -82px 21px 0 rgba(132,149,126,.42),
+    76px 38px 0 rgba(132,149,126,.18),
+    0 0 0 8px rgba(132,149,126,.07)!important;
+}
+.auth-card .google-btn,
+.google-btn{
+  background:linear-gradient(180deg,#fff,#fffdf8)!important;
+}
+.auth-card .elog-mail,
+.auth-card .elog-code,
+.elog-mail,
+.elog-code{
+  background:linear-gradient(145deg,#f3f2ed,#fff 64%)!important;
+}
