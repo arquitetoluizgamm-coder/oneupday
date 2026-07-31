@@ -12473,3 +12473,205 @@ body:has(.auth-wrap){
     transform:none!important;
   }
 }
+
+/* Feed preview · ajuste fino de leitura e toque
+   Mantém o desenho aprovado, só aumenta escala e respiro. */
+.feed-page .feed-stream > article.entry:not(.aux-post){
+  padding:19px 18px 16px!important;
+}
+
+.feed-page .entry-head{
+  min-height:50px!important;
+  gap:13px!important;
+  margin-bottom:16px!important;
+}
+
+.feed-page .entry-person{
+  gap:13px!important;
+}
+
+.feed-page .entry-id{
+  justify-content:center!important;
+  gap:4px!important;
+}
+
+.feed-page .entry-id b{
+  font-size:15px!important;
+  line-height:1.22!important;
+  font-weight:760!important;
+}
+
+.feed-page .entry-mood-line{
+  color:#61718a!important;
+  font-size:12.5px!important;
+  line-height:1.32!important;
+  font-weight:650!important;
+}
+
+.feed-page .entry-head .follow-btn{
+  min-height:40px!important;
+  min-width:82px!important;
+  padding:0 15px!important;
+  font-size:12.5px!important;
+}
+
+.feed-page .feed-journey-pill{
+  gap:7px!important;
+  margin:3px 0 12px!important;
+}
+
+.feed-page .feed-journey-pill small{
+  min-height:0!important;
+  padding:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:#9b533d!important;
+  font-size:11.5px!important;
+  font-weight:740!important;
+  line-height:1.25!important;
+  letter-spacing:.005em!important;
+}
+
+.feed-page .feed-journey-pill b{
+  -webkit-line-clamp:3;
+  font-size:18.5px!important;
+  line-height:1.27!important;
+  font-weight:800!important;
+}
+
+.feed-page .feed-journey-pill + .entry-media,
+.feed-page .feed-journey-pill + .entry-textcard,
+.feed-page .feed-journey-pill + .dp-stage .entry-media,
+.feed-page .feed-journey-pill + .dp-stage .entry-textcard{
+  margin-top:2px!important;
+}
+
+.feed-page .dp-text.under{
+  margin:15px 2px 2px!important;
+}
+
+.feed-page .dp-text.under .entry-text,
+.feed-page .entry .etx .entry-text{
+  font-family:var(--font-sans,Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif)!important;
+  color:#252a3d!important;
+  font-size:15px!important;
+  line-height:1.58!important;
+}
+
+.feed-page .entry-actions.feed-acts{
+  gap:8px!important;
+  min-height:50px!important;
+  margin-top:14px!important;
+  flex-wrap:wrap!important;
+}
+
+.feed-page .feed-acts .support-pill,
+.feed-page .feed-acts .comment-toggle,
+.feed-page .feed-acts .feed-share,
+.feed-page .feed-acts .pc-btn,
+.feed-page .feed-acts .ch-bolt,
+.feed-page .feed-acts .hug-btn,
+.feed-page .feed-acts .metoo-btn{
+  width:46px!important;
+  height:46px!important;
+  min-width:46px!important;
+  min-height:46px!important;
+  color:#435066!important;
+}
+
+.feed-page .feed-acts .support-pill svg,
+.feed-page .feed-acts .comment-toggle svg,
+.feed-page .feed-acts .feed-share svg,
+.feed-page .feed-acts .pc-btn svg{
+  width:22px!important;
+  height:22px!important;
+}
+
+.feed-page .feed-acts .support-pill.on{
+  color:#a85d45!important;
+}
+
+.feed-page .feed-acts .sl-title{
+  flex:1 1 148px!important;
+  max-width:56%!important;
+  min-height:42px!important;
+  padding:0 14px!important;
+  gap:7px!important;
+}
+
+.feed-page .feed-acts .sl-title::before{
+  width:16px!important;
+  height:16px!important;
+  flex-basis:16px!important;
+}
+
+.feed-page .feed-acts .sl-text{
+  font-size:12px!important;
+  line-height:1.2!important;
+  font-weight:740!important;
+}
+
+.feed-page .media-fit,
+.feed-page .entry-media .media-fit{
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  min-height:38px!important;
+  border-radius:12px!important;
+  background:rgba(16,19,45,.58)!important;
+  color:#fff!important;
+}
+
+@media(max-width:860px){
+  .feed-page .feed-stream > article.entry:not(.aux-post){
+    margin-left:9px!important;
+    margin-right:9px!important;
+    padding:16px 14px 14px!important;
+  }
+
+  .feed-page .entry-head{
+    margin-bottom:15px!important;
+  }
+
+  .feed-page .feed-journey-pill b{
+    font-size:18px!important;
+  }
+
+  .feed-page .feed-acts .sl-title{
+    max-width:50%!important;
+  }
+}
+
+@media(max-width:390px){
+  .feed-page .feed-stream > article.entry:not(.aux-post){
+    padding:15px 12px 13px!important;
+  }
+
+  .feed-page .entry-head .follow-btn{
+    min-width:76px!important;
+    min-height:38px!important;
+    padding-inline:12px!important;
+    font-size:12px!important;
+  }
+
+  .feed-page .entry-actions.feed-acts{
+    row-gap:9px!important;
+  }
+
+  .feed-page .feed-acts .sl-title{
+    flex:1 0 100%!important;
+    max-width:100%!important;
+    justify-content:flex-end!important;
+  }
+}
+
+@media(max-width:340px){
+  .feed-page .entry-head{
+    align-items:flex-start!important;
+  }
+
+  .feed-page .entry-head .follow-btn{
+    min-width:70px!important;
+    padding-inline:10px!important;
+  }
+}
