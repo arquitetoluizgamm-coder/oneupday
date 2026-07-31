@@ -13268,3 +13268,32 @@ body:has(.feed-page),
     margin-left:1px!important;
   }
 }
+
+/* Feed · abas na mesma coluna central das publicações.
+   Corrige apenas posicionamento; os botões continuam com o design atual. */
+.wrap.feed-page > .feed-tabs,
+.feed-page > .feed-tabs{
+  width:min(100%,600px)!important;
+  max-width:600px!important;
+  box-sizing:border-box!important;
+  margin:32px auto 20px!important;
+  justify-content:flex-start!important;
+}
+
+.feed-page .feed-tabs button{
+  min-height:36px!important;
+}
+
+.feed-page .feed-tabs button:focus-visible{
+  outline:3px solid rgba(193,111,84,.22)!important;
+  outline-offset:3px!important;
+}
+
+@media(max-width:860px){
+  .wrap.feed-page > .feed-tabs,
+  .feed-page > .feed-tabs{
+    width:calc(100% - 18px)!important;
+    max-width:600px!important;
+    margin:28px auto 18px!important;
+  }
+}
