@@ -863,7 +863,7 @@ export default function FeedClient({ labels }) {
           {idx === 1 && needs.length > 0 && (
             <NeedsSupport people={needs} labels={labels.needs} />
           )}
-          {idx === 1 && needs.length === 0 && momentos.recomendacoes[0] && (
+          {idx === (needs.length > 0 ? 2 : 1) && momentos.recomendacoes[0] && (
             <UpiRecommendation item={momentos.recomendacoes[0]} labels={labels.upiRecommendation} />
           )}
           {idx === 2 && momentos.transformacoes[0] && (
@@ -889,6 +889,9 @@ export default function FeedClient({ labels }) {
         )}
         {items.length > 0 && items.length < 5 && suggestions.length > 0 && (
           <SuggestionCard people={suggestions} labels={labels.suggest} />
+        )}
+        {items.length > 0 && (items.length < 2 || (needs.length > 0 && items.length < 3)) && momentos.recomendacoes[0] && (
+          <UpiRecommendation item={momentos.recomendacoes[0]} labels={labels.upiRecommendation} />
         )}
         {items.length < 3 && momentos.amanha.length > 0 && (
           <Amanha people={momentos.amanha} labels={labels.amanha} />

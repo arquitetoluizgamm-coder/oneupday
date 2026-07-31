@@ -10611,3 +10611,143 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
   .cta,.home-welcome-primary,.wz-go,.future-save,.elog-go,.cm-main,
   .ghost-btn,.wz-back,.wz-draft-btn,.wz-choice,.wz-chip,.wz-aj-use,.pc-btn,.pc-opt { transition:none!important;transform:none!important; }
 }
+
+/* Wizard: no celular, os exemplos da primeira pergunta precisam caber entre
+   o logo fixo do topo e o menu inferior. O modal centralizado ficava enorme
+   e brigava com o footer. */
+@media (max-width: 560px) {
+  .wz-up-modal {
+    top: calc(76px + env(safe-area-inset-top, 0px)) !important;
+    bottom: calc(94px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 14px !important;
+    right: 14px !important;
+    width: auto !important;
+    max-height: none !important;
+    height: auto !important;
+    transform: none !important;
+    padding: 14px 14px 12px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+  }
+
+  .wz-up-modal-head {
+    position: sticky;
+    top: -14px;
+    z-index: 1;
+    margin: -14px -14px 12px;
+    padding: 14px 14px 10px;
+    background: rgba(250,247,242,.94);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
+    backdrop-filter: blur(16px) saturate(120%);
+  }
+
+  .wz-up-categories { gap: 12px; }
+  .wz-up-category .wz-up-examples { gap: 5px; }
+  .wz-up-category .wz-up-examples button {
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+}
+
+/* Comentários: Enter deve quebrar linha. O envio fica no botão, então o campo
+   precisa ser textarea sem perder o formato compacto do composer. */
+.comment-form textarea {
+  min-width: 0;
+  flex: 1;
+  min-height: 38px;
+  max-height: 120px;
+  resize: vertical;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--one-ink, var(--ink));
+  padding: 8px 8px 8px 0;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.35;
+}
+
+.comment-form textarea:focus {
+  outline: none;
+}
+
+@media (max-width: 560px) {
+  .comment-form {
+    align-items: flex-end;
+    border-radius: 18px;
+    padding: 5px 5px 5px 14px;
+  }
+}
+
+/* Jornada pública: leitura por capítulo. Sai a régua/arraste e entra um
+   navegador simples: começa no Dia 1, avança pelas setas ou pelas abas. */
+.journey-public .days-pager {
+  position: sticky;
+  top: calc(62px + env(safe-area-inset-top, 0px));
+  z-index: 8;
+}
+
+.journey-public .days-pager-tabs {
+  display: flex;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 0 2px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.journey-public .days-pager-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.journey-public .days-pager-tab {
+  flex: 0 0 auto;
+  border: 1px solid var(--one-line, var(--line));
+  border-radius: 999px;
+  background: rgba(255,255,255,.62);
+  color: var(--one-muted, var(--muted));
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.journey-public .days-pager-tab.on {
+  border-color: rgba(193,111,84,.42);
+  background: var(--one-terracotta-soft, rgba(193,111,84,.13));
+  color: var(--one-terracotta, #c16f54);
+}
+
+.journey-public .days-pager-tab.difficult:not(.on) {
+  color: var(--one-primary-dark, #a95740);
+}
+
+.journey-public .timeline {
+  display: block !important;
+  overflow: visible !important;
+  margin-top: 16px !important;
+  padding: 0 0 22px !important;
+  scroll-snap-type: none !important;
+}
+
+.journey-public .timeline article {
+  width: 100% !important;
+  height: auto !important;
+  flex: none !important;
+  scroll-snap-align: none !important;
+}
+
+.journey-public .timeline article[hidden] {
+  display: none !important;
+}
+
+.journey-public .timeline .body {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.journey-public .journey-swipe-hint {
+  display: none !important;
+}

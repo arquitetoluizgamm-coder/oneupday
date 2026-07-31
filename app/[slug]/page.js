@@ -24,7 +24,6 @@ import Comments from '../../components/Comments';
 import { notFound } from 'next/navigation';
 import Track from '../../components/Track';
 import TiraDeDias from '../../components/TiraDeDias';
-import JourneyScrollSync from '../../components/JourneyScrollSync';
 import FechaMenus from '../../components/FechaMenus';
 import SeloDoDia from '../../components/SeloDoDia';
 import { textoDaPessoa } from '../../lib/registro';
@@ -632,7 +631,6 @@ export default async function JourneyPage({ params, searchParams }) {
         {Number(journey.total_days) >= 5 && (
           <TiraDeDias dias={dias} hoje={hoje} total={journey.total_days} labels={stripLabels} />
         )}
-        <JourneyScrollSync />
         <p className="journey-swipe-hint">
           {locale === 'pt'
             ? 'Deslize para ler o próximo capítulo.'
