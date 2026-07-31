@@ -10,6 +10,7 @@ import EditarJornada from '../../../../components/EditarJornada';
 import DeleteJourney from '../../../../components/DeleteJourney';
 import Composer from '../../../home/Composer';
 import NextStep from '../../../home/NextStep';
+import './journey-ritual.css';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,23 +53,25 @@ export default async function JornadaDoDono({ params }) {
   return (
     <>
       <AppTop backLabel={t.back} />
-      <main className="wrap jornada-dono">
+      <main className="wrap jornada-dono journey-ritual">
 
-        <div className="create-head">
-          <p className="eyebrow">{fill(t.dayOf, { d: day, t: j.total_days, s: stats.streak || 0 })}</p>
-          <h1>{j.title}</h1>
-        </div>
+        <div className="journey-summary">
+          <div className="create-head">
+            <p className="eyebrow">{fill(t.dayOf, { d: day, t: j.total_days, s: stats.streak || 0 })}</p>
+            <h1>{j.title}</h1>
+          </div>
 
-        <ProgressBar day={day} total={j.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
+          <ProgressBar day={day} total={j.total_days} dayTpl={t.dayXofY} goalWord={t.goalWord} />
 
-        <div className="jd-links">
-          <a className="view-link" href={`/${j.slug}`}>{t.viewPublic}</a>
-          <a className="view-link" href={`/retro/${j.slug}`}>{t.retroLink}</a>
+          <div className="jd-links">
+            <a className="view-link" href={`/${j.slug}`}>{t.viewPublic}</a>
+            <a className="view-link" href={`/retro/${j.slug}`}>{t.retroLink}</a>
+          </div>
         </div>
 
         {/* registrar o dia continua sendo a ação mais frequente:
             fica no topo, antes de qualquer coisa de configuração */}
-        <section className="jd-bloco">
+        <section className="jd-bloco jd-register">
           <p className="jd-titulo">{t.navToday}</p>
           <Composer journeyId={j.id} startDate={j.created_at} aiOn={aiOn} labels={kindLabels} t={{
             placeholder: t.composerPh, post: t.post, posting: t.posting, error: t.postError, setbackNote: t.setbackNote,
