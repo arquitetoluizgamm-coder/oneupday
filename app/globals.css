@@ -13093,3 +13093,68 @@ body:has(.feed-page),
     right:40px!important;
   }
 }
+
+/* Feed desktop · estabilidade de escala e enquadramento
+   Não redesenha o card: só fixa coluna e remove dependência de vh no desktop. */
+@media(min-width:861px){
+  .wrap.feed-page{
+    width:100%!important;
+    max-width:none!important;
+    padding-left:24px!important;
+    padding-right:24px!important;
+  }
+
+  .wrap.feed-page > .feed-stream,
+  .feed-page .feed-stream{
+    width:min(100%,600px)!important;
+    max-width:600px!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    padding-left:0!important;
+    padding-right:0!important;
+    box-sizing:border-box!important;
+  }
+
+  .feed-page .feed-stream > article.entry:not(.aux-post),
+  .feed-page .feed-stream > .aux-post{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+  }
+
+  .feed-page .entry-media,
+  .feed-page .entry-media.livre,
+  .feed-page .dp-stage .entry-media{
+    width:100%!important;
+    aspect-ratio:4 / 5!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:hidden!important;
+  }
+
+  .feed-page .entry-media img,
+  .feed-page .entry-media video,
+  .feed-page .entry-media.livre img,
+  .feed-page .entry-media.livre video,
+  .feed-page .dp-stage .entry-media img,
+  .feed-page .dp-stage .entry-media video{
+    width:100%!important;
+    height:100%!important;
+    max-height:none!important;
+    aspect-ratio:auto!important;
+    object-fit:cover!important;
+    object-position:center center!important;
+    transform:none!important;
+  }
+
+  .feed-page .entry-media.inteiro video,
+  .feed-page .entry-media.livre.inteiro video{
+    height:100%!important;
+    object-fit:contain!important;
+    object-position:center center!important;
+    background:#10131d!important;
+  }
+}
