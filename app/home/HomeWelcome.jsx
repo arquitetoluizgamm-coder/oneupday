@@ -29,6 +29,7 @@ export default function HomeWelcome({ journeys = [], name = '', naoLidas = 0, la
         {tem ? (L.backEyebrow || '').replace('{name}', (name || '').split(' ')[0]) : L.newEyebrow}
       </span>
       <h1 id="home-welcome-title">{!tem ? L.newTitle : (feito ? L.doneTitle : L.backTitle)}</h1>
+      {tem && !feito && L.backLead && <p className="home-welcome-lead">{L.backLead}</p>}
       <p className="home-welcome-copy">{!tem ? L.newSub : (feito ? L.doneSub : L.backSub)}</p>
 
       {tem ? (

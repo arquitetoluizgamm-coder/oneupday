@@ -135,7 +135,7 @@ export default async function Home() {
         <HomeWelcome journeys={welcomeJourneys} name={profile.name || ''} naoLidas={unread || 0} labels={{
           newEyebrow: t.homeWelcomeNewEyebrow, newTitle: t.homeWelcomeNewTitle, newSub: t.homeWelcomeNewSub,
           newCta: t.homeWelcomeNewCta, skip: t.homeWelcomeSkip, backEyebrow: t.homeWelcomeBackEyebrow,
-          backTitle: t.homeWelcomeBackTitle, backSub: t.homeWelcomeBackSub, register: t.homeWelcomeRegister,
+          backTitle: t.homeWelcomeBackTitle, backLead: t.homeWelcomeBackLead, backSub: t.homeWelcomeBackSub, register: t.homeWelcomeRegister,
           doneTitle: t.homeWelcomeDoneTitle, doneSub: t.homeWelcomeDoneSub, doneToday: t.homeWelcomeDoneToday,
           choose: t.homeWelcomeChoose, seeFeed: t.homeWelcomeSeeFeed, feedWithNews: t.homeWelcomeFeedNews,
           exemplos: t.homeWelcomeExemplos, seeOthers: t.homeWelcomeSeeOthers, diaryLater: t.homeWelcomeDiaryLater,
