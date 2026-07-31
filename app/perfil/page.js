@@ -250,9 +250,6 @@ export default async function Perfil() {
             <div className="pc-meta">
               <div className="pc-name-line">
                 <h1>{profile.name}</h1>
-                <a className="pc-tree-link" href="/arvore" aria-label={t.treeTab} title={t.treeTab}>
-                  <img src="/tree-one.svg" alt="" />
-                </a>
               </div>
               <div className="pc-sub">
                 <span>{profile.handle}</span>
@@ -301,6 +298,20 @@ export default async function Perfil() {
             </div>
           </div>
         </section>
+
+        <a className="tree-shortcut" href="/arvore" aria-label={t.treeTab} title={t.treeTab}>
+          <span className="tree-shortcut-icon" aria-hidden="true">
+            <img src="/tree-one.svg" alt="" />
+          </span>
+          <span className="tree-shortcut-txt">
+            <span className="tree-shortcut-titulo">
+              <b>{t.treeShortcut}</b>
+              <img className="one-mark" src="/one-mark-fonte.svg" alt="ONE" width="42" height="15" />
+            </span>
+            <small>{fill(t.treeDays, { n: updatesCount })}</small>
+          </span>
+          <span className="tree-shortcut-arrow" aria-hidden="true">›</span>
+        </a>
 
         <a className="diary-shortcut profile-diary-shortcut" href="/diario">
           <span className="diary-shortcut-icon" aria-hidden="true">✎</span>
