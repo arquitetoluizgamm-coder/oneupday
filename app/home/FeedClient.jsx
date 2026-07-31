@@ -23,6 +23,7 @@ import { MOODS, MOODS_TEXTO, moodGlow } from '../../lib/moods';
 import { comCapa } from '../../lib/media';
 import FollowUserButton from '../[slug]/FollowUserButton';
 import UpiRecommendation from '../../components/UpiRecommendation';
+import './feed-quote.css';
 
 function OneLevel({ level, labels }) {
   if (!level || !labels?.oneLevels?.[level.rank]) return null;
@@ -714,7 +715,7 @@ export default function FeedClient({ labels }) {
         {items.map((item, idx) => (
           <Fragment key={item.id}>
           {item.media ? (
-          <article className="entry entry-photo">
+          <article className={`entry entry-photo${item.kind === 'quote' ? ' entry-quote' : ''}`}>
             <a className="entry-head" href={`/${item.owner.handle || ''}`}>
               <span className={avatarMoodClass(item.owner)} style={avatarMoodStyle(item.owner)}>
                 {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}

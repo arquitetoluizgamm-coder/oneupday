@@ -1,0 +1,211 @@
+/* Feed · card de citação
+   Somente apresentação: mantém imagem, texto, autoria, navegação e ações. */
+
+.feed-page .feed-stream > article.entry.entry-photo.entry-quote{
+  position:relative!important;
+  overflow:hidden!important;
+  margin:0 0 24px!important;
+  padding:18px!important;
+  border:1px solid rgba(193,111,84,.16)!important;
+  border-radius:22px!important;
+  background:
+    radial-gradient(circle at 92% 7%,rgba(132,149,126,.10),transparent 26%),
+    #FFFDF9!important;
+  box-shadow:0 16px 38px rgba(16,19,45,.07),inset 0 1px 0 rgba(255,255,255,.90)!important;
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease!important;
+}
+
+.feed-page .feed-stream > article.entry.entry-photo.entry-quote:hover{
+  transform:translateY(-1px)!important;
+  border-color:rgba(193,111,84,.23)!important;
+  box-shadow:0 20px 44px rgba(16,19,45,.085),inset 0 1px 0 rgba(255,255,255,.92)!important;
+}
+
+.feed-page .entry-quote .entry-head{
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+  min-height:42px!important;
+  margin:0 0 16px!important;
+  padding:0!important;
+  color:inherit!important;
+  text-decoration:none!important;
+}
+
+.feed-page .entry-quote .entry-ava{
+  width:40px!important;
+  height:40px!important;
+  flex:0 0 40px!important;
+  border:2px solid rgba(255,255,255,.95)!important;
+  border-radius:50%!important;
+  box-shadow:0 0 0 1px rgba(16,19,45,.055),0 7px 16px rgba(106,81,59,.13)!important;
+}
+
+.feed-page .entry-quote .entry-id{
+  min-width:0!important;
+  display:grid!important;
+  gap:3px!important;
+}
+
+.feed-page .entry-quote .entry-id b{
+  display:flex!important;
+  align-items:center!important;
+  gap:5px!important;
+  color:#10132D!important;
+  font-size:14.5px!important;
+  line-height:1.16!important;
+  font-weight:760!important;
+  letter-spacing:-.012em!important;
+}
+
+.feed-page .entry-quote .entry-media-kind{
+  display:block!important;
+  max-width:100%!important;
+  color:#706B66!important;
+  font-size:12px!important;
+  line-height:1.25!important;
+  font-weight:620!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+.feed-page .entry-quote .entry-mood-line{
+  font-size:11.5px!important;
+}
+
+.feed-page .entry-quote .entry-media,
+.feed-page .entry-quote .entry-media.livre{
+  position:relative!important;
+  width:100%!important;
+  margin:0!important;
+  overflow:hidden!important;
+  border-radius:18px!important;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(203,214,190,.36),transparent 28%),
+    linear-gradient(145deg,#6F7D69,#394735)!important;
+  box-shadow:0 14px 30px rgba(38,52,34,.16),inset 0 1px 0 rgba(255,255,255,.18)!important;
+}
+
+.feed-page .entry-quote .entry-media::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse at -5% 3%,rgba(205,215,194,.52) 0 22%,transparent 23%),
+    radial-gradient(ellipse at 108% 101%,rgba(250,247,242,.08) 0 26%,transparent 27%),
+    linear-gradient(180deg,rgba(255,255,255,.05),rgba(16,19,45,.08));
+  mix-blend-mode:soft-light;
+}
+
+.feed-page .entry-quote .entry-media img{
+  position:relative!important;
+  z-index:0!important;
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  aspect-ratio:4/5!important;
+  object-fit:cover!important;
+  object-position:center center!important;
+  border-radius:18px!important;
+  filter:saturate(.96) contrast(1.03)!important;
+}
+
+.feed-page .entry-quote .entry-actions.feed-acts{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  margin:16px 0 0!important;
+  padding:0!important;
+  border-top:0!important;
+}
+
+.feed-page .entry-quote .feed-acts .support-pill,
+.feed-page .entry-quote .feed-acts .comment-toggle,
+.feed-page .entry-quote .feed-acts .feed-share{
+  width:44px!important;
+  height:44px!important;
+  min-width:44px!important;
+  min-height:44px!important;
+  display:inline-grid!important;
+  place-items:center!important;
+  padding:0!important;
+  border:1px solid rgba(222,213,199,.82)!important;
+  border-radius:50%!important;
+  background:linear-gradient(145deg,#FFFDF8,#F2ECE2)!important;
+  color:#69707D!important;
+  box-shadow:0 7px 16px rgba(90,77,60,.08),inset 0 1px 0 rgba(255,255,255,.88)!important;
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease,color .2s ease,background .2s ease!important;
+}
+
+.feed-page .entry-quote .feed-acts .support-pill:hover,
+.feed-page .entry-quote .feed-acts .comment-toggle:hover,
+.feed-page .entry-quote .feed-acts .feed-share:hover,
+.feed-page .entry-quote .feed-acts .support-pill:focus-visible,
+.feed-page .entry-quote .feed-acts .comment-toggle:focus-visible,
+.feed-page .entry-quote .feed-acts .feed-share:focus-visible{
+  transform:translateY(-1px)!important;
+  border-color:rgba(193,111,84,.30)!important;
+  color:#9B533D!important;
+  outline:0!important;
+  box-shadow:0 10px 20px rgba(90,77,60,.11),0 0 0 3px rgba(193,111,84,.12),inset 0 1px 0 rgba(255,255,255,.90)!important;
+}
+
+.feed-page .entry-quote .feed-acts .support-pill.on{
+  border-color:rgba(193,111,84,.30)!important;
+  background:#F8E9DF!important;
+  color:#B65F45!important;
+}
+
+.feed-page .entry-quote .feed-acts svg{
+  width:21px!important;
+  height:21px!important;
+}
+
+.feed-page .entry-quote .feed-acts .action-label,
+.feed-page .entry-quote .feed-acts .support-pill span,
+.feed-page .entry-quote .feed-acts .feed-share span{
+  display:none!important;
+}
+
+@media(max-width:640px){
+  .feed-page .feed-stream > article.entry.entry-photo.entry-quote{
+    margin:0 12px 22px!important;
+    padding:14px!important;
+    border-radius:20px!important;
+  }
+
+  .feed-page .entry-quote .entry-head{
+    margin-bottom:13px!important;
+  }
+
+  .feed-page .entry-quote .entry-media,
+  .feed-page .entry-quote .entry-media.livre,
+  .feed-page .entry-quote .entry-media img{
+    border-radius:16px!important;
+  }
+
+  .feed-page .entry-quote .entry-actions.feed-acts{
+    margin-top:13px!important;
+  }
+}
+
+@media(max-width:360px){
+  .feed-page .feed-stream > article.entry.entry-photo.entry-quote{
+    margin-left:8px!important;
+    margin-right:8px!important;
+    padding:12px!important;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .feed-page .feed-stream > article.entry.entry-photo.entry-quote,
+  .feed-page .entry-quote .feed-acts .support-pill,
+  .feed-page .entry-quote .feed-acts .comment-toggle,
+  .feed-page .entry-quote .feed-acts .feed-share{
+    transition:none!important;
+    transform:none!important;
+  }
+}
