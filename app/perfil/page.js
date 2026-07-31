@@ -33,6 +33,7 @@ import ChallengeRespond from '../../components/ChallengeRespond';
 import PushToggle from '../../components/PushToggle';
 import EcoToggle from '../../components/EcoToggle';
 import LanguagePicker from '../../components/LanguagePicker';
+import './profile-redesign.css';
 
 export const dynamic = 'force-dynamic';
 const CHALLENGES_ENABLED = false;
@@ -241,7 +242,7 @@ export default async function Perfil() {
       <AppTop backLabel={t.back} />
 
       <Track type="visit" meta={{ page: "perfil" }} />
-      <main className="wrap">
+      <main className="wrap profile-shell">
         <section className="profile-card">
           <div className="pc-banner" style={profile.banner_url ? { backgroundImage: `url(${profile.banner_url})` } : undefined} />
           <div className="pc-info">
