@@ -3,6 +3,7 @@ import { getLocale } from '../../lib/locale';
 import { getDict, fill } from '../../lib/i18n';
 import AppTop from '../../components/AppTop';
 import BottomNav from '../../components/BottomNav';
+import './explore-redesign.css';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,6 +77,11 @@ export default async function Explore({ searchParams }) {
           {MOMENTS.map(([value, label]) => (
             <a key={value} className={`chip moment${moment === value ? ' on' : ''}`} href={`/grupo/${value}`}>{label}</a>
           ))}
+        </div>
+
+        <div className="explore-results-head">
+          <h2>{t.profileJourneys || t.exploreTitle}</h2>
+          <span>{js.length} {t.profileJourneys || t.exploreTitle}</span>
         </div>
 
         {js.length === 0 && <div className="empty"><b>{t.noPublicJourneys}</b></div>}
