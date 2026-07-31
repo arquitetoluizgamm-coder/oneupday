@@ -10611,3 +10611,40 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
   .cta,.home-welcome-primary,.wz-go,.future-save,.elog-go,.cm-main,
   .ghost-btn,.wz-back,.wz-draft-btn,.wz-choice,.wz-chip,.wz-aj-use,.pc-btn,.pc-opt { transition:none!important;transform:none!important; }
 }
+
+/* Wizard: no celular, os exemplos da primeira pergunta precisam caber entre
+   o logo fixo do topo e o menu inferior. O modal centralizado ficava enorme
+   e brigava com o footer. */
+@media (max-width: 560px) {
+  .wz-up-modal {
+    top: calc(76px + env(safe-area-inset-top, 0px)) !important;
+    bottom: calc(94px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 14px !important;
+    right: 14px !important;
+    width: auto !important;
+    max-height: none !important;
+    height: auto !important;
+    transform: none !important;
+    padding: 14px 14px 12px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+  }
+
+  .wz-up-modal-head {
+    position: sticky;
+    top: -14px;
+    z-index: 1;
+    margin: -14px -14px 12px;
+    padding: 14px 14px 10px;
+    background: rgba(250,247,242,.94);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
+    backdrop-filter: blur(16px) saturate(120%);
+  }
+
+  .wz-up-categories { gap: 12px; }
+  .wz-up-category .wz-up-examples { gap: 5px; }
+  .wz-up-category .wz-up-examples button {
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+}
