@@ -6,8 +6,6 @@ import Comments from '../../components/Comments';
 import SuggestionCard from '../../components/SuggestionCard';
 import NeedsSupport from '../../components/NeedsSupport';
 import EditUpdate from '../../components/EditUpdate';
-import ChallengeStrip from '../../components/ChallengeStrip';
-import ChallengeButton from '../../components/ChallengeButton';
 import Transformacao from '../../components/Transformacao';
 import Amanha from '../../components/Amanha';
 import SeloDoDia from '../../components/SeloDoDia';
@@ -35,31 +33,6 @@ function fillLabel(text, data = {}) {
   return String(text || '').replace(/\{(\w+)\}/g, (_, key) => data[key] ?? '');
 }
 
-function nomeCurto(item) {
-  return (item?.owner?.name || '').trim().split(/\s+/)[0] || 'ONE';
-}
-
-function ultimoDia(item) {
-  if (item?.days?.length) return item.days[item.days.length - 1];
-  return item || {};
-}
-
-function storyLineText(item, labels) {
-  if (!item || item.historia) return '';
-  const d = ultimoDia(item);
-  const name = nomeCurto(item);
-  const day = d.day_number || item.day_number || item.journey?.current_day || 0;
-  const comeback = item.comeback || d.comeback;
-
-  if (d.nextStep || item.nextStep) return fillLabel(labels.feedStoryNext, { name });
-  if (comeback) return fillLabel(labels.feedStoryBack, { name, d: comeback });
-  if (d.kind === 'setback' || item.kind === 'setback') return fillLabel(labels.feedStoryHard, { name });
-  if ([7, 15, 30, 60, 100].includes(day)) return fillLabel(labels.feedStoryMilestone, { name, d: day });
-  if (day <= 1) return fillLabel(labels.feedStoryStart, { name });
-  if (d.photo_url || d.video_url || item.photo_url || item.video_url) return fillLabel(labels.feedStoryPhoto, { name });
-  return fillLabel(labels.feedStoryDefault, { name });
-}
-
 function JourneyTitlePill({ title, slug, day }) {
   if (!title || !slug) return null;
   return (
@@ -68,12 +41,6 @@ function JourneyTitlePill({ title, slug, day }) {
       {day && <small>{day}</small>}
     </a>
   );
-}
-
-function StoryLine({ item, labels }) {
-  const text = storyLineText(item, labels);
-  if (!text) return null;
-  return <p className="entry-storyline">{text}</p>;
 }
 
 function TrackTag({ track, float, hasBar }) {
@@ -249,7 +216,7 @@ function LegendaSobreposta({ text, labels }) {
 // ---- Mídia + legenda do item solto do feed ----
 // Componente próprio, e não um trecho inline, porque hooks não podem
 // morar dentro de um .map(): a ordem mudaria a cada item da lista.
-function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat, progressEl }) {
+function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat }) {
   const [proporcao, setProporcao] = useState(null);
   const soVideo = !!(item.video_url && !item.photo_url);
   const legendaEmCima = soVideo && ehVertical(proporcao);
@@ -265,7 +232,6 @@ function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat, progre
       {cleanText && !legendaEmCima && (
         <div className="dp-text under"><EntryText text={cleanText} labels={labels} limit={100} mencoes={item.mencoes} /></div>
       )}
-      {progressEl}
     </>
   );
 }
@@ -293,9 +259,6 @@ function DayPager({ item, labels, dayLabel, dark }) {
   const [proporcao, setProporcao] = useState(null);
   if (!days.length) return null;
   const d = days[days.length - 1];
-  const total = item.journey.total_days || 0;
-  const pct = total ? Math.min(100, Math.max(3, Math.round(((d.day_number || 0) / total) * 100))) : 0;
-  const left = Math.max(0, total - (d.day_number || 0));
   const cleanText = textoDaPessoa(d.text);
   const hasMedia = !!(d.photo_url || d.video_url);
   const trackEl = d.track ? <TrackTag key={'t' + d.id} track={d.track} float hasBar={false} /> : null;
@@ -334,16 +297,6 @@ function DayPager({ item, labels, dayLabel, dark }) {
         </div>
       )}
 
-      {total > 0 && (
-        <div className="progress-under" aria-hidden="true">
-          <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
-          <div className="mp-meta">
-            <span>{(labels.progressFmt || '').replace('{d}', d.day_number).replace('{r}', left)}</span>
-            <span className="mp-pct">{pct}%</span>
-          </div>
-        </div>
-      )}
-
       {d.nextStep && (
         <StepOpen updateId={d.id} step={d.nextStep} when={d.nextWhen}
           name={(item.owner.name || '').split(' ')[0]} following={d.stepFollowing} own={item.own} labels={labels.step} />
@@ -354,7 +307,6 @@ function DayPager({ item, labels, dayLabel, dark }) {
         <Comments key={'c' + d.id} updateId={d.id} own={item.own} labels={labels.comments} />
         <Percepcao updateId={d.id} toId={item.owner.id} own={item.own} labels={labels.pc} />
         <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
-        {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
         {item.own && <EditUpdate key={'ed' + d.id} update={{ id: d.id, text: d.text, alt: d.alt, photo_url: d.photo_url, day: d.day_number }} labels={labels.editUpdate}
           onChanged={(patch) => setDays((prev) => patch === null ? prev.filter((x) => x.id !== d.id) : prev.map((x) => x.id === d.id ? { ...x, ...patch } : x))} />}
       </ActionsRow>
@@ -746,9 +698,7 @@ export default function FeedClient({ labels }) {
               <EncourageBar mediaId={item.mediaId} initialActive={item.encouraged} labelIdle={labels.supportIdle} labelActive={labels.supportActive} supportersLabel={labels.supporters} supportersLoading={labels.supportersLoading} supportersEmpty={labels.supportersEmpty} closeLabel={labels.popoverClose} />
               <Comments mediaId={item.mediaId} labels={labels.comments} />
               <FeedShare slug={item.owner.handle || ''} title={item.owner.name} label={labels.share} copiedLabel={labels.linkCopied} />
-              {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
             </div>
-            {item.challenge && <ChallengeStrip challenge={item.challenge} labels={labels.ch} />}
           </article>
           ) : (
           <article className={`entry ${item.kind || 'step'}${item.demo ? ' is-demo' : ''}`}>
@@ -759,14 +709,13 @@ export default function FeedClient({ labels }) {
                 </span>
                 <span className="entry-id">
                   <b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} />{item.historia && <span className="hist-selo">{labels.histSelo}</span>}</b>
-                  <small>{dayLabel(item.day_number)}{item.owner.mood && (labels.moods || {})[item.owner.mood] && <span className="entry-mood" style={{ color: MOODS[item.owner.mood] }}> · {labels.moods[item.owner.mood]}</span>}</small>
+                  {item.owner.mood && (labels.moods || {})[item.owner.mood] && <small><span className="entry-mood" style={{ color: MOODS[item.owner.mood] }}>{labels.moods[item.owner.mood]}</span></small>}
                 </span>
               </a>
               {item.owner.id && !item.own && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
               {item.own && !item.demo && !item.days && <EditUpdate update={{ id: item.id, text: item.text, alt: item.alt, photo_url: item.photo_url, day: item.day_number }} labels={labels.editUpdate}
                 onChanged={(patch) => setItems((prev) => patch === null ? prev.filter((x) => x.id !== item.id) : prev.map((x) => x.id === item.id ? { ...x, ...patch } : x))} />}
             </div>
-            <StoryLine item={item} labels={labels} />
             {item.days && !item.demo ? (
               <DayPager item={item} labels={labels} dayLabel={dayLabel} dark={idx % 3 === 2} />
             ) : (
@@ -784,10 +733,6 @@ export default function FeedClient({ labels }) {
             {(() => {
               const hasMedia = !!(item.photo_url || item.video_url);
               const cleanText = textoDaPessoa(item.text);
-              const total = item.journey.total_days || 0;
-              const day = item.journey.current_day || 0;
-              const pct = total ? Math.min(100, Math.max(3, item.journey.progress_pct || Math.round((day / total) * 100))) : 0;
-              const left = Math.max(0, total - day);
               // ============================================================
               // A BARRA DE PROGRESSO ENTROU NO CARD
               //
@@ -806,15 +751,6 @@ export default function FeedClient({ labels }) {
               // cartões são curtos. Lá a barra continua embaixo, com a
               // linha inteira.
               // ============================================================
-              const progressEl = total > 0 ? (
-                <div className="progress-under" aria-hidden="true">
-                  <div className="mp-bar"><span style={{ width: pct + '%' }} /></div>
-                  <div className="mp-meta">
-                    <span>{(labels.progressFmt || '').replace('{d}', day).replace('{r}', left)}</span>
-                    <span className="mp-pct">{pct}%</span>
-                  </div>
-                </div>
-              ) : null;
               const trackFloat = item.track ? <TrackTag track={item.track} float hasBar={false} /> : null;
               if (!hasMedia) {
                 // Sem mídia e sem relato: o dia foi marcado por botão.
@@ -830,13 +766,12 @@ export default function FeedClient({ labels }) {
                       {trackFloat}
                       <VerJornada slug={item.journey.slug} label={labels.seeFullJourney} claro />
                     </a>
-                    {progressEl}
                   </>
                 );
               }
               return (
               <MidiaComLegenda item={item} labels={labels} cleanText={cleanText}
-                  hasMedia={hasMedia} trackFloat={trackFloat} progressEl={progressEl} />
+                  hasMedia={hasMedia} trackFloat={trackFloat} />
               );
             })()}
 
@@ -862,12 +797,10 @@ export default function FeedClient({ labels }) {
                 <Comments updateId={item.id} own={item.own} labels={labels.comments} />
                 <Percepcao updateId={item.id} toId={item.owner.id} own={item.own} labels={labels.pc} />
                 <FeedShare slug={item.journey.slug} title={item.journey.title} label={labels.share} copiedLabel={labels.linkCopied} />
-                {item.challengeable && labels.ch && <ChallengeButton icon toId={item.owner.id} toName={item.owner.name} labels={labels.ch} />}
               </ActionsRow>
             )}
             </>
             )}
-            {item.challenge && !item.demo && <ChallengeStrip challenge={item.challenge} labels={labels.ch} />}
           </article>
           )}
           {idx === 0 && momentos.amanha.length > 0 && (

@@ -6,7 +6,6 @@ import AppTop from '../../../components/AppTop';
 import LoopMarca from '../../../components/LoopMarca';
 import ShareButton from '../../[slug]/ShareButton';
 import Dia1Card from '../../[slug]/Dia1Card';
-import ChallengeButton from '../../[slug]/ChallengeButton';
 import EscolherMomento from '../../../components/EscolherMomento';
 import TomorrowStep from '../TomorrowStep';
 
@@ -50,8 +49,6 @@ export default async function Created({ params }) {
             <Dia1Card journey={journey} owner={owner} theme={journey.title}
               label={t.dia1CardBtn} downloading={t.shareDownloading}
               texts={{ eyebrow: t.dia1Eyebrow, big: t.dia1Big, invite: t.dia1Invite, by: t.dia1By }} />
-            <ChallengeButton slug={journey.slug} theme={journey.title}
-              label={t.challengeBtn} copiedLabel={t.linkCopied} message={t.challengeMsg} />
             <a className="ghost-btn wide" href={`/${journey.slug}`}>{t.successContinue}</a>
           </div>
           {!journey.moment && (

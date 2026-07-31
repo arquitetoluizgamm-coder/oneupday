@@ -10752,6 +10752,13 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
   outline: none;
 }
 
+.feed-journey-pill + .entry-media,
+.feed-journey-pill + .entry-textcard,
+.feed-journey-pill + .dp-stage .entry-media,
+.feed-journey-pill + .dp-stage .entry-textcard {
+  margin-top: 0 !important;
+}
+
 /* Feed: antes/depois acompanha a margem do texto e vira duas miniaturas
    tocáveis, com canto arredondado e relevo material ONE. */
 @media (max-width: 860px) {

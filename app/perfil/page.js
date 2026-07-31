@@ -35,6 +35,7 @@ import EcoToggle from '../../components/EcoToggle';
 import LanguagePicker from '../../components/LanguagePicker';
 
 export const dynamic = 'force-dynamic';
+const CHALLENGES_ENABLED = false;
 const COLORS = ['#C16F54', '#84917A', '#5B7189', '#96523C', '#B3874A', '#A8637A'];
 
 async function ensureProfile(supabase, user) {
@@ -197,7 +198,7 @@ export default async function Perfil() {
   // ---- Desafios (caminhada junta) ----
   let chInvites = [], chWaiting = [], chActive = [];
   const chProfiles = {};
-  try {
+  if (CHALLENGES_ENABLED) try {
     const { data: chs } = await supabase.from('challenges').select('*')
       .or(`from_id.eq.${user.id},to_id.eq.${user.id}`)
       .in('status', ['pending', 'active'])
@@ -331,7 +332,7 @@ export default async function Perfil() {
           </div>
         )}
 
-        <section className="ch-block">
+        {CHALLENGES_ENABLED && <section className="ch-block">
             <p className="eyebrow">{t.chTitle}</p>
             {chInvites.length === 0 && chActive.length === 0 && chWaiting.length === 0 && (
               <p className="ch-empty">{t.chEmpty}</p>
@@ -356,7 +357,7 @@ export default async function Perfil() {
                 <div className="ch-info"><b>{c.title}</b><p>{fill(t.chWaiting, { name: (p.name || '').split(' ')[0] })}</p></div>
               </div>
             ); })}
-        </section>
+        </section>}
 
         {/* as abas existem sempre: sem jornada, a pessoa ainda tem álbum
             e pessoas para explorar — e o vazio precisa de uma saída */}
