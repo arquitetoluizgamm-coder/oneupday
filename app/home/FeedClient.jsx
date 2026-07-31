@@ -267,13 +267,14 @@ function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat }) {
 function MidiaGaleria({ item, labels }) {
   const [proporcao, setProporcao] = useState(null);
   const legendaEmCima = item.kind === 'video' && ehVertical(proporcao);
+  const mostrarLegenda = item.caption && item.kind !== 'quote' && !legendaEmCima;
 
   return (
     <>
       {item.kind === 'video'
         ? <Media video={item.url} labels={labels} caption={item.caption} onRatio={setProporcao} />
         : <Media photo={item.url} alt={item.kind === 'quote' ? (item.caption || '') : ''} />}
-      {item.caption && !legendaEmCima && (
+      {mostrarLegenda && (
         <div className="dp-text under"><EntryText text={item.caption} labels={labels} limit={100} /></div>
       )}
     </>
