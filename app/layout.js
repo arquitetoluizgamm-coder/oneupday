@@ -40,6 +40,29 @@ export async function generateMetadata() {
     metadataBase: new URL('https://oneupday.app'),
     alternates: { canonical: '/' },
     manifest: '/site.webmanifest',
+    // ============================================================
+    // iPHONE: A BARRA DE STATUS TRANSPARENTE DE VERDADE
+    //
+    // No Android isso não existe (o TWA só aceita cor). No iOS
+    // existe e nunca tinha sido ligado: `black-translucent` faz a
+    // barra sumir e o conteúdo passar POR TRÁS do relógio — no app
+    // adicionado à tela de início.
+    //
+    // O preço, conhecido e aceito: neste modo o relógio e os ícones
+    // são SEMPRE brancos. Sobre foto, perfeito. Sobre o topo claro,
+    // o relógio some. O iOS não tem texto escuro sobre barra
+    // transparente — é pegar ou largar, e o Fernando escolheu pegar.
+    //
+    // O CSS já estava pronto: viewport-fit=cover e --sa-top tratam
+    // o espaço da câmera desde os patches antigos.
+    //
+    // No Safari (navegador), nada disso vale: a barra é do Safari.
+    // ============================================================
+    appleWebApp: {
+      capable: true,
+      title: 'One Up Day',
+      statusBarStyle: 'black-translucent',
+    },
     icons: {
       icon: [{ url: '/favicon-32.png', sizes: '32x32' }, { url: '/favicon-16.png', sizes: '16x16' }],
       apple: '/apple-touch-icon.png',
