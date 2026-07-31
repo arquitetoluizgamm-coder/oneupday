@@ -2404,11 +2404,26 @@ h1 { letter-spacing: -0.03em; }
 .comment-more{font-weight:600;color:var(--muted);margin:8px 0 0;display:block;text-align:left}
 .comment-replying{background:transparent;border-left:2px solid var(--line);border-radius:0;padding:4px 0 4px 10px}
 
-/* ---- Visual reto: cantos quadrados em todo o app ---- */
-/* tudo que tinha borda arredondada vira canto reto; círculos verdadeiros
-   (avatares, pontos, botões redondos de ícone) são preservados abaixo */
-:root{--r-card:0px}
-*,*::before,*::after{border-radius:0!important}
+/* ---- O VISUAL RETO FOI DESATIVADO (Patch 244) ----
+
+   Aqui vivia `*,*::before,*::after{border-radius:0!important}` — a
+   decisão que deixou o app inteiro de cantos quadrados.
+
+   Ela saiu por decisão do Fernando, para a migração ao material
+   tátil (o Soft UI dos pilotos 242/243). E saiu também porque este
+   arquivo tinha virado uma guerra: o Liquid Glass (231) e o sistema
+   ONE (239/241) já venciam o reset a golpes de !important, peça por
+   peça. Três linguagens brigando é pior do que qualquer uma delas.
+
+   Com o reset fora, os border-radius históricos do arquivo voltam a
+   valer sozinhos — e os !important que existiam só para vencê-lo
+   podem, aos poucos, ser removidos.
+
+   As fotos do feed continuam retas: as regras edge-to-edge declaram
+   `border-radius:0` explicitamente e não dependiam do reset.
+
+   A lista de círculos abaixo fica — 50% num círculo é inofensivo. */
+:root{--r-card:16px}
 
 /* círculos preservados */
 .ava,.timeline .dot,.cover::after,.ob-steps li span,.feed-ava,.me-ava,.pc-avatar,
@@ -9304,12 +9319,18 @@ html.chrome-scrolling:not(.chrome-mostra):not(.chrome-top) .top.top-feed{
 
 /* Navegação ONE: vidro só na barra inferior e em painéis flutuantes. */
 .bottom-nav {
+  /* Patch 244: o vidro deu lugar ao material tátil do piloto 243 —
+     cápsula clara quase opaca, sombra quente embaixo/direita e luz
+     em cima/esquerda. O blur cai de 18 para 14: com fundo a 94% ele
+     trabalha menos, e é o rodapé que mais pesa na rolagem. */
   border-radius: 28px !important;
-  background: rgba(250, 247, 242, .78) !important;
+  background: rgba(250, 247, 242, .94) !important;
   border-color: rgba(255, 255, 255, .86) !important;
-  box-shadow: var(--one-shadow-sheet), inset 0 1px 0 rgba(255, 255, 255, .86) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(120%);
-  backdrop-filter: blur(18px) saturate(120%);
+  box-shadow: 15px 15px 30px rgba(151, 132, 110, .25),
+              -14px -14px 28px rgba(255, 255, 255, .9),
+              inset 1px 1px 0 rgba(255, 255, 255, .75) !important;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 .bottom-nav a,
 .bottom-nav .bn-create { min-width: var(--one-touch-min); min-height: var(--one-touch-min); }
@@ -10419,4 +10440,109 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
 @media (prefers-reduced-motion: reduce) {
   .cta,.home-welcome-primary,.wz-go,.future-save,.elog-go,.cm-main,
   .ghost-btn,.wz-back,.wz-draft-btn,.wz-choice,.wz-chip,.wz-aj-use,.pc-btn,.pc-opt { transition:none!important;transform:none!important; }
+}
+
+/* ============================================================
+   PATCH 244 · MATERIAL TÁTIL — GRUPO 1: TOKENS, BOTÕES E RODAPÉ
+
+   Primeiro grupo da migração para o Soft UI validado nos pilotos
+   242 (/new) e 243 (/material-pilot). Este grupo cobre só o que a
+   mão toca: botões, campos de entrada e o rodapé. Cards do feed e
+   telas internas vêm nos grupos seguintes.
+
+   ------------------------------------------------------------
+   O QUE MUDOU EM RELAÇÃO AOS TOKENS DO PILOTO, E POR QUÊ
+
+   O piloto foi medido antes de ser copiado, e dois valores dele
+   reprovavam no mesmo critério que o Patch 178 usou para zerar o
+   contraste do app:
+
+     rótulo #84957E sobre o fundo ..... 3,00:1  (mínimo 4,5)
+     sage-deep #5D7B69 ................ 4,39:1  (por um fio)
+
+   Aqui os rótulos usam #597665 — mesmo matiz, 4,70:1.
+
+   E os elementos elevados de superfície (botão secundário, chip)
+   ganham uma borda de 1px quase invisível: relevo por sombra
+   falha a WCAG 1.4.11 quando a sombra é o ÚNICO limite do
+   controle. A borda não aparece — mas garante o contorno.
+
+   O fundo dos tokens é var(--bg) #F8F8F6 — o do app — e não o
+   #FAF7F2 do piloto: sombra de neumorfismo só funde com a
+   superfície se for calculada sobre a superfície real.
+   ============================================================ */
+:root{
+  --tat-sombra: rgba(151,132,110,.25);   /* quente, embaixo/direita */
+  --tat-sombra-forte: rgba(151,132,110,.30);
+  --tat-luz: rgba(255,255,255,.92);      /* fria, cima/esquerda */
+  --tat-rotulo: #597665;                 /* 4,70:1 sobre --bg */
+  --tat-secundario: #5E564D;             /* 6,78:1 */
+  --tat-r-controle: 18px;
+  --tat-elev: 9px 9px 19px var(--tat-sombra), -8px -8px 17px var(--tat-luz);
+  --tat-elev-alta: 12px 12px 25px var(--tat-sombra), -12px -12px 25px var(--tat-luz);
+  --tat-fundo-inset: inset 6px 6px 13px var(--tat-sombra), inset -6px -6px 13px var(--tat-luz);
+}
+
+/* ---- o botão primário: elevado, e afunda ao tocar ---- */
+.cta{
+  border-radius:var(--tat-r-controle);
+  box-shadow:8px 9px 18px rgba(16,19,45,.22),
+             -6px -6px 14px var(--tat-luz),
+             inset 1px 1px 0 rgba(255,255,255,.14);
+  transition:transform 150ms ease, box-shadow 150ms ease;
+}
+.cta:active{
+  transform:translate(2px,2px);
+  box-shadow:2px 2px 6px rgba(16,19,45,.22),
+             inset 3px 3px 8px rgba(0,0,0,.22);
+}
+
+/* ---- o secundário: superfície elevada + a borda da 1.4.11 ---- */
+.ghost-btn{
+  border:1px solid rgba(151,132,110,.28);
+  border-radius:var(--tat-r-controle);
+  background:var(--bg,#F8F8F6);
+  box-shadow:var(--tat-elev);
+  transition:transform 150ms ease, box-shadow 150ms ease;
+}
+.ghost-btn:active{
+  transform:translate(2px,2px);
+  box-shadow:var(--tat-fundo-inset);
+}
+
+/* ---- os três do ritual: elevados; o escolhido afunda ----
+   É a inversão que o piloto 242 validou no wizard: escolher é
+   PRESSIONAR — o selecionado fica afundado na superfície, não
+   flutuando com anel. O anel de box-shadow do Patch 178 é
+   substituído por este estado. */
+.ritual-btn,.ritual-btn.did,.ritual-btn.tried,.ritual-btn.paused{
+  border:1px solid rgba(151,132,110,.28);
+  border-radius:16px;
+  background:var(--bg,#F8F8F6);
+  box-shadow:6px 6px 13px var(--tat-sombra), -6px -6px 13px var(--tat-luz);
+  transition:transform 140ms ease, box-shadow 140ms ease, color 140ms ease;
+}
+.ritual-btn.selected,
+.composer2 .ritual-btn.selected{
+  background:var(--bg,#F8F8F6) !important;   /* o !important herdado do 5983 */
+  color:var(--terracota-txt,#A85941);
+  box-shadow:var(--tat-fundo-inset);
+  transform:translate(1px,1px);
+}
+
+/* ---- campos de texto: rebaixados na superfície ----
+   Só os dois de uso diário por enquanto (composer e comentário).
+   O resto entra no grupo 2 com o wizard. */
+.composer2-input,
+.comment-form{
+  border-radius:16px;
+  box-shadow:var(--tat-fundo-inset);
+  background:var(--bg,#F8F8F6);
+}
+.comment-form{border-radius:999px}
+
+/* ---- toque respeitoso ---- */
+@media(prefers-reduced-motion:reduce){
+  .cta,.ghost-btn,.ritual-btn{transition:none}
+  .cta:active,.ghost-btn:active,.ritual-btn.selected{transform:none}
 }
