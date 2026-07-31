@@ -10901,3 +10901,10 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
 .journey-public .journey-swipe-hint {
   display: none !important;
 }
+
+/* Avatar do feed: o relevo padrão usa !important mais acima.
+   Quando há sentimento do dia, este halo vence e fica visível. */
+.entry-head .entry-ava.has-mood,
+.entry-ava.has-mood {
+  box-shadow: var(--mood-shadow) !important;
+}

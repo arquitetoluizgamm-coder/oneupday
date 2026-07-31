@@ -57,8 +57,12 @@ function MoodLine({ mood, labels }) {
 function avatarMoodStyle(owner) {
   return {
     background: owner.avatar_color || 'var(--orange)',
-    ...(owner.mood && MOODS[owner.mood] ? { boxShadow: moodGlow(MOODS[owner.mood]) } : {}),
+    ...(owner.mood && MOODS[owner.mood] ? { '--mood-shadow': moodGlow(MOODS[owner.mood]) } : {}),
   };
+}
+
+function avatarMoodClass(owner) {
+  return `entry-ava${owner?.mood && MOODS[owner.mood] ? ' has-mood' : ''}`;
 }
 
 function TrackTag({ track, float, hasBar }) {
@@ -706,7 +710,7 @@ export default function FeedClient({ labels }) {
           {item.media ? (
           <article className="entry entry-photo">
             <a className="entry-head" href={`/${item.owner.handle || ''}`}>
-              <span className="entry-ava" style={avatarMoodStyle(item.owner)}>
+              <span className={avatarMoodClass(item.owner)} style={avatarMoodStyle(item.owner)}>
                 {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}
               </span>
               <span className="entry-id"><b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} /></b>{item.kind === 'quote' && labels.quoteLabel && <small className="entry-media-kind">{labels.quoteLabel.replace('{name}', item.owner.name || '')}</small>}<MoodLine mood={item.owner.mood} labels={labels} /></span>
@@ -722,7 +726,7 @@ export default function FeedClient({ labels }) {
           <article className={`entry ${item.kind || 'step'}${item.demo ? ' is-demo' : ''}`}>
             <div className="entry-head">
               <a className="entry-person" href={`/${item.owner.handle || item.journey.slug}`}>
-                <span className="entry-ava" style={avatarMoodStyle(item.owner)}>
+                <span className={avatarMoodClass(item.owner)} style={avatarMoodStyle(item.owner)}>
                   {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}
                 </span>
                 <span className="entry-id">
