@@ -17,11 +17,16 @@ export default function UpiRecommendation({ item, labels }) {
         <img src="/upi.svg" alt="Upi" />
         <div><b>Upi</b><span>{labels.title}</span></div>
       </div>
-      <p>{fill(line, { name })}</p>
-      {item.trecho && <blockquote>“{item.trecho}”</blockquote>}
       <a href={`/${item.journeySlug}`} className="upi-recommendation-link">
-        <span><strong>{item.journeyTitle}</strong><small>{fill(labels.day, { d: item.dia, t: item.total })}</small></span>
-        <span aria-hidden="true">›</span>
+        <span className="upi-rec-body">
+          <span className="upi-rec-line">{fill(line, { name })}</span>
+          {item.trecho && <span className="upi-rec-quote">“{item.trecho}”</span>}
+          <span className="upi-rec-journey">
+            <strong>{item.journeyTitle}</strong>
+            <small>{fill(labels.day, { d: item.dia, t: item.total })}</small>
+          </span>
+        </span>
+        <span className="upi-rec-arrow" aria-hidden="true">›</span>
       </a>
     </aside>
   );
