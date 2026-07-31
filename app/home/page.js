@@ -139,7 +139,7 @@ export default async function Home() {
           doneTitle: t.homeWelcomeDoneTitle, doneSub: t.homeWelcomeDoneSub, doneToday: t.homeWelcomeDoneToday,
           choose: t.homeWelcomeChoose, seeFeed: t.homeWelcomeSeeFeed, feedWithNews: t.homeWelcomeFeedNews,
           exemplos: t.homeWelcomeExemplos, seeOthers: t.homeWelcomeSeeOthers, diaryLater: t.homeWelcomeDiaryLater,
-          day: t.homeWelcomeDay, journeySub: t.homeWelcomeJourneySub, diaryTitle: t.navDiary, diarySub: t.diarySub,
+          day: t.homeWelcomeDay, journeySub: t.homeWelcomeJourneySub, diaryTitle: t.navDiary, diaryWrite: t.homeWelcomeDiaryWrite, diarySub: t.diarySub,
           memoryNew: t.homeWelcomeMemoryNew, memoryBack: t.homeWelcomeMemoryBack, memoryDone: t.homeWelcomeMemoryDone,
           ritualLabel: t.homeWelcomeRitualLabel, tree: t.navTree, diary: t.navDiary, future: t.navFuture,
         }} />

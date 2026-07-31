@@ -25,6 +25,7 @@ export default function HomeWelcome({ journeys = [], name = '', naoLidas = 0, la
 
   return (
     <section className="home-welcome" aria-labelledby="home-welcome-title">
+      {tem && <span className="home-welcome-mark" aria-hidden="true"><img className="upi-char" src="/upi.svg" alt="" /></span>}
       <span className="home-welcome-eyebrow">
         {tem ? (L.backEyebrow || '').replace('{name}', (name || '').split(' ')[0]) : L.newEyebrow}
       </span>
@@ -72,11 +73,15 @@ export default function HomeWelcome({ journeys = [], name = '', naoLidas = 0, la
       )}
 
       {!feito && (
-        <button type="button" className="home-welcome-skip" onClick={feed}>
-          {!tem
-            ? (L.seeOthers || L.seeFeed || L.skip)
-            : (naoLidas > 0 ? (L.feedWithNews || '').replace('{n}', naoLidas) : (L.seeFeed || L.skip))}
-        </button>
+        tem ? (
+          <a className="home-welcome-skip home-welcome-diary-link" href="/diario">
+            {L.diaryWrite || L.diaryTitle || 'Diário privado'}
+          </a>
+        ) : (
+          <button type="button" className="home-welcome-skip" onClick={feed}>
+            {L.seeOthers || L.seeFeed || L.skip}
+          </button>
+        )
       )}
     </section>
   );
