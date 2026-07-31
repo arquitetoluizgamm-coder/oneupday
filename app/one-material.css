@@ -44,3 +44,16 @@ html,body,.feed-page,.wrap.feed-page,.home-welcome{background:#fff!important}.to
     border-radius:50%!important;
   }
 }
+
+/* Filtros do feed não são um card: ficam sobre o branco da própria página. */
+.feed-tabs,.feed-tabs button,.feed-tabs .on{
+  background:#fff!important;
+}
+.feed-tabs{
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+.feed-tabs .on{
+  color:var(--one-primary-dark,#A95740)!important;
+  box-shadow:inset 0 -2px 0 var(--one-terracotta,#C16F54)!important;
+}
