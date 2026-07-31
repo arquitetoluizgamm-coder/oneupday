@@ -350,7 +350,9 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       const d = await r.json().catch(() => ({}));
       if (r.ok && d.titulo) {
         setIaOrganizou(true);
-        setTitle(d.titulo || title);
+        // O nome da jornada pertence à pessoa. A IA pode dar forma ao
+        // restante do registro, mas nunca trocar silenciosamente o título
+        // que ela escolheu na primeira tela.
         setGoal(d.descricao || goal);
         setPratica(d.pratica || goal);
         setFirst(d.primeiro || hoje);
