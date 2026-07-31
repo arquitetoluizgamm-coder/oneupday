@@ -41,28 +41,22 @@ export async function generateMetadata() {
     alternates: { canonical: '/' },
     manifest: '/site.webmanifest',
     // ============================================================
-    // iPHONE: A BARRA DE STATUS TRANSPARENTE DE VERDADE
+    // AS METAS DA APPLE FORAM REMOVIDAS — REVERSÃO DO PATCH 246
     //
-    // No Android isso não existe (o TWA só aceita cor). No iOS
-    // existe e nunca tinha sido ligado: `black-translucent` faz a
-    // barra sumir e o conteúdo passar POR TRÁS do relógio — no app
-    // adicionado à tela de início.
+    // O Fernando relatou: a transparência da barra FUNCIONAVA e
+    // parou. A única mudança recente nesta área foi o 246, que
+    // adicionou `appleWebApp` (capable + black-translucent).
     //
-    // O preço, conhecido e aceito: neste modo o relógio e os ícones
-    // são SEMPRE brancos. Sobre foto, perfeito. Sobre o topo claro,
-    // o relógio some. O iOS não tem texto escuro sobre barra
-    // transparente — é pegar ou largar, e o Fernando escolheu pegar.
+    // O mecanismo provável: sem essas metas, o iOS decide pelo
+    // site.webmanifest — o caminho moderno. COM elas, ele cai no
+    // caminho legado, que o iOS 26.1 quebrou (a faixa de vidro
+    // sobre o relógio). Eu liguei uma chave que empurrou o app
+    // para o lado quebrado.
     //
-    // O CSS já estava pronto: viewport-fit=cover e --sa-top tratam
-    // o espaço da câmera desde os patches antigos.
-    //
-    // No Safari (navegador), nada disso vale: a barra é do Safari.
+    // Se alguém quiser reintroduzir isso um dia: teste no aparelho
+    // ANTES, removendo e readicionando o ícone da tela de início —
+    // o iOS grava essas metas no momento de adicionar.
     // ============================================================
-    appleWebApp: {
-      capable: true,
-      title: 'One Up Day',
-      statusBarStyle: 'black-translucent',
-    },
     icons: {
       icon: [{ url: '/favicon-32.png', sizes: '32x32' }, { url: '/favicon-16.png', sizes: '16x16' }],
       apple: '/apple-touch-icon.png',
