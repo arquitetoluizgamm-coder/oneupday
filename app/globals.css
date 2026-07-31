@@ -11436,9 +11436,9 @@ body:has(.landing){
    ============================================================ */
 body:has(.auth-wrap){
   background:
-    radial-gradient(circle at 50% 18%,rgba(232,166,76,.13),transparent 28rem),
-    radial-gradient(circle at 16% 78%,rgba(132,149,126,.13),transparent 24rem),
-    linear-gradient(180deg,#fffdf8 0%,#f7f0e6 100%)!important;
+    radial-gradient(circle at 50% 18%,rgba(132,149,126,.12),transparent 28rem),
+    radial-gradient(circle at 18% 78%,rgba(232,166,76,.08),transparent 24rem),
+    linear-gradient(180deg,#fffefb 0%,#f4f1ea 100%)!important;
 }
 
 .auth-wrap{
@@ -11475,11 +11475,11 @@ body:has(.auth-wrap){
   top:calc(15% + 22px);
   left:calc(50% + 82px);
   border-radius:999px;
-  background:var(--one-terracotta,#C16F54);
+  background:var(--one-sage,#84957e);
   box-shadow:
-    -82px 21px 0 rgba(132,149,126,.72),
-    76px 38px 0 rgba(232,166,76,.70),
-    0 0 0 8px rgba(193,111,84,.08);
+    -82px 21px 0 rgba(132,149,126,.50),
+    76px 38px 0 rgba(232,166,76,.38),
+    0 0 0 8px rgba(132,149,126,.08);
 }
 
 .auth-card{
@@ -11621,7 +11621,7 @@ body:has(.auth-wrap){
   border-radius:21px!important;
   border:1px solid rgba(222,213,199,.74)!important;
   background:
-    linear-gradient(145deg,#f6efe5,#fffdf8 62%)!important;
+    linear-gradient(145deg,#f3f0e8,#fffefb 62%)!important;
   color:var(--one-ink,#2d2924)!important;
   box-shadow:
     inset 3px 3px 8px rgba(119,93,70,.08),
@@ -11654,7 +11654,7 @@ body:has(.auth-wrap){
 .elog-mail:-webkit-autofill,
 .elog-code:-webkit-autofill{
   -webkit-text-fill-color:var(--one-ink,#2d2924)!important;
-  box-shadow:0 0 0 1000px #fff8ef inset!important;
+  box-shadow:0 0 0 1000px #fffef6 inset!important;
   caret-color:var(--one-ink,#2d2924);
 }
 
@@ -11716,7 +11716,7 @@ body:has(.auth-wrap){
   width:42px;
   height:1px;
   transform:translateX(-50%);
-  background:linear-gradient(90deg,transparent,rgba(193,111,84,.38),transparent);
+  background:linear-gradient(90deg,transparent,rgba(132,149,126,.34),transparent);
 }
 
 .login-wait{
