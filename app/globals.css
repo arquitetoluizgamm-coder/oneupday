@@ -3282,23 +3282,159 @@ h1 { letter-spacing: -0.03em; }
   text-transform:uppercase;color:var(--ink);white-space:nowrap}
 
 /* ---------- 2. O AMANHA DOS OUTROS ---------- */
-.am-block{margin:22px 0 6px;padding:14px 14px 8px;background:var(--surface);border:1px solid var(--line)}
-@media(max-width:640px){ .am-block{border-left:0;border-right:0} }
+.am-block{
+  position:relative;
+  overflow:hidden;
+  margin:22px 0 10px;
+  padding:18px 18px 12px;
+  background:linear-gradient(145deg,#fffaf4 0%,#f8f2ea 100%);
+  border:1px solid rgba(193,111,84,.18);
+  border-radius:20px;
+  box-shadow:0 10px 28px rgba(16,19,45,.06);
+}
+.am-block::before{
+  content:'';
+  position:absolute;
+  inset:0 auto 0 0;
+  width:4px;
+  background:linear-gradient(180deg,rgba(193,111,84,.9),rgba(132,149,126,.55));
+  opacity:.9;
+}
+@media(max-width:640px){
+  .am-block{
+    margin:18px 0 10px;
+    padding:16px 14px 10px;
+    border-left:0;
+    border-right:0;
+    border-radius:0;
+    box-shadow:none;
+  }
+  .am-block::before{width:3px}
+}
 .am-title{margin:0 0 10px;font-family:var(--display);font-weight:800;font-size:10px;
   letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.am-list{display:flex;flex-direction:column}
-.am-row{display:flex;align-items:center;gap:11px;padding:9px 0;text-decoration:none;color:var(--ink);
-  border-top:1px solid #f2f0eb}
+.am-head{position:relative;z-index:1;margin-bottom:16px}
+.am-head .aux-post-head>div,
+.am-head>div{gap:4px}
+.am-head b{font-size:17px;letter-spacing:-.025em;color:var(--one-ink,var(--ink))}
+.am-head small{font-size:12.5px;color:var(--one-muted,var(--muted));line-height:1.4}
+.am-mark{
+  width:34px;
+  height:34px;
+  flex-basis:34px;
+  border-radius:14px;
+  background:linear-gradient(145deg,rgba(193,111,84,.16),rgba(132,149,126,.13));
+  color:var(--one-terracotta,var(--orange));
+  box-shadow:inset 0 0 0 1px rgba(193,111,84,.12);
+}
+.am-mark span{
+  display:block;
+  width:13px;
+  height:13px;
+  border-radius:999px 999px 999px 3px;
+  background:currentColor;
+  transform:rotate(45deg);
+  opacity:.9;
+}
+.am-list{position:relative;z-index:1;display:flex;flex-direction:column}
+.am-row{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:58px;
+  padding:10px 8px 10px 0;
+  text-decoration:none;
+  color:var(--one-ink,var(--ink));
+  border-top:1px solid rgba(227,222,212,.72);
+  border-radius:14px;
+  transition:background .2s ease,transform .2s ease,box-shadow .2s ease;
+}
 .am-row:first-child{border-top:0}
-.am-ava{width:32px;height:32px;border-radius:50%;overflow:hidden;flex:0 0 auto;
-  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.am-row:hover{
+  background:rgba(255,255,255,.42);
+  box-shadow:0 4px 14px rgba(16,19,45,.035);
+}
+.am-row:active{transform:scale(.992)}
+.am-row:focus-visible{
+  outline:3px solid var(--one-focus,rgba(193,111,84,.25));
+  outline-offset:2px;
+}
+.am-row + .am-row::before{
+  content:'';
+  position:absolute;
+  top:-1px;
+  left:52px;
+  right:8px;
+  height:1px;
+  background:rgba(227,222,212,.72);
+}
+.am-row + .am-row{border-top:0}
+.am-ava{width:40px;height:40px;border-radius:50%;overflow:hidden;flex:0 0 40px;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:750;font-size:14px;
+  border:1px solid rgba(255,255,255,.78);box-shadow:0 0 0 1px rgba(16,19,45,.06)}
 .am-ava img{width:100%;height:100%;object-fit:cover}
-.am-txt{flex:1;min-width:0;display:flex;flex-direction:column}
-.am-txt b{font-size:14px;font-weight:650;line-height:1.3}
-.am-txt small{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.am-go{color:var(--muted);font-size:17px;flex:0 0 auto}
-.am-row.comecou .am-txt b{color:#84917A}
-.am-row.termina .am-txt b,.am-row.chegou .am-txt b{color:#C16F54}
+.am-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.am-line{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+.am-txt b{
+  min-width:0;
+  max-width:100%;
+  color:var(--one-ink,var(--ink));
+  font-size:14.5px;
+  font-weight:760;
+  line-height:1.25;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.am-txt em{
+  flex:0 0 auto;
+  max-width:100%;
+  padding:3px 8px;
+  border-radius:999px;
+  background:rgba(132,149,126,.16);
+  color:#58664f;
+  font-size:11px;
+  font-style:normal;
+  font-weight:780;
+  line-height:1.15;
+  white-space:nowrap;
+}
+.am-row.chegou .am-txt em{background:rgba(193,111,84,.14);color:#9b533d}
+.am-txt small{
+  color:var(--one-muted,var(--muted));
+  font-size:12.5px;
+  line-height:1.35;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.am-go{
+  display:grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  color:rgba(16,19,45,.48);
+  background:rgba(255,255,255,.44);
+  flex:0 0 30px;
+  transition:transform .2s ease,color .2s ease,background .2s ease;
+}
+.am-row:hover .am-go{transform:translateX(2px);color:var(--one-terracotta,var(--orange));background:rgba(255,255,255,.7)}
+@media(max-width:420px){
+  .am-row{gap:10px;padding-right:4px}
+  .am-ava{width:38px;height:38px;flex-basis:38px}
+  .am-line{gap:5px}
+  .am-txt b{font-size:14px}
+  .am-txt em{font-size:10.5px;padding:3px 7px}
+  .am-go{width:28px;height:28px;flex-basis:28px}
+}
+@media(prefers-reduced-motion:reduce){
+  .am-row,.am-go{transition:none}
+  .am-row:hover .am-go{transform:none}
+  .am-row:active{transform:none}
+}
 
 /* ---------- 3. RETORNOS ---------- */
 .rt-block{margin:22px 0 6px;padding:14px;background:linear-gradient(160deg,#10132D 0%,#171d4d 100%);color:#FAF7F2}
@@ -6046,14 +6182,14 @@ h1 { letter-spacing: -0.03em; }
 .composer-extra-toggle b{font-size:20px;line-height:1;font-weight:500}
 .composer-extra-panel:not(.open) .tools{display:none}
 .composer-extra-panel:not(.open){justify-content:flex-end}
-.feed-stream > .aux-post{margin:0 0 14px;padding:18px 16px;background:var(--surface,#fff);border:1px solid var(--line);border-radius:16px;box-shadow:0 7px 22px rgba(24,36,59,.045)}
+.feed-stream > .aux-post:not(.am-block){margin:0 0 14px;padding:18px 16px;background:var(--surface,#fff);border:1px solid var(--line);border-radius:16px;box-shadow:0 7px 22px rgba(24,36,59,.045)}
 .aux-post-head{display:flex;align-items:flex-start;gap:11px;margin:0 0 14px}
 .aux-post-head>div{display:grid;gap:3px;min-width:0}
 .aux-post-head b{color:var(--ink);font-family:var(--display);font-size:15px;font-weight:850;line-height:1.2}
 .aux-post-head small{color:var(--muted);font-size:11px;line-height:1.35}
 .aux-post-mark{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:50%;background:var(--support-soft,#f2ded4);color:var(--orange,#c16f54);font-size:16px}
 .aux-post .needs-title,.aux-post .sg-head,.aux-post .am-title,.aux-post .an-title{display:none}
-@media(max-width:640px){.feed-stream > .aux-post{margin-inline:0;border-radius:0;border-left:0;border-right:0;box-shadow:none;padding:18px 16px}}
+@media(max-width:640px){.feed-stream > .aux-post:not(.am-block){margin-inline:0;border-radius:0;border-left:0;border-right:0;box-shadow:none;padding:18px 16px}}
 .ej-section{padding:18px 0;border-bottom:1px solid var(--line,#ece9e2)}
 .ej-section:first-child{padding-top:0}
 .ej-section-title{margin:0;color:var(--ink);font-family:var(--display);font-size:16px;font-weight:850;letter-spacing:-.01em}
@@ -10706,16 +10842,13 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
    Antes "Alguém precisa de você hoje" e "Amanhã por aqui" usavam padding
    próprio, então texto e ícones ficavam desalinhados do feed. */
 @media (max-width: 860px) {
-  .feed-stream > .aux-post.needs,
-  .feed-stream > .aux-post.am-block {
+  .feed-stream > .aux-post.needs {
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
 
   .feed-stream > .aux-post.needs > .aux-post-head,
-  .feed-stream > .aux-post.am-block > .aux-post-head,
-  .feed-stream > .aux-post.needs > .needs-list,
-  .feed-stream > .aux-post.am-block > .am-list {
+  .feed-stream > .aux-post.needs > .needs-list {
     padding-left: var(--recuo-feed) !important;
     padding-right: var(--recuo-feed) !important;
   }

@@ -110,7 +110,7 @@ export default async function Home() {
     pc: { title: t.pcTitle, sub: t.pcSub, done: t.pcDone, cancel: t.epCancel, tipos: t.pcTipos },
     step: { back: t.stepBack, follow: t.stepFollow, following: t.stepFollowing, decided: t.stepDecided, result: t.stepResult, open: t.stepOpen },
     transf: { tag: t.trTag, dayFmt: t.trDayFmt, gap: t.trGap, see: t.trSee },
-    amanha: { title: t.amTitle, sub: t.amSub, comecou: t.amComecou, termina: t.amTermina, chegou: t.amChegou, marco: t.amMarco },
+    amanha: { title: t.amTitle, sub: t.amSub, comecou: t.amComecou, termina: t.amTermina, chegou: t.amChegou, marco: t.amMarco, doneDay: t.amDoneDay, reachedDay: t.amReachedDay },
     retornos: { title: t.rtTitle, came: t.rtCame, cta: t.rtCta, sent: t.rtSent },
     hug: { hug: t.hugLabel, toast: t.hugToast }, metoo: { meToo: t.meToo, meTooQ: t.meTooQ, meTooBack: t.meTooBack, meTooTrying: t.meTooTrying, meTooHard: t.meTooHard, meTooJust: t.meTooJust, meTooDone: t.meTooDone }, milestoneFmt: t.milestoneFmt, needs: { title: t.needsTitle, sub: t.needsSub, cta: t.needsCta, sent: t.needsSent }, comebackFmt: t.comebackFmt,
     popoverClose: t.commentClose,
