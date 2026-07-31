@@ -10729,10 +10729,8 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
 /* Feed: título da jornada vira uma pequena chamada ONE antes do conteúdo.
    Sai do metadado embaixo do nome, onde passava batido. */
 .feed-journey-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  display: inline-grid;
+  gap: 2px;
   width: fit-content;
   max-width: calc(100% - 2 * var(--recuo-feed, 16px));
   margin: 12px var(--recuo-feed, 16px) 0;
@@ -10744,7 +10742,7 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
   background: transparent;
   color: var(--one-ink, #2d2924);
   box-shadow: none;
-  padding: 2px 0 3px 9px;
+  padding: 1px 0 4px 9px;
   font-size: 13px;
   font-weight: 800;
   line-height: 1.15;
@@ -10757,15 +10755,16 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13.5px;
+  font-size: 13.8px;
   font-weight: 850;
 }
 
 .feed-journey-pill small {
-  flex: 0 0 auto;
   color: var(--one-terracotta, #c16f54);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 

@@ -89,7 +89,7 @@ export default async function Home() {
   const kindLabels = { step: t.kindStep, win: t.kindWin, setback: t.kindSetback, learned: t.kindLearned };
 
   const feedLabels = {
-    dayShort: t.dayShort, tagSetback: t.tagSetback, tagWin: t.tagWin,
+    dayShort: t.dayShort, journeyStatusFmt: t.journeyStatusFmt, tagSetback: t.tagSetback, tagWin: t.tagWin,
     selo: { fiz: t.seloFiz, tentei: t.seloTentei, parei: t.seloParei, comecei: t.seloComecei },
     altReserva: t.altReserva,
     viewPublic: t.viewPublic, muteTopic: t.muteTopic,
