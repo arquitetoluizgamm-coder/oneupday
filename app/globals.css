@@ -10677,3 +10677,77 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
     padding: 5px 5px 5px 14px;
   }
 }
+
+/* Jornada pública: leitura por capítulo. Sai a régua/arraste e entra um
+   navegador simples: começa no Dia 1, avança pelas setas ou pelas abas. */
+.journey-public .days-pager {
+  position: sticky;
+  top: calc(62px + env(safe-area-inset-top, 0px));
+  z-index: 8;
+}
+
+.journey-public .days-pager-tabs {
+  display: flex;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 0 2px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.journey-public .days-pager-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.journey-public .days-pager-tab {
+  flex: 0 0 auto;
+  border: 1px solid var(--one-line, var(--line));
+  border-radius: 999px;
+  background: rgba(255,255,255,.62);
+  color: var(--one-muted, var(--muted));
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.journey-public .days-pager-tab.on {
+  border-color: rgba(193,111,84,.42);
+  background: var(--one-terracotta-soft, rgba(193,111,84,.13));
+  color: var(--one-terracotta, #c16f54);
+}
+
+.journey-public .days-pager-tab.difficult:not(.on) {
+  color: var(--one-primary-dark, #a95740);
+}
+
+.journey-public .timeline {
+  display: block !important;
+  overflow: visible !important;
+  margin-top: 16px !important;
+  padding: 0 0 22px !important;
+  scroll-snap-type: none !important;
+}
+
+.journey-public .timeline article {
+  width: 100% !important;
+  height: auto !important;
+  flex: none !important;
+  scroll-snap-align: none !important;
+}
+
+.journey-public .timeline article[hidden] {
+  display: none !important;
+}
+
+.journey-public .timeline .body {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.journey-public .journey-swipe-hint {
+  display: none !important;
+}
