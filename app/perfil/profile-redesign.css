@@ -681,3 +681,426 @@ body:has(.profile-shell) .top:not(.top-feed) .top-brand .one-mark{
     transform:none!important;
   }
 }
+
+/* Perfil · revisão final de hierarquia e composição */
+body:has(.profile-shell) .top:not(.top-feed){
+  min-height:calc(58px + env(safe-area-inset-top,0px))!important;
+  padding-top:calc(8px + env(safe-area-inset-top,0px))!important;
+  border-bottom-color:rgba(222,213,199,.45)!important;
+  box-shadow:none!important;
+}
+
+.profile-shell{
+  max-width:680px!important;
+  padding-top:16px!important;
+}
+
+.profile-shell .profile-card{
+  margin-bottom:18px!important;
+  border-radius:26px!important;
+  box-shadow:0 18px 44px rgba(46,38,29,.08),inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+
+.profile-shell .pc-banner{
+  height:clamp(170px,31vw,224px)!important;
+  margin:12px 12px 0!important;
+  border-radius:22px!important;
+}
+
+.profile-shell .pc-info{
+  grid-template-columns:68px minmax(0,1fr) auto!important;
+  align-items:start!important;
+  gap:16px!important;
+  padding:0 22px 24px!important;
+}
+
+.profile-shell .pc-avatar{
+  width:68px!important;
+  height:68px!important;
+  flex-basis:68px!important;
+  margin:-28px 0 0!important;
+  border-width:4px!important;
+  font-size:27px!important;
+}
+
+.profile-shell .pc-meta{
+  margin:14px 0 0!important;
+}
+
+.profile-shell .pc-name-line h1,
+.profile-shell .pc-meta h1{
+  font-size:clamp(21px,3.6vw,24px)!important;
+  line-height:1.1!important;
+  letter-spacing:-.035em!important;
+}
+
+.profile-shell .pc-sub{
+  margin-top:4px!important;
+}
+
+.profile-shell .pc-sub span{
+  font-size:13px!important;
+  font-weight:620!important;
+}
+
+.profile-shell .pc-consistency{
+  margin-top:8px!important;
+  font-size:12.8px!important;
+  font-weight:680!important;
+}
+
+.profile-shell .pc-acoes{
+  align-self:start!important;
+  margin-top:16px!important;
+  gap:7px!important;
+}
+
+.profile-shell .pc-acoes > a,
+.profile-shell .pc-acoes > button,
+.profile-shell .pc-acoes .icon-btn,
+.profile-shell .pc-acoes .header-create,
+.profile-shell .pc-acoes .pm-trigger{
+  width:44px!important;
+  height:44px!important;
+  min-width:44px!important;
+  min-height:44px!important;
+  border-radius:15px!important;
+}
+
+.profile-shell .tree-shortcut{
+  min-height:72px!important;
+  margin:0 0 12px!important;
+  padding:13px 16px!important;
+  border-color:rgba(132,149,126,.20)!important;
+  border-radius:20px!important;
+  background:
+    radial-gradient(circle at 94% 12%,rgba(132,149,126,.12),transparent 28%),
+    linear-gradient(145deg,#FFFDF9,#F1F6ED)!important;
+  box-shadow:0 10px 24px rgba(62,73,55,.055),inset 0 1px 0 rgba(255,255,255,.88)!important;
+}
+
+.profile-shell .tree-shortcut-icon{
+  width:44px!important;
+  height:44px!important;
+  flex-basis:44px!important;
+  border-radius:16px!important;
+  border-color:rgba(132,149,126,.22)!important;
+}
+
+.profile-shell .tree-shortcut-icon img{
+  width:31px!important;
+  height:31px!important;
+}
+
+.profile-shell .tree-shortcut-titulo .one-mark{
+  display:none!important;
+}
+
+.profile-shell .tree-shortcut-titulo b{
+  font-size:14px!important;
+  font-weight:760!important;
+}
+
+.profile-shell .tree-shortcut small{
+  font-size:12px!important;
+  color:#687660!important;
+}
+
+.profile-shell .pc-progress-bar{
+  margin:0 0 20px!important;
+}
+
+.profile-shell .pc-progress-upi{
+  position:relative!important;
+  min-height:74px!important;
+  padding:14px 52px 14px 16px!important;
+  border-color:rgba(193,111,84,.18)!important;
+  border-radius:20px!important;
+  background:
+    radial-gradient(circle at 8% 14%,rgba(193,111,84,.09),transparent 30%),
+    linear-gradient(145deg,#FFFDF9,#FCF7EF)!important;
+  box-shadow:0 9px 22px rgba(80,61,45,.045),inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+
+.profile-shell .pc-progress-upi::after{
+  content:"›";
+  position:absolute;
+  right:17px;
+  top:50%;
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  color:#9AA3B0;
+  font-size:25px;
+  line-height:1;
+  transform:translateY(-50%);
+  pointer-events:none;
+}
+
+.profile-shell .pc-progress-upi .upi-char{
+  width:44px!important;
+  height:44px!important;
+  flex-basis:44px!important;
+}
+
+.profile-shell .pc-progress-button .upi-name{
+  color:#B7644A!important;
+  font-size:10.8px!important;
+}
+
+.profile-shell .pc-progress-button p{
+  font-size:14px!important;
+  line-height:1.35!important;
+}
+
+.profile-shell .ptabs-wrap{
+  margin:22px 0 14px!important;
+}
+
+.profile-shell .ptabs-row{
+  margin:0 0 14px!important;
+}
+
+.profile-shell .ptabs-row .ptabs{
+  align-items:center!important;
+  min-height:48px!important;
+  gap:7px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  padding:4px!important;
+  scroll-padding-inline:8px!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+
+.profile-shell .ptabs-row .ptab{
+  flex:0 0 auto!important;
+  min-width:max-content!important;
+  min-height:42px!important;
+  padding:0 15px!important;
+  font-size:12.5px!important;
+}
+
+.profile-shell .ptabs-row .ptab.on{
+  border:1px solid rgba(222,213,199,.72)!important;
+}
+
+.profile-shell .ptab-actions{
+  margin:0 0 12px!important;
+  padding-bottom:2px!important;
+}
+
+.profile-shell .ptab-actions .ptab-link{
+  flex:0 0 auto!important;
+  min-width:max-content!important;
+  min-height:42px!important;
+  padding:0 15px!important;
+  border-radius:999px!important;
+}
+
+.profile-shell .jcard.jcard-link{
+  margin-bottom:16px!important;
+  padding:17px 18px 18px!important;
+  border-radius:21px!important;
+  box-shadow:0 8px 20px rgba(16,19,45,.045),inset 0 1px 0 rgba(255,255,255,.88)!important;
+}
+
+.profile-shell .jcard-head{
+  align-items:flex-start!important;
+}
+
+.profile-shell .jcard-head h2{
+  font-size:17.5px!important;
+  line-height:1.18!important;
+}
+
+.profile-shell .jcard-head span{
+  margin-top:6px!important;
+  font-size:12.2px!important;
+}
+
+.profile-shell .jcard .progress{
+  position:relative!important;
+  margin-top:13px!important;
+}
+
+.profile-shell .jcard .progress-meta{
+  margin:0!important;
+  min-height:0!important;
+}
+
+.profile-shell .jcard .progress-meta span:first-child{
+  display:none!important;
+}
+
+.profile-shell .jcard .progress-pct{
+  position:absolute!important;
+  right:0!important;
+  top:-33px!important;
+  color:#746D67!important;
+  font-size:12px!important;
+  font-weight:720!important;
+}
+
+.profile-shell .jcard .progress-track{
+  height:9px!important;
+}
+
+.profile-shell .nc-neutral{
+  margin-top:18px!important;
+  padding:18px!important;
+  border-radius:22px!important;
+  background:
+    radial-gradient(circle at 94% 8%,rgba(193,111,84,.06),transparent 31%),
+    #FFFDF9!important;
+  box-shadow:0 9px 24px rgba(16,19,45,.045),inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+
+.profile-shell .pv-block{
+  margin:0 0 16px!important;
+}
+
+.profile-shell .pv-title{
+  margin:0 0 11px!important;
+  font-family:var(--display,Georgia,serif)!important;
+  font-size:16px!important;
+  line-height:1.25!important;
+  letter-spacing:-.02em!important;
+  text-transform:none!important;
+  color:#10132D!important;
+  font-weight:760!important;
+}
+
+.profile-shell .pv-list{
+  gap:8px!important;
+}
+
+.profile-shell .pv-item{
+  align-items:center!important;
+  gap:7px!important;
+  padding:9px 12px!important;
+  border:1px solid rgba(132,149,126,.23)!important;
+  border-radius:999px!important;
+  background:linear-gradient(145deg,#FFFDF9,#F4F7EF)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.86)!important;
+}
+
+.profile-shell .pv-item b{
+  color:#35402F!important;
+  font-size:13px!important;
+  font-weight:680!important;
+}
+
+.profile-shell .pv-item i{
+  color:#746D67!important;
+  font-size:11.5px!important;
+}
+
+.profile-shell .nc-neutral .nc{
+  border-radius:18px!important;
+  border-color:rgba(222,213,199,.74)!important;
+  background:rgba(255,253,249,.72)!important;
+  box-shadow:none!important;
+}
+
+.profile-shell .nc-neutral .nc-eyebrow{
+  color:#746D67!important;
+  letter-spacing:.11em!important;
+}
+
+.profile-shell .nc-neutral .nc-closed-text,
+.profile-shell .nc-neutral .nc-sealed-text,
+.profile-shell .nc-neutral .nc-lead{
+  color:#10132D!important;
+}
+
+.profile-shell .nc-neutral .nc-open-btn,
+.profile-shell .nc-neutral .nc-cta{
+  min-height:42px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:1px solid rgba(193,111,84,.30)!important;
+  border-radius:999px!important;
+  background:linear-gradient(145deg,#D78768,#B75F45)!important;
+  color:#fff!important;
+  box-shadow:0 8px 18px rgba(175,96,70,.16)!important;
+}
+
+@media(max-width:720px){
+  .profile-shell .pc-info{
+    grid-template-columns:64px minmax(0,1fr)!important;
+    grid-template-areas:
+      "ava meta"
+      "actions actions"!important;
+    gap:12px 14px!important;
+    padding:0 16px 20px!important;
+  }
+
+  .profile-shell .pc-avatar{
+    width:64px!important;
+    height:64px!important;
+    flex-basis:64px!important;
+    margin-top:-24px!important;
+    font-size:25px!important;
+  }
+
+  .profile-shell .pc-meta{
+    margin-top:13px!important;
+  }
+
+  .profile-shell .pc-name-line h1,
+  .profile-shell .pc-meta h1{
+    font-size:22px!important;
+  }
+
+  .profile-shell .pc-acoes{
+    width:100%!important;
+    margin-top:0!important;
+    justify-content:flex-end!important;
+  }
+}
+
+@media(max-width:640px){
+  .profile-shell{
+    padding-top:14px!important;
+  }
+
+  .profile-shell .profile-card{
+    margin-bottom:16px!important;
+  }
+
+  .profile-shell .pc-banner{
+    height:134px!important;
+    margin:9px 9px 0!important;
+  }
+
+  .profile-shell .tree-shortcut{
+    margin-bottom:11px!important;
+  }
+
+  .profile-shell .pc-progress-bar{
+    margin-bottom:19px!important;
+  }
+
+  .profile-shell .ptabs-wrap{
+    margin-top:20px!important;
+  }
+
+  .profile-shell .ptabs-row .ptabs{
+    border-radius:22px!important;
+  }
+
+  .profile-shell .ptabs-row .ptab{
+    min-height:42px!important;
+    padding-inline:14px!important;
+  }
+
+  .profile-shell .jcard .progress-pct{
+    top:-32px!important;
+  }
+
+  .profile-shell .nc-neutral{
+    padding:16px!important;
+  }
+}
