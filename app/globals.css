@@ -10333,6 +10333,26 @@ body {
   box-shadow:var(--one-shadow-soft-raised)!important;
 }
 
+/* O + do perfil tambem e' um botao dentro de `.pc-acoes`, entao a
+   regra generica acima apagava o terracota e deixava um quadrado claro
+   entre o sino e a engrenagem. Ele precisa vencer esse override aqui. */
+.profile-card .pc-acoes > .pf-add{
+  border:1px solid rgba(255,255,255,.58)!important;
+  border-radius:50%!important;
+  background:var(--orange)!important;
+  color:#FAF7F2!important;
+  box-shadow:var(--one-shadow-soft-raised)!important;
+}
+.profile-card .pc-acoes > .pf-add:hover,
+.profile-card .pc-acoes > .pf-add:focus-visible{
+  background:#a95740!important;
+}
+.profile-card .pc-acoes > .pf-add svg{
+  display:block;
+  color:currentColor;
+  stroke:currentColor;
+}
+
 /* ============================================================
    REDESENHO MATERIAL ONE — camada completa de Preview
    A luz vem do alto à esquerda em todas as telas.
