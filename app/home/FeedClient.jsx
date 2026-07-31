@@ -54,6 +54,13 @@ function MoodLine({ mood, labels }) {
   );
 }
 
+function avatarMoodStyle(owner) {
+  return {
+    background: owner.avatar_color || 'var(--orange)',
+    ...(owner.mood && MOODS[owner.mood] ? { boxShadow: moodGlow(MOODS[owner.mood]) } : {}),
+  };
+}
+
 function TrackTag({ track, float, hasBar }) {
   const [playing, setPlaying] = useState(false);
   const audio = useRef(null);
@@ -699,10 +706,10 @@ export default function FeedClient({ labels }) {
           {item.media ? (
           <article className="entry entry-photo">
             <a className="entry-head" href={`/${item.owner.handle || ''}`}>
-              <span className="entry-ava" style={{ background: item.owner.avatar_color || 'var(--orange)' }}>
+              <span className="entry-ava" style={avatarMoodStyle(item.owner)}>
                 {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}
               </span>
-              <span className="entry-id"><b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} /></b>{item.kind === 'quote' && labels.quoteLabel && <small className="entry-media-kind">{labels.quoteLabel.replace('{name}', item.owner.name || '')}</small>}</span>
+              <span className="entry-id"><b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} /></b>{item.kind === 'quote' && labels.quoteLabel && <small className="entry-media-kind">{labels.quoteLabel.replace('{name}', item.owner.name || '')}</small>}<MoodLine mood={item.owner.mood} labels={labels} /></span>
             </a>
             <MidiaGaleria item={item} labels={labels} />
             <div className="entry-actions feed-acts">
@@ -715,7 +722,7 @@ export default function FeedClient({ labels }) {
           <article className={`entry ${item.kind || 'step'}${item.demo ? ' is-demo' : ''}`}>
             <div className="entry-head">
               <a className="entry-person" href={`/${item.owner.handle || item.journey.slug}`}>
-                <span className="entry-ava" style={{ background: item.owner.avatar_color || 'var(--orange)', ...(item.owner.mood && MOODS[item.owner.mood] ? { boxShadow: moodGlow(MOODS[item.owner.mood]) } : {}) }}>
+                <span className="entry-ava" style={avatarMoodStyle(item.owner)}>
                   {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}
                 </span>
                 <span className="entry-id">

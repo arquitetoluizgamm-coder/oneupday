@@ -147,6 +147,12 @@ export async function GET(req) {
   const mediaRows = (mediaR.data || []).filter((m) => !blocked.has(m.user_id));
   const mediaOwnerIds = [...new Set(mediaRows.map((m) => m.user_id))];
   const mediaIds = mediaRows.map((m) => m.id);
+  if (mediaOwnerIds.length) {
+    const mediaMoodR = await guard(supabase.from('profiles').select('id, mood, mood_at').in('id', mediaOwnerIds).not('mood', 'is', null));
+    (mediaMoodR.data || []).forEach((mp) => {
+      if (mp.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) ownerMoodById[mp.id] = mp.mood;
+    });
+  }
 
   // Nivel ONE por dias distintos registrados, nunca por curtidas.
   const levelOwnerIds = [...new Set([...ownerIds, ...mediaOwnerIds])];
@@ -234,7 +240,7 @@ export async function GET(req) {
       });
     }
   } catch {}
-  const mediaFeed = mediaRows.map((m) => ({ id: 'media-' + m.id, media: true, mediaId: m.id, url: m.url, kind: m.kind, caption: m.caption || '', created_at: m.created_at, owner: { ...(mediaProf[m.user_id] || {}), one_level: levelFor(m.user_id) }, encouraged: mediaEncSet.has(m.id), challenge: challengeByOwner[m.user_id] || null, challengeable: canChallenge.has(m.user_id) }));
+  const mediaFeed = mediaRows.map((m) => ({ id: 'media-' + m.id, media: true, mediaId: m.id, url: m.url, kind: m.kind, caption: m.caption || '', created_at: m.created_at, owner: { ...(mediaProf[m.user_id] || {}), mood: ownerMoodById[m.user_id] || null, one_level: levelFor(m.user_id) }, encouraged: mediaEncSet.has(m.id), challenge: challengeByOwner[m.user_id] || null, challengeable: canChallenge.has(m.user_id) }));
   const mediaTotal = mediaFeed.length;
 
   // ---- a jornada é um post só: dias agrupados, navegáveis no card ----
