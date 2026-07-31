@@ -10702,35 +10702,59 @@ p,small,.muted,.sub,.entry-meta,.entry-journey,.pc-sub { color:var(--one-muted);
   }
 }
 
-/* Feed: título da jornada onde o olho já está, sem virar chamada grande. */
+/* Feed: título da jornada vira uma pequena chamada ONE antes do conteúdo.
+   Sai do metadado embaixo do nome, onde passava batido. */
 .feed-journey-pill {
-  position: absolute;
-  left: 12px;
-  bottom: 12px;
-  z-index: 3;
-  max-width: calc(100% - 24px);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: calc(100% - 2 * var(--recuo-feed, 16px));
+  margin: 11px var(--recuo-feed, 16px) 8px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-decoration: none;
   border: 1px solid rgba(255,255,255,.72);
   border-radius: 999px;
-  background: rgba(250,247,242,.78);
+  background: linear-gradient(145deg, rgba(255,253,248,.88), rgba(241,233,222,.72));
   color: var(--one-ink, #2d2924);
-  box-shadow: 0 10px 24px rgba(16,19,45,.16), inset 0 1px 0 rgba(255,255,255,.86);
+  box-shadow: 5px 6px 14px rgba(151,132,110,.16), -4px -4px 10px rgba(255,255,255,.78), inset 1px 1px 0 rgba(255,255,255,.9);
   -webkit-backdrop-filter: blur(16px) saturate(120%);
   backdrop-filter: blur(16px) saturate(120%);
-  padding: 7px 11px;
-  font-size: 11px;
+  padding: 7px 12px 7px 8px;
+  font-size: 12px;
   font-weight: 850;
   line-height: 1.1;
   letter-spacing: .01em;
-  pointer-events: none;
+  transition: transform .16s ease, box-shadow .16s ease;
 }
 
-.entry-textcard .feed-journey-pill {
-  top: 14px;
-  bottom: auto;
-  max-width: calc(100% - 28px);
+.feed-journey-pill span {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  min-width: 34px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--one-terracotta, #c16f54);
+  color: #fffdf8;
+  font-size: 9px;
+  letter-spacing: .12em;
+}
+
+.feed-journey-pill b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 850;
+}
+
+.feed-journey-pill:hover,
+.feed-journey-pill:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 7px 8px 18px rgba(151,132,110,.20), -5px -5px 12px rgba(255,255,255,.82), inset 1px 1px 0 rgba(255,255,255,.92);
+  outline: none;
 }
 
 /* Feed: antes/depois acompanha a margem do texto e vira duas miniaturas

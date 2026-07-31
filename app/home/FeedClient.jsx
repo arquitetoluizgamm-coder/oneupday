@@ -60,9 +60,14 @@ function storyLineText(item, labels) {
   return fillLabel(labels.feedStoryDefault, { name });
 }
 
-function JourneyTitlePill({ title }) {
-  if (!title) return null;
-  return <span className="feed-journey-pill">{title}</span>;
+function JourneyTitlePill({ title, slug }) {
+  if (!title || !slug) return null;
+  return (
+    <a className="feed-journey-pill" href={`/${slug}`}>
+      <span aria-hidden="true">ONE</span>
+      <b>{title}</b>
+    </a>
+  );
 }
 
 function StoryLine({ item, labels }) {
@@ -251,9 +256,10 @@ function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat, progre
 
   return (
     <>
-      {item.photo_url && <Media photo={item.photo_url} alt={textoAlternativo(item.alt, { dia: item.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackFloat}<JourneyTitlePill title={item.journey?.title} /><VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
+      <JourneyTitlePill title={item.journey?.title} slug={item.journey?.slug} />
+      {item.photo_url && <Media photo={item.photo_url} alt={textoAlternativo(item.alt, { dia: item.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackFloat}<VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
       {item.video_url && !item.photo_url && (
-        <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackFloat}<JourneyTitlePill title={item.journey?.title} /></Media>
+        <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackFloat}</Media>
       )}
       {!hasMedia && !cleanText && item.track && <TrackTag track={item.track} />}
       {cleanText && !legendaEmCima && (
@@ -303,16 +309,16 @@ function DayPager({ item, labels, dayLabel, dark }) {
         <StepResult decided={d.closes.step} name={(item.owner.name || '').split(' ')[0]} labels={labels.step} />
       )}
 
+      <JourneyTitlePill title={item.journey?.title} slug={item.journey?.slug} />
       <div className={`dp-stage${hasMedia ? '' : ' is-text'}`}>
         <div className="dp-slide" key={d.id}>
           {hasMedia ? (
             <>
-              {d.photo_url && <Media photo={d.photo_url} alt={textoAlternativo(d.alt, { dia: d.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackEl}<JourneyTitlePill title={item.journey?.title} /><VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
-              {d.video_url && !d.photo_url && <Media video={d.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackEl}<JourneyTitlePill title={item.journey?.title} /></Media>}
+              {d.photo_url && <Media photo={d.photo_url} alt={textoAlternativo(d.alt, { dia: d.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackEl}<VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
+              {d.video_url && !d.photo_url && <Media video={d.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackEl}</Media>}
             </>
           ) : (
             <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}${cleanText ? '' : ' so-selo'}`}>
-              <JourneyTitlePill title={item.journey?.title} />
               {cleanText
                 ? <CardText text={cleanText} labels={labels} mencoes={d.mencoes} />
                 : <SeloDoDia kind={d.kind} dia={d.day_number} labels={labels.selo} />}
@@ -753,7 +759,7 @@ export default function FeedClient({ labels }) {
                 </span>
                 <span className="entry-id">
                   <b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} />{item.historia && <span className="hist-selo">{labels.histSelo}</span>}</b>
-                  <small><span className="entry-journey">{item.journey.title}</span> · {dayLabel(item.day_number)}{item.owner.mood && (labels.moods || {})[item.owner.mood] && <span className="entry-mood" style={{ color: MOODS[item.owner.mood] }}> · {labels.moods[item.owner.mood]}</span>}</small>
+                  <small>{dayLabel(item.day_number)}{item.owner.mood && (labels.moods || {})[item.owner.mood] && <span className="entry-mood" style={{ color: MOODS[item.owner.mood] }}> · {labels.moods[item.owner.mood]}</span>}</small>
                 </span>
               </a>
               {item.owner.id && !item.own && <FollowUserButton profileId={item.owner.id} labelFollow={labels.follow} labelFollowing={labels.following} labelBack={labels.followBack} />}
@@ -816,8 +822,8 @@ export default function FeedClient({ labels }) {
                 // apagar o dia — mas mostra selo, não frase.
                 return (
                   <>
+                    <JourneyTitlePill title={item.journey?.title} slug={item.journey?.slug} />
                     <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText ? '' : ' so-selo'}`}>
-                      <JourneyTitlePill title={item.journey?.title} />
                       {cleanText
                         ? <CardText text={cleanText} labels={labels} mencoes={item.mencoes} />
                         : <SeloDoDia kind={item.kind} dia={item.day_number} labels={labels.selo} />}
