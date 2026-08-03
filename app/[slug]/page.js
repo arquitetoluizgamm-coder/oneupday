@@ -372,7 +372,7 @@ function DemoJourneyPage({ story, t, locale, viewerId }) {
 
 export async function generateMetadata({ params }) {
   let slug; try { slug = decodeURIComponent(params.slug); } catch { slug = params.slug; }
-  const ogImage = `/${encodeURIComponent(slug)}/opengraph-image`;
+  const ogImage = '/og-capa.png';
   if (slug.startsWith('@')) {
     const p = await loadProfile(slug);
     return { title: p ? `${p.profile.name} · One Up Day` : 'One Up Day' };
