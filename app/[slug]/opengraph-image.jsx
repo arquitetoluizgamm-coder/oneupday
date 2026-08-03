@@ -42,11 +42,11 @@ function Card({ big, title, sub, foot, kind }) {
   );
 }
 
-export default async function OG({ params, request }) {
+export default async function OG({ params }) {
   try {
     return await renderJourneyImage(params);
   } catch {
-    return fetch(new URL('/og-capa.png', request.url));
+    return fetch('https://oneupday.app/og-capa.png');
   }
 }
 
