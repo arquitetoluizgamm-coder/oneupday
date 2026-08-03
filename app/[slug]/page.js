@@ -378,9 +378,11 @@ async function loadShareMetadata(slug) {
       .eq('slug', slug).eq('is_public', true).maybeSingle();
     if (!journey) return null;
     const { data: photo } = await sb.from('updates')
-      .select('photo_url, day_number').eq('journey_id', journey.id)
-      .not('photo_url', 'is', null).order('day_number', { ascending: false }).limit(1).maybeSingle();
-    return { journey, photoUrl: photo?.photo_url || null };
+      .select('photo_url, text, day_number').eq('journey_id', journey.id)
+      .order('day_number', { ascending: false }).limit(1).maybeSingle();
+    const latestText = String(photo?.text || '').replace(/\s+/g, ' ').trim();
+    const excerpt = latestText.length > 160 ? `${latestText.slice(0, 157).trimEnd()}…` : latestText;
+    return { journey, photoUrl: photo?.photo_url || null, excerpt };
   } catch {
     return null;
   }
@@ -409,8 +411,9 @@ export async function generateMetadata({ params }) {
   if (!data) {
     if (share) {
       const title = `${share.journey.title} · One Up Day`;
+      const description = share.excerpt || share.journey.goal || '';
       const image = share.photoUrl ? new URL(share.photoUrl, 'https://oneupday.app').toString() : '/og-capa.png';
-      return { title, description: share.journey.goal || '', alternates: { canonical: journeyUrl }, openGraph: { url: journeyUrl, title, description: share.journey.goal || '', images: [{ url: image, width: 1200, height: 630, type: 'image/jpeg', alt: share.journey.title }] }, twitter: { card: 'summary_large_image', images: [image] } };
+      return { title, description, alternates: { canonical: journeyUrl }, openGraph: { url: journeyUrl, title, description, images: [{ url: image, width: 1200, height: 630, type: 'image/jpeg', alt: share.journey.title }] }, twitter: { card: 'summary_large_image', description, images: [image] } };
     }
     const prof = await loadProfile(slug);
     if (prof) return { title: `${prof.profile.name} · One Up Day` };
@@ -426,12 +429,13 @@ export async function generateMetadata({ params }) {
   // navegador e, pior, na prévia de todo link de jornada compartilhado —
   // que é justamente o que as pessoas mandam no WhatsApp.
   const td = getDict(getLocale());
+  const shareDescription = share?.excerpt || journey.goal || '';
   return {
     title: `${journey.title} — ${fill(td.dayXofY, { d: stats.current_day || 0, t: journey.total_days })} · One Up Day`,
-    description: journey.goal || '',
+    description: shareDescription,
     alternates: { canonical: journeyUrl },
-    openGraph: { url: journeyUrl, title: journey.title, description: journey.goal || '', images: [{ url: ogImage, width: 1200, height: 630, type: 'image/jpeg', alt: journey.title }] },
-    twitter: { card: 'summary_large_image', images: [ogImage] },
+    openGraph: { url: journeyUrl, title: journey.title, description: shareDescription, images: [{ url: ogImage, width: 1200, height: 630, type: 'image/jpeg', alt: journey.title }] },
+    twitter: { card: 'summary_large_image', description: shareDescription, images: [ogImage] },
   };
 }
 
