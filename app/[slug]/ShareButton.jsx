@@ -79,6 +79,12 @@ export default function ShareButton({ journey, owner, stats, latest, label, down
 
   async function make() {
     setBusy(true);
+    const shareUrl = `https://oneupday.app/${journey.slug}`;
+    const isDesktop = typeof navigator !== 'undefined' && (navigator.maxTouchPoints || 0) === 0;
+    if (isDesktop) {
+      const copied = await copiarTexto(shareUrl);
+      setDone(copied ? 'Link copiado.' : 'Não foi possível copiar o link.');
+    }
     const canvas = document.createElement('canvas');
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
