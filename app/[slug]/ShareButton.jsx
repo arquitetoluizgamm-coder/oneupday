@@ -225,14 +225,21 @@ export default function ShareButton({ journey, owner, stats, latest, label, down
       // 'cancelado' também conta: a pessoa chegou até o menu de
       // compartilhar, e isso é o que o número precisa saber.
       if (r !== 'erro') track('card_generated', { kind: 'progress', slug: journey.slug, via: r });
-      setDone(r === 'copiado' || r === 'baixado' ? 'Link copiado e card baixado' : r === 'compartilhado' ? 'Compartilhado' : '');
+      const message = r === 'copiado' || r === 'baixado'
+        ? 'Link copiado. O card foi baixado.'
+        : r === 'compartilhado' ? 'Compartilhado.' : '';
+      setDone(message);
+      if (message) window.setTimeout(() => setDone(''), 4000);
       setBusy(false);
     }, 'image/png');
   }
 
   return (
-    <button className="share-button card-acao" onClick={make} disabled={busy}>
-      {busy ? downloading : done || label}
-    </button>
+    <span className="share-action-wrap">
+      <button className="share-button card-acao" onClick={make} disabled={busy}>
+        {busy ? downloading : label}
+      </button>
+      {done && <span className="share-confirmation" role="status" aria-live="polite">{done}</span>}
+    </span>
   );
 }
