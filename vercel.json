@@ -1,12 +1,7 @@
 {
   "crons": [
-    {
-      "path": "/api/push/send",
-      "schedule": "0 23 * * *"
-    },
-    {
-      "path": "/api/comments/revisar",
-      "schedule": "20 3 * * *"
-    }
+    { "path": "/api/push/send", "schedule": "0 23 * * *" },
+    { "path": "/api/comments/revisar", "schedule": "20 3 * * *" },
+    { "path": "/api/routines/reminder", "schedule": "30 23 * * *" }
   ]
 }
