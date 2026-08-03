@@ -42,7 +42,15 @@ function Card({ big, title, sub, foot, kind }) {
   );
 }
 
-export default async function OG({ params }) {
+export default async function OG({ params, request }) {
+  try {
+    return await renderJourneyImage(params);
+  } catch {
+    return fetch(new URL('/og-capa.png', request.url));
+  }
+}
+
+async function renderJourneyImage(params) {
   const slug = decodeURIComponent(params.slug);
   let sb;
   try { sb = getSupabase(); } catch { return fallbackImage(); }
