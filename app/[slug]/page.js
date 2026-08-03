@@ -418,8 +418,9 @@ export async function generateMetadata({ params }) {
   }
   const { journey, stats } = data;
   const latestPhoto = share?.photoUrl || [...(data.updates || [])].reverse().find((update) => update.photo_url)?.photo_url;
-  ogImage = latestPhoto
-    ? new URL(latestPhoto, 'https://oneupday.app').toString()
+  const imageSource = journey.cover_url || latestPhoto;
+  ogImage = imageSource
+    ? new URL(imageSource, 'https://oneupday.app').toString()
     : '/og-capa.png';
   // Estava com "Day X of Y" cravado em inglês. Isso aparece na aba do
   // navegador e, pior, na prévia de todo link de jornada compartilhado —
