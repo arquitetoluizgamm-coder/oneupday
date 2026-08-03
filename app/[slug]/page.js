@@ -370,8 +370,25 @@ function DemoJourneyPage({ story, t, locale, viewerId }) {
   );
 }
 
+async function loadShareMetadata(slug) {
+  try {
+    const sb = createClient();
+    const { data: journey } = await sb.from('journeys')
+      .select('id, title, goal, total_days')
+      .eq('slug', slug).eq('is_public', true).maybeSingle();
+    if (!journey) return null;
+    const { data: photo } = await sb.from('updates')
+      .select('photo_url, day_number').eq('journey_id', journey.id)
+      .not('photo_url', 'is', null).order('day_number', { ascending: false }).limit(1).maybeSingle();
+    return { journey, photoUrl: photo?.photo_url || null };
+  } catch {
+    return null;
+  }
+}
+
 export async function generateMetadata({ params }) {
   let slug; try { slug = decodeURIComponent(params.slug); } catch { slug = params.slug; }
+  const journeyUrl = `https://oneupday.app/${encodeURIComponent(slug)}`;
   let ogImage = '/og-capa.png';
   if (slug.startsWith('@')) {
     const p = await loadProfile(slug);
@@ -382,19 +399,26 @@ export async function generateMetadata({ params }) {
     return {
       title: `${demo.title} · One Up Day`,
       description: demo.goal,
-      openGraph: { images: [{ url: ogImage, width: 1200, height: 630, alt: demo.title }] },
+      alternates: { canonical: journeyUrl },
+      openGraph: { url: journeyUrl, title: demo.title, images: [{ url: ogImage, width: 1200, height: 630, alt: demo.title }] },
       twitter: { card: 'summary_large_image', images: [ogImage] },
     };
   }
+  const share = await loadShareMetadata(slug);
   const data = await loadJourney(slug);
   if (!data) {
+    if (share) {
+      const title = `${share.journey.title} · One Up Day`;
+      const image = share.photoUrl ? new URL(share.photoUrl, 'https://oneupday.app').toString() : '/og-capa.png';
+      return { title, description: share.journey.goal || '', alternates: { canonical: journeyUrl }, openGraph: { url: journeyUrl, title, description: share.journey.goal || '', images: [{ url: image, width: 1200, height: 630, type: 'image/jpeg', alt: share.journey.title }] }, twitter: { card: 'summary_large_image', images: [image] } };
+    }
     const prof = await loadProfile(slug);
     if (prof) return { title: `${prof.profile.name} · One Up Day` };
     return { title: 'One Up Day' };
   }
   const { journey, stats } = data;
-  const latestPhoto = [...(data.updates || [])].reverse().find((update) => update.photo_url);
-  ogImage = latestPhoto?.photo_url
+  const latestPhoto = share?.photoUrl || [...(data.updates || [])].reverse().find((update) => update.photo_url)?.photo_url;
+  ogImage = latestPhoto
     ? new URL(latestPhoto.photo_url, 'https://oneupday.app').toString()
     : '/og-capa.png';
   // Estava com "Day X of Y" cravado em inglês. Isso aparece na aba do
@@ -404,7 +428,8 @@ export async function generateMetadata({ params }) {
   return {
     title: `${journey.title} — ${fill(td.dayXofY, { d: stats.current_day || 0, t: journey.total_days })} · One Up Day`,
     description: journey.goal || '',
-    openGraph: { images: [{ url: ogImage, width: 1200, height: 630, type: 'image/jpeg', alt: journey.title }] },
+    alternates: { canonical: journeyUrl },
+    openGraph: { url: journeyUrl, title: journey.title, description: journey.goal || '', images: [{ url: ogImage, width: 1200, height: 630, type: 'image/jpeg', alt: journey.title }] },
     twitter: { card: 'summary_large_image', images: [ogImage] },
   };
 }

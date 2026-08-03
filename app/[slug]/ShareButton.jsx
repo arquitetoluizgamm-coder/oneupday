@@ -221,7 +221,10 @@ export default function ShareButton({ journey, owner, stats, latest, label, down
       const r = await entregarImagem(blob, `one-up-day-${journey.slug}.png`, journey.title, {
         url: `https://oneupday.app/${journey.slug}`,
       });
-      if (r === 'baixado') await copiarTexto(`https://oneupday.app/${journey.slug}`);
+      if (r === 'baixado') {
+        await copiarTexto(`https://oneupday.app/${journey.slug}`);
+        setDone('Link copiado.');
+      }
       // 'cancelado' também conta: a pessoa chegou até o menu de
       // compartilhar, e isso é o que o número precisa saber.
       if (r !== 'erro') track('card_generated', { kind: 'progress', slug: journey.slug, via: r });
@@ -239,7 +242,7 @@ export default function ShareButton({ journey, owner, stats, latest, label, down
       <button className="share-button card-acao" onClick={make} disabled={busy}>
         {busy ? downloading : label}
       </button>
-      {done && <span className="share-confirmation" role="status" aria-live="polite">{done}</span>}
+      {done && <span className="share-confirmation" role="status" aria-live="polite" style={{ display: 'block', marginTop: 6, color: '#5d6c57', fontSize: 12, fontWeight: 700 }}>{done}</span>}
     </span>
   );
 }
