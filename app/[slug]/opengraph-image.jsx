@@ -5,6 +5,13 @@ export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 export const alt = 'One Up Day';
 
+function fallbackImage() {
+  return new ImageResponse(
+    <Card big="" title="One day. One step up." sub="Uma jornada real, um passo de cada vez." foot="oneupday.app" />,
+    { ...size }
+  );
+}
+
 function Card({ big, title, sub, foot, kind }) {
   return (
     <div style={{
@@ -37,21 +44,25 @@ function Card({ big, title, sub, foot, kind }) {
 
 export default async function OG({ params }) {
   const slug = decodeURIComponent(params.slug);
-  const sb = getSupabase();
+  let sb;
+  try { sb = getSupabase(); } catch { return fallbackImage(); }
 
   if (slug.startsWith('@')) {
-    const { data: p } = await sb.from('profiles').select('name, handle').eq('handle', slug).maybeSingle();
+    let p;
+    try { ({ data: p } = await sb.from('profiles').select('name, handle').eq('handle', slug).maybeSingle()); } catch { return fallbackImage(); }
     return new ImageResponse(
       <Card big="" title={p?.name || 'One Up Day'} sub={p?.handle || ''} foot={`oneupday.app/${p?.handle || ''}`} />,
       { ...size }
     );
   }
 
-  const { data: j } = await sb.from('journeys').select('*').eq('slug', slug).eq('is_public', true).maybeSingle();
+  let j;
+  try { ({ data: j } = await sb.from('journeys').select('*').eq('slug', slug).eq('is_public', true).maybeSingle()); } catch { return fallbackImage(); }
   if (!j) {
     return new ImageResponse(<Card big="" title="One day. One step up." sub="" foot="oneupday.app" />, { ...size });
   }
-  const { data: s } = await sb.from('journey_stats').select('*').eq('journey_id', j.id).maybeSingle();
+  let s;
+  try { ({ data: s } = await sb.from('journey_stats').select('*').eq('journey_id', j.id).maybeSingle()); } catch { s = null; }
   const day = s?.current_day || 0;
   return new ImageResponse(
     <Card big={`Day ${day}`} title={j.title} sub={`Day ${day} of ${j.total_days}`} foot={`oneupday.app/${j.slug}`} />,
