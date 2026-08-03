@@ -372,7 +372,7 @@ function DemoJourneyPage({ story, t, locale, viewerId }) {
 
 export async function generateMetadata({ params }) {
   let slug; try { slug = decodeURIComponent(params.slug); } catch { slug = params.slug; }
-  const ogImage = '/og-capa.png';
+  let ogImage = '/og-capa.png';
   if (slug.startsWith('@')) {
     const p = await loadProfile(slug);
     return { title: p ? `${p.profile.name} · One Up Day` : 'One Up Day' };
@@ -393,6 +393,10 @@ export async function generateMetadata({ params }) {
     return { title: 'One Up Day' };
   }
   const { journey, stats } = data;
+  const latestPhoto = [...(data.updates || [])].reverse().find((update) => update.photo_url);
+  ogImage = latestPhoto?.photo_url
+    ? new URL(latestPhoto.photo_url, 'https://oneupday.app').toString()
+    : '/og-capa.png';
   // Estava com "Day X of Y" cravado em inglês. Isso aparece na aba do
   // navegador e, pior, na prévia de todo link de jornada compartilhado —
   // que é justamente o que as pessoas mandam no WhatsApp.
@@ -400,7 +404,7 @@ export async function generateMetadata({ params }) {
   return {
     title: `${journey.title} — ${fill(td.dayXofY, { d: stats.current_day || 0, t: journey.total_days })} · One Up Day`,
     description: journey.goal || '',
-    openGraph: { images: [{ url: ogImage, width: 1200, height: 630, alt: journey.title }] },
+    openGraph: { images: [{ url: ogImage, width: 1200, height: 630, type: 'image/jpeg', alt: journey.title }] },
     twitter: { card: 'summary_large_image', images: [ogImage] },
   };
 }

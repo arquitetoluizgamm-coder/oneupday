@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { track } from '../../lib/track';
-import { entregarImagem } from '../../lib/compartilhar';
+import { copiarTexto, entregarImagem } from '../../lib/compartilhar';
 
 // ============================================================
 // O CARD DA JORNADA — medir antes de desenhar
@@ -75,6 +75,7 @@ function loadImg(src) {
 
 export default function ShareButton({ journey, owner, stats, latest, label, downloading, card }) {
   const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState('');
 
   async function make() {
     setBusy(true);
@@ -220,16 +221,25 @@ export default function ShareButton({ journey, owner, stats, latest, label, down
       const r = await entregarImagem(blob, `one-up-day-${journey.slug}.png`, journey.title, {
         url: `https://oneupday.app/${journey.slug}`,
       });
+      if (r === 'baixado') await copiarTexto(`https://oneupday.app/${journey.slug}`);
       // 'cancelado' também conta: a pessoa chegou até o menu de
       // compartilhar, e isso é o que o número precisa saber.
       if (r !== 'erro') track('card_generated', { kind: 'progress', slug: journey.slug, via: r });
+      const message = r === 'copiado' || r === 'baixado'
+        ? 'Link copiado. O card foi baixado.'
+        : r === 'compartilhado' ? 'Compartilhado.' : '';
+      setDone(message);
+      if (message) window.setTimeout(() => setDone(''), 4000);
       setBusy(false);
     }, 'image/png');
   }
 
   return (
-    <button className="share-button card-acao" onClick={make} disabled={busy}>
-      {busy ? downloading : label}
-    </button>
+    <span className="share-action-wrap">
+      <button className="share-button card-acao" onClick={make} disabled={busy}>
+        {busy ? downloading : label}
+      </button>
+      {done && <span className="share-confirmation" role="status" aria-live="polite">{done}</span>}
+    </span>
   );
 }
