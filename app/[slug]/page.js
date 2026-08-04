@@ -402,7 +402,7 @@ export async function generateMetadata({ params }) {
       title: `${demo.title} · One Up Day`,
       description: demo.goal,
       alternates: { canonical: journeyUrl },
-      openGraph: { url: journeyUrl, title: demo.title, images: [{ url: ogImage, width: 1200, height: 630, alt: demo.title }] },
+      openGraph: { url: journeyUrl, type: 'article', title: demo.title, images: [{ url: ogImage, width: 1200, height: 630, alt: demo.title }] },
       twitter: { card: 'summary_large_image', images: [ogImage] },
     };
   }
@@ -413,7 +413,7 @@ export async function generateMetadata({ params }) {
       const title = `${share.journey.title} · One Up Day`;
       const description = share.excerpt || share.journey.goal || '';
       const image = share.photoUrl ? new URL(share.photoUrl, 'https://oneupday.app').toString() : '/og-capa.png';
-      return { title, description, alternates: { canonical: journeyUrl }, openGraph: { url: journeyUrl, title, description, images: [{ url: image, width: 1200, height: 630, type: 'image/jpeg', alt: share.journey.title }] }, twitter: { card: 'summary_large_image', description, images: [image] } };
+      return { title, description, alternates: { canonical: journeyUrl }, openGraph: { url: journeyUrl, type: 'article', title, description, images: [{ url: image, width: 1200, height: 630, type: 'image/jpeg', alt: share.journey.title }] }, twitter: { card: 'summary_large_image', description, images: [image] } };
     }
     const prof = await loadProfile(slug);
     if (prof) return { title: `${prof.profile.name} · One Up Day` };
@@ -437,7 +437,7 @@ export async function generateMetadata({ params }) {
     title: `${journey.title} — ${fill(td.dayXofY, { d: stats.current_day || 0, t: journey.total_days })} · One Up Day`,
     description: shareDescription,
     alternates: { canonical: journeyUrl },
-    openGraph: { url: journeyUrl, title: journey.title, description: shareDescription, images: [{ url: ogImage, width: 1200, height: 630, type: 'image/jpeg', alt: journey.title }] },
+    openGraph: { url: journeyUrl, type: 'article', title: journey.title, description: shareDescription, images: [{ url: ogImage, width: 1200, height: 630, type: 'image/jpeg', alt: journey.title }] },
     twitter: { card: 'summary_large_image', description: shareDescription, images: [ogImage] },
   };
 }
