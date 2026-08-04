@@ -79,7 +79,7 @@ export default function ShareButton({ journey, owner, stats, latest, label, down
 
   async function make() {
     setBusy(true);
-    const shareUrl = `https://oneupday.app/${journey.slug}`;
+    const shareUrl = `https://oneupday.app/${journey.slug}?r=s`;
     const isDesktop = typeof navigator !== 'undefined' && (navigator.maxTouchPoints || 0) === 0;
     if (isDesktop) {
       const copied = await copiarTexto(shareUrl);
