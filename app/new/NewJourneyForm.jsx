@@ -725,7 +725,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
           )}
           <div className="wz-line-area">
             <textarea className="wz-input wz-grow-input" value={hoje} onInput={crescerCampo} onChange={(e) => setHoje(e.target.value)}
-              maxLength={400} rows={1} placeholder={t.wzHojePh} autoFocus />
+            maxLength={1000} rows={2} placeholder={t.wzHojePh} autoFocus />
           </div>
         </div>
       )}

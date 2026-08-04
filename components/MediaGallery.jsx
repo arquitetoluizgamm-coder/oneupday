@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react';
 import { createClient } from '../lib/supabase/client';
 import { comCapa } from '../lib/media';
 
-export default function MediaGallery({ items, showVis, visLabels, own, deleteLabel, deleteConfirm, navLabels }) {
+export default function MediaGallery({ items, showVis, visLabels, own, deleteLabel, deleteConfirm, editLabel = 'Editar', editSaveLabel = 'Salvar', editCancelLabel = 'Cancelar', navLabels }) {
   const [list, setList] = useState(items || []);
   const [open, setOpen] = useState(-1);
   const [busy, setBusy] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState('');
   useEffect(() => {
     if (open < 0) return;
     function onKey(e) { if (e.key === 'Escape') setOpen(-1); }
@@ -25,6 +27,24 @@ export default function MediaGallery({ items, showVis, visLabels, own, deleteLab
     setBusy(false);
     setOpen(-1);
     setList((prev) => prev.filter((x) => x.id !== m.id));
+  }
+
+  function beginEdit(m) {
+    setDraft(m.caption || '');
+    setEditing(true);
+  }
+
+  async function saveEdit(m) {
+    if (busy || !draft.trim()) return;
+    setBusy(true);
+    try {
+      const sb = createClient();
+      const { error } = await sb.from('media').update({ caption: draft.trim().slice(0, 280) }).eq('id', m.id);
+      if (error) throw error;
+      setList((prev) => prev.map((x) => x.id === m.id ? { ...x, caption: draft.trim().slice(0, 280) } : x));
+      setEditing(false);
+    } catch { }
+    setBusy(false);
   }
 
   // ============================================================
@@ -56,6 +76,13 @@ export default function MediaGallery({ items, showVis, visLabels, own, deleteLab
         <div className="lightbox" onClick={() => setOpen(-1)}>
           <button className="lb-close" onClick={() => setOpen(-1)} aria-label={N.close || 'Close'}>✕</button>
           {own && <button className="lb-del" onClick={(e) => { e.stopPropagation(); remove(list[open]); }} disabled={busy} aria-label={deleteLabel}>🗑 {deleteLabel}</button>}
+          {own && list[open].kind === 'quote' && !editing && <button className="lb-edit" onClick={(e) => { e.stopPropagation(); beginEdit(list[open]); }} disabled={busy}>{editLabel}</button>}
+          {own && list[open].kind === 'quote' && editing && (
+            <div className="lb-edit-form" onClick={(e) => e.stopPropagation()}>
+              <textarea value={draft} maxLength={280} onChange={(e) => setDraft(e.target.value)} aria-label={editLabel} />
+              <div><button type="button" onClick={() => setEditing(false)}>{editCancelLabel}</button><button type="button" onClick={() => saveEdit(list[open])} disabled={busy || !draft.trim()}>{editSaveLabel}</button></div>
+            </div>
+          )}
           <div className="lb-inner" onClick={(e) => e.stopPropagation()}>
             {list[open].kind === 'video'
               ? <video src={comCapa(list[open].url)} controls autoPlay playsInline />
