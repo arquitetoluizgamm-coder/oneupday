@@ -351,3 +351,8 @@
     grid-template-columns:1fr!important;
   }
 }
+.home-welcome-completed{display:flex;gap:12px;align-items:flex-start;margin:18px 0 4px;padding:12px 14px;border:1px solid rgba(193,111,84,.24);border-radius:16px;background:linear-gradient(135deg,rgba(193,111,84,.08),rgba(132,145,122,.10));animation:home-complete-in .45s ease both}
+.home-welcome-completed-seal{display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:50%;background:var(--orange,#c16f54);color:#fff;font-weight:800;box-shadow:0 0 0 5px rgba(193,111,84,.10)}
+.home-welcome-completed b{color:var(--night,#09102d);font-size:.9rem}.home-welcome-completed p{margin:2px 0 8px;color:var(--muted,#657083);font-size:.76rem}.home-welcome-completed a{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid rgba(9,16,45,.08);color:var(--night,#09102d);font-size:.78rem;text-decoration:none}.home-welcome-completed em{font-style:normal;color:var(--orange,#c16f54);font-size:.68rem;font-weight:700}
+@keyframes home-complete-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.home-welcome-upi-congrats{margin:4px 0 8px;color:var(--muted,#657083);font-size:.72rem;line-height:1.35}.home-welcome-upi-congrats b{color:var(--orange,#c16f54)}

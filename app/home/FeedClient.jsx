@@ -169,6 +169,8 @@ function Media({ photo, video, href, labels, caption, onRatio, children, alt = '
   ) : (
     <img
       src={photo} alt={alt}
+      loading="lazy"
+      decoding="async"
       // Imagem que já está em cache termina de carregar ANTES do React
       // pendurar o onLoad — o evento nunca dispara e a foto fica presa na
       // proporção padrão. O ref confere isso no momento em que a tag nasce.

@@ -47,15 +47,19 @@ export default async function Home() {
 
   const { data: journeys } = await supabase.from('journeys').select('*').eq('owner_id', user.id).order('created_at', { ascending: false });
   const list = journeys || [];
-  const primary = list[0] || null;
+  let primary = list[0] || null;
   let pstats = {};
   if (primary) { const { data: st } = await supabase.from('journey_stats').select('*').eq('journey_id', primary.id).maybeSingle(); pstats = st || {}; }
   let welcomeJourneys = list;
   if (list.length) {
     const { data: stats } = await supabase.from('journey_stats').select('journey_id, current_day').in('journey_id', list.map((j) => j.id));
     const byId = Object.fromEntries((stats || []).map((s) => [s.journey_id, s.current_day || 0]));
-    welcomeJourneys = list.map((j) => ({ ...j, current_day: byId[j.id] || 0 }));
+    welcomeJourneys = list.map((j) => ({ ...j, current_day: byId[j.id] || 0, concluida: (byId[j.id] || 0) >= (j.total_days || 0) }));
   }
+
+  const completedJourneys = welcomeJourneys.filter((j) => j.concluida);
+  const activeJourneys = welcomeJourneys.filter((j) => !j.concluida);
+  primary = activeJourneys[0] || primary;
 
   if (list.length) {
     const jIds = list.map((j) => j.id);
@@ -132,7 +136,7 @@ export default async function Home() {
       <ScrollChrome />
       <DailyMood userId={user.id} answeredToday={moodToday} labels={{ title: t.dailyMoodTitle, sub: t.dailyMoodSub, skip: t.dailyMoodSkip, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful } }} />
       <main className="wrap feed-page">
-        <HomeWelcome journeys={welcomeJourneys} name={profile.name || ''} naoLidas={unread || 0} labels={{
+        <HomeWelcome journeys={activeJourneys} completedJourneys={completedJourneys} name={profile.name || ''} naoLidas={unread || 0} labels={{
           newEyebrow: t.homeWelcomeNewEyebrow, newTitle: t.homeWelcomeNewTitle, newSub: t.homeWelcomeNewSub,
           newCta: t.homeWelcomeNewCta, skip: t.homeWelcomeSkip, backEyebrow: t.homeWelcomeBackEyebrow,
           backTitle: t.homeWelcomeBackTitle, backLead: t.homeWelcomeBackLead, backSub: t.homeWelcomeBackSub, register: t.homeWelcomeRegister,

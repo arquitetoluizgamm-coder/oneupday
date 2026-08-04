@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import './home-welcome.css';
+import UpiCongratulations from './UpiCongratulations';
 
 function diaAtual(j) {
   if (j.current_day) return j.current_day;
@@ -8,7 +9,7 @@ function diaAtual(j) {
   return i ? Math.max(1, Math.floor((Date.now() - new Date(i).getTime()) / 86400000) + 1) : 1;
 }
 
-export default function HomeWelcome({ journeys = [], name = '', naoLidas = 0, labels: L = {} }) {
+export default function HomeWelcome({ journeys = [], completedJourneys = [], name = '', naoLidas = 0, labels: L = {} }) {
   const [visivel, setVisivel] = useState(true);
   const tem = journeys.length > 0;
   const pendentes = journeys.filter((j) => !j.hoje);
@@ -70,6 +71,15 @@ export default function HomeWelcome({ journeys = [], name = '', naoLidas = 0, la
           </div>
           <a className="home-welcome-primary" href="/new">{L.newCta}</a>
         </>
+      )}
+
+      {completedJourneys.length > 0 && (
+        <section className="home-welcome-completed" aria-label={L.completedTitle || 'Jornadas concluídas'}>
+          <span className="home-welcome-completed-seal" aria-hidden="true">✓</span>
+          <div><b>{L.completedTitle || 'Jornada concluída'}</b><p>{L.completedSub || 'Você chegou até aqui, e isso merece ser reconhecido.'}</p>
+            {completedJourneys.slice(0, 2).map((j) => <div key={j.id}><a href={`/perfil/jornada/${j.slug}`}><strong>{j.title}</strong><em>{L.completedBadge || 'Concluída'}</em></a><UpiCongratulations journey={j} /></div>)}
+          </div>
+        </section>
       )}
 
       {!feito && (

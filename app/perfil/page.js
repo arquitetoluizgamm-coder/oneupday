@@ -403,7 +403,7 @@ export default async function Perfil() {
               </div>
             )}
             quotes={myQuotes.length > 0 ? (
-              <MediaGallery items={myQuotes} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} own deleteLabel={t.mediaDelete} deleteConfirm={t.mediaDeleteConfirm} navLabels={{ close: t.commentClose, previous: t.dpPrev, next: t.dpNext }} />
+              <MediaGallery items={myQuotes} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} own deleteLabel={t.mediaDelete} deleteConfirm={t.mediaDeleteConfirm} editLabel={t.epBtn} editSaveLabel={t.epSave} editCancelLabel={t.epCancel} navLabels={{ close: t.commentClose, previous: t.dpPrev, next: t.dpNext }} />
             ) : (
               <div className="tab-empty">
                 <p>{t.quotesEmpty}</p>

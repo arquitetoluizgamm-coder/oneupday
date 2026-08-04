@@ -29,7 +29,10 @@ export async function POST(req) {
   const locale = getLocale();
   const lang = locale === 'pt' ? 'português do Brasil' : locale === 'es' ? 'español' : 'English';
   let system, prompt, wantsJson = false;
-  if (mode === 'polish') {
+  if (mode === 'congratulate') {
+    system = `Você é a Upi, uma presença acolhedora do One Up Day. Escreva uma única mensagem curta de parabéns em ${lang}, personalizada a partir da jornada concluída. Reconheça a constância e o caminho, sem exagero, sem competição e sem inventar detalhes. Responda apenas com a mensagem, sem aspas.`;
+    prompt = ctx + '\n\nA jornada foi concluída. Escreva uma mensagem calorosa de 1 ou 2 frases.';
+  } else if (mode === 'polish') {
     wantsJson = true;
     system = `Você ajuda alguém a transformar um registro curto em um post melhor para uma rede social de evolução pessoal chamada One Up Day.
 
