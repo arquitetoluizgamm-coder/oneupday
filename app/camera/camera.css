@@ -1,0 +1,131 @@
+.camera-page {
+  width: min(100% - 32px, 680px);
+  margin: 0 auto;
+  padding: 42px 0 80px;
+  color: var(--night, #10152f);
+}
+
+.camera-kicker {
+  color: var(--orange, #c47152);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+
+.camera-page h1 {
+  margin: 10px 0 6px;
+  font-size: clamp(30px, 6vw, 48px);
+  line-height: 1.05;
+}
+
+.camera-lead {
+  margin: 0 0 26px;
+  color: var(--muted, #687080);
+}
+
+.camera-setup,
+.camera-card {
+  border: 1px solid rgba(196, 113, 82, .22);
+  border-radius: 22px;
+  background: #fbf8f1;
+  box-shadow: 0 12px 34px rgba(16, 21, 47, .08);
+}
+
+.camera-setup {
+  padding: 28px;
+}
+
+.camera-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  background: #dfe5d8;
+  color: #5d6c57;
+  font-size: 20px;
+}
+
+.camera-setup h2,
+.camera-card h2 {
+  margin: 16px 0 8px;
+  font-size: 22px;
+}
+
+.camera-setup p,
+.camera-note {
+  color: #687080;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.camera-setup code {
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: #eee8dc;
+  color: #7d503f;
+  font-size: .9em;
+}
+
+.camera-card { overflow: hidden; }
+
+.camera-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px;
+}
+
+.camera-card h2 { margin: 8px 0 0; }
+
+.camera-status {
+  color: #5d6c57;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.camera-status i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: #7f9b6f;
+}
+
+.camera-open {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  padding: 0 15px;
+  border-radius: 12px;
+  background: var(--orange, #c47152);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.camera-frame-wrap {
+  min-height: 420px;
+  background: #e3e8de;
+}
+
+.camera-frame {
+  display: block;
+  width: 100%;
+  height: 500px;
+  border: 0;
+  background: #e3e8de;
+}
+
+.camera-card > .camera-note { margin: 0; padding: 14px 24px 20px; }
+
+@media (max-width: 560px) {
+  .camera-page { padding-top: 28px; }
+  .camera-card-head { align-items: flex-start; flex-direction: column; }
+  .camera-open { width: 100%; justify-content: center; }
+  .camera-frame-wrap { min-height: 300px; }
+  .camera-frame { height: 360px; }
+}
