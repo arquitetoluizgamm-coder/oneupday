@@ -404,7 +404,7 @@ export async function generateMetadata({ params }) {
       title: `${demo.title} · One Up Day`,
       description: demo.goal,
       alternates: { canonical: journeyUrl },
-      openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title: demo.title, description: demo.goal, images: [{ url: `${ogImage}&title=${encodeURIComponent(demo.title)}&description=${encodeURIComponent(demo.goal)}&media=${encodeURIComponent(new URL('/demo-stories/paulo-casamento-01.png', 'https://oneupday.app').toString())}`, width: 1200, height: 630, type: 'image/png', alt: demo.title }] },
+      openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title: demo.title, description: demo.goal, images: [{ url: 'https://oneupday.app/og-capa.png', width: 1200, height: 630, type: 'image/png', alt: demo.title }] },
       twitter: { card: 'summary_large_image', images: [ogImage] },
     };
   }
@@ -414,7 +414,7 @@ export async function generateMetadata({ params }) {
     if (share) {
       const title = `${share.journey.title} · One Up Day`;
       const description = share.excerpt || share.journey.goal || '';
-      const image = journeyOg(share.journey.updated_at || share.journey.created_at, '1', `&title=${encodeURIComponent(share.journey.title)}&description=${encodeURIComponent(description)}${share.photoUrl ? `&media=${encodeURIComponent(new URL(share.photoUrl, 'https://oneupday.app').toString())}` : ''}&total=${encodeURIComponent(share.journey.total_days || '')}`);
+      const image = share.photoUrl ? new URL(share.photoUrl, 'https://oneupday.app').toString() : 'https://oneupday.app/og-capa.png';
       return { title, description, alternates: { canonical: journeyUrl }, openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title, description, images: [{ url: image, width: 1200, height: 630, type: 'image/png', alt: share.journey.title }] }, twitter: { card: 'summary_large_image', description, images: [image] } };
     }
     const prof = await loadProfile(slug);
@@ -434,11 +434,12 @@ export async function generateMetadata({ params }) {
   const updateText = String(latestUpdate?.text || '').replace(/\s+/g, ' ').trim();
   const updateExcerpt = updateText.length > 160 ? `${updateText.slice(0, 157).trimEnd()}…` : updateText;
   const shareDescription = share?.excerpt || updateExcerpt || journey.goal || '';
+  const facebookImage = latestPhotoForCard ? new URL(latestPhotoForCard, 'https://oneupday.app').toString() : 'https://oneupday.app/og-capa.png';
   return {
     title: `${journey.title} — ${fill(td.dayXofY, { d: stats.current_day || 0, t: journey.total_days })} · One Up Day`,
     description: shareDescription,
     alternates: { canonical: journeyUrl },
-    openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title: journey.title, description: shareDescription, images: [{ url: ogImage, width: 1200, height: 630, type: 'image/png', secureUrl: ogImage, alt: journey.title }] },
+    openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title: journey.title, description: shareDescription, images: [{ url: facebookImage, width: 1200, height: 630, alt: journey.title }] },
     twitter: { card: 'summary_large_image', description: shareDescription, images: [ogImage] },
   };
 }
