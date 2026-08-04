@@ -11,7 +11,7 @@ async function fetchJourney(slug) {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!base || !key) return null;
   const headers = { apikey: key, Authorization: `Bearer ${key}` };
-  const journeyUrl = `${base}/rest/v1/journeys?slug=eq.${encodeURIComponent(slug)}&is_public=eq.true&select=id,title,goal,cover_url,total_days,updated_at,created_at&limit=1`;
+  const journeyUrl = `${base}/rest/v1/journeys?slug=eq.${encodeURIComponent(slug)}&visibility=eq.public&select=id,title,goal,cover_url,total_days,updated_at,created_at,visibility&limit=1`;
   const journeyResponse = await fetch(journeyUrl, { headers, cache: 'no-store' });
   if (!journeyResponse.ok) return null;
   const [journey] = await journeyResponse.json();
