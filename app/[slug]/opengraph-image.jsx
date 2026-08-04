@@ -1,79 +1,51 @@
 import { ImageResponse } from 'next/og';
-import { getSupabase } from '../../lib/supabase';
 
+export const runtime = 'edge';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 export const alt = 'One Up Day';
 
-function fallbackImage() {
-  return new ImageResponse(
-    <Card big="" title="One day. One step up." sub="Uma jornada real, um passo de cada vez." foot="oneupday.app" />,
-    { ...size }
-  );
+const esc = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+
+async function readJourney(slug) {
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!base || !key) return null;
+  const headers = { apikey: key, Authorization: `Bearer ${key}` };
+  const journeyUrl = `${base}/rest/v1/journeys?slug=eq.${encodeURIComponent(slug)}&is_public=eq.true&select=id,title,goal,cover_url&limit=1`;
+  const jr = await fetch(journeyUrl, { headers, cache: 'no-store' });
+  const [journey] = await jr.json();
+  if (!journey) return null;
+  const updatesUrl = `${base}/rest/v1/updates?journey_id=eq.${journey.id}&select=text,photo_url,day_number&order=day_number.desc&limit=1`;
+  const ur = await fetch(updatesUrl, { headers, cache: 'no-store' });
+  const [update] = await ur.json();
+  const text = esc(update?.text || journey.goal);
+  return { journey, update, excerpt: text.length > 190 ? `${text.slice(0, 187).trimEnd()}…` : text };
 }
 
-function Card({ big, title, sub, foot, kind }) {
-  return (
-    <div style={{
-      width: '100%', height: '100%', display: 'flex', flexDirection: 'column',
-      justifyContent: 'space-between', padding: '70px', background: '#090c2a',
-      backgroundImage: 'radial-gradient(600px 300px at 90% 0%, rgba(240,47,135,.35), transparent), radial-gradient(600px 300px at 0% 100%, rgba(255,211,61,.22), transparent)',
-      fontFamily: 'sans-serif',
-    }}>
-      <div style={{ display: 'flex', fontSize: 40, fontWeight: 800, color: '#fff' }}>
-        One <span style={{ color: '#ff7a45', margin: '0 10px' }}>Up</span> Day
+function Card({ title, excerpt, image }) {
+  return <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: '#f8f5ee', color: '#10152f', fontFamily: 'Arial', padding: '46px' }}>
+    <div style={{ display: 'flex', fontSize: 28, fontWeight: 700, color: '#5d6c57' }}>ONE · uma jornada real</div>
+    <div style={{ display: 'flex', marginTop: 24, gap: 34, alignItems: 'center' }}>
+      {image ? <img src={image} width="370" height="300" style={{ objectFit: 'cover', borderRadius: 18 }} /> : null}
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div style={{ display: 'flex', fontSize: 42, fontWeight: 800, lineHeight: 1.12 }}>{title}</div>
+        <div style={{ display: 'flex', marginTop: 24, fontSize: 25, lineHeight: 1.3, color: '#4c5362' }}>{excerpt}</div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {kind === 'setback' && (
-          <div style={{ display: 'flex', fontSize: 26, color: 'rgba(255,255,255,.7)', marginBottom: 10, fontWeight: 700 }}>
-            SETBACK · STILL IN THE JOURNEY
-          </div>
-        )}
-        <div style={{
-          display: 'flex', fontSize: 120, fontWeight: 900, lineHeight: 1,
-          backgroundImage: 'linear-gradient(90deg,#f02f87,#ff7a45,#ffd33d)',
-          backgroundClip: 'text', color: 'transparent',
-        }}>{big}</div>
-        <div style={{ display: 'flex', fontSize: 60, fontWeight: 800, color: '#fff', marginTop: 20, maxWidth: 1000 }}>{title}</div>
-        {sub ? <div style={{ display: 'flex', fontSize: 34, color: 'rgba(255,255,255,.7)', marginTop: 14 }}>{sub}</div> : null}
-      </div>
-      <div style={{ display: 'flex', fontSize: 30, color: 'rgba(255,255,255,.6)', fontWeight: 600 }}>{foot}</div>
     </div>
-  );
+    <div style={{ display: 'flex', marginTop: 'auto', fontSize: 24, color: '#c47152', fontWeight: 700 }}>oneupday.app</div>
+  </div>;
 }
 
 export default async function OG({ params }) {
   try {
-    return await renderJourneyImage(params);
-  } catch {
-    return fetch('https://oneupday.app/og-capa.png');
-  }
-}
-
-async function renderJourneyImage(params) {
-  const slug = decodeURIComponent(params.slug);
-  let sb;
-  try { sb = getSupabase(); } catch { return fallbackImage(); }
-
-  if (slug.startsWith('@')) {
-    let p;
-    try { ({ data: p } = await sb.from('profiles').select('name, handle').eq('handle', slug).maybeSingle()); } catch { return fallbackImage(); }
+    const slug = decodeURIComponent(params.slug);
+    const data = await readJourney(slug);
     return new ImageResponse(
-      <Card big="" title={p?.name || 'One Up Day'} sub={p?.handle || ''} foot={`oneupday.app/${p?.handle || ''}`} />,
+      <Card title={data?.journey?.title || 'One Up Day'} excerpt={data?.excerpt || 'Um passo real, um dia de cada vez.'} image={data?.update?.photo_url || data?.journey?.cover_url || null} />,
       { ...size }
     );
+  } catch {
+    return new ImageResponse(<Card title="One Up Day" excerpt="Um passo real, um dia de cada vez." />, { ...size });
   }
-
-  let j;
-  try { ({ data: j } = await sb.from('journeys').select('*').eq('slug', slug).eq('is_public', true).maybeSingle()); } catch { return fallbackImage(); }
-  if (!j) {
-    return new ImageResponse(<Card big="" title="One day. One step up." sub="" foot="oneupday.app" />, { ...size });
-  }
-  let s;
-  try { ({ data: s } = await sb.from('journey_stats').select('*').eq('journey_id', j.id).maybeSingle()); } catch { s = null; }
-  const day = s?.current_day || 0;
-  return new ImageResponse(
-    <Card big={`Day ${day}`} title={j.title} sub={`Day ${day} of ${j.total_days}`} foot={`oneupday.app/${j.slug}`} />,
-    { ...size }
-  );
 }
