@@ -391,7 +391,7 @@ async function loadShareMetadata(slug) {
 export async function generateMetadata({ params }) {
   let slug; try { slug = decodeURIComponent(params.slug); } catch { slug = params.slug; }
   const journeyUrl = `https://oneupday.app/${encodeURIComponent(slug)}`;
-  const ogVersion = (value) => encodeURIComponent(`share-v2-${value || '1'}`);
+  const ogVersion = (value) => encodeURIComponent(`share-v3-${value || '1'}`);
   const journeyOg = (value, fallback = '1', extra = '') => `https://oneupday.app/api/og/journey/${encodeURIComponent(slug)}?v=${ogVersion(value || fallback)}${extra}`;
   let ogImage = journeyOg('demo');
   if (slug.startsWith('@')) {
