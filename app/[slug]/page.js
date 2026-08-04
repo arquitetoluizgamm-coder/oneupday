@@ -412,7 +412,7 @@ export async function generateMetadata({ params }) {
     if (share) {
       const title = `${share.journey.title} · One Up Day`;
       const description = share.excerpt || share.journey.goal || '';
-      const image = `${journeyUrl}/opengraph-image`;
+      const image = share.photoUrl ? new URL(share.photoUrl, 'https://oneupday.app').toString() : '/og-capa.png';
       return { title, description, alternates: { canonical: journeyUrl }, openGraph: { url: journeyUrl, type: 'article', title, description, images: [{ url: image, width: 1200, height: 630, type: 'image/jpeg', alt: share.journey.title }] }, twitter: { card: 'summary_large_image', description, images: [image] } };
     }
     const prof = await loadProfile(slug);
@@ -421,7 +421,10 @@ export async function generateMetadata({ params }) {
   }
   const { journey, stats } = data;
   const latestPhoto = share?.photoUrl || [...(data.updates || [])].reverse().find((update) => update.photo_url)?.photo_url;
-  ogImage = `${journeyUrl}/opengraph-image`;
+  const imageSource = journey.cover_url || latestPhoto;
+  ogImage = imageSource
+    ? new URL(imageSource, 'https://oneupday.app').toString()
+    : '/og-capa.png';
   // Estava com "Day X of Y" cravado em inglês. Isso aparece na aba do
   // navegador e, pior, na prévia de todo link de jornada compartilhado —
   // que é justamente o que as pessoas mandam no WhatsApp.
