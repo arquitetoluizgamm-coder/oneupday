@@ -43,19 +43,16 @@ async function imageData(url) {
   }
 }
 
-function ShareCard({ title, excerpt, image, totalDays }) {
+function ShareCard({ title, excerpt, image, totalDays, currentDay }) {
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', background: '#f8f5ee', color: '#10152f', fontFamily: 'sans-serif', padding: 52 }}>
-      <div style={{ width: '53%', display: 'flex', flexDirection: 'column', paddingRight: 42 }}>
-        <div style={{ display: 'flex', fontSize: 27, fontWeight: 800, color: '#5d6c57' }}>ONE UP DAY</div>
-        <div style={{ display: 'flex', marginTop: 28, fontSize: 20, letterSpacing: 2, fontWeight: 700, color: '#c47152' }}>PUBLIC JOURNEY</div>
-        <div style={{ display: 'flex', marginTop: 18, fontSize: 48, lineHeight: 1.08, fontWeight: 800 }}>{title}</div>
-        <div style={{ display: 'flex', marginTop: 22, fontSize: 25, lineHeight: 1.25, color: '#4d5562' }}>{excerpt || 'One real step at a time.'}</div>
-        <div style={{ display: 'flex', marginTop: 'auto', fontSize: 23, fontWeight: 700, color: '#5d6c57' }}>Day 1 of {totalDays || 'a journey'}</div>
-        <div style={{ display: 'flex', marginTop: 12, fontSize: 20, color: '#8a6e5e' }}>Coming back is progress.</div>
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: '#10152f', color: '#fff', fontFamily: 'sans-serif' }}>
+      <div style={{ width: '100%', height: 390, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#dfe5d8', overflow: 'hidden' }}>
+        {image ? <img src={image} width="1200" height="390" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center' }} /> : <div style={{ display: 'flex', fontSize: 42, color: '#5d6c57', textAlign: 'center', padding: 40 }}>ONE UP DAY</div>}
       </div>
-      <div style={{ width: '47%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#dfe5d8', borderRadius: 28, overflow: 'hidden' }}>
-        {image ? <img src={image} width="510" height="526" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ display: 'flex', fontSize: 34, color: '#5d6c57', textAlign: 'center', padding: 40 }}>One day at a time.</div>}
+      <div style={{ width: '100%', height: 240, display: 'flex', flexDirection: 'column', padding: '24px 52px 20px' }}>
+        <div style={{ display: 'flex', fontSize: 18, letterSpacing: 2, fontWeight: 700, color: '#d78b6d' }}>ONE UP DAY  ·  JORNADA EM ANDAMENTO</div>
+        <div style={{ display: 'flex', marginTop: 10, fontSize: 42, lineHeight: 1.08, fontWeight: 800 }}>{title}</div>
+        <div style={{ display: 'flex', marginTop: 'auto', fontSize: 20, color: '#d6dfd0' }}>Dia {currentDay || 1} de {totalDays || 'uma jornada'}  ·  {excerpt || 'Um passo real de cada vez.'}</div>
       </div>
     </div>
   );
@@ -68,9 +65,12 @@ export async function GET(request, { params }) {
     const query = new URL(request.url).searchParams;
     const title = clean(query.get('title')) || data?.journey?.title || 'One Up Day';
     const excerpt = clean(query.get('description')) || data?.excerpt;
-    const image = await imageData(data?.update?.photo_url || data?.journey?.cover_url);
+    const mediaUrl = query.get('media') || data?.update?.photo_url || data?.journey?.cover_url;
+    const image = await imageData(mediaUrl);
+    const totalDays = query.get('total') || data?.journey?.total_days;
+    const currentDay = query.get('day') || data?.update?.day_number || 1;
     return new ImageResponse(
-      <ShareCard title={title} excerpt={excerpt} image={image} totalDays={data?.journey?.total_days} />,
+      <ShareCard title={title} excerpt={excerpt} image={image} totalDays={totalDays} currentDay={currentDay} />,
       { ...SIZE, headers: { 'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800' } },
     );
   } catch {

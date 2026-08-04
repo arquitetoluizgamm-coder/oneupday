@@ -392,7 +392,7 @@ export async function generateMetadata({ params }) {
   let slug; try { slug = decodeURIComponent(params.slug); } catch { slug = params.slug; }
   const journeyUrl = `https://oneupday.app/${encodeURIComponent(slug)}`;
   const ogVersion = (value) => encodeURIComponent(value || '1');
-  const journeyOg = (value, fallback = '1') => `https://oneupday.app/api/og/journey/${encodeURIComponent(slug)}?v=${ogVersion(value || fallback)}`;
+  const journeyOg = (value, fallback = '1', extra = '') => `https://oneupday.app/api/og/journey/${encodeURIComponent(slug)}?v=${ogVersion(value || fallback)}${extra}`;
   let ogImage = journeyOg('demo');
   if (slug.startsWith('@')) {
     const p = await loadProfile(slug);
@@ -404,7 +404,7 @@ export async function generateMetadata({ params }) {
       title: `${demo.title} · One Up Day`,
       description: demo.goal,
       alternates: { canonical: journeyUrl },
-      openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title: demo.title, description: demo.goal, images: [{ url: `${ogImage}&title=${encodeURIComponent(demo.title)}&description=${encodeURIComponent(demo.goal)}`, width: 1200, height: 630, type: 'image/png', alt: demo.title }] },
+      openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title: demo.title, description: demo.goal, images: [{ url: `${ogImage}&title=${encodeURIComponent(demo.title)}&description=${encodeURIComponent(demo.goal)}&media=${encodeURIComponent(new URL('/demo-stories/paulo-casamento-01.png', 'https://oneupday.app').toString())}`, width: 1200, height: 630, type: 'image/png', alt: demo.title }] },
       twitter: { card: 'summary_large_image', images: [ogImage] },
     };
   }
@@ -414,7 +414,7 @@ export async function generateMetadata({ params }) {
     if (share) {
       const title = `${share.journey.title} · One Up Day`;
       const description = share.excerpt || share.journey.goal || '';
-      const image = journeyOg(share.journey.updated_at || share.journey.created_at);
+      const image = journeyOg(share.journey.updated_at || share.journey.created_at, '1', `&title=${encodeURIComponent(share.journey.title)}&description=${encodeURIComponent(description)}${share.photoUrl ? `&media=${encodeURIComponent(new URL(share.photoUrl, 'https://oneupday.app').toString())}` : ''}&total=${encodeURIComponent(share.journey.total_days || '')}`);
       return { title, description, alternates: { canonical: journeyUrl }, openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title, description, images: [{ url: image, width: 1200, height: 630, type: 'image/png', alt: share.journey.title }] }, twitter: { card: 'summary_large_image', description, images: [image] } };
     }
     const prof = await loadProfile(slug);
@@ -423,7 +423,9 @@ export async function generateMetadata({ params }) {
   }
   const { journey, stats } = data;
   const ogVersionSource = [...(data.updates || [])].reverse()[0]?.created_at;
-  ogImage = journeyOg(journey.updated_at || ogVersionSource || journey.created_at);
+  const latestPhotoForCard = [...(data.updates || [])].reverse().find((update) => update.photo_url)?.photo_url || journey.cover_url;
+  const cardParams = `&title=${encodeURIComponent(journey.title)}&description=${encodeURIComponent(share?.excerpt || journey.goal || '')}&day=${encodeURIComponent(stats.current_day || 1)}&total=${encodeURIComponent(journey.total_days || '')}${latestPhotoForCard ? `&media=${encodeURIComponent(new URL(latestPhotoForCard, 'https://oneupday.app').toString())}` : ''}`;
+  ogImage = journeyOg(journey.updated_at || ogVersionSource || journey.created_at, '1', cardParams);
   // Estava com "Day X of Y" cravado em inglês. Isso aparece na aba do
   // navegador e, pior, na prévia de todo link de jornada compartilhado —
   // que é justamente o que as pessoas mandam no WhatsApp.
