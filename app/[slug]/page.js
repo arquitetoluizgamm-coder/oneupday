@@ -374,7 +374,7 @@ async function loadShareMetadata(slug) {
   try {
     const sb = createClient();
     const { data: journey } = await sb.from('journeys')
-      .select('id, title, goal, total_days')
+      .select('id, title, goal, total_days, updated_at, created_at')
       .eq('slug', slug).eq('is_public', true).maybeSingle();
     if (!journey) return null;
     const { data: photo } = await sb.from('updates')
@@ -391,7 +391,9 @@ async function loadShareMetadata(slug) {
 export async function generateMetadata({ params }) {
   let slug; try { slug = decodeURIComponent(params.slug); } catch { slug = params.slug; }
   const journeyUrl = `https://oneupday.app/${encodeURIComponent(slug)}`;
-  let ogImage = '/og-capa.png';
+  const ogVersion = (value) => encodeURIComponent(value || '1');
+  const journeyOg = (value, fallback = '1') => `https://oneupday.app/api/og/journey/${encodeURIComponent(slug)}?v=${ogVersion(value || fallback)}`;
+  let ogImage = journeyOg('demo');
   if (slug.startsWith('@')) {
     const p = await loadProfile(slug);
     return { title: p ? `${p.profile.name} · One Up Day` : 'One Up Day' };
@@ -402,7 +404,7 @@ export async function generateMetadata({ params }) {
       title: `${demo.title} · One Up Day`,
       description: demo.goal,
       alternates: { canonical: journeyUrl },
-      openGraph: { url: journeyUrl, type: 'article', title: demo.title, images: [{ url: ogImage, width: 1200, height: 630, alt: demo.title }] },
+      openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title: demo.title, description: demo.goal, images: [{ url: `${ogImage}&title=${encodeURIComponent(demo.title)}&description=${encodeURIComponent(demo.goal)}`, width: 1200, height: 630, type: 'image/png', alt: demo.title }] },
       twitter: { card: 'summary_large_image', images: [ogImage] },
     };
   }
@@ -412,19 +414,15 @@ export async function generateMetadata({ params }) {
     if (share) {
       const title = `${share.journey.title} · One Up Day`;
       const description = share.excerpt || share.journey.goal || '';
-      const image = share.photoUrl ? new URL(share.photoUrl, 'https://oneupday.app').toString() : '/og-capa.png';
-      return { title, description, alternates: { canonical: journeyUrl }, openGraph: { url: journeyUrl, type: 'article', title, description, images: [{ url: image, width: 1200, height: 630, type: 'image/jpeg', alt: share.journey.title }] }, twitter: { card: 'summary_large_image', description, images: [image] } };
+      const image = journeyOg(share.journey.updated_at || share.journey.created_at);
+      return { title, description, alternates: { canonical: journeyUrl }, openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title, description, images: [{ url: image, width: 1200, height: 630, type: 'image/png', alt: share.journey.title }] }, twitter: { card: 'summary_large_image', description, images: [image] } };
     }
     const prof = await loadProfile(slug);
     if (prof) return { title: `${prof.profile.name} · One Up Day` };
     return { title: 'One Up Day' };
   }
   const { journey, stats } = data;
-  const latestPhoto = share?.photoUrl || [...(data.updates || [])].reverse().find((update) => update.photo_url)?.photo_url;
-  const imageSource = journey.cover_url || latestPhoto;
-  ogImage = imageSource
-    ? new URL(imageSource, 'https://oneupday.app').toString()
-    : '/og-capa.png';
+  ogImage = journeyOg(journey.updated_at || latestUpdate?.created_at || journey.created_at);
   // Estava com "Day X of Y" cravado em inglês. Isso aparece na aba do
   // navegador e, pior, na prévia de todo link de jornada compartilhado —
   // que é justamente o que as pessoas mandam no WhatsApp.
@@ -437,7 +435,7 @@ export async function generateMetadata({ params }) {
     title: `${journey.title} — ${fill(td.dayXofY, { d: stats.current_day || 0, t: journey.total_days })} · One Up Day`,
     description: shareDescription,
     alternates: { canonical: journeyUrl },
-    openGraph: { url: journeyUrl, type: 'article', title: journey.title, description: shareDescription, images: [{ url: ogImage, width: 1200, height: 630, type: 'image/jpeg', alt: journey.title }] },
+    openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title: journey.title, description: shareDescription, images: [{ url: ogImage, width: 1200, height: 630, type: 'image/png', secureUrl: ogImage, alt: journey.title }] },
     twitter: { card: 'summary_large_image', description: shareDescription, images: [ogImage] },
   };
 }
