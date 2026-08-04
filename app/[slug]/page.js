@@ -429,7 +429,10 @@ export async function generateMetadata({ params }) {
   // navegador e, pior, na prévia de todo link de jornada compartilhado —
   // que é justamente o que as pessoas mandam no WhatsApp.
   const td = getDict(getLocale());
-  const shareDescription = share?.excerpt || journey.goal || '';
+  const latestUpdate = [...(data.updates || [])].sort((a, b) => (b.day_number || 0) - (a.day_number || 0))[0];
+  const updateText = String(latestUpdate?.text || '').replace(/\s+/g, ' ').trim();
+  const updateExcerpt = updateText.length > 160 ? `${updateText.slice(0, 157).trimEnd()}…` : updateText;
+  const shareDescription = share?.excerpt || updateExcerpt || journey.goal || '';
   return {
     title: `${journey.title} — ${fill(td.dayXofY, { d: stats.current_day || 0, t: journey.total_days })} · One Up Day`,
     description: shareDescription,
