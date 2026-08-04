@@ -413,7 +413,7 @@ export async function generateMetadata({ params }) {
     if (share) {
       const title = `${share.journey.title} · One Up Day`;
       const description = share.excerpt || share.journey.goal || '';
-      const image = journeyOg();
+      const image = share.photoUrl ? new URL(share.photoUrl, 'https://oneupday.app').toString() : 'https://oneupday.app/og-capa.png';
       return { title, description, alternates: { canonical: journeyUrl }, openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title, description, images: [{ url: image, width: 1200, height: 630, type: 'image/png', alt: share.journey.title }] }, twitter: { card: 'summary_large_image', description, images: [image] } };
     }
     const prof = await loadProfile(slug);
@@ -421,7 +421,8 @@ export async function generateMetadata({ params }) {
     return { title: 'One Up Day' };
   }
   const { journey, stats } = data;
-  ogImage = journeyOg();
+  const latestPhotoForCard = [...(data.updates || [])].reverse().find((update) => update.photo_url)?.photo_url || journey.cover_url;
+  const facebookImage = latestPhotoForCard ? new URL(latestPhotoForCard, 'https://oneupday.app').toString() : 'https://oneupday.app/og-capa.png';
   // Estava com "Day X of Y" cravado em inglês. Isso aparece na aba do
   // navegador e, pior, na prévia de todo link de jornada compartilhado —
   // que é justamente o que as pessoas mandam no WhatsApp.
@@ -434,7 +435,7 @@ export async function generateMetadata({ params }) {
     title: `${journey.title} — ${fill(td.dayXofY, { d: stats.current_day || 0, t: journey.total_days })} · One Up Day`,
     description: shareDescription,
     alternates: { canonical: journeyUrl },
-    openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title: journey.title, description: shareDescription, images: [{ url: ogImage, width: 1200, height: 630, type: 'image/png', alt: journey.title }] },
+    openGraph: { siteName: 'One Up Day', type: 'article', url: journeyUrl, title: journey.title, description: shareDescription, images: [{ url: facebookImage, width: 1200, height: 630, alt: journey.title }] },
     twitter: { card: 'summary_large_image', description: shareDescription, images: [ogImage] },
   };
 }
