@@ -422,7 +422,8 @@ export async function generateMetadata({ params }) {
     return { title: 'One Up Day' };
   }
   const { journey, stats } = data;
-  ogImage = journeyOg(journey.updated_at || latestUpdate?.created_at || journey.created_at);
+  const ogVersionSource = [...(data.updates || [])].reverse()[0]?.created_at;
+  ogImage = journeyOg(journey.updated_at || ogVersionSource || journey.created_at);
   // Estava com "Day X of Y" cravado em inglês. Isso aparece na aba do
   // navegador e, pior, na prévia de todo link de jornada compartilhado —
   // que é justamente o que as pessoas mandam no WhatsApp.
