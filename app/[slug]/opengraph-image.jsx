@@ -23,6 +23,18 @@ async function readJourney(slug) {
   return { journey, update, excerpt: text.length > 190 ? `${text.slice(0, 187).trimEnd()}…` : text };
 }
 
+async function asDataUrl(url) {
+  if (!url) return null;
+  try {
+    const response = await fetch(url, { cache: 'no-store' });
+    if (!response.ok) return null;
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    return `data:${response.headers.get('content-type') || 'image/jpeg'};base64,${btoa(binary)}`;
+  } catch { return null; }
+}
+
 function Card({ title, excerpt, image }) {
   return <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: '#f8f5ee', color: '#10152f', fontFamily: 'Arial', padding: '46px' }}>
     <div style={{ display: 'flex', fontSize: 28, fontWeight: 700, color: '#5d6c57' }}>ONE · uma jornada real</div>
@@ -41,11 +53,12 @@ export default async function OG({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
     const data = await readJourney(slug);
+    const image = await asDataUrl(data?.update?.photo_url || data?.journey?.cover_url);
     return new ImageResponse(
-      <Card title={data?.journey?.title || 'One Up Day'} excerpt={data?.excerpt || 'Um passo real, um dia de cada vez.'} image={data?.update?.photo_url || data?.journey?.cover_url || null} />,
+      <Card title={data?.journey?.title || 'One Up Day'} excerpt={data?.excerpt || 'Um passo real, um dia de cada vez.'} image={image} />,
       { ...size }
     );
   } catch {
-    return new ImageResponse(<Card title="One Up Day" excerpt="Um passo real, um dia de cada vez." />, { ...size });
+    return fetch('https://oneupday.app/og-capa.png');
   }
 }
