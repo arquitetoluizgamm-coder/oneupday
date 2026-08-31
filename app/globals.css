@@ -14277,6 +14277,10 @@ body:has(.feed-page),
   line-height:1.15!important;
   text-decoration:none!important;
   cursor:pointer!important;
+  border:0!important;
+  background:transparent!important;
+  font:inherit!important;
+  text-align:left!important;
 }
 
 .feed-page .feed-track-float .feed-track-name{
@@ -14306,6 +14310,14 @@ body:has(.feed-page),
 
 .feed-page .feed-track-float .feed-track-name small{
   color:rgba(255,255,255,.74)!important;
+}
+
+.feed-page .is-full-track .feed-track-name small{
+  color:var(--terra,#a95036)!important;
+}
+
+.feed-page .feed-track-float.is-full-track .feed-track-name small{
+  color:#F2C9B8!important;
 }
 
 .feed-page .feed-track-name:hover>span,

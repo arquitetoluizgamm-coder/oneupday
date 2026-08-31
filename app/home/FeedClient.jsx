@@ -78,9 +78,11 @@ function TrackTag({ track, float, hasBar }) {
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [fullTrackMode, setFullTrackMode] = useState(false);
   const audio = useRef(null);
   const shell = useRef(null);
   const inView = useRef(false);
+  const fullTrackModeRef = useRef(false);
   const instanceId = useId();
   const mediaRef = useContext(MediaPlaybackContext);
   const start = Math.max(0, Number(track.start_seconds) || 0);
@@ -106,11 +108,18 @@ function TrackTag({ track, float, hasBar }) {
     const player = audio.current;
     if (!player) return false;
     const video = mediaRef?.current;
-    const offset = video && (!duration || video.currentTime < duration) ? (video.currentTime || 0) : 0;
-    const target = start + offset;
-    if (reset || player.currentTime < start || player.currentTime >= end - 0.04) {
+    const playingFullTrack = fullTrackModeRef.current;
+    const playStart = playingFullTrack ? 0 : start;
+    const playEnd = playingFullTrack ? Infinity : end;
+    const offset = !playingFullTrack && video && (!duration || video.currentTime < duration) ? (video.currentTime || 0) : 0;
+    const target = playStart + offset;
+    const reachedEnd = playingFullTrack
+      ? player.ended || (Number.isFinite(player.duration) && player.duration > 0 && player.currentTime >= player.duration - 0.04)
+      : player.currentTime >= playEnd - 0.04;
+    if (reset || player.currentTime < playStart || reachedEnd) {
       try { player.currentTime = target; } catch {}
-      setProgress(duration > 0 ? Math.min(100, (offset / duration) * 100) : 0);
+      const fullProgress = Number.isFinite(player.duration) && player.duration > 0 ? (target / player.duration) * 100 : 0;
+      setProgress(playingFullTrack ? Math.min(100, fullProgress) : (duration > 0 ? Math.min(100, (offset / duration) * 100) : 0));
     }
     player.volume = musicVolume;
     player.muted = musicVolume === 0;
@@ -121,7 +130,7 @@ function TrackTag({ track, float, hasBar }) {
       await player.play();
       setMuted(player.muted);
       setPlaying(true);
-      if (!player.muted || !allowMutedFallback) applyVideoMix(true);
+      if (!player.muted || !allowMutedFallback) applyVideoMix(!playingFullTrack);
       return true;
     } catch {
       if (!allowMutedFallback) {
@@ -146,7 +155,7 @@ function TrackTag({ track, float, hasBar }) {
   function syncToVideo() {
     const player = audio.current;
     const video = mediaRef?.current;
-    if (!player || !video) return;
+    if (!player || !video || fullTrackModeRef.current) return;
     if (duration > 0 && video.currentTime >= duration - 0.04) {
       player.pause();
       setPlaying(false);
@@ -166,7 +175,7 @@ function TrackTag({ track, float, hasBar }) {
       window.dispatchEvent(new CustomEvent(TRACK_PLAY_EVENT, { detail: instanceId }));
       player.muted = musicVolume === 0;
       player.volume = musicVolume;
-      applyVideoMix(true);
+      applyVideoMix(!fullTrackModeRef.current);
       player.play().then(() => {
         setMuted(player.muted);
         setPlaying(true);
@@ -228,11 +237,11 @@ function TrackTag({ track, float, hasBar }) {
     const video = mediaRef?.current;
     const player = audio.current;
     if (!playing || !video || !player) return undefined;
-    const onPlay = () => { syncToVideo(); player.play().catch(() => {}); };
-    const onPause = () => player.pause();
-    const onEnded = () => { player.pause(); setPlaying(false); };
-    const onSeek = () => syncToVideo();
-    const onTime = () => { if (!video.paused) syncToVideo(); };
+    const onPlay = () => { if (!fullTrackModeRef.current) { syncToVideo(); player.play().catch(() => {}); } };
+    const onPause = () => { if (!fullTrackModeRef.current) player.pause(); };
+    const onEnded = () => { if (!fullTrackModeRef.current) { player.pause(); setPlaying(false); } };
+    const onSeek = () => { if (!fullTrackModeRef.current) syncToVideo(); };
+    const onTime = () => { if (!fullTrackModeRef.current && !video.paused) syncToVideo(); };
     video.addEventListener('play', onPlay);
     video.addEventListener('pause', onPause);
     video.addEventListener('ended', onEnded);
@@ -249,21 +258,43 @@ function TrackTag({ track, float, hasBar }) {
 
   function keepInsideClip(event) {
     const player = event.currentTarget;
-    const clipDuration = duration > 0 ? duration : Math.max(0, (player.duration || 0) - start);
+    const playingFullTrack = fullTrackModeRef.current;
+    const clipStart = playingFullTrack ? 0 : start;
+    const clipDuration = playingFullTrack
+      ? Math.max(0, player.duration || 0)
+      : (duration > 0 ? duration : Math.max(0, (player.duration || 0) - start));
     if (clipDuration > 0 && Number.isFinite(clipDuration)) {
-      setProgress(Math.min(100, Math.max(0, ((player.currentTime - start) / clipDuration) * 100)));
+      setProgress(Math.min(100, Math.max(0, ((player.currentTime - clipStart) / clipDuration) * 100)));
     }
-    if (player.currentTime >= end - 0.04) {
+    if (!playingFullTrack && player.currentTime >= end - 0.04) {
       player.pause();
       setProgress(100);
       setPlaying(false);
     }
   }
 
+  function toggleFullTrack(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const player = audio.current;
+    if (!player) return;
+    const nextMode = !fullTrackModeRef.current;
+    fullTrackModeRef.current = nextMode;
+    setFullTrackMode(nextMode);
+    player.pause();
+    setProgress(0);
+    if (nextMode) applyVideoMix(false);
+    playTrack({ reset: true, allowMutedFallback: false });
+  }
+
   const audible = playing && !muted;
-  const actionLabel = audible ? 'Pausar trilha' : (playing ? 'Ativar som' : 'Tocar trilha');
+  const actionLabel = audible
+    ? (fullTrackMode ? 'Pausar faixa completa' : 'Pausar trilha')
+    : (playing ? 'Ativar som' : (fullTrackMode ? 'Tocar faixa completa' : 'Tocar trilha'));
   const trackTitle = track.title || 'Trilha do ONE';
-  const fullTrackLabel = `${trackTitle}. Ouvir faixa completa`;
+  const fullTrackLabel = fullTrackMode
+    ? `${trackTitle}. Voltar ao trecho usado no post`
+    : `${trackTitle}. Ouvir faixa completa neste post`;
 
   const btn = (
     <button type="button" className={`feed-track-spk${audible ? ' on' : ''}`} onClick={toggle} aria-label={actionLabel} aria-pressed={audible} title={trackTitle + (track.artist ? ` · ${track.artist}` : '')}>
@@ -276,10 +307,10 @@ function TrackTag({ track, float, hasBar }) {
   );
 
   const trackName = track.audio_url ? (
-    <a className="feed-track-name" href={track.audio_url} target="_blank" rel="noopener noreferrer" onClick={(event) => event.stopPropagation()} aria-label={fullTrackLabel} title={fullTrackLabel}>
+    <button type="button" className="feed-track-name" onClick={toggleFullTrack} aria-label={fullTrackLabel} aria-pressed={fullTrackMode} title={fullTrackLabel}>
       <span>{trackTitle}</span>
-      <small>{track.artist && <span>{track.artist} · </span>}Ouvir completa <span aria-hidden="true">↗</span></small>
-    </a>
+      <small>{track.artist && <span>{track.artist} · </span>}{fullTrackMode ? 'Faixa completa · voltar ao trecho' : 'Ouvir completa aqui'}</small>
+    </button>
   ) : (
     <span className="feed-track-name"><span>{trackTitle}</span>{track.artist && <small>{track.artist}</small>}</span>
   );
@@ -290,7 +321,7 @@ function TrackTag({ track, float, hasBar }) {
 
   if (float) {
     return (
-      <span ref={shell} className={`feed-track-float${hasBar ? ' above-bar' : ''}${playing ? ' is-playing' : ''}`}>
+      <span ref={shell} className={`feed-track-float${hasBar ? ' above-bar' : ''}${playing ? ' is-playing' : ''}${fullTrackMode ? ' is-full-track' : ''}`}>
         {btn}
         {trackName}
         {equalizer}
@@ -301,7 +332,7 @@ function TrackTag({ track, float, hasBar }) {
   }
 
   return (
-    <div ref={shell} className={`feed-track${playing ? ' is-playing' : ''}`}>
+    <div ref={shell} className={`feed-track${playing ? ' is-playing' : ''}${fullTrackMode ? ' is-full-track' : ''}`}>
       {btn}
       {trackName}
       {equalizer}
