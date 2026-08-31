@@ -77,6 +77,7 @@ const TRACK_PLAY_EVENT = 'one:track-play';
 function TrackTag({ track, float, hasBar }) {
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [progress, setProgress] = useState(0);
   const audio = useRef(null);
   const shell = useRef(null);
   const inView = useRef(false);
@@ -99,6 +100,7 @@ function TrackTag({ track, float, hasBar }) {
     const target = start + offset;
     if (reset || player.currentTime < start || player.currentTime >= end - 0.04) {
       try { player.currentTime = target; } catch {}
+      setProgress(duration > 0 ? Math.min(100, (offset / duration) * 100) : 0);
     }
     player.volume = 0.85;
     player.muted = false;
@@ -233,17 +235,25 @@ function TrackTag({ track, float, hasBar }) {
   }, [playing, mediaRef, start, duration]);
 
   function keepInsideClip(event) {
-    if (event.currentTarget.currentTime >= end - 0.04) {
-      event.currentTarget.pause();
+    const player = event.currentTarget;
+    const clipDuration = duration > 0 ? duration : Math.max(0, (player.duration || 0) - start);
+    if (clipDuration > 0 && Number.isFinite(clipDuration)) {
+      setProgress(Math.min(100, Math.max(0, ((player.currentTime - start) / clipDuration) * 100)));
+    }
+    if (player.currentTime >= end - 0.04) {
+      player.pause();
+      setProgress(100);
       setPlaying(false);
     }
   }
 
   const audible = playing && !muted;
   const actionLabel = audible ? 'Pausar trilha' : (playing ? 'Ativar som' : 'Tocar trilha');
+  const trackTitle = track.title || 'Trilha do ONE';
+  const fullTrackLabel = `${trackTitle}. Ouvir faixa completa`;
 
   const btn = (
-    <button type="button" className={`feed-track-spk${audible ? ' on' : ''}`} onClick={toggle} aria-label={actionLabel} aria-pressed={audible} title={track.title + (track.artist ? ` · ${track.artist}` : '')}>
+    <button type="button" className={`feed-track-spk${audible ? ' on' : ''}`} onClick={toggle} aria-label={actionLabel} aria-pressed={audible} title={trackTitle + (track.artist ? ` · ${track.artist}` : '')}>
       {audible ? (
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>
       ) : (
@@ -252,22 +262,38 @@ function TrackTag({ track, float, hasBar }) {
     </button>
   );
 
+  const trackName = track.audio_url ? (
+    <a className="feed-track-name" href={track.audio_url} target="_blank" rel="noopener noreferrer" onClick={(event) => event.stopPropagation()} aria-label={fullTrackLabel} title={fullTrackLabel}>
+      <span>{trackTitle}</span>
+      <small>{track.artist && <span>{track.artist} · </span>}Ouvir completa <span aria-hidden="true">↗</span></small>
+    </a>
+  ) : (
+    <span className="feed-track-name"><span>{trackTitle}</span>{track.artist && <small>{track.artist}</small>}</span>
+  );
+
+  const equalizer = <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>;
+  const timeline = <span className="feed-track-progress" aria-hidden="true"><i style={{ width: `${progress}%` }} /></span>;
+  const audioElement = <audio ref={audio} src={track.audio_url} preload="metadata" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onVolumeChange={(event) => setMuted(event.currentTarget.muted)} onTimeUpdate={keepInsideClip} onEnded={() => { setPlaying(false); setProgress(100); }} />;
+
   if (float) {
     return (
-      <span ref={shell} className={`feed-track-float${hasBar ? ' above-bar' : ''}`}>
-        {audible && <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>}
+      <span ref={shell} className={`feed-track-float${hasBar ? ' above-bar' : ''}${playing ? ' is-playing' : ''}`}>
         {btn}
-        <audio ref={audio} src={track.audio_url} preload="metadata" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onVolumeChange={(event) => setMuted(event.currentTarget.muted)} onTimeUpdate={keepInsideClip} onEnded={() => setPlaying(false)} />
+        {trackName}
+        {equalizer}
+        {timeline}
+        {audioElement}
       </span>
     );
   }
 
   return (
-    <div ref={shell} className="feed-track">
+    <div ref={shell} className={`feed-track${playing ? ' is-playing' : ''}`}>
       {btn}
-      <span className="feed-track-name">{track.title}{track.artist ? ` · ${track.artist}` : ''}</span>
-      {audible && <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>}
-      <audio ref={audio} src={track.audio_url} preload="metadata" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onVolumeChange={(event) => setMuted(event.currentTarget.muted)} onTimeUpdate={keepInsideClip} onEnded={() => setPlaying(false)} />
+      {trackName}
+      {equalizer}
+      {timeline}
+      {audioElement}
     </div>
   );
 }
