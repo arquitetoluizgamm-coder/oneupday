@@ -78,25 +78,29 @@ function TrackTag({ track, float, hasBar }) {
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [mixerOpen, setMixerOpen] = useState(false);
-  const [musicVolume, setMusicVolume] = useState(0.85);
-  const [videoVolume, setVideoVolume] = useState(1);
   const audio = useRef(null);
   const shell = useRef(null);
   const inView = useRef(false);
-  const musicVolumeRef = useRef(0.85);
   const instanceId = useId();
   const mediaRef = useContext(MediaPlaybackContext);
-  const hasVideo = Boolean(mediaRef);
-  const mixerId = `track-mixer-${String(instanceId).replace(/:/g, '')}`;
   const start = Math.max(0, Number(track.start_seconds) || 0);
   const duration = Math.max(0, Number(track.duration_seconds) || 0);
   const end = duration > 0 ? start + duration : Infinity;
+  const musicVolume = Math.min(1, Math.max(0, Number(track.track_volume ?? 85) / 100));
+  const videoVolume = Math.min(1, Math.max(0, Number(track.video_volume ?? 100) / 100));
+
+  const applyVideoMix = useCallback((enableSound) => {
+    const video = mediaRef?.current;
+    if (!video) return;
+    video.volume = videoVolume;
+    video.muted = !enableSound || videoVolume === 0;
+  }, [mediaRef, videoVolume]);
 
   const pause = useCallback(() => {
     if (audio.current) audio.current.pause();
+    if (mediaRef?.current) mediaRef.current.muted = true;
     setPlaying(false);
-  }, []);
+  }, [mediaRef]);
 
   const playTrack = useCallback(async ({ reset = false, allowMutedFallback = true } = {}) => {
     const player = audio.current;
@@ -108,8 +112,8 @@ function TrackTag({ track, float, hasBar }) {
       try { player.currentTime = target; } catch {}
       setProgress(duration > 0 ? Math.min(100, (offset / duration) * 100) : 0);
     }
-    player.volume = musicVolumeRef.current;
-    player.muted = musicVolumeRef.current === 0;
+    player.volume = musicVolume;
+    player.muted = musicVolume === 0;
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent(TRACK_PLAY_EVENT, { detail: instanceId }));
     }
@@ -117,6 +121,7 @@ function TrackTag({ track, float, hasBar }) {
       await player.play();
       setMuted(player.muted);
       setPlaying(true);
+      if (!player.muted || !allowMutedFallback) applyVideoMix(true);
       return true;
     } catch {
       if (!allowMutedFallback) {
@@ -124,6 +129,7 @@ function TrackTag({ track, float, hasBar }) {
         return false;
       }
       player.muted = true;
+      applyVideoMix(false);
       try {
         await player.play();
         setMuted(true);
@@ -135,7 +141,7 @@ function TrackTag({ track, float, hasBar }) {
         return false;
       }
     }
-  }, [duration, end, instanceId, mediaRef, start]);
+  }, [applyVideoMix, duration, end, instanceId, mediaRef, musicVolume, start]);
 
   function syncToVideo() {
     const player = audio.current;
@@ -158,13 +164,11 @@ function TrackTag({ track, float, hasBar }) {
     if (!player) return;
     if (!player.paused && player.muted) {
       window.dispatchEvent(new CustomEvent(TRACK_PLAY_EVENT, { detail: instanceId }));
-      const restoredVolume = musicVolumeRef.current > 0 ? musicVolumeRef.current : 0.85;
-      musicVolumeRef.current = restoredVolume;
-      setMusicVolume(restoredVolume);
-      player.muted = false;
-      player.volume = restoredVolume;
+      player.muted = musicVolume === 0;
+      player.volume = musicVolume;
+      applyVideoMix(true);
       player.play().then(() => {
-        setMuted(false);
+        setMuted(player.muted);
         setPlaying(true);
       }).catch(pause);
       return;
@@ -174,28 +178,6 @@ function TrackTag({ track, float, hasBar }) {
       return;
     }
     playTrack({ reset: false, allowMutedFallback: false });
-  }
-
-  function changeMusicVolume(event) {
-    event.stopPropagation();
-    const next = Math.min(1, Math.max(0, Number(event.target.value) / 100));
-    musicVolumeRef.current = next;
-    setMusicVolume(next);
-    const player = audio.current;
-    if (!player) return;
-    player.volume = next;
-    player.muted = next === 0;
-    setMuted(player.muted);
-  }
-
-  function changeVideoVolume(event) {
-    event.stopPropagation();
-    const next = Math.min(1, Math.max(0, Number(event.target.value) / 100));
-    setVideoVolume(next);
-    const video = mediaRef?.current;
-    if (!video) return;
-    video.volume = next;
-    video.muted = next === 0;
   }
 
   useEffect(() => {
@@ -265,15 +247,6 @@ function TrackTag({ track, float, hasBar }) {
     };
   }, [playing, mediaRef, start, duration]);
 
-  useEffect(() => {
-    const video = mediaRef?.current;
-    if (!video) return undefined;
-    const syncVideoVolume = () => setVideoVolume(video.muted ? 0 : video.volume);
-    syncVideoVolume();
-    video.addEventListener('volumechange', syncVideoVolume);
-    return () => video.removeEventListener('volumechange', syncVideoVolume);
-  }, [mediaRef]);
-
   function keepInsideClip(event) {
     const player = event.currentTarget;
     const clipDuration = duration > 0 ? duration : Math.max(0, (player.duration || 0) - start);
@@ -313,44 +286,15 @@ function TrackTag({ track, float, hasBar }) {
 
   const equalizer = <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>;
   const timeline = <span className="feed-track-progress" aria-hidden="true"><i style={{ width: `${progress}%` }} /></span>;
-  const mixerToggle = hasVideo ? (
-    <button
-      type="button"
-      className="feed-track-mix-toggle"
-      onClick={(event) => { event.preventDefault(); event.stopPropagation(); setMixerOpen((open) => !open); }}
-      aria-label="Ajustar volume do vídeo e da música"
-      aria-expanded={mixerOpen}
-      aria-controls={mixerId}
-      title="Ajustar volumes"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6" /></svg>
-    </button>
-  ) : null;
-  const mixer = hasVideo && mixerOpen ? (
-    <span id={mixerId} className="feed-track-mixer" role="group" aria-label="Volumes do post" onClick={(event) => event.stopPropagation()}>
-      <label className="feed-track-mix-row">
-        <span>Música</span>
-        <input type="range" min="0" max="100" step="5" value={Math.round(musicVolume * 100)} onChange={changeMusicVolume} aria-label="Volume da música" />
-        <b>{Math.round(musicVolume * 100)}%</b>
-      </label>
-      <label className="feed-track-mix-row">
-        <span>Vídeo</span>
-        <input type="range" min="0" max="100" step="5" value={Math.round(videoVolume * 100)} onChange={changeVideoVolume} aria-label="Volume do áudio original do vídeo" />
-        <b>{Math.round(videoVolume * 100)}%</b>
-      </label>
-    </span>
-  ) : null;
   const audioElement = <audio ref={audio} src={track.audio_url} preload="metadata" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onVolumeChange={(event) => setMuted(event.currentTarget.muted)} onTimeUpdate={keepInsideClip} onEnded={() => { setPlaying(false); setProgress(100); }} />;
 
   if (float) {
     return (
-      <span ref={shell} className={`feed-track-float${hasBar ? ' above-bar' : ''}${playing ? ' is-playing' : ''}${hasVideo ? ' has-mixer' : ''}${mixerOpen ? ' mixer-open' : ''}`}>
+      <span ref={shell} className={`feed-track-float${hasBar ? ' above-bar' : ''}${playing ? ' is-playing' : ''}`}>
         {btn}
         {trackName}
         {equalizer}
-        {mixerToggle}
         {timeline}
-        {mixer}
         {audioElement}
       </span>
     );
@@ -361,9 +305,7 @@ function TrackTag({ track, float, hasBar }) {
       {btn}
       {trackName}
       {equalizer}
-      {mixerToggle}
       {timeline}
-      {mixer}
       {audioElement}
     </div>
   );

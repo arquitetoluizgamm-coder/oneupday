@@ -82,6 +82,8 @@ export default async function JornadaDoDono({ params }) {
             aiWrite: t.aiWrite,
             musicAdd: t.musicAdd, musicTitle: t.musicTitle, musicUse: t.musicUse, musicRemove: t.musicRemove,
             musicEmpty: t.musicEmpty, musicSearchPh: t.musicSearchPh, musicKeyNeeded: t.musicKeyNeeded,
+            musicMixTitle: t.musicMixTitle, musicMixHint: t.musicMixHint,
+            musicTrackVolume: t.musicTrackVolume, musicVideoVolume: t.musicVideoVolume,
             aiErr: t.aiErr, aiRateErr: t.aiRateErr,
             moodQ: t.moodQ,
             dayRegisterTitle: t.dayRegisterTitle, dayRegisterSub: t.dayRegisterSub,

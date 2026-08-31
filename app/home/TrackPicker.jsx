@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 const PHOTO_CLIP_SECONDS = 30;
+const DEFAULT_TRACK_VOLUME = 35;
+const DEFAULT_VIDEO_VOLUME = 100;
 
 function clock(value) {
   const total = Math.max(0, Math.floor(Number(value) || 0));
@@ -66,6 +68,7 @@ export default function TrackPicker({ selected, onSelect, labels, videoDuration 
     const from = Math.max(0, Number(start) || 0);
     const length = Math.max(0.1, Number(duration) || PHOTO_CLIP_SECONDS);
     audioRef.current.src = track.audio_url;
+    audioRef.current.volume = Math.min(1, Math.max(0, Number(track.track_volume ?? 100) / 100));
     audioRef.current.currentTime = from;
     previewEnd.current = Math.min(Number(track.duration || track.total_seconds) || Infinity, from + length);
     audioRef.current.play().catch(() => {});
@@ -74,7 +77,7 @@ export default function TrackPicker({ selected, onSelect, labels, videoDuration 
 
   function choose(track) {
     const clip = clipFor(track.duration, videoDuration);
-    onSelect({
+    const selectedTrack = {
       id: track.id,
       title: track.title,
       artist: track.artist,
@@ -83,7 +86,12 @@ export default function TrackPicker({ selected, onSelect, labels, videoDuration 
       start_seconds: 0,
       duration_seconds: clip.duration,
       full: clip.full,
-    });
+    };
+    if (videoDuration > 0) {
+      selectedTrack.track_volume = DEFAULT_TRACK_VOLUME;
+      selectedTrack.video_volume = DEFAULT_VIDEO_VOLUME;
+    }
+    onSelect(selectedTrack);
     stopPreview();
     setMode('clip');
   }
@@ -93,12 +101,25 @@ export default function TrackPicker({ selected, onSelect, labels, videoDuration 
     const clip = clipFor(selected.total_seconds, videoDuration);
     const maxStart = Math.max(0, (Number(selected.total_seconds) || 0) - clip.duration);
     const nextStart = clip.full ? 0 : Math.min(Number(selected.start_seconds) || 0, maxStart);
+    const needsVideoMix = videoDuration > 0 && (selected.track_volume == null || selected.video_volume == null);
+    const needsPhotoReset = videoDuration <= 0 && selected.video_volume != null;
     if (
       Math.abs((Number(selected.duration_seconds) || 0) - clip.duration) > 0.05 ||
       Math.abs((Number(selected.start_seconds) || 0) - nextStart) > 0.05 ||
-      selected.full !== clip.full
+      selected.full !== clip.full ||
+      needsVideoMix ||
+      needsPhotoReset
     ) {
-      onSelect({ ...selected, start_seconds: nextStart, duration_seconds: clip.duration, full: clip.full });
+      const next = { ...selected, start_seconds: nextStart, duration_seconds: clip.duration, full: clip.full };
+      if (needsVideoMix) {
+        next.track_volume = DEFAULT_TRACK_VOLUME;
+        next.video_volume = DEFAULT_VIDEO_VOLUME;
+      }
+      if (needsPhotoReset) {
+        next.track_volume = 85;
+        delete next.video_volume;
+      }
+      onSelect(next);
     }
   }, [videoDuration, selected, onSelect]);
 
@@ -106,6 +127,12 @@ export default function TrackPicker({ selected, onSelect, labels, videoDuration 
     const start = Number(value) || 0;
     stopPreview();
     onSelect({ ...selected, start_seconds: start });
+  }
+
+  function updateVolume(field, value) {
+    const volume = Math.round(Math.min(100, Math.max(0, Number(value) || 0)));
+    onSelect({ ...selected, [field]: volume });
+    if (field === 'track_volume' && audioRef.current) audioRef.current.volume = volume / 100;
   }
 
   const panelHead = (
@@ -138,6 +165,12 @@ export default function TrackPicker({ selected, onSelect, labels, videoDuration 
           </button>
           <button type="button" className="track-chip-remove" onClick={() => { stopPreview(); onSelect(null); setOpen(false); }} aria-label={labels.remove}>×</button>
         </div>
+        {videoDuration > 0 && (
+          <button type="button" className="track-mix-summary" onClick={toggleOpen} aria-expanded={open}>
+            <span>{labels.mixTitle || 'Mixagem'}</span>
+            <small>{labels.trackVolume || 'Música'} {Math.round(Number(selected.track_volume) || 0)}% · {labels.videoVolume || 'Vídeo'} {Math.round(Number(selected.video_volume) || 0)}%</small>
+          </button>
+        )}
         {open && (
           <div className="track-panel track-clip-panel">
             {panelHead}
@@ -156,6 +189,20 @@ export default function TrackPicker({ selected, onSelect, labels, videoDuration 
                 <input type="range" min="0" max={maxStart} step="0.1" value={Math.min(start, maxStart)} onChange={(event) => updateStart(event.target.value)} />
                 <span className="track-range-scale"><i>0:00</i><i>{clock(total)}</i></span>
               </label>
+            )}
+            {videoDuration > 0 && (
+              <fieldset className="track-mix-editor">
+                <legend>{labels.mixTitle || 'Equilíbrio do som'}</legend>
+                <p>{labels.mixHint || 'Defina como a música e o áudio original do vídeo serão ouvidos no post.'}</p>
+                <label className="track-mix-control">
+                  <span>{labels.trackVolume || 'Volume da música'} <b>{Math.round(Number(selected.track_volume) || 0)}%</b></span>
+                  <input type="range" min="0" max="100" step="5" value={Math.round(Number(selected.track_volume) || 0)} onChange={(event) => updateVolume('track_volume', event.target.value)} />
+                </label>
+                <label className="track-mix-control">
+                  <span>{labels.videoVolume || 'Áudio do vídeo'} <b>{Math.round(Number(selected.video_volume) || 0)}%</b></span>
+                  <input type="range" min="0" max="100" step="5" value={Math.round(Number(selected.video_volume) || 0)} onChange={(event) => updateVolume('video_volume', event.target.value)} />
+                </label>
+              </fieldset>
             )}
             <button type="button" className="track-done" onClick={() => { stopPreview(); setOpen(false); }}>{labels.done}</button>
             {audio}

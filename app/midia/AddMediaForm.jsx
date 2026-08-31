@@ -7,10 +7,14 @@ import TrackPicker from '../home/TrackPicker';
 import { duracaoDoVideo } from '../../lib/media';
 
 const MAX_VIDEO = 60 * 1024 * 1024;
+const volumePct = (value, fallback) => {
+  const parsed = Number(value);
+  return Math.round(Math.min(100, Math.max(0, Number.isFinite(parsed) ? parsed : fallback)));
+};
 
 function trackFields(track) {
   if (!track) return {};
-  return {
+  const fields = {
     track_title: track.title,
     track_artist: track.artist,
     track_audio_url: track.audio_url,
@@ -19,13 +23,18 @@ function trackFields(track) {
     track_duration_seconds: Number(track.duration_seconds) || 30,
     track_full: !!track.full,
   };
+  if (track.video_volume != null) {
+    fields.track_volume = volumePct(track.track_volume, 35);
+    fields.video_volume = volumePct(track.video_volume, 100);
+  }
+  return fields;
 }
 
 function removeTrackFields(row, keepLegacy = false) {
   const clean = { ...row };
   const fields = keepLegacy
-    ? ['track_id', 'track_start_seconds', 'track_duration_seconds', 'track_full']
-    : ['track_title', 'track_artist', 'track_audio_url', 'track_id', 'track_start_seconds', 'track_duration_seconds', 'track_full'];
+    ? ['track_id', 'track_start_seconds', 'track_duration_seconds', 'track_full', 'track_volume', 'video_volume']
+    : ['track_title', 'track_artist', 'track_audio_url', 'track_id', 'track_start_seconds', 'track_duration_seconds', 'track_full', 'track_volume', 'video_volume'];
   fields.forEach((key) => delete clean[key]);
   return clean;
 }
@@ -127,6 +136,11 @@ export default function AddMediaForm({ userId, journeys, t }) {
         ({ error } = await supabase.from('media').insert(mediaRow));
         if (!error) break;
         const message = error.message || '';
+        if (/(track_volume|video_volume)/.test(message) && ('track_volume' in mediaRow || 'video_volume' in mediaRow)) {
+          const { track_volume: _trackVolume, video_volume: _videoVolume, ...withoutMix } = mediaRow;
+          mediaRow = withoutMix;
+          continue;
+        }
         if (/track_/.test(message) && mediaRow.track_audio_url) {
           mediaRow = removeTrackFields(mediaRow);
           continue;

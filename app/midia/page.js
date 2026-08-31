@@ -26,7 +26,7 @@ export default async function Midia() {
           whichJourney: t.mediaWhichJourney, whichDay: t.mediaWhichDay, whoSees: t.mediaWhoSees,
           pubPublic: t.pubPublic, pubFollowers: t.pubFollowers, pubPrivate: t.pubPrivate,
           save: t.mediaSave, saving: t.creating, captionLabel: t.mediaCaption, captionPh: t.mediaCaptionPh,
-          musicTitle: t.musicAdd, music: { add: t.musicAdd, title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded, official: t.musicOfficial, clip: t.musicClip, starts: t.musicStarts, whole: t.musicWhole, seconds: t.musicSeconds, videoLength: t.musicVideoLength, done: t.musicDone },
+          musicTitle: t.musicAdd, music: { add: t.musicAdd, title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded, official: t.musicOfficial, clip: t.musicClip, starts: t.musicStarts, whole: t.musicWhole, seconds: t.musicSeconds, videoLength: t.musicVideoLength, done: t.musicDone, mixTitle: t.musicMixTitle, mixHint: t.musicMixHint, trackVolume: t.musicTrackVolume, videoVolume: t.musicVideoVolume },
           crop: { original: t.cropOriginal, square: t.cropSquare, portrait: t.cropPortrait, landscape: t.cropLandscape, use: t.cropUse, edit: t.cropEdit, cancel: t.cropCancel, hint: t.cropHint, hintOriginal: t.cropHintOriginal, zoom: t.cropZoom },
         }} />
       </main>

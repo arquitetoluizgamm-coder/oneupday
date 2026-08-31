@@ -24,6 +24,10 @@ function looksRisky(t) {
   return RISK.some(w => x.includes(w));
 }
 const MAX_VIDEO = 60 * 1024 * 1024; // 60MB
+const volumePct = (value, fallback) => {
+  const parsed = Number(value);
+  return Math.round(Math.min(100, Math.max(0, Number.isFinite(parsed) ? parsed : fallback)));
+};
 
 function ToolIcon({ type }) {
   const paths = {
@@ -317,6 +321,10 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       row.track_start_seconds = Number(track.start_seconds) || 0;
       row.track_duration_seconds = Number(track.duration_seconds) || 30;
       row.track_full = !!track.full;
+      if (videoUrl) {
+        row.track_volume = volumePct(track.track_volume, 35);
+        row.video_volume = volumePct(track.video_volume, 100);
+      }
     }
     let novo = null;
     let error = null;
@@ -324,7 +332,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     // Campos auxiliares não podem bloquear a publicação enquanto as
     // migrações são propagadas. Cada tentativa remove somente o campo
     // explicitamente ausente e mantém o restante do post intacto.
-    for (let attempt = 0; attempt < 3; attempt += 1) {
+    for (let attempt = 0; attempt < 4; attempt += 1) {
       ({ data: novo, error } = await supabase.from('updates').insert(insertRow).select('id').maybeSingle());
       if (!error) break;
       const message = error.message || '';
@@ -339,6 +347,12 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
         delete insertRow.track_start_seconds;
         delete insertRow.track_duration_seconds;
         delete insertRow.track_full;
+        continue;
+      }
+      if (/(track_volume|video_volume)/.test(message) && ('track_volume' in insertRow || 'video_volume' in insertRow)) {
+        console.warn('[music] colunas de mixagem ausentes — rode a migração add_post_audio_mix');
+        delete insertRow.track_volume;
+        delete insertRow.video_volume;
         continue;
       }
       break;
@@ -587,7 +601,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           <button type="button" className={`tool${videoUrl ? ' set' : ''}`} title={t.addVideo} aria-label={t.addVideo} onClick={() => videoRef.current?.click()} disabled={uploading}><ToolIcon type="video" /></button>
           <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPickPhoto} />
           <input ref={videoRef} type="file" accept="video/*" hidden onChange={onPickVideo} />
-          <TrackPicker selected={track} onSelect={setTrack} videoDuration={videoDuration} labels={{ add: t.musicAdd || 'Música', title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded, official: t.musicOfficial, clip: t.musicClip, starts: t.musicStarts, whole: t.musicWhole, seconds: t.musicSeconds, videoLength: t.musicVideoLength, done: t.musicDone }} />
+          <TrackPicker selected={track} onSelect={setTrack} videoDuration={videoDuration} labels={{ add: t.musicAdd || 'Música', title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded, official: t.musicOfficial, clip: t.musicClip, starts: t.musicStarts, whole: t.musicWhole, seconds: t.musicSeconds, videoLength: t.musicVideoLength, done: t.musicDone, mixTitle: t.musicMixTitle, mixHint: t.musicMixHint, trackVolume: t.musicTrackVolume, videoVolume: t.musicVideoVolume }} />
           {aiOn && <button type="button" className="tool ai" title={t.aiWrite} aria-label={t.aiWrite} onClick={aiWrite} disabled={saving || uploading}><ToolIcon type="ai" /></button>}
         </div>
         <button className="post-btn" onClick={post} disabled={saving || uploading || !kind || (!text.trim() && !photoUrl && !videoUrl)}>

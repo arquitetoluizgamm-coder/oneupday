@@ -111,10 +111,11 @@ export async function GET(req) {
   const uids = updates.map((item) => item.id);
   const guard = (pr) => Promise.resolve(pr).then((r) => r).catch(() => ({ data: [] }));
 
-  const [encR, tracksR, trackMetaR, supEncR, statsR, moodR, allUpsR, mediaR] = await Promise.all([
+  const [encR, tracksR, trackMetaR, trackMixR, supEncR, statsR, moodR, allUpsR, mediaR] = await Promise.all([
     updates.length ? guard(supabase.from('encouragements').select('update_id').eq('user_id', user.id).in('update_id', uids)) : { data: [] },
     updates.length ? guard(supabase.from('updates').select('id, track_title, track_artist, track_audio_url').in('id', uids).not('track_audio_url', 'is', null)) : { data: [] },
     updates.length ? guard(supabase.from('updates').select('id, track_id, track_start_seconds, track_duration_seconds, track_full').in('id', uids).not('track_audio_url', 'is', null)) : { data: [] },
+    updates.length ? guard(supabase.from('updates').select('id, track_volume, video_volume').in('id', uids).not('track_audio_url', 'is', null)) : { data: [] },
     updates.length ? guard(supabase.from('encouragements').select('update_id, user_id').in('update_id', uids)) : { data: [] },
     journeyIds.length ? guard(supabase.from('journey_stats').select('journey_id, current_day, progress_pct').in('journey_id', journeyIds)) : { data: [] },
     ownerIds.length ? guard(supabase.from('profiles').select('id, mood, mood_at').in('id', ownerIds).not('mood', 'is', null)) : { data: [] },
@@ -132,6 +133,13 @@ export async function GET(req) {
       start_seconds: item.track_start_seconds,
       duration_seconds: item.track_duration_seconds,
       full: item.track_full,
+    });
+  });
+  (trackMixR.data || []).forEach((item) => {
+    if (!trackByUpdate[item.id]) return;
+    Object.assign(trackByUpdate[item.id], {
+      track_volume: item.track_volume,
+      video_volume: item.video_volume,
     });
   });
   const statsByJourney = {};
@@ -266,6 +274,8 @@ export async function GET(req) {
       start_seconds: m.track_start_seconds,
       duration_seconds: m.track_duration_seconds,
       full: m.track_full,
+      track_volume: m.track_volume,
+      video_volume: m.video_volume,
     } : null,
     owner: { ...(mediaProf[m.user_id] || {}), mood: ownerMoodById[m.user_id] || null, one_level: levelFor(m.user_id) },
     encouraged: mediaEncSet.has(m.id),
@@ -298,10 +308,11 @@ export async function GET(req) {
   // estar velho se a pessoa trocou de handle depois.
   // ============================================================
   const idsParaMencao = [...new Set([...uids, ...dayIds])];
-  const [encAllR, tracksAllR, trackMetaAllR, mencoesR] = await Promise.all([
+  const [encAllR, tracksAllR, trackMetaAllR, trackMixAllR, mencoesR] = await Promise.all([
     dayIds.length ? guard(supabase.from('encouragements').select('update_id').eq('user_id', user.id).in('update_id', dayIds)) : { data: [] },
     dayIds.length ? guard(supabase.from('updates').select('id, track_title, track_artist, track_audio_url').in('id', dayIds).not('track_audio_url', 'is', null)) : { data: [] },
     dayIds.length ? guard(supabase.from('updates').select('id, track_id, track_start_seconds, track_duration_seconds, track_full').in('id', dayIds).not('track_audio_url', 'is', null)) : { data: [] },
+    dayIds.length ? guard(supabase.from('updates').select('id, track_volume, video_volume').in('id', dayIds).not('track_audio_url', 'is', null)) : { data: [] },
     idsParaMencao.length ? guard(supabase.from('mentions').select('update_id, profile:profiles!mentions_profile_id_fkey(id, name, handle, avatar_color)').in('update_id', idsParaMencao)) : { data: [] },
   ]);
 
@@ -322,6 +333,13 @@ export async function GET(req) {
       start_seconds: item.track_start_seconds,
       duration_seconds: item.track_duration_seconds,
       full: item.track_full,
+    });
+  });
+  (trackMixAllR.data || []).forEach((item) => {
+    if (!trackByUpdate[item.id]) return;
+    Object.assign(trackByUpdate[item.id], {
+      track_volume: item.track_volume,
+      video_volume: item.video_volume,
     });
   });
 
