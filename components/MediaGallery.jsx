@@ -59,7 +59,7 @@ export default function MediaGallery({ items, showVis, visLabels, own, deleteLab
   // não tem coluna de descrição (só updates tem, desde o patch 79),
   // e a legenda de uma foto é legenda, não descrição da imagem.
   // ============================================================
-  const altDe = (m) => (m.kind === 'quote' ? (m.caption || '') : '');
+  const altDe = (m) => (m.kind === 'quote' || m.kind === 'bible' ? (m.caption || '') : '');
 
   return (
     <>

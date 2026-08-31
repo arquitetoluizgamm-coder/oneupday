@@ -218,6 +218,7 @@ body:has(.profile-shell) .top:not(.top-feed) .top-brand .one-mark{
 }
 
 .profile-shell .tree-shortcut,
+.profile-shell .bible-shortcut,
 .profile-shell .pc-progress-bar,
 .profile-shell .pc-bar,
 .profile-shell .ptabs-wrap,
@@ -313,6 +314,72 @@ body:has(.profile-shell) .top:not(.top-feed) .top-brand .one-mark{
   display:grid!important;
   place-items:center!important;
   border-radius:999px!important;
+  color:#8B97A9!important;
+  font-size:24px!important;
+}
+
+.profile-shell .bible-shortcut{
+  min-height:86px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:14px!important;
+  margin:0 0 12px!important;
+  padding:15px 17px!important;
+  border:1px solid rgba(193,111,84,.18)!important;
+  border-radius:22px!important;
+  background:
+    radial-gradient(circle at 94% 0%,rgba(193,111,84,.12),transparent 34%),
+    linear-gradient(145deg,#FFFDF8,#F1F5EC)!important;
+  color:#10132D!important;
+  text-decoration:none!important;
+  box-shadow:0 12px 28px rgba(16,19,45,.055),inset 0 1px 0 rgba(255,255,255,.88)!important;
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease!important;
+}
+
+.profile-shell .bible-shortcut:hover{
+  transform:translateY(-1px)!important;
+  border-color:rgba(193,111,84,.30)!important;
+  box-shadow:0 16px 32px rgba(16,19,45,.075),inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+
+.profile-shell .bible-shortcut:focus-visible{
+  outline:3px solid rgba(193,111,84,.22)!important;
+  outline-offset:3px!important;
+}
+
+.profile-shell .bible-shortcut-icon{
+  width:46px!important;
+  height:46px!important;
+  flex:0 0 46px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:15px!important;
+  background:#FFF9F3!important;
+  color:#A85A43!important;
+  box-shadow:0 7px 16px rgba(90,77,60,.08),inset 0 1px 0 rgba(255,255,255,.9)!important;
+}
+
+.profile-shell .bible-shortcut-copy{
+  min-width:0!important;
+  display:grid!important;
+  gap:4px!important;
+}
+
+.profile-shell .bible-shortcut-copy b{
+  color:#10132D!important;
+  font-size:14.5px!important;
+  line-height:1.25!important;
+  font-weight:780!important;
+}
+
+.profile-shell .bible-shortcut-copy small{
+  color:#687268!important;
+  font-size:12px!important;
+  line-height:1.4!important;
+}
+
+.profile-shell .bible-shortcut-arrow{
+  margin-left:auto!important;
   color:#8B97A9!important;
   font-size:24px!important;
 }

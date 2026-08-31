@@ -60,7 +60,7 @@ async function ensureProfile(supabase, user) {
   return profile;
 }
 
-export default async function Perfil() {
+export default async function Perfil({ searchParams }) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
@@ -143,8 +143,10 @@ export default async function Perfil() {
   // mexer no acervo de alguém. Ver supabase/citacao-aba.sql.
   // ============================================================
   const ehCitacao = (m) => m.kind === 'quote';
+  const ehBiblica = (m) => m.kind === 'bible';
   const myQuotes = myMedia.filter(ehCitacao);
-  const myAlbum = myMedia.filter((m) => !ehCitacao(m));
+  const myBible = myMedia.filter(ehBiblica);
+  const myAlbum = myMedia.filter((m) => !ehCitacao(m) && !ehBiblica(m));
 
   // ---- Próximo Capítulo (casa fixa: sempre disponível aqui) ----
   const primary = list[0] || null;
@@ -315,6 +317,17 @@ export default async function Perfil() {
           <span className="tree-shortcut-arrow" aria-hidden="true">›</span>
         </a>
 
+        <a className="bible-shortcut" href="/mensagem-biblica">
+          <span className="bible-shortcut-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H12v18H7.5A3.5 3.5 0 0 0 4 23z" />
+              <path d="M20 5.5A3.5 3.5 0 0 0 16.5 2H12v18h4.5a3.5 3.5 0 0 1 3.5 3z" />
+            </svg>
+          </span>
+          <span className="bible-shortcut-copy"><b>{t.bibleTitle}</b><small>{t.bibleShortcutSub}</small></span>
+          <span className="bible-shortcut-arrow" aria-hidden="true">›</span>
+        </a>
+
         <a className="diary-shortcut profile-diary-shortcut" href="/diario">
           <span className="diary-shortcut-icon" aria-hidden="true">✎</span>
           <span><b>{t.navDiary}</b><small>{t.diarySub}</small></span>
@@ -363,7 +376,8 @@ export default async function Perfil() {
         {/* as abas existem sempre: sem jornada, a pessoa ainda tem álbum
             e pessoas para explorar — e o vazio precisa de uma saída */}
         <ProfileTabs
-            labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, quotes: t.profTabQuotes, people: t.profTabPeople }}
+            labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, quotes: t.profTabQuotes, bible: t.profTabBible, people: t.profTabPeople }}
+            initialTab={searchParams?.aba === 'biblia' ? 'bible' : undefined}
             extraTab={<><a className="ptab ptab-link" href="/diario">{t.navDiary}</a><a className="ptab ptab-link" href="/futuro">{t.futureTitle}</a></>}
             journeys={(
               <>
@@ -408,6 +422,14 @@ export default async function Perfil() {
               <div className="tab-empty">
                 <p>{t.quotesEmpty}</p>
                 <a className="cta" href="/citacao">{t.quotesEmptyCta}</a>
+              </div>
+            )}
+            bible={myBible.length > 0 ? (
+              <MediaGallery items={myBible} showVis visLabels={{ public: t.pubPublic, followers: t.pubFollowers, private: t.pubPrivate }} own deleteLabel={t.mediaDelete} deleteConfirm={t.mediaDeleteConfirm} navLabels={{ close: t.commentClose, previous: t.dpPrev, next: t.dpNext }} />
+            ) : (
+              <div className="tab-empty">
+                <p>{t.bibleEmpty}</p>
+                <a className="cta" href="/mensagem-biblica">{t.bibleEmptyCta}</a>
               </div>
             )}
             people={(

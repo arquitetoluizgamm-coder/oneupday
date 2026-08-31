@@ -12,7 +12,7 @@ import { useState } from 'react';
 // Com um painel só, a barra de abas não aparece: uma aba sozinha
 // não é escolha, é enfeite.
 // ============================================================
-export default function ProfileTabs({ labels, journeys, album, quotes, people, actions, extraTab }) {
+export default function ProfileTabs({ labels, journeys, album, quotes, bible, people, actions, extraTab, initialTab }) {
   const L = labels || {};
 
   // Citações vêm depois do álbum e antes de pessoas: as três primeiras
@@ -21,10 +21,12 @@ export default function ProfileTabs({ labels, journeys, album, quotes, people, a
     ['journeys', L.journeys, journeys],
     ['album', L.album, album],
     ['quotes', L.quotes, quotes],
+    ['bible', L.bible, bible],
     ['people', L.people, people],
   ].filter(([, , painel]) => painel !== null && painel !== undefined && painel !== false);
 
-  const [tab, setTab] = useState(abas[0] ? abas[0][0] : 'journeys');
+  const firstTab = abas.some(([key]) => key === initialTab) ? initialTab : (abas[0] ? abas[0][0] : 'journeys');
+  const [tab, setTab] = useState(firstTab);
   // se a aba guardada sumiu (o álbum ficou vazio, por exemplo), cai na primeira
   const atual = abas.some(([k]) => k === tab) ? tab : (abas[0] ? abas[0][0] : '');
 

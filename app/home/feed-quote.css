@@ -209,3 +209,17 @@
     transform:none!important;
   }
 }
+
+/* A mensagem bíblica usa a mesma estrutura humana da citação, mas uma
+   atmosfera própria. O texto no card é uma explicação, nunca o versículo. */
+.feed-page .feed-stream > article.entry.entry-bible{
+  border-color:rgba(132,149,126,.22)!important;
+  background:
+    radial-gradient(circle at 92% 7%,rgba(193,111,84,.10),transparent 27%),
+    #FFFDF8!important;
+}
+.feed-page .entry-bible .entry-media,
+.feed-page .entry-bible .entry-media.livre{
+  background:linear-gradient(145deg,#F8F3E8,#E7EEE1)!important;
+  box-shadow:0 14px 30px rgba(62,75,55,.14),inset 0 1px 0 rgba(255,255,255,.55)!important;
+}

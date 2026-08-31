@@ -175,7 +175,8 @@ async function ProfilePage({ handle }) {
   const { profile, journeys, statsById, photoBy, media } = data;
   // Citação tem aba própria: ela é texto desenhado, não foto.
   const citacoes = media.filter((m) => m.kind === 'quote');
-  const album = media.filter((m) => m.kind !== 'quote');
+  const mensagensBiblicas = media.filter((m) => m.kind === 'bible');
+  const album = media.filter((m) => m.kind !== 'quote' && m.kind !== 'bible');
   const t = getDict(getLocale());
   const initial = (profile.name || '?')[0];
 
@@ -250,7 +251,7 @@ async function ProfilePage({ handle }) {
             de alguem com cinco jornadas rolava a pagina inteira — e quem
             nao sabia que existia album nunca chegava la. */}
         <ProfileTabs
-          labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, quotes: t.profTabQuotes }}
+          labels={{ journeys: t.profTabJourneys, album: t.profTabAlbum, quotes: t.profTabQuotes, bible: t.profTabBible }}
           journeys={(
             <>
               {journeys.length === 0 && <div className="empty"><b>{t.noPublicJourneys}</b></div>}
@@ -277,6 +278,7 @@ async function ProfilePage({ handle }) {
           /* sem foto nenhuma, a aba nao existe — nao ha nada atras dela */
           album={album.length > 0 ? <MediaGallery items={album} navLabels={{ close: t.commentClose, previous: t.dpPrev, next: t.dpNext }} /> : null}
           quotes={citacoes.length > 0 ? <MediaGallery items={citacoes} navLabels={{ close: t.commentClose, previous: t.dpPrev, next: t.dpNext }} /> : null}
+          bible={mensagensBiblicas.length > 0 ? <MediaGallery items={mensagensBiblicas} navLabels={{ close: t.commentClose, previous: t.dpPrev, next: t.dpNext }} /> : null}
           people={null}
         />
       </main>
