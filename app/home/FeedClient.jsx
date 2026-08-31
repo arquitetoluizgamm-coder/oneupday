@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, Fragment } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useLayoutEffect, useRef, useState, Fragment } from 'react';
 import EncourageBar from '../[slug]/EncourageBar';
 import FeedShare from './FeedShare';
 import Comments from '../../components/Comments';
@@ -72,14 +72,62 @@ function avatarMoodClass(owner) {
 }
 
 const MediaPlaybackContext = createContext(null);
+const TRACK_PLAY_EVENT = 'one:track-play';
 
 function TrackTag({ track, float, hasBar }) {
   const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(false);
   const audio = useRef(null);
+  const shell = useRef(null);
+  const inView = useRef(false);
+  const instanceId = useId();
   const mediaRef = useContext(MediaPlaybackContext);
   const start = Math.max(0, Number(track.start_seconds) || 0);
   const duration = Math.max(0, Number(track.duration_seconds) || 0);
   const end = duration > 0 ? start + duration : Infinity;
+
+  const pause = useCallback(() => {
+    if (audio.current) audio.current.pause();
+    setPlaying(false);
+  }, []);
+
+  const playTrack = useCallback(async ({ reset = false, allowMutedFallback = true } = {}) => {
+    const player = audio.current;
+    if (!player) return false;
+    const video = mediaRef?.current;
+    const offset = video && (!duration || video.currentTime < duration) ? (video.currentTime || 0) : 0;
+    const target = start + offset;
+    if (reset || player.currentTime < start || player.currentTime >= end - 0.04) {
+      try { player.currentTime = target; } catch {}
+    }
+    player.volume = 0.85;
+    player.muted = false;
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent(TRACK_PLAY_EVENT, { detail: instanceId }));
+    }
+    try {
+      await player.play();
+      setMuted(false);
+      setPlaying(true);
+      return true;
+    } catch {
+      if (!allowMutedFallback) {
+        setPlaying(false);
+        return false;
+      }
+      player.muted = true;
+      try {
+        await player.play();
+        setMuted(true);
+        setPlaying(true);
+        return true;
+      } catch {
+        setMuted(true);
+        setPlaying(false);
+        return false;
+      }
+    }
+  }, [duration, end, instanceId, mediaRef, start]);
 
   function syncToVideo() {
     const player = audio.current;
@@ -98,19 +146,68 @@ function TrackTag({ track, float, hasBar }) {
 
   function toggle(e) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
-    if (!audio.current) return;
-    if (playing) {
-      audio.current.pause();
-      setPlaying(false);
-    } else {
-      const video = mediaRef?.current;
-      const offset = video && (!duration || video.currentTime < duration) ? (video.currentTime || 0) : 0;
-      try { audio.current.currentTime = start + offset; } catch {}
-      audio.current.volume = 0.85;
-      audio.current.play().catch(() => {});
-      setPlaying(true);
+    const player = audio.current;
+    if (!player) return;
+    if (!player.paused && player.muted) {
+      window.dispatchEvent(new CustomEvent(TRACK_PLAY_EVENT, { detail: instanceId }));
+      player.muted = false;
+      player.volume = 0.85;
+      player.play().then(() => {
+        setMuted(false);
+        setPlaying(true);
+      }).catch(pause);
+      return;
     }
+    if (!player.paused) {
+      pause();
+      return;
+    }
+    playTrack({ reset: false, allowMutedFallback: false });
   }
+
+  useEffect(() => {
+    const stopOtherTrack = (event) => {
+      if (event.detail !== instanceId) pause();
+    };
+    window.addEventListener(TRACK_PLAY_EVENT, stopOtherTrack);
+    return () => window.removeEventListener(TRACK_PLAY_EVENT, stopOtherTrack);
+  }, [instanceId, pause]);
+
+  useEffect(() => {
+    const node = shell.current?.closest('.entry-media, .entry-textcard')
+      || shell.current?.closest('article.entry')
+      || shell.current;
+    if (!node) return undefined;
+
+    if (!('IntersectionObserver' in window)) {
+      inView.current = true;
+      playTrack({ reset: true });
+      return () => pause();
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      const active = entry.isIntersecting && entry.intersectionRatio >= 0.58;
+      if (active === inView.current) return;
+      inView.current = active;
+      if (active) playTrack({ reset: true });
+      else pause();
+    }, { threshold: [0, 0.35, 0.58, 0.85] });
+    observer.observe(node);
+    return () => {
+      observer.disconnect();
+      inView.current = false;
+      pause();
+    };
+  }, [pause, playTrack]);
+
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.hidden) pause();
+      else if (inView.current) playTrack({ reset: false });
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, [pause, playTrack]);
 
   useEffect(() => {
     const video = mediaRef?.current;
@@ -142,9 +239,12 @@ function TrackTag({ track, float, hasBar }) {
     }
   }
 
+  const audible = playing && !muted;
+  const actionLabel = audible ? 'Pausar trilha' : (playing ? 'Ativar som' : 'Tocar trilha');
+
   const btn = (
-    <button type="button" className={`feed-track-spk${playing ? ' on' : ''}`} onClick={toggle} aria-label={playing ? 'pausar' : 'tocar'} title={track.title + (track.artist ? ` · ${track.artist}` : '')}>
-      {playing ? (
+    <button type="button" className={`feed-track-spk${audible ? ' on' : ''}`} onClick={toggle} aria-label={actionLabel} aria-pressed={audible} title={track.title + (track.artist ? ` · ${track.artist}` : '')}>
+      {audible ? (
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>
       ) : (
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
@@ -154,20 +254,20 @@ function TrackTag({ track, float, hasBar }) {
 
   if (float) {
     return (
-      <span className={`feed-track-float${hasBar ? ' above-bar' : ''}`}>
-        {playing && <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>}
+      <span ref={shell} className={`feed-track-float${hasBar ? ' above-bar' : ''}`}>
+        {audible && <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>}
         {btn}
-        <audio ref={audio} src={track.audio_url} onTimeUpdate={keepInsideClip} onEnded={() => setPlaying(false)} />
+        <audio ref={audio} src={track.audio_url} preload="metadata" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onVolumeChange={(event) => setMuted(event.currentTarget.muted)} onTimeUpdate={keepInsideClip} onEnded={() => setPlaying(false)} />
       </span>
     );
   }
 
   return (
-    <div className="feed-track">
+    <div ref={shell} className="feed-track">
       {btn}
       <span className="feed-track-name">{track.title}{track.artist ? ` · ${track.artist}` : ''}</span>
-      {playing && <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>}
-      <audio ref={audio} src={track.audio_url} onTimeUpdate={keepInsideClip} onEnded={() => setPlaying(false)} />
+      {audible && <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>}
+      <audio ref={audio} src={track.audio_url} preload="metadata" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onVolumeChange={(event) => setMuted(event.currentTarget.muted)} onTimeUpdate={keepInsideClip} onEnded={() => setPlaying(false)} />
     </div>
   );
 }

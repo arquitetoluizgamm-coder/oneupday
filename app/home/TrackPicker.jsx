@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 
-const PHOTO_CLIP_SECONDS = 15;
+const PHOTO_CLIP_SECONDS = 30;
 
 function clock(value) {
   const total = Math.max(0, Math.floor(Number(value) || 0));
@@ -57,14 +57,14 @@ export default function TrackPicker({ selected, onSelect, labels, videoDuration 
     });
   }
 
-  function preview(track, start = 0, duration = 15) {
+  function preview(track, start = 0, duration = PHOTO_CLIP_SECONDS) {
     if (!audioRef.current) return;
     if (playing === track.id) {
       stopPreview();
       return;
     }
     const from = Math.max(0, Number(start) || 0);
-    const length = Math.max(0.1, Number(duration) || 15);
+    const length = Math.max(0.1, Number(duration) || PHOTO_CLIP_SECONDS);
     audioRef.current.src = track.audio_url;
     audioRef.current.currentTime = from;
     previewEnd.current = Math.min(Number(track.duration || track.total_seconds) || Infinity, from + length);

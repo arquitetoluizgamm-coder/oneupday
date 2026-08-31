@@ -2388,8 +2388,8 @@ h1 { letter-spacing: -0.03em; }
 .entry-head .view-link:hover{border-color:var(--sage);background:var(--sage-soft)}
 
 /* ---- Alto-falante flutuante sobre o card (feed) ---- */
-.feed-track-float{position:absolute;right:10px;bottom:12px;z-index:3;display:inline-flex;align-items:center;gap:7px;pointer-events:none}
-.feed-track-float.above-bar{bottom:44px}
+.feed-track-float{position:absolute;right:10px;top:12px;bottom:auto;z-index:3;display:inline-flex;align-items:center;gap:7px;pointer-events:none}
+.feed-track-float.above-bar{top:12px;bottom:auto}
 .feed-track-float .feed-track-spk{pointer-events:auto;width:30px;height:30px;border:0;
   background:rgba(16,19,45,.38);color:#fff;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
   box-shadow:0 1px 6px rgba(9,10,20,.22);display:inline-flex;align-items:center;justify-content:center;

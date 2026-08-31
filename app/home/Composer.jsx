@@ -315,7 +315,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       row.track_audio_url = track.audio_url;
       row.track_id = track.id;
       row.track_start_seconds = Number(track.start_seconds) || 0;
-      row.track_duration_seconds = Number(track.duration_seconds) || 15;
+      row.track_duration_seconds = Number(track.duration_seconds) || 30;
       row.track_full = !!track.full;
     }
     let novo = null;

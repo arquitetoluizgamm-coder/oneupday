@@ -49,7 +49,7 @@ function trackFields(track) {
     track_audio_url: track.audio_url,
     track_id: track.id,
     track_start_seconds: Number(track.start_seconds) || 0,
-    track_duration_seconds: Number(track.duration_seconds) || 15,
+    track_duration_seconds: Number(track.duration_seconds) || 30,
     track_full: !!track.full,
   };
 }
