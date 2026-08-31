@@ -19,6 +19,12 @@ body:has(.biblical-page){
 .biblical-reading>div b{display:block;margin-bottom:5px;color:#A85A43;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase}
 .biblical-reading>div p{margin:0;color:#343A34;font-size:13.5px;line-height:1.55;font-weight:620}
 .biblical-reading small{color:#7B7C75;font-size:11px;line-height:1.45}
+.biblical-music{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:0;padding:16px 18px;border:1px solid rgba(132,149,126,.24);border-radius:20px;background:linear-gradient(145deg,#FCFBF6,#F1F5EC)}
+.biblical-music>div:first-child{display:grid;gap:3px;min-width:0}
+.biblical-music>div:first-child span{color:#31354A;font-size:12px;font-weight:800}
+.biblical-music>div:first-child small{color:#737783;font-size:11px;line-height:1.35}
+.biblical-music .composer-toolbar{flex:0 1 auto}
+.biblical-music .track-picker.has-selection{max-width:min(270px,48vw)}
 .biblical-visibility{display:grid;gap:10px;padding:18px;border:1px solid rgba(222,213,199,.78);border-radius:20px;background:#FFFDF9}
 .biblical-visibility>span{color:#31354A;font-size:12px;font-weight:800}
 .biblical-visibility>p{margin:0;color:#737783;font-size:11.5px;line-height:1.45}
@@ -32,6 +38,6 @@ body:has(.biblical-page){
 .biblical-error{display:grid;justify-items:center;gap:12px;padding:22px;border:1px solid rgba(193,111,84,.22);border-radius:18px;background:#FFF8F4;text-align:center}
 .biblical-error p{margin:0;color:#7E4636;font-size:13px;line-height:1.5}
 @keyframes biblePulse{50%{box-shadow:0 0 0 14px rgba(132,149,126,0);transform:scale(1.03)}}
-@media(max-width:430px){.biblical-page{padding-inline:14px}.biblical-head h1{font-size:34px}.biblical-preview{padding:7px;border-radius:20px}.biblical-reading{padding:18px}.biblical-visibility{padding:15px}}
+@media(max-width:430px){.biblical-page{padding-inline:14px}.biblical-head h1{font-size:34px}.biblical-preview{padding:7px;border-radius:20px}.biblical-reading{padding:18px}.biblical-music{align-items:flex-start;padding:15px}.biblical-music .track-picker.has-selection{max-width:52vw}.biblical-visibility{padding:15px}}
 @media(prefers-reduced-motion:reduce){.biblical-pulse{animation:none}}
 

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
+import TrackPicker from '../home/TrackPicker';
 
 const WIDTH = 1080;
 const HEIGHT = 1350;
@@ -143,6 +144,26 @@ function asCaption(message) {
   return `${message.reference}\n${message.title}\n\n${message.explanation}\n\n${message.application}`.trim();
 }
 
+function trackFields(track) {
+  if (!track) return {};
+  return {
+    track_title: track.title,
+    track_artist: track.artist,
+    track_audio_url: track.audio_url,
+    track_id: track.id,
+    track_start_seconds: Number(track.start_seconds) || 0,
+    track_duration_seconds: Number(track.duration_seconds) || 30,
+    track_full: !!track.full,
+  };
+}
+
+function removeTrackFields(row) {
+  const clean = { ...row };
+  ['track_title', 'track_artist', 'track_audio_url', 'track_id', 'track_start_seconds', 'track_duration_seconds', 'track_full']
+    .forEach((key) => delete clean[key]);
+  return clean;
+}
+
 async function canvasBlob(canvas) {
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error('image')), 'image/png');
@@ -154,6 +175,7 @@ export default function BiblicalMessageForm({ t, userId }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [visibility, setVisibility] = useState('private');
+  const [track, setTrack] = useState(null);
   const [error, setError] = useState('');
   const canvas = useRef(null);
   const router = useRouter();
@@ -209,13 +231,24 @@ export default function BiblicalMessageForm({ t, userId }) {
       });
       if (uploadError) throw uploadError;
       const url = supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
-      const { error: insertError } = await supabase.from('media').insert({
+      let row = {
         user_id: userId,
         url,
         kind: 'bible',
         visibility,
         caption: asCaption(message),
-      });
+        ...trackFields(track),
+      };
+      let insertError = null;
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        ({ error: insertError } = await supabase.from('media').insert(row));
+        if (!insertError) break;
+        if (/track_/.test(insertError.message || '') && row.track_audio_url) {
+          row = removeTrackFields(row);
+          continue;
+        }
+        break;
+      }
       if (insertError) throw insertError;
       router.push('/perfil?aba=biblia');
       router.refresh();
@@ -251,6 +284,31 @@ export default function BiblicalMessageForm({ t, userId }) {
             <p>{message.explanation}</p>
             <div><b>{t.bibleTodayLabel}</b><p>{message.application}</p></div>
             <small>{t.bibleNoQuoteLong}</small>
+          </div>
+
+          <div className="biblical-music media-music-field">
+            <div>
+              <span>{t.musicAdd}</span>
+              <small>{t.musicOfficial}</small>
+            </div>
+            <div className="composer-toolbar"><div className="tools">
+              <TrackPicker selected={track} onSelect={setTrack} labels={{
+                add: t.musicAdd,
+                title: t.musicTitle,
+                use: t.musicUse,
+                remove: t.musicRemove,
+                empty: t.musicEmpty,
+                searchPh: t.musicSearchPh,
+                keyNeeded: t.musicKeyNeeded,
+                official: t.musicOfficial,
+                clip: t.musicClip,
+                starts: t.musicStarts,
+                whole: t.musicWhole,
+                seconds: t.musicSeconds,
+                videoLength: t.musicVideoLength,
+                done: t.musicDone,
+              }} />
+            </div></div>
           </div>
 
           <div className="biblical-visibility">

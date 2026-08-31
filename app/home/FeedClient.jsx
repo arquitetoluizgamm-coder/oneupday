@@ -429,7 +429,7 @@ function MidiaGaleria({ item, labels }) {
   const [proporcao, setProporcao] = useState(null);
   const legendaEmCima = item.kind === 'video' && ehVertical(proporcao);
   const textualCard = item.kind === 'quote' || item.kind === 'bible';
-  const mostrarLegenda = item.caption && item.kind !== 'quote' && !legendaEmCima;
+  const mostrarLegenda = item.caption && item.kind !== 'quote' && item.kind !== 'bible' && !legendaEmCima;
   const trackEl = item.track ? <TrackTag track={item.track} float hasBar={false} /> : null;
 
   return (
@@ -438,7 +438,7 @@ function MidiaGaleria({ item, labels }) {
         ? <Media video={item.url} labels={labels} caption={item.caption} onRatio={setProporcao}>{trackEl}</Media>
         : <Media photo={item.url} alt={textualCard ? (item.caption || '') : ''}>{trackEl}</Media>}
       {mostrarLegenda && (
-        <div className="dp-text under"><EntryText text={item.caption} labels={labels} limit={item.kind === 'bible' ? 280 : 100} /></div>
+        <div className="dp-text under"><EntryText text={item.caption} labels={labels} limit={100} /></div>
       )}
     </>
   );
