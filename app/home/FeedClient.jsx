@@ -285,7 +285,7 @@ function MidiaGaleria({ item, labels }) {
 }
 
 // ---- Um card por jornada: mostra o dia mais recente. Sem slides. ----
-function DayPager({ item, labels, dayLabel, dark }) {
+function DayPager({ item, labels, dayLabel }) {
   const [days, setDays] = useState(item.days || []);
   const [proporcao, setProporcao] = useState(null);
   if (!days.length) return null;
@@ -312,7 +312,7 @@ function DayPager({ item, labels, dayLabel, dark }) {
               {d.video_url && !d.photo_url && <Media video={d.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackEl}</Media>}
             </>
           ) : (
-            <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${dark ? ' dark' : ''}${cleanText ? '' : ' so-selo'}`}>
+            <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText ? '' : ' so-selo'}`}>
               {cleanText
                 ? <CardText text={cleanText} labels={labels} mencoes={d.mencoes} />
                 : <SeloDoDia kind={d.kind} dia={d.day_number} labels={labels.selo} />}
@@ -748,7 +748,7 @@ export default function FeedClient({ labels }) {
                 onChanged={(patch) => setItems((prev) => patch === null ? prev.filter((x) => x.id !== item.id) : prev.map((x) => x.id === item.id ? { ...x, ...patch } : x))} />}
             </div>
             {item.days && !item.demo ? (
-              <DayPager item={item} labels={labels} dayLabel={dayLabel} dark={idx % 3 === 2} />
+              <DayPager item={item} labels={labels} dayLabel={dayLabel} />
             ) : (
             <>
             {item.closes && item.closes.step && (

@@ -5,7 +5,6 @@ import { getDict } from '../../lib/i18n';
 import AppTop from '../../components/AppTop';
 import BottomNav from '../../components/BottomNav';
 import FeedClient from './FeedClient';
-import HomeWelcome from './HomeWelcome';
 import NextStep from './NextStep';
 import ProgressBar from '../../components/ProgressBar';
 import Track from '../../components/Track';
@@ -43,54 +42,21 @@ export default async function Home() {
   if (!user) redirect('/login');
   const profile = await ensureProfile(supabase, user);
   const t = getDict(getLocale());
-  const { count: unread } = await supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('recipient_id', user.id).eq('read', false);
 
   const { data: journeys } = await supabase.from('journeys').select('*').eq('owner_id', user.id).order('created_at', { ascending: false });
   const list = journeys || [];
   let primary = list[0] || null;
-  let pstats = {};
-  if (primary) { const { data: st } = await supabase.from('journey_stats').select('*').eq('journey_id', primary.id).maybeSingle(); pstats = st || {}; }
-  let welcomeJourneys = list;
   if (list.length) {
     const { data: stats } = await supabase.from('journey_stats').select('journey_id, current_day').in('journey_id', list.map((j) => j.id));
     const byId = Object.fromEntries((stats || []).map((s) => [s.journey_id, s.current_day || 0]));
-    welcomeJourneys = list.map((j) => ({ ...j, current_day: byId[j.id] || 0, concluida: (byId[j.id] || 0) >= (j.total_days || 0) }));
-  }
-
-  const completedJourneys = welcomeJourneys.filter((j) => j.concluida);
-  const activeJourneys = welcomeJourneys.filter((j) => !j.concluida);
-  primary = activeJourneys[0] || primary;
-
-  if (list.length) {
-    const jIds = list.map((j) => j.id);
-    // `created_at` entra aqui de graça: a consulta já existia, só não
-    // trazia a data. É com ela que a tela de entrada descobre se a
-    // pessoa JÁ registrou hoje — a informação mais importante que esta
-    // página tem, e que ela vinha ignorando.
-    const { data: myUps } = await supabase.from('updates').select('id, journey_id, created_at').in('journey_id', jIds);
-
-    // dia local, não UTC: quem registra às 22h de Brasília não pode
-    // ver o app dizer que ainda não registrou.
-    const hojeLocal = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-    const registradasHoje = new Set(
-      (myUps || [])
-        .filter((u) => u.created_at && new Date(new Date(u.created_at).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10) === hojeLocal)
-        .map((u) => u.journey_id),
-    );
-    welcomeJourneys = welcomeJourneys.map((j) => ({ ...j, hoje: registradasHoje.has(j.id) }));
+    primary = list.find((j) => (byId[j.id] || 0) < (j.total_days || 0)) || primary;
   }
 
   let moodToday = false;
   try { const { data: mp } = await supabase.from('profiles').select('mood, mood_at').eq('id', user.id).maybeSingle(); if (mp?.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) moodToday = !!mp.mood; } catch {}
 
-  let aiPrefOff = false;
-  try { const { data: pref } = await supabase.from('profiles').select('ai_opt_out').eq('id', user.id).maybeSingle(); aiPrefOff = !!pref?.ai_opt_out; } catch { }
-  const aiOn = !!process.env.OPENAI_API_KEY && !aiPrefOff && !!primary;
-
   // ---- Próximo Capítulo: antecipação pelo amanhã, nunca ansiedade ----
   const nc = await computeNextChapter(supabase, user.id, primary, t);
-
-  const kindLabels = { step: t.kindStep, win: t.kindWin, setback: t.kindSetback, learned: t.kindLearned };
 
   const feedLabels = {
     dayShort: t.dayShort, journeyStatusFmt: t.journeyStatusFmt, tagSetback: t.tagSetback, tagWin: t.tagWin,
@@ -127,8 +93,7 @@ export default async function Home() {
 
   return (
     <>
-      {/* mesmo topo do resto do app. A home passa os numeros do sino
-          porque ja os calculou aqui — evita repetir as consultas. */}
+      {/* Mesmo topo global usado no restante do app. */}
       <AppTop sino />
 
       <Track type="visit" meta={{ page: "home" }} />
@@ -136,17 +101,7 @@ export default async function Home() {
       <ScrollChrome />
       <DailyMood userId={user.id} answeredToday={moodToday} labels={{ title: t.dailyMoodTitle, sub: t.dailyMoodSub, skip: t.dailyMoodSkip, moods: { down: t.moodDown, anxious: t.moodAnxious, angry: t.moodAngry, tired: t.moodTired, motivated: t.moodMotivated, happy: t.moodHappy, grateful: t.moodGrateful } }} />
       <main className="wrap feed-page">
-        <HomeWelcome journeys={activeJourneys} completedJourneys={completedJourneys} name={profile.name || ''} naoLidas={unread || 0} labels={{
-          newEyebrow: t.homeWelcomeNewEyebrow, newTitle: t.homeWelcomeNewTitle, newSub: t.homeWelcomeNewSub,
-          newCta: t.homeWelcomeNewCta, skip: t.homeWelcomeSkip, backEyebrow: t.homeWelcomeBackEyebrow,
-          backTitle: t.homeWelcomeBackTitle, backLead: t.homeWelcomeBackLead, backSub: t.homeWelcomeBackSub, register: t.homeWelcomeRegister,
-          doneTitle: t.homeWelcomeDoneTitle, doneSub: t.homeWelcomeDoneSub, doneToday: t.homeWelcomeDoneToday,
-          choose: t.homeWelcomeChoose, seeFeed: t.homeWelcomeSeeFeed, feedWithNews: t.homeWelcomeFeedNews,
-          exemplos: t.homeWelcomeExemplos, seeOthers: t.homeWelcomeSeeOthers, diaryLater: t.homeWelcomeDiaryLater,
-          day: t.homeWelcomeDay, journeySub: t.homeWelcomeJourneySub, diaryTitle: t.navDiary, diaryWrite: t.homeWelcomeDiaryWrite, diarySub: t.diarySub,
-          memoryNew: t.homeWelcomeMemoryNew, memoryBack: t.homeWelcomeMemoryBack, memoryDone: t.homeWelcomeMemoryDone,
-          ritualLabel: t.homeWelcomeRitualLabel, tree: t.navTree, diary: t.navDiary, future: t.navFuture,
-        }} />
+        <FeedClient mutedCats={profile.muted_cats || ''} labels={feedLabels} />
         <a className="diary-shortcut" href="/diario">
           <span className="diary-shortcut-icon" aria-hidden="true">✎</span>
           <span><b>{t.navDiary}</b><small>{t.diarySub}</small></span>
@@ -160,7 +115,6 @@ export default async function Home() {
         {nc.mode && (
           <NextChapter mode={nc.mode} line={nc.line} env={nc.env} labels={ncLabels(t, nc)} dismissible />
         )}
-        <FeedClient mutedCats={profile.muted_cats || ''} labels={feedLabels} />
       </main>
       <BottomNav active="home" t={t} />
     </>

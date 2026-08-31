@@ -12160,8 +12160,24 @@ body:has(.auth-wrap){
   margin:0!important;
   border-radius:20px!important;
   overflow:hidden!important;
-  background:#141722!important;
   box-shadow:0 1px 0 rgba(255,255,255,.75),0 10px 24px rgba(16,19,45,.08)!important;
+}
+
+.feed-page .entry-media,
+.feed-page .dp-stage .entry-media{
+  background:#141722!important;
+}
+
+.feed-page .entry-textcard,
+.feed-page .dp-stage .entry-textcard{
+  background:linear-gradient(145deg,#FFFDF9 0%,#F7F0E6 100%)!important;
+  border:1px solid rgba(222,213,199,.76)!important;
+  color:var(--one-ink,#10132d)!important;
+}
+
+.feed-page .entry-textcard .dpc-text,
+.feed-page .dp-stage .entry-textcard .dpc-text{
+  color:var(--one-ink,#10132d)!important;
 }
 
 .feed-page .entry-media img,
