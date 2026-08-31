@@ -33,6 +33,7 @@ import ChallengeRespond from '../../components/ChallengeRespond';
 import PushToggle from '../../components/PushToggle';
 import EcoToggle from '../../components/EcoToggle';
 import LanguagePicker from '../../components/LanguagePicker';
+import OneSocialLinks from '../../components/OneSocialLinks';
 import './profile-redesign.css';
 
 export const dynamic = 'force-dynamic';
@@ -65,7 +66,8 @@ export default async function Perfil({ searchParams }) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
   const profile = await ensureProfile(supabase, user);
-  const t = getDict(getLocale());
+  const locale = getLocale();
+  const t = getDict(locale);
 
   const { data: journeys } = await supabase.from('journeys').select('*').eq('owner_id', user.id).order('created_at', { ascending: false });
   const list = journeys || [];
@@ -479,6 +481,7 @@ export default async function Perfil({ searchParams }) {
             )}
           />
 
+        <OneSocialLinks locale={locale} />
 
         {nc.mode && (
           <div className="nc-neutral">

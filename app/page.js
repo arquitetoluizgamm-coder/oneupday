@@ -8,6 +8,7 @@ import Origem from '../components/Origem';
 import Motion from '../components/Motion';
 import AnimatedLogo from '../components/AnimatedLogo';
 import JornadaExemplo from '../components/JornadaExemplo';
+import LandingVideo from '../components/LandingVideo';
 import { exemploJornada } from '../lib/exemploJornada';
 
 export const dynamic = 'force-dynamic';
@@ -39,9 +40,10 @@ export default async function Home() {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (user) redirect('/home');
-  const t = getDict(getLocale());
+  const locale = getLocale();
+  const t = getDict(locale);
   const featured = await loadFeatured();
-  const exemplo = exemploJornada(getLocale());
+  const exemplo = exemploJornada(locale);
 
   // Demonstração fixa e controlada — a primeira impressão da marca não
   // depende das fotos dos primeiros usuários.
@@ -150,6 +152,8 @@ export default async function Home() {
             ))}
           </div>
         </section>
+
+        <LandingVideo locale={locale} />
 
         {/* ═══ 4 · O DIFERENCIAL ══════════════════════════════════ */}
         <section className="land-see">

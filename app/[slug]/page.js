@@ -27,6 +27,7 @@ import FechaMenus from '../../components/FechaMenus';
 import SeloDoDia from '../../components/SeloDoDia';
 import { textoDaPessoa } from '../../lib/registro';
 import { textoAlternativo } from '../../lib/alt';
+import OneSocialLinks from '../../components/OneSocialLinks';
 
 // O topo agora mostra avatar e sino de quem esta olhando, ou seja a
 // pagina depende da sessao. Ela ja era dinamica de fato (o codigo le
@@ -177,7 +178,8 @@ async function ProfilePage({ handle }) {
   const citacoes = media.filter((m) => m.kind === 'quote');
   const mensagensBiblicas = media.filter((m) => m.kind === 'bible');
   const album = media.filter((m) => m.kind !== 'quote' && m.kind !== 'bible');
-  const t = getDict(getLocale());
+  const locale = getLocale();
+  const t = getDict(locale);
   const initial = (profile.name || '?')[0];
 
   // ---- Desafios: botão (entre quem se segue) + área pública ----
@@ -281,6 +283,7 @@ async function ProfilePage({ handle }) {
           bible={mensagensBiblicas.length > 0 ? <MediaGallery items={mensagensBiblicas} navLabels={{ close: t.commentClose, previous: t.dpPrev, next: t.dpNext }} /> : null}
           people={null}
         />
+        <OneSocialLinks locale={locale} />
       </main>
       <footer className="foot">One <b>Up</b> Day · {t.tagline} · oneupday.app/{profile.handle}</footer>
     </>
