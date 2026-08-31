@@ -904,7 +904,6 @@ a.moment-tag:hover{background:rgba(255,255,255,.28)}
 .track-search{display:flex;gap:6px;margin-bottom:8px}
 .track-search input{flex:1;border:1px solid var(--line,#eceaf3);border-radius:10px;padding:8px 10px;font-size:14px}
 .track-search button{border:0;background:var(--soft,#f2f0f9);border-radius:10px;padding:0 12px;cursor:pointer}
-.track-credit{font-size:11px;color:var(--muted);text-align:center;margin:8px 0 0}
 /* Composer: área de texto que cresce */
 .composer2-input{display:block;resize:none;line-height:1.5;min-height:48px;max-height:220px;overflow-y:auto;font-family:inherit;font-size:15px}
 
@@ -12161,6 +12160,62 @@ body:has(.auth-wrap){
   border-radius:20px!important;
   overflow:hidden!important;
   box-shadow:0 1px 0 rgba(255,255,255,.75),0 10px 24px rgba(16,19,45,.08)!important;
+}
+
+/* Catálogo oficial e seleção do trecho da música */
+.track-panel{
+  width:min(390px,calc(100vw - 32px));
+  max-width:none;
+  padding:14px;
+  border-color:rgba(199,107,76,.22);
+  border-radius:16px;
+  background:#fffdf9;
+  box-shadow:0 18px 44px rgba(16,19,45,.16);
+}
+.track-panel-head>div{display:flex;min-width:0;flex-direction:column;gap:2px}
+.track-panel-head b{color:var(--ink);font-size:15px}
+.track-panel-head small{color:var(--muted);font-size:11px;font-weight:600}
+.track-panel-head button{width:36px;height:36px;border-radius:50%;font-size:20px}
+.track-panel-head button:hover{background:rgba(16,19,45,.05)}
+.track-list{max-height:300px;overscroll-behavior:contain}
+.track-row{min-height:52px;padding:8px}
+.track-use,.track-done{background:var(--terra,#c76b4c);color:#fff}
+.track-picker.has-selection{max-width:min(260px,52vw)}
+.track-chip{width:100%;min-width:0;padding:4px 5px 4px 10px;gap:4px;background:#f3f6ef;border-color:#d7e0d1;color:var(--ink)}
+.track-chip-main{display:flex;min-width:0;flex:1;flex-direction:column;align-items:flex-start;border:0;background:transparent;color:inherit;cursor:pointer;text-align:left}
+.track-chip-main span{display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:700}
+.track-chip-main small{color:var(--muted);font-size:10px;font-weight:600}
+.track-chip-remove{flex:0 0 34px;width:34px;height:34px;border-radius:50%!important}
+.track-clip-song{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid rgba(16,19,45,.06);border-bottom:1px solid rgba(16,19,45,.06)}
+.track-change{border:0;background:transparent;color:var(--terra,#a95036);font-size:11px;font-weight:700;cursor:pointer}
+.track-clip-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 10px}
+.track-clip-summary b{color:var(--ink);font-size:13px}
+.track-clip-summary span{color:var(--terra,#a95036);font-size:12px;font-weight:700;white-space:nowrap}
+.track-range{display:flex;flex-direction:column;gap:7px;color:var(--muted);font-size:12px;font-weight:600}
+.track-range input{width:100%;accent-color:var(--terra,#c76b4c);cursor:pointer}
+.track-range-scale{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}
+.track-range-scale i{font-style:normal}
+.track-done{width:100%;min-height:42px;margin-top:14px;border:0;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer}
+.track-play:focus-visible,.track-use:focus-visible,.track-done:focus-visible,.track-change:focus-visible,.track-chip button:focus-visible,.track-panel-head button:focus-visible,.track-range input:focus-visible{outline:3px solid rgba(199,107,76,.35);outline-offset:2px}
+.media-music-field{position:relative;margin-top:16px}
+.media-music-field>.field-label,.media-music-field>.cit-label{display:block;margin-bottom:8px}
+.media-music-field .composer-toolbar{display:flex;justify-content:flex-start;margin:0;padding:0;border:0;background:transparent;box-shadow:none}
+.media-music-field .tools{display:flex;min-width:0}
+
+@media(max-width:520px){
+  .track-panel{
+    position:fixed;
+    left:16px;
+    right:16px;
+    bottom:calc(16px + env(safe-area-inset-bottom));
+    width:auto;
+    max-height:min(72svh,620px);
+    margin:0;
+    overflow:auto;
+    z-index:120;
+  }
+  .track-list{max-height:min(48svh,360px)}
+  .track-picker.has-selection{max-width:56vw}
 }
 
 .feed-page .entry-media,

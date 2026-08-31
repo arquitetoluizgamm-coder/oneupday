@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 import { FUNDOS, fundosPara, corpoPara } from '../../lib/fundos';
+import TrackPicker from '../home/TrackPicker';
 
 // ============================================================
 // CITAÇÃO
@@ -39,6 +40,25 @@ function quebrar(ctx, texto, larg) {
 const ASPA_ESCALA = 3.2;   // em relação ao corpo do texto
 const ASPA_ALTURA = 0.56;  // altura visual da aspa dentro do seu em
 const ASPA_OPACIDADE = 0.26;
+
+function trackFields(track) {
+  if (!track) return {};
+  return {
+    track_title: track.title,
+    track_artist: track.artist,
+    track_audio_url: track.audio_url,
+    track_id: track.id,
+    track_start_seconds: Number(track.start_seconds) || 0,
+    track_duration_seconds: Number(track.duration_seconds) || 15,
+    track_full: !!track.full,
+  };
+}
+
+function removeTrackFields(row) {
+  const clean = { ...row };
+  ['track_title', 'track_artist', 'track_audio_url', 'track_id', 'track_start_seconds', 'track_duration_seconds', 'track_full'].forEach((key) => delete clean[key]);
+  return clean;
+}
 
 function desenhar(ctx, img, fundo, texto, autor) {
   ctx.clearRect(0, 0, LARG, ALT);
@@ -102,6 +122,7 @@ export default function CitacaoForm({ t, userId, autorPadrao }) {
   const [erro, setErro] = useState('');
   const [visibilidade, setVisibilidade] = useState('public');
   const [publicando, setPublicando] = useState(false);
+  const [track, setTrack] = useState(null);
   const canvas = useRef(null);
   const imgs = useRef({});
   const router = useRouter();
@@ -181,14 +202,26 @@ export default function CitacaoForm({ t, userId, autorPadrao }) {
       // kind 'quote' e não 'photo': é o que separa a citação do álbum.
       // A coluna não tem CHECK, então o valor entra direto — mas se um
       // dia tiver, a citação volta a ser foto em vez de não ser nada.
-      const linha = { user_id: userId, url, kind: 'quote', visibility: visibilidade, caption: texto.trim() };
-      let { error } = await supabase.from('media').insert(linha);
-      if (error && /caption|column/i.test(error.message || '')) {
-        const { caption: _c, ...semCap } = linha;
-        ({ error } = await supabase.from('media').insert(semCap));
-      }
-      if (error && /kind|check|constraint/i.test(error.message || '')) {
-        ({ error } = await supabase.from('media').insert({ ...linha, kind: 'photo' }));
+      let linha = { user_id: userId, url, kind: 'quote', visibility: visibilidade, caption: texto.trim(), ...trackFields(track) };
+      let error = null;
+      for (let attempt = 0; attempt < 4; attempt += 1) {
+        ({ error } = await supabase.from('media').insert(linha));
+        if (!error) break;
+        const message = error.message || '';
+        if (/track_/.test(message) && linha.track_audio_url) {
+          linha = removeTrackFields(linha);
+          continue;
+        }
+        if (/caption|column/i.test(message) && 'caption' in linha) {
+          const { caption: _caption, ...withoutCaption } = linha;
+          linha = withoutCaption;
+          continue;
+        }
+        if (/kind|check|constraint/i.test(message) && linha.kind === 'quote') {
+          linha = { ...linha, kind: 'photo' };
+          continue;
+        }
+        break;
       }
       if (error) throw error;
 
@@ -290,6 +323,13 @@ export default function CitacaoForm({ t, userId, autorPadrao }) {
               onClick={() => setVisibilidade(v)}>{l}</button>
           ))}
         </div>
+      </div>
+
+      <div className="cit-field media-music-field">
+        <span className="cit-label">{t.musicAdd}</span>
+        <div className="composer-toolbar"><div className="tools">
+          <TrackPicker selected={track} onSelect={setTrack} labels={{ add: t.musicAdd, title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded, official: t.musicOfficial, clip: t.musicClip, starts: t.musicStarts, whole: t.musicWhole, seconds: t.musicSeconds, videoLength: t.musicVideoLength, done: t.musicDone }} />
+        </div></div>
       </div>
 
       {erro && <p className="ep-err" role="alert">{erro}</p>}

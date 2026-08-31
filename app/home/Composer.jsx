@@ -10,6 +10,7 @@ import { track as trackEvent } from '../../lib/track';
 import CampoMencao from '../../components/CampoMencao';
 import { salvarMencoes } from '../../lib/mencoes';
 import { saveUpiMemory } from '../../lib/upiMemoryClient';
+import { duracaoDoVideo } from '../../lib/media';
 
 // Frases que podem indicar sofrimento intenso — mostra apoio, nunca bloqueia.
 const RISK = [
@@ -39,6 +40,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   const [saving, setSaving] = useState(false);
   const [photoUrl, setPhotoUrl] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
+  const [videoDuration, setVideoDuration] = useState(0);
   const [uploading, setUploading] = useState(false);
   // Descrição da foto para quem não enxerga. Rascunho da IA,
   // decisão da pessoa: o campo abre preenchido e editável.
@@ -156,7 +158,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     try {
       const url = await upload(toUpload, ext);
       if (!url) { alert(t.error); return; }
-      setPhotoUrl(url); setVideoUrl(null);
+      setPhotoUrl(url); setVideoUrl(null); setVideoDuration(0);
       if (videoRef.current) videoRef.current.value = '';
       descrever(url);
     } finally {
@@ -187,11 +189,12 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > MAX_VIDEO) { alert(t.videoTooBig); e.target.value = ''; return; }
+    const duration = await duracaoDoVideo(file);
     setUploading(true);
     try {
       const url = await upload(file);
       if (!url) { alert(t.error); return; }
-      setVideoUrl(url); setPhotoUrl(null); setAlt('');
+      setVideoUrl(url); setVideoDuration(duration); setPhotoUrl(null); setAlt('');
       if (photoRef.current) photoRef.current.value = '';
     } finally {
       setUploading(false);
@@ -306,16 +309,39 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       text: value || fallback, photo_url: photoUrl, video_url: videoUrl,
     };
     if (photoUrl && alt.trim()) row.alt = alt.trim().slice(0, ALT_MAX);
-    if (track) { row.track_title = track.title; row.track_artist = track.artist; row.track_audio_url = track.audio_url; }
-    let { data: novo, error } = await supabase.from('updates').insert(row).select('id').maybeSingle();
-    // Se o supabase/alt-imagem.sql ainda não foi rodado, a coluna não
-    // existe e o insert falha inteiro. Publicar é a ação central do app:
-    // ela não pode morrer por causa de um campo de acessibilidade.
-    // Tenta de novo sem a descrição e avisa no console, não na cara da pessoa.
-    if (error && /alt/.test(error.message || '') && row.alt) {
-      console.warn('[alt] coluna ausente — rode supabase/alt-imagem.sql');
-      const semAlt = { ...row }; delete semAlt.alt;
-      ({ data: novo, error } = await supabase.from('updates').insert(semAlt).select('id').maybeSingle());
+    if (track) {
+      row.track_title = track.title;
+      row.track_artist = track.artist;
+      row.track_audio_url = track.audio_url;
+      row.track_id = track.id;
+      row.track_start_seconds = Number(track.start_seconds) || 0;
+      row.track_duration_seconds = Number(track.duration_seconds) || 15;
+      row.track_full = !!track.full;
+    }
+    let novo = null;
+    let error = null;
+    const insertRow = { ...row };
+    // Campos auxiliares não podem bloquear a publicação enquanto as
+    // migrações são propagadas. Cada tentativa remove somente o campo
+    // explicitamente ausente e mantém o restante do post intacto.
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      ({ data: novo, error } = await supabase.from('updates').insert(insertRow).select('id').maybeSingle());
+      if (!error) break;
+      const message = error.message || '';
+      if (/alt/.test(message) && insertRow.alt) {
+        console.warn('[alt] coluna ausente — rode supabase/alt-imagem.sql');
+        delete insertRow.alt;
+        continue;
+      }
+      if (/track_(id|start_seconds|duration_seconds|full)/.test(message) && 'track_id' in insertRow) {
+        console.warn('[music] colunas de recorte ausentes — rode supabase/music-clips.sql');
+        delete insertRow.track_id;
+        delete insertRow.track_start_seconds;
+        delete insertRow.track_duration_seconds;
+        delete insertRow.track_full;
+        continue;
+      }
+      break;
     }
     setSaving(false);
     if (error) { alert(t.error); return; }
@@ -343,7 +369,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
     trackEvent('update_posted', { journeyId, kind });
     setPostedKind(kind);
     try { localStorage.removeItem(`oud-day-draft:${journeyId}:${dayNumber}`); } catch {}
-    setText(''); setKind(''); setPhotoUrl(null); setVideoUrl(null); setTrack(null); setAlt(''); setQi(0); setUpiOptions([]); setUpiBase('');
+    setText(''); setKind(''); setPhotoUrl(null); setVideoUrl(null); setVideoDuration(0); setTrack(null); setAlt(''); setQi(0); setUpiOptions([]); setUpiBase('');
     if (photoRef.current) photoRef.current.value = '';
     if (videoRef.current) videoRef.current.value = '';
     setPosted(true);
@@ -561,7 +587,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           <button type="button" className={`tool${videoUrl ? ' set' : ''}`} title={t.addVideo} aria-label={t.addVideo} onClick={() => videoRef.current?.click()} disabled={uploading}><ToolIcon type="video" /></button>
           <input ref={photoRef} type="file" accept="image/*" hidden onChange={onPickPhoto} />
           <input ref={videoRef} type="file" accept="video/*" hidden onChange={onPickVideo} />
-          <TrackPicker selected={track} onSelect={setTrack} labels={{ add: '🎵', title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded }} />
+          <TrackPicker selected={track} onSelect={setTrack} videoDuration={videoDuration} labels={{ add: t.musicAdd || 'Música', title: t.musicTitle, use: t.musicUse, remove: t.musicRemove, empty: t.musicEmpty, searchPh: t.musicSearchPh, keyNeeded: t.musicKeyNeeded, official: t.musicOfficial, clip: t.musicClip, starts: t.musicStarts, whole: t.musicWhole, seconds: t.musicSeconds, videoLength: t.musicVideoLength, done: t.musicDone }} />
           {aiOn && <button type="button" className="tool ai" title={t.aiWrite} aria-label={t.aiWrite} onClick={aiWrite} disabled={saving || uploading}><ToolIcon type="ai" /></button>}
         </div>
         <button className="post-btn" onClick={post} disabled={saving || uploading || !kind || (!text.trim() && !photoUrl && !videoUrl)}>

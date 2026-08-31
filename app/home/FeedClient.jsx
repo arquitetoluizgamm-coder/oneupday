@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useLayoutEffect, useRef, useState, Fragment } from 'react';
+import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, Fragment } from 'react';
 import EncourageBar from '../[slug]/EncourageBar';
 import FeedShare from './FeedShare';
 import Comments from '../../components/Comments';
@@ -71,9 +71,30 @@ function avatarMoodClass(owner) {
   return `entry-ava${owner?.mood && MOODS[owner.mood] ? ' has-mood' : ''}`;
 }
 
+const MediaPlaybackContext = createContext(null);
+
 function TrackTag({ track, float, hasBar }) {
   const [playing, setPlaying] = useState(false);
   const audio = useRef(null);
+  const mediaRef = useContext(MediaPlaybackContext);
+  const start = Math.max(0, Number(track.start_seconds) || 0);
+  const duration = Math.max(0, Number(track.duration_seconds) || 0);
+  const end = duration > 0 ? start + duration : Infinity;
+
+  function syncToVideo() {
+    const player = audio.current;
+    const video = mediaRef?.current;
+    if (!player || !video) return;
+    if (duration > 0 && video.currentTime >= duration - 0.04) {
+      player.pause();
+      setPlaying(false);
+      return;
+    }
+    const target = start + Math.max(0, video.currentTime || 0);
+    if (Math.abs(player.currentTime - target) > 0.3) {
+      try { player.currentTime = target; } catch {}
+    }
+  }
 
   function toggle(e) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
@@ -82,8 +103,42 @@ function TrackTag({ track, float, hasBar }) {
       audio.current.pause();
       setPlaying(false);
     } else {
+      const video = mediaRef?.current;
+      const offset = video && (!duration || video.currentTime < duration) ? (video.currentTime || 0) : 0;
+      try { audio.current.currentTime = start + offset; } catch {}
+      audio.current.volume = 0.85;
       audio.current.play().catch(() => {});
       setPlaying(true);
+    }
+  }
+
+  useEffect(() => {
+    const video = mediaRef?.current;
+    const player = audio.current;
+    if (!playing || !video || !player) return undefined;
+    const onPlay = () => { syncToVideo(); player.play().catch(() => {}); };
+    const onPause = () => player.pause();
+    const onEnded = () => { player.pause(); setPlaying(false); };
+    const onSeek = () => syncToVideo();
+    const onTime = () => { if (!video.paused) syncToVideo(); };
+    video.addEventListener('play', onPlay);
+    video.addEventListener('pause', onPause);
+    video.addEventListener('ended', onEnded);
+    video.addEventListener('seeked', onSeek);
+    video.addEventListener('timeupdate', onTime);
+    return () => {
+      video.removeEventListener('play', onPlay);
+      video.removeEventListener('pause', onPause);
+      video.removeEventListener('ended', onEnded);
+      video.removeEventListener('seeked', onSeek);
+      video.removeEventListener('timeupdate', onTime);
+    };
+  }, [playing, mediaRef, start, duration]);
+
+  function keepInsideClip(event) {
+    if (event.currentTarget.currentTime >= end - 0.04) {
+      event.currentTarget.pause();
+      setPlaying(false);
     }
   }
 
@@ -102,7 +157,7 @@ function TrackTag({ track, float, hasBar }) {
       <span className={`feed-track-float${hasBar ? ' above-bar' : ''}`}>
         {playing && <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>}
         {btn}
-        <audio ref={audio} src={track.audio_url} onEnded={() => setPlaying(false)} />
+        <audio ref={audio} src={track.audio_url} onTimeUpdate={keepInsideClip} onEnded={() => setPlaying(false)} />
       </span>
     );
   }
@@ -112,7 +167,7 @@ function TrackTag({ track, float, hasBar }) {
       {btn}
       <span className="feed-track-name">{track.title}{track.artist ? ` · ${track.artist}` : ''}</span>
       {playing && <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>}
-      <audio ref={audio} src={track.audio_url} onEnded={() => setPlaying(false)} />
+      <audio ref={audio} src={track.audio_url} onTimeUpdate={keepInsideClip} onEnded={() => setPlaying(false)} />
     </div>
   );
 }
@@ -144,6 +199,7 @@ function Media({ photo, video, href, labels, caption, onRatio, children, alt = '
   // começa em 4:3 (o padrão do CSS) e ajusta assim que sabe o tamanho real
   const [nat, setNat] = useState(null);   // proporção real do arquivo
   const [inteiro, setInteiro] = useState(false); // ver o quadro todo (contain)
+  const videoRef = useRef(null);
   const L = labels || {};
 
   const minimo = video ? (4 / 5) : RATIO_ALTO_FOTO;
@@ -156,6 +212,7 @@ function Media({ photo, video, href, labels, caption, onRatio, children, alt = '
 
   const conteudo = video ? (
     <video
+      ref={videoRef}
       src={comCapa(video)} controls playsInline preload="metadata"
       onLoadedMetadata={(e) => {
         const el = e.target;
@@ -218,7 +275,8 @@ function Media({ photo, video, href, labels, caption, onRatio, children, alt = '
   if (href && !video) {
     return <a href={href} className={cls} style={style}>{conteudo}{legenda}{children}</a>;
   }
-  return <div className={cls} style={style}>{conteudo}{alternar}{legenda}{children}</div>;
+  const media = <div className={cls} style={style}>{conteudo}{alternar}{legenda}{children}</div>;
+  return video ? <MediaPlaybackContext.Provider value={videoRef}>{media}</MediaPlaybackContext.Provider> : media;
 }
 
 // ---- Legenda sobre o vídeo vertical, com "ler mais" ----
@@ -271,12 +329,13 @@ function MidiaGaleria({ item, labels }) {
   const [proporcao, setProporcao] = useState(null);
   const legendaEmCima = item.kind === 'video' && ehVertical(proporcao);
   const mostrarLegenda = item.caption && item.kind !== 'quote' && !legendaEmCima;
+  const trackEl = item.track ? <TrackTag track={item.track} float hasBar={false} /> : null;
 
   return (
     <>
       {item.kind === 'video'
-        ? <Media video={item.url} labels={labels} caption={item.caption} onRatio={setProporcao} />
-        : <Media photo={item.url} alt={item.kind === 'quote' ? (item.caption || '') : ''} />}
+        ? <Media video={item.url} labels={labels} caption={item.caption} onRatio={setProporcao}>{trackEl}</Media>
+        : <Media photo={item.url} alt={item.kind === 'quote' ? (item.caption || '') : ''}>{trackEl}</Media>}
       {mostrarLegenda && (
         <div className="dp-text under"><EntryText text={item.caption} labels={labels} limit={100} /></div>
       )}

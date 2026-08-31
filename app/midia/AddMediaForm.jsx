@@ -3,8 +3,32 @@ import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 import ImageCropper from '../../components/ImageCropper';
+import TrackPicker from '../home/TrackPicker';
+import { duracaoDoVideo } from '../../lib/media';
 
 const MAX_VIDEO = 60 * 1024 * 1024;
+
+function trackFields(track) {
+  if (!track) return {};
+  return {
+    track_title: track.title,
+    track_artist: track.artist,
+    track_audio_url: track.audio_url,
+    track_id: track.id,
+    track_start_seconds: Number(track.start_seconds) || 0,
+    track_duration_seconds: Number(track.duration_seconds) || 15,
+    track_full: !!track.full,
+  };
+}
+
+function removeTrackFields(row, keepLegacy = false) {
+  const clean = { ...row };
+  const fields = keepLegacy
+    ? ['track_id', 'track_start_seconds', 'track_duration_seconds', 'track_full']
+    : ['track_title', 'track_artist', 'track_audio_url', 'track_id', 'track_start_seconds', 'track_duration_seconds', 'track_full'];
+  fields.forEach((key) => delete clean[key]);
+  return clean;
+}
 
 export default function AddMediaForm({ userId, journeys, t }) {
   const L = t || {};
@@ -17,6 +41,8 @@ export default function AddMediaForm({ userId, journeys, t }) {
   const [desc, setDesc] = useState('');
   const [url, setUrl] = useState('');
   const [kind, setKind] = useState('photo');
+  const [videoDuration, setVideoDuration] = useState(0);
+  const [track, setTrack] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [rawFile, setRawFile] = useState(null);
@@ -43,11 +69,12 @@ export default function AddMediaForm({ userId, journeys, t }) {
     const isVideo = file.type.startsWith('video');
     if (isVideo) {
       if (file.size > MAX_VIDEO) { alert(L.videoTooBig); e.target.value = ''; return; }
+      const duration = await duracaoDoVideo(file);
       setUploading(true);
       const u = await store(file, (file.name.split('.').pop() || 'mp4').toLowerCase());
       setUploading(false);
       if (!u) { alert(L.error); return; }
-      setUrl(u); setKind('video'); return;
+      setUrl(u); setKind('video'); setVideoDuration(duration); return;
     }
     // foto → abre o enquadrador antes de subir
     if (rawUrl) URL.revokeObjectURL(rawUrl);
@@ -66,7 +93,7 @@ export default function AddMediaForm({ userId, journeys, t }) {
     const u = await store(toUpload, ext);
     setUploading(false);
     if (!u) { alert(L.error); return; }
-    setUrl(u); setKind('photo'); // mantém rawFile p/ reeditar enquadramento
+    setUrl(u); setKind('photo'); setVideoDuration(0); // mantém rawFile p/ reeditar enquadramento
   }
   function onCropCancel() {
     if (rawUrl) URL.revokeObjectURL(rawUrl);
@@ -84,17 +111,32 @@ export default function AddMediaForm({ userId, journeys, t }) {
     let error;
     if (dest === 'journey' && journeyId) {
       const d = Math.max(1, parseInt(day || '1', 10) || 1);
-      ({ error } = await supabase.from('updates').insert({
+      const updateRow = {
         journey_id: journeyId, day_number: d, kind: 'step',
         text: desc.trim() || (kind === 'video' ? '🎥' : '📷'),
         photo_url: kind === 'photo' ? url : null, video_url: kind === 'video' ? url : null,
-      }));
+        ...trackFields(track),
+      };
+      ({ error } = await supabase.from('updates').insert(updateRow));
+      if (error && /track_/.test(error.message || '')) {
+        ({ error } = await supabase.from('updates').insert(removeTrackFields(updateRow, true)));
+      }
     } else {
-      const mediaRow = { user_id: userId, url, kind, visibility, caption: desc.trim() || null };
-      ({ error } = await supabase.from('media').insert(mediaRow));
-      if (error && /caption|column/i.test(error.message || '')) {
-        const { caption: _c, ...noCap } = mediaRow;
-        ({ error } = await supabase.from('media').insert(noCap));
+      let mediaRow = { user_id: userId, url, kind, visibility, caption: desc.trim() || null, ...trackFields(track) };
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        ({ error } = await supabase.from('media').insert(mediaRow));
+        if (!error) break;
+        const message = error.message || '';
+        if (/track_/.test(message) && mediaRow.track_audio_url) {
+          mediaRow = removeTrackFields(mediaRow);
+          continue;
+        }
+        if (/caption|column/i.test(message) && 'caption' in mediaRow) {
+          const { caption: _caption, ...withoutCaption } = mediaRow;
+          mediaRow = withoutCaption;
+          continue;
+        }
+        break;
       }
     }
     setSaving(false);
@@ -162,6 +204,12 @@ export default function AddMediaForm({ userId, journeys, t }) {
 
           <div className="field-label" style={{ marginTop: 16 }}>{L.captionLabel}</div>
           <textarea className="media-caption" value={desc} onChange={e => setDesc(e.target.value)} maxLength={300} placeholder={L.captionPh} rows={3} />
+          <div className="media-music-field">
+            <span className="field-label">{L.musicTitle}</span>
+            <div className="composer-toolbar"><div className="tools">
+              <TrackPicker selected={track} onSelect={setTrack} videoDuration={videoDuration} labels={L.music} />
+            </div></div>
+          </div>
           <button className="cta wide grow" onClick={submit} disabled={saving || uploading} style={{ marginTop: 14 }}>{saving ? L.saving : L.save}</button>
         </>
       )}
