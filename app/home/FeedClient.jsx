@@ -334,7 +334,7 @@ const LIMITE_VERTICAL = 0.85;     // abaixo disso é "vertical" para a legenda
 
 const ehVertical = (r) => r !== null && r !== undefined && r < LIMITE_VERTICAL;
 
-function Media({ photo, video, href, labels, caption, onRatio, children, alt = '' }) {
+function Media({ photo, video, href, labels, caption, onRatio, children, alt = '', hasTrack = false }) {
   // começa em 4:3 (o padrão do CSS) e ajusta assim que sabe o tamanho real
   const [nat, setNat] = useState(null);   // proporção real do arquivo
   const [inteiro, setInteiro] = useState(false); // ver o quadro todo (contain)
@@ -353,8 +353,31 @@ function Media({ photo, video, href, labels, caption, onRatio, children, alt = '
   useEffect(() => {
     const player = videoRef.current;
     if (!video || !player) return undefined;
-    const start = () => player.play().catch(() => {});
-    const stop = () => player.pause();
+    let shouldPlay = false;
+    const start = async () => {
+      shouldPlay = true;
+      if (!hasTrack) {
+        let preference = null;
+        try { preference = window.sessionStorage.getItem('one:feed-video-sound'); } catch {}
+        const wantsSound = preference !== 'off';
+        player.muted = !wantsSound;
+        setVideoMuted(!wantsSound);
+      }
+      try {
+        await player.play();
+      } catch {
+        // Autoplay audível pode ser bloqueado pelo navegador. Nesse caso,
+        // mantém o vídeo andando e deixa o botão de som sempre disponível.
+        if (!shouldPlay) return;
+        player.muted = true;
+        setVideoMuted(true);
+        try { await player.play(); } catch {}
+      }
+    };
+    const stop = () => {
+      shouldPlay = false;
+      player.pause();
+    };
 
     if (!('IntersectionObserver' in window)) {
       start();
@@ -367,7 +390,25 @@ function Media({ photo, video, href, labels, caption, onRatio, children, alt = '
     }, { threshold: [0, 0.35, 0.58, 0.85] });
     observer.observe(player);
     return () => { observer.disconnect(); stop(); };
-  }, [video]);
+  }, [video, hasTrack]);
+
+  function toggleVideoSound(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const player = videoRef.current;
+    if (!player) return;
+    const enableSound = player.muted || videoMuted;
+    player.muted = !enableSound;
+    if (enableSound && player.volume === 0) player.volume = 1;
+    setVideoMuted(!enableSound);
+    try { window.sessionStorage.setItem('one:feed-video-sound', enableSound ? 'on' : 'off'); } catch {}
+    if (enableSound) {
+      player.play().catch(() => {
+        player.muted = true;
+        setVideoMuted(true);
+      });
+    }
+  }
 
   const conteudo = video ? (
     <video
@@ -401,6 +442,23 @@ function Media({ photo, video, href, labels, caption, onRatio, children, alt = '
     />
   );
 
+  const soundToggle = video && !hasTrack ? (
+    <button
+      type="button"
+      className={`media-sound${videoMuted ? ' is-muted' : ' is-on'}`}
+      onClick={toggleVideoSound}
+      aria-label={videoMuted ? (L.videoSoundOn || 'Ativar som do vídeo') : (L.videoSoundOff || 'Silenciar vídeo')}
+      aria-pressed={!videoMuted}
+      title={videoMuted ? (L.videoSoundOn || 'Ativar som do vídeo') : (L.videoSoundOff || 'Silenciar vídeo')}
+    >
+      {videoMuted ? (
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="m17 9 5 5m0-5-5 5"/></svg>
+      ) : (
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>
+      )}
+    </button>
+  ) : null;
+
   // botão só no vídeo, e só quando há corte de verdade (ou teto de altura)
   const alternar = video && (cortado || vertical) ? (
     <button
@@ -429,13 +487,13 @@ function Media({ photo, video, href, labels, caption, onRatio, children, alt = '
     <LegendaSobreposta text={caption} labels={L} />
   ) : null;
 
-  const cls = `entry-media livre${vertical ? ' vertical' : ''}${inteiro ? ' inteiro' : ''}`;
+  const cls = `entry-media livre${vertical ? ' vertical' : ''}${inteiro ? ' inteiro' : ''}${video && !hasTrack ? ' has-video-sound' : ''}`;
 
   // vídeo não vira link: o toque é para dar play, não para navegar
   if (href && !video) {
     return <a href={href} className={cls} style={style}>{conteudo}{legenda}{children}</a>;
   }
-  const media = <div className={cls} style={style}>{conteudo}{alternar}{legenda}{children}</div>;
+  const media = <div className={cls} style={style}>{conteudo}{soundToggle}{alternar}{legenda}{children}</div>;
   return video ? <MediaPlaybackContext.Provider value={videoRef}>{media}</MediaPlaybackContext.Provider> : media;
 }
 
@@ -474,7 +532,7 @@ function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat }) {
       <JourneyTitlePill title={item.journey?.title} slug={item.journey?.slug} day={journeyStatusLabel(labels, item.day_number)} />
       {item.photo_url && <Media photo={item.photo_url} alt={textoAlternativo(item.alt, { dia: item.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackFloat}<VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
       {item.video_url && !item.photo_url && (
-        <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackFloat}</Media>
+        <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao} hasTrack={!!item.track}>{trackFloat}</Media>
       )}
       {!hasMedia && !cleanText && item.track && <TrackTag track={item.track} />}
       {cleanText && !legendaEmCima && (
@@ -495,7 +553,7 @@ function MidiaGaleria({ item, labels }) {
   return (
     <>
       {item.kind === 'video'
-        ? <Media video={item.url} labels={labels} caption={item.caption} onRatio={setProporcao}>{trackEl}</Media>
+        ? <Media video={item.url} labels={labels} caption={item.caption} onRatio={setProporcao} hasTrack={!!item.track}>{trackEl}</Media>
         : <Media photo={item.url} alt={textualCard ? (item.caption || '') : ''}>{trackEl}</Media>}
       {mostrarLegenda && (
         <div className="dp-text under"><EntryText text={item.caption} labels={labels} limit={100} /></div>
@@ -529,7 +587,7 @@ function DayPager({ item, labels, dayLabel }) {
           {hasMedia ? (
             <>
               {d.photo_url && <Media photo={d.photo_url} alt={textoAlternativo(d.alt, { dia: d.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackEl}<VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
-              {d.video_url && !d.photo_url && <Media video={d.video_url} labels={labels} caption={cleanText} onRatio={setProporcao}>{trackEl}</Media>}
+              {d.video_url && !d.photo_url && <Media video={d.video_url} labels={labels} caption={cleanText} onRatio={setProporcao} hasTrack={!!d.track}>{trackEl}</Media>}
             </>
           ) : (
             <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText ? '' : ' so-selo'}`}>
