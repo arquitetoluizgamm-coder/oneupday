@@ -67,7 +67,6 @@ export default function UpiDailyMemory({ labels }) {
             onChange={(e) => setAnswer(e.target.value)}
             placeholder={labels.placeholder}
             rows={3}
-            maxLength={1200}
           />
           <div>
             <button type="button" className="cta" onClick={save} disabled={!answer.trim() || saving}>

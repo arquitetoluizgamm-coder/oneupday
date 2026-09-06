@@ -14198,7 +14198,7 @@ body:has(.feed-page),
   }
 }
 
-/* Player da trilha no post: nome clicável, equalizador e avanço do trecho. */
+/* Player da trilha no post: pílula compacta no fluxo, sem cobrir a mídia. */
 .feed-page .feed-track-float{
   display:grid!important;
   grid-template-columns:36px minmax(0,1fr) 18px!important;
@@ -14222,20 +14222,21 @@ body:has(.feed-page),
 .feed-page .feed-track{
   position:relative!important;
   display:grid!important;
-  grid-template-columns:40px minmax(0,1fr) 18px!important;
-  grid-template-rows:minmax(40px,auto) 3px!important;
+  grid-template-columns:34px minmax(0,1fr)!important;
+  grid-template-rows:minmax(34px,auto) 2px!important;
   align-items:center!important;
-  column-gap:9px!important;
-  row-gap:4px!important;
-  width:min(100%,390px)!important;
-  min-height:52px!important;
-  padding:6px 10px 6px 6px!important;
-  border:1px solid rgba(132,145,122,.25)!important;
-  border-radius:18px!important;
-  background:rgba(243,246,239,.78)!important;
-  box-shadow:0 5px 16px rgba(16,19,45,.055)!important;
-  -webkit-backdrop-filter:blur(9px)!important;
-  backdrop-filter:blur(9px)!important;
+  column-gap:8px!important;
+  row-gap:2px!important;
+  width:100%!important;
+  min-height:42px!important;
+  margin:8px 0 4px!important;
+  padding:3px 9px 3px 4px!important;
+  border:1px solid rgba(132,145,122,.2)!important;
+  border-radius:999px!important;
+  background:rgba(246,247,243,.88)!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:blur(6px)!important;
+  backdrop-filter:blur(6px)!important;
   overflow:hidden!important;
 }
 
@@ -14244,10 +14245,10 @@ body:has(.feed-page),
   grid-column:1!important;
   grid-row:1!important;
   justify-self:center!important;
-  width:36px!important;
-  height:36px!important;
-  min-width:36px!important;
-  min-height:36px!important;
+  width:32px!important;
+  height:32px!important;
+  min-width:32px!important;
+  min-height:32px!important;
   margin:0!important;
   border-radius:50%!important;
 }
@@ -14294,7 +14295,7 @@ body:has(.feed-page),
   text-overflow:ellipsis!important;
   white-space:nowrap!important;
   font-size:11.5px!important;
-  font-weight:800!important;
+  font-weight:750!important;
 }
 
 .feed-page .feed-track-name small{
@@ -14304,7 +14305,7 @@ body:has(.feed-page),
   text-overflow:ellipsis!important;
   white-space:nowrap!important;
   color:var(--muted)!important;
-  font-size:9.5px!important;
+  font-size:9px!important;
   font-weight:650!important;
 }
 
@@ -14340,7 +14341,7 @@ body:has(.feed-page),
   grid-column:3!important;
   grid-row:1!important;
   justify-self:end!important;
-  display:inline-flex!important;
+  display:none!important;
   align-items:flex-end!important;
   gap:2px!important;
   width:16px!important;
@@ -14371,7 +14372,7 @@ body:has(.feed-page),
   align-self:end!important;
   display:block!important;
   width:100%!important;
-  height:3px!important;
+  height:2px!important;
   overflow:hidden!important;
   border-radius:999px!important;
   background:rgba(132,145,122,.2)!important;
@@ -14396,6 +14397,10 @@ body:has(.feed-page),
     width:min(300px,calc(100% - 18px))!important;
     grid-template-columns:36px minmax(0,1fr) 16px!important;
     column-gap:7px!important;
+  }
+
+  .feed-page .feed-track{
+    margin-top:7px!important;
   }
 
 }

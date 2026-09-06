@@ -125,12 +125,12 @@ export default function EditarJornada({ journey, currentDay = 0, t }) {
         <h2 className="ej-section-title">{L.ejIdentity}</h2>
         <p className="ej-section-sub">{L.ejIdentitySub}</p>
       <label className="ep-field">{L.ejName}
-        <input value={title} onChange={(e) => { setTitle(e.target.value); setSalvo(false); }} maxLength={80} />
+        <input value={title} onChange={(e) => { setTitle(e.target.value); setSalvo(false); }} />
       </label>
 
       <label className="ep-field">{L.ejGoal}
         <textarea className="ej-goal" value={goal} onChange={(e) => { setGoal(e.target.value); setSalvo(false); }}
-          maxLength={300} rows={3} />
+          rows={3} />
       </label>
 
       <div className="ep-field">{L.ejCover}

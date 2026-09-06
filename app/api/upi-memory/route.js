@@ -87,7 +87,7 @@ export async function POST(req) {
   }
 
   const body = await req.json().catch(() => ({}));
-  const answer = String(body.answer || '').trim().slice(0, 1200);
+  const answer = String(body.answer || '').trim();
   if (!answer) return NextResponse.json({ error: 'empty' }, { status: 400 });
 
   const locale = getLocale();

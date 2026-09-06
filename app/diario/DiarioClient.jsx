@@ -120,7 +120,6 @@ export default function DiarioClient({ labels }) {
               onChange={(e) => setMemAnswer(e.target.value)}
               placeholder={labels.upiMemoryPh}
               rows={3}
-              maxLength={1200}
             />
           </label>
           <div className="upi-memory-actions">

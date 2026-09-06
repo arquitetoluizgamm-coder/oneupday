@@ -161,12 +161,12 @@ export default function EditJourney({ journey, currentDay = 0, t }) {
 
                 <div className="ej-scroll">
                   <label className="ep-field">{L.ejName}
-                    <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} />
+                    <input value={title} onChange={(e) => setTitle(e.target.value)} />
                   </label>
 
                   <label className="ep-field">{L.ejGoal}
                     <textarea className="ej-goal" value={goal} onChange={(e) => setGoal(e.target.value)}
-                      maxLength={300} rows={3} />
+                      rows={3} />
                   </label>
 
                   {/* ---- capa ---- */}

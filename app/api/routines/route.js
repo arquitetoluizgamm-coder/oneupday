@@ -43,9 +43,9 @@ export async function POST(req) {
   const action = String(body.action || '');
 
   if (action === 'create') {
-    const name = String(body.name || '').trim().slice(0, 120);
-    const ideal = String(body.ideal_text || '').trim().slice(0, 240);
-    const minimum = String(body.minimum_text || '').trim().slice(0, 240) || null;
+    const name = String(body.name || '').trim();
+    const ideal = String(body.ideal_text || '').trim();
+    const minimum = String(body.minimum_text || '').trim() || null;
     if (!name || !ideal) return bad('required');
     const scheduleType = ['daily', 'weekdays', 'weekly_target'].includes(body.schedule_type) ? body.schedule_type : 'daily';
     const weekdays = Array.isArray(body.weekdays) ? body.weekdays.map(Number).filter((n) => n >= 0 && n <= 6) : [];
@@ -81,7 +81,7 @@ export async function POST(req) {
     const previousPresence = (previousLogs || []).find((log) => log.state === 'ideal' || log.state === 'minimum');
     const intentionalPause = (previousLogs || []).some((log) => log.state === 'paused' && log.log_date < logDate);
     const returning = !!previousPresence && (intentionalPause || dateDiff(previousPresence.log_date, logDate) >= 3);
-    const { data, error } = await supabase.from('routine_logs').upsert({ routine_id: routineId, owner_id: user.id, log_date: logDate, state, note: String(body.note || '').trim().slice(0, 500) || null }, { onConflict: 'routine_id,log_date' }).select('*').single();
+    const { data, error } = await supabase.from('routine_logs').upsert({ routine_id: routineId, owner_id: user.id, log_date: logDate, state, note: String(body.note || '').trim() || null }, { onConflict: 'routine_id,log_date' }).select('*').single();
     if (error) return NextResponse.json({ error: 'db', detail: error.message }, { status: 500 });
     await event(supabase, user.id, state === 'ideal' ? 'routine_ideal_completed' : state === 'minimum' ? 'routine_minimum_completed' : 'routine_not_today_selected', { routine_id: routineId, return_after_pause: returning, source_screen: 'routines' });
     if (returning) await event(supabase, user.id, 'routine_return_detected', { routine_id: routineId, source_screen: 'routines' });
@@ -90,7 +90,7 @@ export async function POST(req) {
 
   if (action === 'pause') {
     const until = body.pause_until || null;
-    const note = String(body.pause_note || '').trim().slice(0, 240) || null;
+    const note = String(body.pause_note || '').trim() || null;
     const { data, error } = await supabase.from('routines').update({ status: 'paused', pause_until: until, pause_note: note }).eq('id', routineId).eq('owner_id', user.id).select('*').single();
     if (error) return NextResponse.json({ error: 'db', detail: error.message }, { status: 500 });
     const today = localDate();

@@ -9,7 +9,7 @@ export default function TomorrowStep({ userId, journeyId, labels }) {
   const [err, setErr] = useState('');
 
   async function save() {
-    const value = text.trim().slice(0, 200);
+    const value = text.trim();
     if (!value || saving || saved) return;
     setSaving(true);
     setErr('');
@@ -51,7 +51,7 @@ export default function TomorrowStep({ userId, journeyId, labels }) {
       </div>
       <textarea
         value={text}
-        onChange={(e) => setText(e.target.value.slice(0, 200))}
+        onChange={(e) => setText(e.target.value)}
         placeholder={labels.placeholder}
         rows={2}
       />

@@ -74,9 +74,8 @@ function avatarMoodClass(owner) {
 const MediaPlaybackContext = createContext(null);
 const TRACK_PLAY_EVENT = 'one:track-play';
 
-function TrackTag({ track, float, hasBar }) {
+function TrackTag({ track }) {
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fullTrackMode, setFullTrackMode] = useState(false);
   const audio = useRef(null);
@@ -128,7 +127,6 @@ function TrackTag({ track, float, hasBar }) {
     }
     try {
       await player.play();
-      setMuted(player.muted);
       setPlaying(true);
       if (!player.muted || !allowMutedFallback) applyVideoMix(!playingFullTrack);
       return true;
@@ -141,11 +139,9 @@ function TrackTag({ track, float, hasBar }) {
       applyVideoMix(false);
       try {
         await player.play();
-        setMuted(true);
         setPlaying(true);
         return true;
       } catch {
-        setMuted(true);
         setPlaying(false);
         return false;
       }
@@ -167,28 +163,6 @@ function TrackTag({ track, float, hasBar }) {
     }
   }
 
-  function toggle(e) {
-    if (e) { e.preventDefault(); e.stopPropagation(); }
-    const player = audio.current;
-    if (!player) return;
-    if (!player.paused && player.muted) {
-      window.dispatchEvent(new CustomEvent(TRACK_PLAY_EVENT, { detail: instanceId }));
-      player.muted = musicVolume === 0;
-      player.volume = musicVolume;
-      applyVideoMix(!fullTrackModeRef.current);
-      player.play().then(() => {
-        setMuted(player.muted);
-        setPlaying(true);
-      }).catch(pause);
-      return;
-    }
-    if (!player.paused) {
-      pause();
-      return;
-    }
-    playTrack({ reset: false, allowMutedFallback: false });
-  }
-
   useEffect(() => {
     const stopOtherTrack = (event) => {
       if (event.detail !== instanceId) pause();
@@ -198,7 +172,9 @@ function TrackTag({ track, float, hasBar }) {
   }, [instanceId, pause]);
 
   useEffect(() => {
-    const node = shell.current?.closest('.entry-media, .entry-textcard')
+    const previous = shell.current?.previousElementSibling;
+    const node = previous?.matches?.('.entry-media, .entry-textcard') ? previous
+      : shell.current?.closest('.entry-media, .entry-textcard')
       || shell.current?.closest('article.entry')
       || shell.current;
     if (!node) return undefined;
@@ -278,30 +254,31 @@ function TrackTag({ track, float, hasBar }) {
     event.stopPropagation();
     const player = audio.current;
     if (!player) return;
-    const nextMode = !fullTrackModeRef.current;
-    fullTrackModeRef.current = nextMode;
-    setFullTrackMode(nextMode);
+    if (fullTrackModeRef.current) {
+      if (player.paused) playTrack({ reset: false, allowMutedFallback: false });
+      else pause();
+      return;
+    }
+    fullTrackModeRef.current = true;
+    setFullTrackMode(true);
     player.pause();
     setProgress(0);
-    if (nextMode) applyVideoMix(false);
+    applyVideoMix(false);
     playTrack({ reset: true, allowMutedFallback: false });
   }
 
-  const audible = playing && !muted;
-  const actionLabel = audible
-    ? (fullTrackMode ? 'Pausar faixa completa' : 'Pausar trilha')
-    : (playing ? 'Ativar som' : (fullTrackMode ? 'Tocar faixa completa' : 'Tocar trilha'));
+  const actionLabel = fullTrackMode && playing
+    ? 'Pausar faixa completa'
+    : (fullTrackMode ? 'Continuar faixa completa' : 'Ouvir faixa completa');
   const trackTitle = track.title || 'Trilha do ONE';
-  const fullTrackLabel = fullTrackMode
-    ? `${trackTitle}. Voltar ao trecho usado no post`
-    : `${trackTitle}. Ouvir faixa completa neste post`;
+  const fullTrackLabel = `${trackTitle}. ${actionLabel}`;
 
   const btn = (
-    <button type="button" className={`feed-track-spk${audible ? ' on' : ''}`} onClick={toggle} aria-label={actionLabel} aria-pressed={audible} title={trackTitle + (track.artist ? ` · ${track.artist}` : '')}>
-      {audible ? (
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>
+    <button type="button" className={`feed-track-spk${fullTrackMode && playing ? ' on' : ''}`} onClick={toggleFullTrack} aria-label={actionLabel} aria-pressed={fullTrackMode && playing} title={actionLabel}>
+      {fullTrackMode && playing ? (
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>
       ) : (
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="butt"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
       )}
     </button>
   );
@@ -309,33 +286,19 @@ function TrackTag({ track, float, hasBar }) {
   const trackName = track.audio_url ? (
     <button type="button" className="feed-track-name" onClick={toggleFullTrack} aria-label={fullTrackLabel} aria-pressed={fullTrackMode} title={fullTrackLabel}>
       <span>{trackTitle}</span>
-      <small>{track.artist && <span>{track.artist} · </span>}{fullTrackMode ? 'Faixa completa · voltar ao trecho' : 'Ouvir completa aqui'}</small>
+      <small>{track.artist && <span>{track.artist} · </span>}{fullTrackMode ? (playing ? 'Tocando faixa completa' : 'Continuar faixa completa') : 'Ouvir faixa completa'}</small>
     </button>
   ) : (
     <span className="feed-track-name"><span>{trackTitle}</span>{track.artist && <small>{track.artist}</small>}</span>
   );
 
-  const equalizer = <span className="feed-track-eq" aria-hidden="true"><i/><i/><i/></span>;
   const timeline = <span className="feed-track-progress" aria-hidden="true"><i style={{ width: `${progress}%` }} /></span>;
-  const audioElement = <audio ref={audio} src={track.audio_url} preload="metadata" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onVolumeChange={(event) => setMuted(event.currentTarget.muted)} onTimeUpdate={keepInsideClip} onEnded={() => { setPlaying(false); setProgress(100); }} />;
-
-  if (float) {
-    return (
-      <span ref={shell} className={`feed-track-float${hasBar ? ' above-bar' : ''}${playing ? ' is-playing' : ''}${fullTrackMode ? ' is-full-track' : ''}`}>
-        {btn}
-        {trackName}
-        {equalizer}
-        {timeline}
-        {audioElement}
-      </span>
-    );
-  }
+  const audioElement = <audio ref={audio} src={track.audio_url} preload="metadata" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onTimeUpdate={keepInsideClip} onEnded={() => { setPlaying(false); setProgress(100); }} />;
 
   return (
     <div ref={shell} className={`feed-track${playing ? ' is-playing' : ''}${fullTrackMode ? ' is-full-track' : ''}`}>
       {btn}
       {trackName}
-      {equalizer}
       {timeline}
       {audioElement}
     </div>
@@ -365,7 +328,7 @@ const LIMITE_VERTICAL = 0.85;     // abaixo disso é "vertical" para a legenda
 
 const ehVertical = (r) => r !== null && r !== undefined && r < LIMITE_VERTICAL;
 
-function Media({ photo, video, href, labels, caption, onRatio, children, alt = '', hasTrack = false }) {
+function Media({ photo, video, href, labels, caption, onRatio, children, below, alt = '', hasTrack = false }) {
   // começa em 4:3 (o padrão do CSS) e ajusta assim que sabe o tamanho real
   const [nat, setNat] = useState(null);   // proporção real do arquivo
   const [inteiro, setInteiro] = useState(false); // ver o quadro todo (contain)
@@ -522,10 +485,12 @@ function Media({ photo, video, href, labels, caption, onRatio, children, alt = '
 
   // vídeo não vira link: o toque é para dar play, não para navegar
   if (href && !video) {
-    return <a href={href} className={cls} style={style}>{conteudo}{legenda}{children}</a>;
+    return <><a href={href} className={cls} style={style}>{conteudo}{legenda}{children}</a>{below}</>;
   }
   const media = <div className={cls} style={style}>{conteudo}{soundToggle}{alternar}{legenda}{children}</div>;
-  return video ? <MediaPlaybackContext.Provider value={videoRef}>{media}</MediaPlaybackContext.Provider> : media;
+  return video
+    ? <MediaPlaybackContext.Provider value={videoRef}>{media}{below}</MediaPlaybackContext.Provider>
+    : <>{media}{below}</>;
 }
 
 // ---- Legenda sobre o vídeo vertical, com "ler mais" ----
@@ -553,7 +518,7 @@ function LegendaSobreposta({ text, labels }) {
 // ---- Mídia + legenda do item solto do feed ----
 // Componente próprio, e não um trecho inline, porque hooks não podem
 // morar dentro de um .map(): a ordem mudaria a cada item da lista.
-function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat }) {
+function MidiaComLegenda({ item, labels, cleanText }) {
   const [proporcao, setProporcao] = useState(null);
   const soVideo = !!(item.video_url && !item.photo_url);
   const legendaEmCima = soVideo && ehVertical(proporcao);
@@ -561,11 +526,10 @@ function MidiaComLegenda({ item, labels, cleanText, hasMedia, trackFloat }) {
   return (
     <>
       <JourneyTitlePill title={item.journey?.title} slug={item.journey?.slug} day={journeyStatusLabel(labels, item.day_number)} />
-      {item.photo_url && <Media photo={item.photo_url} alt={textoAlternativo(item.alt, { dia: item.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackFloat}<VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
+      {item.photo_url && <Media photo={item.photo_url} alt={textoAlternativo(item.alt, { dia: item.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`} below={item.track ? <TrackTag track={item.track} /> : null}><VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
       {item.video_url && !item.photo_url && (
-        <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao} hasTrack={!!item.track}>{trackFloat}</Media>
+        <Media video={item.video_url} labels={labels} caption={cleanText} onRatio={setProporcao} hasTrack={!!item.track} below={item.track ? <TrackTag track={item.track} /> : null} />
       )}
-      {!hasMedia && !cleanText && item.track && <TrackTag track={item.track} />}
       {cleanText && !legendaEmCima && (
         <div className="dp-text under"><EntryText text={cleanText} labels={labels} limit={100} mencoes={item.mencoes} /></div>
       )}
@@ -579,13 +543,13 @@ function MidiaGaleria({ item, labels }) {
   const legendaEmCima = item.kind === 'video' && ehVertical(proporcao);
   const textualCard = item.kind === 'quote' || item.kind === 'bible';
   const mostrarLegenda = item.caption && item.kind !== 'quote' && item.kind !== 'bible' && !legendaEmCima;
-  const trackEl = item.track ? <TrackTag track={item.track} float hasBar={false} /> : null;
+  const trackEl = item.track ? <TrackTag track={item.track} /> : null;
 
   return (
     <>
       {item.kind === 'video'
-        ? <Media video={item.url} labels={labels} caption={item.caption} onRatio={setProporcao} hasTrack={!!item.track}>{trackEl}</Media>
-        : <Media photo={item.url} alt={textualCard ? (item.caption || '') : ''}>{trackEl}</Media>}
+        ? <Media video={item.url} labels={labels} caption={item.caption} onRatio={setProporcao} hasTrack={!!item.track} below={trackEl} />
+        : <Media photo={item.url} alt={textualCard ? (item.caption || '') : ''} below={trackEl} />}
       {mostrarLegenda && (
         <div className="dp-text under"><EntryText text={item.caption} labels={labels} limit={100} /></div>
       )}
@@ -601,7 +565,7 @@ function DayPager({ item, labels, dayLabel }) {
   const d = days[days.length - 1];
   const cleanText = textoDaPessoa(d.text);
   const hasMedia = !!(d.photo_url || d.video_url);
-  const trackEl = d.track ? <TrackTag key={'t' + d.id} track={d.track} float hasBar={false} /> : null;
+  const trackEl = d.track ? <TrackTag key={'t' + d.id} track={d.track} /> : null;
   // vídeo vertical leva a legenda por cima; nesse caso ela não se repete embaixo
   const soVideo = !!(d.video_url && !d.photo_url);
   const legendaEmCima = soVideo && ehVertical(proporcao);
@@ -617,19 +581,20 @@ function DayPager({ item, labels, dayLabel }) {
         <div className="dp-slide" key={d.id}>
           {hasMedia ? (
             <>
-              {d.photo_url && <Media photo={d.photo_url} alt={textoAlternativo(d.alt, { dia: d.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`}>{trackEl}<VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
-              {d.video_url && !d.photo_url && <Media video={d.video_url} labels={labels} caption={cleanText} onRatio={setProporcao} hasTrack={!!d.track}>{trackEl}</Media>}
+              {d.photo_url && <Media photo={d.photo_url} alt={textoAlternativo(d.alt, { dia: d.day_number, titulo: item.journey.title }, labels)} href={`/${item.journey.slug}`} below={trackEl}><VerJornada slug={item.journey.slug} label={labels.seeFullJourney} /></Media>}
+              {d.video_url && !d.photo_url && <Media video={d.video_url} labels={labels} caption={cleanText} onRatio={setProporcao} hasTrack={!!d.track} below={trackEl} />}
             </>
           ) : (
             <a href={`/${item.journey.slug}`} className={`entry-textcard dp-card${cleanText ? '' : ' so-selo'}`}>
               {cleanText
                 ? <CardText text={cleanText} labels={labels} mencoes={d.mencoes} />
                 : <SeloDoDia kind={d.kind} dia={d.day_number} labels={labels.selo} />}
-              {trackEl}
             <VerJornada slug={item.journey.slug} label={labels.seeFullJourney} claro /></a>
           )}
         </div>
       </div>
+
+      {!hasMedia && trackEl}
 
       {hasMedia && cleanText && !legendaEmCima && (
         <div className="dp-text under">
@@ -1091,7 +1056,7 @@ export default function FeedClient({ labels }) {
               // cartões são curtos. Lá a barra continua embaixo, com a
               // linha inteira.
               // ============================================================
-              const trackFloat = item.track ? <TrackTag track={item.track} float hasBar={false} /> : null;
+              const trackEl = item.track ? <TrackTag track={item.track} /> : null;
               if (!hasMedia) {
                 // Sem mídia e sem relato: o dia foi marcado por botão.
                 // O cartão continua existindo — apagar o registro seria
@@ -1103,15 +1068,14 @@ export default function FeedClient({ labels }) {
                       {cleanText
                         ? <CardText text={cleanText} labels={labels} mencoes={item.mencoes} />
                         : <SeloDoDia kind={item.kind} dia={item.day_number} labels={labels.selo} />}
-                      {trackFloat}
                       <VerJornada slug={item.journey.slug} label={labels.seeFullJourney} claro />
                     </a>
+                    {trackEl}
                   </>
                 );
               }
               return (
-              <MidiaComLegenda item={item} labels={labels} cleanText={cleanText}
-                  hasMedia={hasMedia} trackFloat={trackFloat} />
+              <MidiaComLegenda item={item} labels={labels} cleanText={cleanText} />
               );
             })()}
 

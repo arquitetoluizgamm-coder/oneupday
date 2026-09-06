@@ -39,9 +39,10 @@ export default function MediaGallery({ items, showVis, visLabels, own, deleteLab
     setBusy(true);
     try {
       const sb = createClient();
-      const { error } = await sb.from('media').update({ caption: draft.trim().slice(0, 280) }).eq('id', m.id);
+      const caption = draft.trim();
+      const { error } = await sb.from('media').update({ caption }).eq('id', m.id);
       if (error) throw error;
-      setList((prev) => prev.map((x) => x.id === m.id ? { ...x, caption: draft.trim().slice(0, 280) } : x));
+      setList((prev) => prev.map((x) => x.id === m.id ? { ...x, caption } : x));
       setEditing(false);
     } catch { }
     setBusy(false);
@@ -79,7 +80,7 @@ export default function MediaGallery({ items, showVis, visLabels, own, deleteLab
           {own && list[open].kind === 'quote' && !editing && <button className="lb-edit" onClick={(e) => { e.stopPropagation(); beginEdit(list[open]); }} disabled={busy}>{editLabel}</button>}
           {own && list[open].kind === 'quote' && editing && (
             <div className="lb-edit-form" onClick={(e) => e.stopPropagation()}>
-              <textarea value={draft} maxLength={280} onChange={(e) => setDraft(e.target.value)} aria-label={editLabel} />
+              <textarea value={draft} onChange={(e) => setDraft(e.target.value)} aria-label={editLabel} />
               <div><button type="button" onClick={() => setEditing(false)}>{editCancelLabel}</button><button type="button" onClick={() => saveEdit(list[open])} disabled={busy || !draft.trim()}>{editSaveLabel}</button></div>
             </div>
           )}

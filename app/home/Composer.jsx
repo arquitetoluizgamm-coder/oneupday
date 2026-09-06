@@ -259,7 +259,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   }
 
   function usarSugestao(texto) {
-    setText(String(texto || '').slice(0, 500));
+    setText(String(texto || ''));
     setUpiOptions([]);
     requestAnimationFrame(() => inputRef.current?.focus());
   }
@@ -392,7 +392,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
   async function doneEnvelope(save) {
     if (envBusy) return;
     setEnvBusy(true);
-    const passo = envText.trim().slice(0, 200);
+    const passo = envText.trim();
     if (save && passo) {
       try {
         const sb = createClient();
@@ -434,7 +434,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
       const raw = localStorage.getItem(draftKey);
       if (!raw) return;
       const d = JSON.parse(raw);
-      if (d?.text) setText(String(d.text).slice(0, 500));
+      if (d?.text) setText(String(d.text));
       if (['win', 'step', 'setback'].includes(d?.kind)) setKind(d.kind);
     } catch {}
   }, [draftKey]);
@@ -457,7 +457,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
         <p className="env-meaning">{dayNumber === 1 ? t.meaning?.first : (postedKind === 'setback' ? t.meaning?.setback : t.meaning?.step)}</p>
         <span className="env-eyebrow">{t.step?.q}</span>
         <textarea className="env-input" value={envText} onChange={e => setEnvText(e.target.value)}
-          maxLength={200} placeholder={t.step?.ph} rows={2} autoFocus />
+          placeholder={t.step?.ph} rows={2} autoFocus />
         {envText.trim() && (
           <>
             <span className="step-when-q">{t.step?.whenQ}</span>
@@ -526,7 +526,7 @@ export default function Composer({ journeyId, startDate, labels, t, aiOn }) {
           publicar checa se a lista está aberta antes de agir. */}
       <CampoMencao textareaRef={inputRef} className="composer2-input" valor={text}
         onChange={e => setText(e.target.value)}
-        maxLength={500} placeholder={kind ? (pergunta || ph) : (t.dayChooseFirst || ph)} rows={1}
+        placeholder={kind ? (pergunta || ph) : (t.dayChooseFirst || ph)} rows={1}
         aria-describedby={pergunta ? 'perg-do-dia' : undefined}
         onKeyDown={e => {
           if (e.defaultPrevented) return;

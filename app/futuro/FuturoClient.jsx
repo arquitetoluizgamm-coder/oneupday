@@ -121,7 +121,7 @@ export default function FuturoClient({ labels, userId }) {
     <section className="future-create">
       <div className="future-kind"><button className={kind === 'letter' ? 'on' : ''} onClick={() => setKind('letter')} type="button">{labels.futureLetter}</button><button className={kind === 'guided' ? 'on' : ''} onClick={() => setKind('guided')} type="button">{labels.futureGuided}</button></div>
       <label>{labels.futureWhen}<input type="date" min={addDays(1)} value={date} onChange={(e) => setDate(e.target.value)} /></label>
-      <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={labels.futureTitlePh} maxLength={80} />
+      <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={labels.futureTitlePh} />
       {kind === 'letter' ? <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder={labels.futureLetterPh} rows={7} /> : <div className="future-questions">{labels.futureQuestions.map((q, i) => <label key={q}>{q}<textarea value={answers[i]} onChange={(e) => setAnswers((a) => a.map((v, n) => n === i ? e.target.value : v))} rows={3} /></label>)}</div>}
       <button type="button" className="cta future-save" onClick={create} disabled={!(kind === 'letter' ? body.trim() : answers.some(Boolean))}>{labels.futureSeal}</button>{saved && <span className="future-saved">{labels.futureSealed}</span>}
     </section>

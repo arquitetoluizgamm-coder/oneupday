@@ -101,7 +101,7 @@ export default function EditUpdate({ update, labels, onChanged }) {
               <>
                 <b className="ep-title">{(L.title || '').replace('{d}', update.day)}</b>
                 <label className="ep-field ep-text">{L.text}
-                  <textarea className="ej-goal" value={text} onChange={(e) => setText(e.target.value)} maxLength={500} rows={4} />
+                  <textarea className="ej-goal" value={text} onChange={(e) => setText(e.target.value)} rows={4} />
                 </label>
                 <div className="ep-field">{L.photo}
                   {photoUrl ? (

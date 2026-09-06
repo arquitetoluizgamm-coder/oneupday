@@ -217,7 +217,7 @@ export default function AddMediaForm({ userId, journeys, t }) {
           )}
 
           <div className="field-label" style={{ marginTop: 16 }}>{L.captionLabel}</div>
-          <textarea className="media-caption" value={desc} onChange={e => setDesc(e.target.value)} maxLength={300} placeholder={L.captionPh} rows={3} />
+          <textarea className="media-caption" value={desc} onChange={e => setDesc(e.target.value)} placeholder={L.captionPh} rows={3} />
           <div className="media-music-field">
             <span className="field-label">{L.musicTitle}</span>
             <div className="composer-toolbar"><div className="tools">

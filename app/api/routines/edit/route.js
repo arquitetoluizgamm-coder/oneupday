@@ -12,11 +12,11 @@ export async function PATCH(req) {
   if (!user) return NextResponse.json({ error: 'auth' }, { status: 401 });
   const body = await req.json().catch(() => ({}));
   const id = String(body.routine_id || '');
-  const name = String(body.name || '').trim().slice(0, 120);
-  const ideal = String(body.ideal_text || '').trim().slice(0, 240);
+  const name = String(body.name || '').trim();
+  const ideal = String(body.ideal_text || '').trim();
   if (!id || !name || !ideal) return NextResponse.json({ error: 'required' }, { status: 400 });
   const patch = {
-    name, ideal_text: ideal, minimum_text: String(body.minimum_text || '').trim().slice(0, 240) || null,
+    name, ideal_text: ideal, minimum_text: String(body.minimum_text || '').trim() || null,
     schedule_type: ['daily', 'weekdays', 'weekly_target'].includes(body.schedule_type) ? body.schedule_type : 'daily',
     weekdays: Array.isArray(body.weekdays) ? body.weekdays.map(Number).filter((day) => day >= 0 && day <= 6) : [],
     weekly_target: body.schedule_type === 'weekly_target' ? Math.max(1, Math.min(7, Number(body.weekly_target) || 1)) : null,

@@ -670,7 +670,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {step === S_TITULO && (
         <div className="wz-body">
           <input className="wz-input" value={title} onChange={(e) => setTitle(e.target.value)}
-            maxLength={80} placeholder={t.fNamePh} autoFocus />
+            placeholder={t.fNamePh} autoFocus />
 
         </div>
       )}
@@ -686,8 +686,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
           )}
           <div className="wz-line-area">
             <textarea className="wz-input wz-grow-input" value={goal} onInput={crescerCampo} onChange={(e) => setGoal(e.target.value)}
-              maxLength={180} rows={1} placeholder={t.wzActionPh} autoFocus />
-            <span className="wz-inline-count">{goal.length}/300</span>
+              rows={1} placeholder={t.wzActionPh} autoFocus />
           </div>
         </div>
       )}
@@ -701,7 +700,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
             ))}
             <button type="button" className={`wz-choice${frequencia === 'custom' ? ' on' : ''}`} onClick={() => setFrequencia('custom')}>{t.ritmoOutro}</button>
           </div>
-          {frequencia === 'custom' && <input className="wz-input" value={frequenciaOutro} onChange={(e) => setFrequenciaOutro(e.target.value)} maxLength={80} placeholder={t.wzFrequencyCustomPh} autoFocus />}
+          {frequencia === 'custom' && <input className="wz-input" value={frequenciaOutro} onChange={(e) => setFrequenciaOutro(e.target.value)} placeholder={t.wzFrequencyCustomPh} autoFocus />}
         </div>
       )}
 
@@ -709,7 +708,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
       {step === S_PLANO && (
         <div className="wz-body">
           <input className="wz-input" value={plano} onChange={(e) => setPlano(e.target.value)}
-            maxLength={40} placeholder={t.wzDurationPh} autoFocus />
+            placeholder={t.wzDurationPh} autoFocus />
           <p className="wz-hint">{t.wzDurationHint}</p>
         </div>
       )}
@@ -725,7 +724,7 @@ export default function NewJourneyForm({ userId, t, aiOn }) {
           )}
           <div className="wz-line-area">
             <textarea className="wz-input wz-grow-input" value={hoje} onInput={crescerCampo} onChange={(e) => setHoje(e.target.value)}
-            maxLength={1000} rows={2} placeholder={t.wzHojePh} autoFocus />
+            rows={2} placeholder={t.wzHojePh} autoFocus />
           </div>
         </div>
       )}
