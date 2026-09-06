@@ -30,12 +30,13 @@ export async function GET(req) {
   const blocked = new Set((blk || []).map((item) => item.blocked_id));
 
   let targetIds = [];
+  let followedProfiles = [];
   if (scope === 'following') {
     const { data: fl } = await supabase.from('follows').select('journey_id').eq('user_id', user.id);
     let followedJourneyIds = (fl || []).map((item) => item.journey_id);
 
     const { data: pf } = await supabase.from('profile_follows').select('following_id').eq('follower_id', user.id);
-    const followedProfiles = [...new Set((pf || []).map((item) => item.following_id))];
+    followedProfiles = [...new Set((pf || []).map((item) => item.following_id))];
 
     if (followedProfiles.length) {
       const { data: ownerJourneys } = await supabase.from('journeys').select('id').in('owner_id', followedProfiles).eq('visibility', 'public');
@@ -43,9 +44,9 @@ export async function GET(req) {
     }
 
     const uniqueJourneyIds = [...new Set(followedJourneyIds)];
-    if (!uniqueJourneyIds.length) return NextResponse.json({ items: [] });
-
-    const { data: followedJourneys } = await supabase.from('journeys').select('id, owner_id, category').in('id', uniqueJourneyIds);
+    const { data: followedJourneys } = uniqueJourneyIds.length
+      ? await supabase.from('journeys').select('id, owner_id, category').in('id', uniqueJourneyIds)
+      : { data: [] };
     targetIds = (followedJourneys || [])
       .filter((journey) => !blocked.has(journey.owner_id) && !mutedCats.has(journey.category))
       .map((journey) => journey.id);
@@ -66,7 +67,6 @@ export async function GET(req) {
 
   // pessoas de exemplo removidas do feed: só gente real aqui
   const demoItems = [];
-  if (!targetIds.length && !demoItems.length) return NextResponse.json({ items: [] });
 
   let updates = [];
   if (targetIds.length) {
@@ -110,6 +110,14 @@ export async function GET(req) {
 
   const uids = updates.map((item) => item.id);
   const guard = (pr) => Promise.resolve(pr).then((r) => r).catch(() => ({ data: [] }));
+  let mediaQuery = supabase.from('media')
+    .select('*')
+    .in('visibility', ['public', 'followers']);
+  if (scope === 'following') {
+    mediaQuery = followedProfiles.length
+      ? mediaQuery.in('user_id', followedProfiles)
+      : null;
+  }
 
   const [encR, tracksR, trackMetaR, trackMixR, supEncR, statsR, moodR, allUpsR, mediaR] = await Promise.all([
     updates.length ? guard(supabase.from('encouragements').select('update_id').eq('user_id', user.id).in('update_id', uids)) : { data: [] },
@@ -120,7 +128,7 @@ export async function GET(req) {
     journeyIds.length ? guard(supabase.from('journey_stats').select('journey_id, current_day, progress_pct').in('journey_id', journeyIds)) : { data: [] },
     ownerIds.length ? guard(supabase.from('profiles').select('id, mood, mood_at').in('id', ownerIds).not('mood', 'is', null)) : { data: [] },
     journeyIds.length ? guard(supabase.from('updates').select('id, journey_id, day_number, kind, text, alt, photo_url, video_url, created_at').in('journey_id', journeyIds)) : { data: [] },
-    scope === 'all' ? guard(supabase.from('media').select('*').eq('visibility', 'public').order('created_at', { ascending: false }).limit(60)) : { data: [] },
+    mediaQuery ? guard(mediaQuery.order('created_at', { ascending: false }).limit(60)) : { data: [] },
   ]);
 
   const myEnc = new Set((encR.data || []).map((e) => e.update_id));
@@ -165,6 +173,12 @@ export async function GET(req) {
   const mediaRows = (mediaR.data || []).filter((m) => !blocked.has(m.user_id));
   const mediaOwnerIds = [...new Set(mediaRows.map((m) => m.user_id))];
   const mediaIds = mediaRows.map((m) => m.id);
+  const routineIds = [...new Set(mediaRows.map((m) => m.routine_id).filter(Boolean))];
+  const routineR = routineIds.length
+    ? await guard(supabase.from('routines').select('id, name, ideal_text, minimum_text, status, privacy').in('id', routineIds).neq('status', 'archived'))
+    : { data: [] };
+  const routineMap = {};
+  (routineR.data || []).forEach((routine) => { routineMap[routine.id] = routine; });
   if (mediaOwnerIds.length) {
     const mediaMoodR = await guard(supabase.from('profiles').select('id, mood, mood_at').in('id', mediaOwnerIds).not('mood', 'is', null));
     (mediaMoodR.data || []).forEach((mp) => {
@@ -258,13 +272,19 @@ export async function GET(req) {
       });
     }
   } catch {}
-  const mediaFeed = mediaRows.map((m) => ({
+  const routineCopy = locale === 'en'
+    ? { label: 'Routine', ideal: 'Ideal version', minimum: 'Minimum version' }
+    : locale === 'es'
+      ? { label: 'Rutina', ideal: 'Versión ideal', minimum: 'Versión mínima' }
+      : { label: 'Rotina', ideal: 'Versão ideal', minimum: 'Versão mínima' };
+  const mediaFeed = mediaRows.filter((m) => !m.routine_id || routineMap[m.routine_id]).map((m) => ({
     id: 'media-' + m.id,
     media: true,
     mediaId: m.id,
     url: m.url,
     kind: m.kind,
     caption: m.caption || '',
+    routine: m.routine_id ? { ...routineMap[m.routine_id], ...routineCopy } : null,
     created_at: m.created_at,
     track: m.track_audio_url ? {
       id: m.track_id,

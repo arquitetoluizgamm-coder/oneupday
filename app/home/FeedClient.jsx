@@ -544,12 +544,24 @@ function MidiaGaleria({ item, labels }) {
   const textualCard = item.kind === 'quote' || item.kind === 'bible';
   const mostrarLegenda = item.caption && item.kind !== 'quote' && item.kind !== 'bible' && !legendaEmCima;
   const trackEl = item.track ? <TrackTag track={item.track} /> : null;
+  const hasMedia = !!item.url;
 
   return (
     <>
-      {item.kind === 'video'
+      {item.routine && (
+        <section className="feed-routine-card" aria-label={item.routine.label}>
+          <span>{item.routine.label}</span>
+          <h3>{item.routine.name}</h3>
+          <div className="feed-routine-versions">
+            <p><small>{item.routine.ideal}</small><b>{item.routine.ideal_text}</b></p>
+            {item.routine.minimum_text && <p><small>{item.routine.minimum}</small><b>{item.routine.minimum_text}</b></p>}
+          </div>
+        </section>
+      )}
+      {hasMedia && (item.kind === 'video'
         ? <Media video={item.url} labels={labels} caption={item.caption} onRatio={setProporcao} hasTrack={!!item.track} below={trackEl} />
-        : <Media photo={item.url} alt={textualCard ? (item.caption || '') : ''} below={trackEl} />}
+        : <Media photo={item.url} alt={textualCard ? (item.caption || '') : ''} below={trackEl} />)}
+      {!hasMedia && trackEl}
       {mostrarLegenda && (
         <div className="dp-text under"><EntryText text={item.caption} labels={labels} limit={100} /></div>
       )}
@@ -991,12 +1003,12 @@ export default function FeedClient({ labels }) {
         {items.map((item, idx) => (
           <Fragment key={item.id}>
           {item.media ? (
-          <article className={`entry entry-photo${item.kind === 'quote' ? ' entry-quote' : ''}${item.kind === 'bible' ? ' entry-quote entry-bible' : ''}`}>
+          <article className={`entry entry-photo${item.kind === 'quote' ? ' entry-quote' : ''}${item.kind === 'bible' ? ' entry-quote entry-bible' : ''}${item.routine ? ' entry-routine' : ''}`}>
             <a className="entry-head" href={`/${item.owner.handle || ''}`}>
               <span className={avatarMoodClass(item.owner)} style={avatarMoodStyle(item.owner)}>
                 {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}
               </span>
-              <span className="entry-id"><b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} /></b>{item.kind === 'quote' && labels.quoteLabel && <small className="entry-media-kind">{labels.quoteLabel.replace('{name}', item.owner.name || '')}</small>}{item.kind === 'bible' && labels.bibleLabel && <small className="entry-media-kind">{labels.bibleLabel.replace('{name}', item.owner.name || '')}</small>}<MoodLine mood={item.owner.mood} labels={labels} /></span>
+              <span className="entry-id"><b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} /></b>{item.kind === 'quote' && labels.quoteLabel && <small className="entry-media-kind">{labels.quoteLabel.replace('{name}', item.owner.name || '')}</small>}{item.kind === 'bible' && labels.bibleLabel && <small className="entry-media-kind">{labels.bibleLabel.replace('{name}', item.owner.name || '')}</small>}{item.routine && <small className="entry-media-kind">{item.routine.label}</small>}<MoodLine mood={item.owner.mood} labels={labels} /></span>
             </a>
             <MidiaGaleria item={item} labels={labels} />
             <div className="entry-actions feed-acts">

@@ -157,11 +157,17 @@ async function loadProfile(handle) {
   // ============================================================
   try {
     let { data: md, error } = await sb.from('media')
-      .select('id, url, kind, caption').eq('user_id', profile.id)
+      .select('id, url, kind, caption, routine_id').eq('user_id', profile.id)
+      .is('routine_id', null)
       .order('created_at', { ascending: false }).limit(60);
-    if (error && /caption|column/i.test(error.message || '')) {
+    if (error && /routine_id/i.test(error.message || '')) {
       ({ data: md } = await sb.from('media')
         .select('id, url, kind').eq('user_id', profile.id)
+        .order('created_at', { ascending: false }).limit(60));
+    } else if (error && /caption|column/i.test(error.message || '')) {
+      ({ data: md } = await sb.from('media')
+        .select('id, url, kind, routine_id').eq('user_id', profile.id)
+        .is('routine_id', null)
         .order('created_at', { ascending: false }).limit(60));
     }
     media = md || [];

@@ -23,5 +23,18 @@ export default async function Rotinas() {
     supabase.from('routine_logs').select('*').eq('owner_id', user.id).order('log_date', { ascending: false }).limit(500),
     supabase.from('journeys').select('id, title').eq('owner_id', user.id).order('created_at', { ascending: false }),
   ]);
-  return <><AppTop backLabel={t.back} /><main className="wrap routine-page"><RoutinesClientComplete initialRoutines={error ? [] : (routines || [])} initialLogs={error ? [] : (logs || [])} journeys={journeys || []} labels={labels} migrationMissing={!!error} /></main><BottomNav active="create" t={t} /></>;
+  const routineRows = error ? [] : (routines || []);
+  const routineIds = routineRows.map((routine) => routine.id);
+  const { data: publications } = routineIds.length
+    ? await supabase.from('media').select('*').in('routine_id', routineIds)
+    : { data: [] };
+  const publicationByRoutine = {};
+  (publications || []).forEach((publication) => {
+    publicationByRoutine[publication.routine_id] = publication;
+  });
+  const routinesWithPublication = routineRows.map((routine) => ({
+    ...routine,
+    publication: publicationByRoutine[routine.id] || null,
+  }));
+  return <><AppTop backLabel={t.back} /><main className="wrap routine-page"><RoutinesClientComplete userId={user.id} initialRoutines={routinesWithPublication} initialLogs={error ? [] : (logs || [])} journeys={journeys || []} labels={labels} migrationMissing={!!error} /></main><BottomNav active="create" t={t} /></>;
 }

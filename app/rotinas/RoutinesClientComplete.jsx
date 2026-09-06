@@ -9,6 +9,47 @@ import {
   scheduleLabel,
   weeklyPresence,
 } from "../../lib/routines/core";
+import RoutinePublicationFields from "./RoutinePublicationFields";
+
+function emptyRoutineForm() {
+  return {
+    name: "",
+    ideal_text: "",
+    minimum_text: "",
+    schedule_type: "daily",
+    weekdays: [1, 3, 5],
+    weekly_target: 3,
+    linked_journey_id: "",
+    privacy: "private",
+    media_url: "",
+    media_kind: "photo",
+    media_caption: "",
+    track: null,
+  };
+}
+
+function visibilityFor(value) {
+  if (value === "public" || value === "followers") return value;
+  return value === "profile" ? "public" : "private";
+}
+
+function trackFromPublication(publication) {
+  if (!publication?.track_audio_url) return null;
+  const start = Number(publication.track_start_seconds) || 0;
+  const duration = Number(publication.track_duration_seconds) || 30;
+  return {
+    id: publication.track_id,
+    title: publication.track_title,
+    artist: publication.track_artist,
+    audio_url: publication.track_audio_url,
+    start_seconds: start,
+    duration_seconds: duration,
+    total_seconds: Math.max(duration, start + duration),
+    full: !!publication.track_full,
+    track_volume: publication.track_volume,
+    video_volume: publication.video_volume,
+  };
+}
 
 function fill(text, values) {
   return String(text || "").replace(
@@ -23,6 +64,7 @@ function tomorrow(days = 1) {
 }
 
 export default function RoutinesClient({
+  userId,
   initialRoutines,
   initialLogs,
   journeys,
@@ -40,16 +82,7 @@ export default function RoutinesClient({
   const [pauseId, setPauseId] = useState(null);
   const [editing, setEditing] = useState(null);
   const [editForm, setEditForm] = useState(null);
-  const [form, setForm] = useState({
-    name: "",
-    ideal_text: "",
-    minimum_text: "",
-    schedule_type: "daily",
-    weekdays: [1, 3, 5],
-    weekly_target: 3,
-    linked_journey_id: "",
-    privacy: "private",
-  });
+  const [form, setForm] = useState(emptyRoutineForm);
   const today = localDate();
   const scheduled = useMemo(
     () => routines.filter((routine) => scheduledOn(routine, today)),
@@ -57,16 +90,7 @@ export default function RoutinesClient({
   );
 
   function resetWizard() {
-    setForm({
-      name: "",
-      ideal_text: "",
-      minimum_text: "",
-      schedule_type: "daily",
-      weekdays: [1, 3, 5],
-      weekly_target: 3,
-      linked_journey_id: "",
-      privacy: "private",
-    });
+    setForm(emptyRoutineForm());
     setStep(0);
     setWizard(false);
   }
@@ -175,12 +199,22 @@ export default function RoutinesClient({
     }
   }
   function beginEdit(routine) {
+    const publication = routine.publication;
     setEditing(routine);
     setEditForm({
       name: routine.name,
       ideal_text: routine.ideal_text,
       minimum_text: routine.minimum_text || "",
-      privacy: routine.privacy || "private",
+      schedule_type: routine.schedule_type || "daily",
+      weekdays: routine.weekdays || [],
+      weekly_target: routine.weekly_target || 3,
+      period: routine.period || "anytime",
+      linked_journey_id: routine.linked_journey_id || "",
+      privacy: visibilityFor(routine.privacy),
+      media_url: publication?.url || "",
+      media_kind: publication?.kind === "video" ? "video" : "photo",
+      media_caption: publication?.caption || "",
+      track: trackFromPublication(publication),
     });
     setPauseId(null);
   }
@@ -492,17 +526,12 @@ export default function RoutinesClient({
                 {form.linked_journey_id && (
                   <p className="routine-hint">{labels.privacyHint}</p>
                 )}
-                <label>
-                  {labels.privacyQ}
-                  <select
-                    value={form.privacy}
-                    onChange={(e) => update("privacy", e.target.value)}
-                  >
-                    <option value="private">{labels.private}</option>
-                    <option value="milestones">{labels.milestones}</option>
-                    <option value="profile">{labels.profile}</option>
-                  </select>
-                </label>
+                <RoutinePublicationFields
+                  userId={userId}
+                  value={form}
+                  onChange={setForm}
+                  labels={labels.publication}
+                />
               </div>
             )}
             {step === 4 && (
@@ -536,6 +565,22 @@ export default function RoutinesClient({
                   <div>
                     <span>{labels.linkQ}</span>
                     <strong>{journeyTitle(form.linked_journey_id)}</strong>
+                  </div>
+                )}
+                <div>
+                  <span>{labels.privacyQ}</span>
+                  <strong>{labels.publication[form.privacy]}</strong>
+                </div>
+                {(form.media_url || form.track) && (
+                  <div>
+                    <span>{labels.publication.mediaTitle}</span>
+                    <strong>
+                      {form.media_url
+                        ? form.media_kind === "video"
+                          ? labels.publication.video
+                          : labels.publication.photo
+                        : labels.publication.musicOnly}
+                    </strong>
                   </div>
                 )}
               </div>
@@ -613,19 +658,12 @@ export default function RoutinesClient({
                   }
                 />
               </label>
-              <label>
-                {labels.privacyQ}
-                <select
-                  value={editForm.privacy}
-                  onChange={(e) =>
-                    setEditForm((v) => ({ ...v, privacy: e.target.value }))
-                  }
-                >
-                  <option value="private">{labels.private}</option>
-                  <option value="milestones">{labels.milestones}</option>
-                  <option value="profile">{labels.profile}</option>
-                </select>
-              </label>
+              <RoutinePublicationFields
+                userId={userId}
+                value={editForm}
+                onChange={setEditForm}
+                labels={labels.publication}
+              />
             </div>
             <div className="routine-dialog-actions">
               <button className="ghost-btn" onClick={() => setEditing(null)}>
@@ -702,6 +740,14 @@ function RoutineCard({
       {routine.linked_journey_id && (
         <p className="routine-link">↗ {journeyTitle}</p>
       )}
+      <p className="routine-sharing">
+        <span aria-hidden="true">◉</span>{" "}
+        {labels.publication[visibilityFor(routine.privacy)]}
+        {routine.publication?.url && (
+          <> · {routine.publication.kind === "video" ? labels.publication.video : labels.publication.photo}</>
+        )}
+        {routine.publication?.track_audio_url && <> · {labels.publication.musicOnly}</>}
+      </p>
       <div className="routine-card-actions">
         {paused ? (
           <button

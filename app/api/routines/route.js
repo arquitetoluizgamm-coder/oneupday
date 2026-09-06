@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '../../../lib/supabase/server';
 import { isRoutineFeatureEnabled } from '../../../lib/routines/flags';
 import { localDate, dateDiff } from '../../../lib/routines/core';
+import { routinePublication, routineVisibility } from '../../../lib/routines/publication';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -32,7 +33,18 @@ export async function GET() {
     supabase.from('journeys').select('id, title').eq('owner_id', user.id).order('created_at', { ascending: false }),
   ]);
   if (error) return NextResponse.json({ error: 'migration_required', detail: error.message }, { status: 503 });
-  return NextResponse.json({ routines: routines || [], logs: logs || [], journeys: journeys || [] });
+  const routineRows = routines || [];
+  const routineIds = routineRows.map((routine) => routine.id);
+  const { data: publications } = routineIds.length
+    ? await supabase.from('media').select('*').in('routine_id', routineIds)
+    : { data: [] };
+  const publicationByRoutine = {};
+  (publications || []).forEach((publication) => { publicationByRoutine[publication.routine_id] = publication; });
+  return NextResponse.json({
+    routines: routineRows.map((routine) => ({ ...routine, publication: publicationByRoutine[routine.id] || null })),
+    logs: logs || [],
+    journeys: journeys || [],
+  });
 }
 
 export async function POST(req) {
@@ -56,16 +68,31 @@ export async function POST(req) {
       const { data: journey } = await supabase.from('journeys').select('id').eq('id', journeyId).eq('owner_id', user.id).maybeSingle();
       if (!journey) return bad('journey_not_found', 404);
     }
+    const privacy = routineVisibility(body.privacy);
     const { data, error } = await supabase.from('routines').insert({
       owner_id: user.id, name, ideal_text: ideal, minimum_text: minimum,
       schedule_type: scheduleType, weekdays, weekly_target: weeklyTarget,
       start_date: body.start_date || localDate(), preferred_time: body.preferred_time || null,
       period: body.period || 'anytime', linked_journey_id: journeyId,
-      privacy: ['private', 'milestones', 'profile'].includes(body.privacy) ? body.privacy : 'private',
+      privacy,
     }).select('*').single();
     if (error) return NextResponse.json({ error: 'db', detail: error.message }, { status: 500 });
+    const publicationRow = routinePublication(body, user.id, data.id, privacy);
+    let publication = null;
+    if (publicationRow) {
+      const { data: savedPublication, error: publicationError } = await supabase
+        .from('media')
+        .insert(publicationRow)
+        .select('*')
+        .single();
+      if (publicationError) {
+        await supabase.from('routines').delete().eq('id', data.id).eq('owner_id', user.id);
+        return NextResponse.json({ error: 'db', detail: publicationError.message }, { status: 500 });
+      }
+      publication = savedPublication;
+    }
     await event(supabase, user.id, 'routine_created', { routine_id: data.id, linked_to_journey: !!journeyId, schedule_type: scheduleType, minimum_enabled: !!minimum, privacy: data.privacy, source_screen: 'routines' });
-    return NextResponse.json({ routine: data });
+    return NextResponse.json({ routine: { ...data, publication } });
   }
 
   const routineId = String(body.routine_id || '');
@@ -109,6 +136,7 @@ export async function POST(req) {
   if (action === 'archive') {
     const { data, error } = await supabase.from('routines').update({ status: 'archived' }).eq('id', routineId).eq('owner_id', user.id).select('*').single();
     if (error) return NextResponse.json({ error: 'db', detail: error.message }, { status: 500 });
+    await supabase.from('media').update({ visibility: 'private' }).eq('routine_id', routineId).eq('user_id', user.id);
     await event(supabase, user.id, 'routine_archived', { routine_id: routineId, source_screen: 'routines' });
     return NextResponse.json({ routine: data });
   }
