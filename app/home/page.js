@@ -11,8 +11,6 @@ import Track from '../../components/Track';
 import Origem from '../../components/Origem';
 import ScrollChrome from '../../components/ScrollChrome';
 import DailyMood from '../../components/DailyMood';
-import NextChapter from '../../components/NextChapter';
-import { computeNextChapter, ncLabels } from '../../lib/nextChapter';
 import UpiDailyMemory from './UpiDailyMemory';
 
 export const dynamic = 'force-dynamic';
@@ -21,7 +19,7 @@ const COLORS = ['#C16F54', '#84917A', '#5B7189', '#96523C', '#B3874A', '#A8637A'
 async function ensureProfile(supabase, user) {
   const meta = user.user_metadata || {};
   const googleAvatar = meta.avatar_url || meta.picture || null;
-  const { data: existing } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color, muted_cats, notif_paused').eq('id', user.id).maybeSingle();
+  const { data: existing } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color, muted_cats, notif_paused, mood, mood_at').eq('id', user.id).maybeSingle();
   if (existing) {
     if (!existing.avatar_url && googleAvatar) { await supabase.from('profiles').update({ avatar_url: googleAvatar }).eq('id', user.id); existing.avatar_url = googleAvatar; }
     return existing;
@@ -43,20 +41,11 @@ export default async function Home() {
   const profile = await ensureProfile(supabase, user);
   const t = getDict(getLocale());
 
-  const { data: journeys } = await supabase.from('journeys').select('*').eq('owner_id', user.id).order('created_at', { ascending: false });
-  const list = journeys || [];
-  let primary = list[0] || null;
-  if (list.length) {
-    const { data: stats } = await supabase.from('journey_stats').select('journey_id, current_day').in('journey_id', list.map((j) => j.id));
-    const byId = Object.fromEntries((stats || []).map((s) => [s.journey_id, s.current_day || 0]));
-    primary = list.find((j) => (byId[j.id] || 0) < (j.total_days || 0)) || primary;
-  }
-
-  let moodToday = false;
-  try { const { data: mp } = await supabase.from('profiles').select('mood, mood_at').eq('id', user.id).maybeSingle(); if (mp?.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) moodToday = !!mp.mood; } catch {}
-
-  // ---- Próximo Capítulo: antecipação pelo amanhã, nunca ansiedade ----
-  const nc = await computeNextChapter(supabase, user.id, primary, t);
+  const moodToday = !!(
+    profile.mood
+    && profile.mood_at
+    && Date.now() - new Date(profile.mood_at).getTime() < 30 * 3600 * 1000
+  );
 
   const feedLabels = {
     dayShort: t.dayShort, journeyStatusFmt: t.journeyStatusFmt, tagSetback: t.tagSetback, tagWin: t.tagWin,
@@ -94,7 +83,7 @@ export default async function Home() {
   return (
     <>
       {/* Mesmo topo global usado no restante do app. */}
-      <AppTop sino />
+      <AppTop sino authenticated />
 
       <Track type="visit" meta={{ page: "home" }} />
       <Origem />
@@ -112,11 +101,8 @@ export default async function Home() {
           save: t.upiMemorySave, update: t.upiMemoryUpdate, saving: t.upiMemorySaving,
           saved: t.upiMemorySaved, diary: t.navDiary,
         }} />
-        {nc.mode && (
-          <NextChapter mode={nc.mode} line={nc.line} env={nc.env} labels={ncLabels(t, nc)} dismissible />
-        )}
       </main>
-      <BottomNav active="home" t={t} />
+      <BottomNav active="home" t={t} userId={user.id} initialProfile={profile} />
     </>
   );
 }

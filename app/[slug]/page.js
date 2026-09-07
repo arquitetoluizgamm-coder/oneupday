@@ -28,6 +28,7 @@ import SeloDoDia from '../../components/SeloDoDia';
 import { textoDaPessoa } from '../../lib/registro';
 import { textoAlternativo } from '../../lib/alt';
 import OneSocialLinks from '../../components/OneSocialLinks';
+import ProfessionalBadge from '../../components/ProfessionalBadge';
 
 // O topo agora mostra avatar e sino de quem esta olhando, ou seja a
 // pagina depende da sessao. Ela ja era dinamica de fato (o codigo le
@@ -125,7 +126,7 @@ async function loadProfile(handle) {
   let profile = null;
   for (const h of variants) {
     const { data } = await sb.from('profiles')
-      .select('id, name, handle, avatar_url, avatar_color, banner_url').eq('handle', h).maybeSingle();
+      .select('id, name, handle, avatar_url, avatar_color, banner_url, is_professional_verified, professional_title').eq('handle', h).maybeSingle();
     if (data) { profile = data; break; }
   }
   if (!profile) return null;
@@ -227,7 +228,10 @@ async function ProfilePage({ handle }) {
               {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : initial}
             </div>
             <div className="pc-meta">
-              <h1>{profile.name}</h1>
+              <div className="pc-name-line">
+                <h1>{profile.name}</h1>
+                {profile.is_professional_verified && <ProfessionalBadge title={profile.professional_title} />}
+              </div>
               <span>{profile.handle}</span>
             </div>
             <div className="pc-follow">

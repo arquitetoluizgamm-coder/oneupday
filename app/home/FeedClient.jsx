@@ -883,6 +883,7 @@ export default function FeedClient({ labels }) {
   const [momentos, setMomentos] = useState({ transformacoes: [], amanha: [], retornos: [], recomendacoes: [] });
   const [andamento, setAndamento] = useState([]);
   const [needs, setNeeds] = useState([]);
+  const secondaryStartedRef = useRef(false);
   useEffect(() => {
     function onProfileUpdated(e) {
       const { userId, avatar_url } = e.detail || {};
@@ -907,12 +908,6 @@ export default function FeedClient({ labels }) {
       window.removeEventListener('oud:update-updated', onUpdateUpdated);
     };
   }, []);
-  useEffect(() => { fetch('/api/needs').then((r) => r.json()).then((j) => setNeeds(j.people || [])).catch(() => {}); }, []);
-  useEffect(() => { fetch('/api/suggestions').then((r) => r.json()).then((j) => setSuggestions(j.people || [])).catch(() => {}); }, []);
-  useEffect(() => { fetch('/api/eco', { method: 'POST' }).catch(() => {}); }, []);
-  useEffect(() => { fetch('/api/andamento').then((r) => r.json()).then((j) => setAndamento(j.andamento || [])).catch(() => {}); }, []);
-  useEffect(() => { fetch('/api/momentos').then((r) => r.json()).then((j) => setMomentos({ transformacoes: j.transformacoes || [], amanha: j.amanha || [], retornos: j.retornos || [], recomendacoes: j.recomendacoes || [] })).catch(() => {}); }, []);
-
   async function load() {
     if (busy.current || doneRef.current) return;
     busy.current = true;
@@ -964,6 +959,37 @@ export default function FeedClient({ labels }) {
     load();
   }, [kind]);
 
+  // A primeira página do feed tem prioridade. Blocos auxiliares são
+  // buscados somente depois dela, evitando seis chamadas concorrentes
+  // logo após o login ou a reabertura da home.
+  useEffect(() => {
+    if (!started || secondaryStartedRef.current) return undefined;
+    let cancelled = false;
+    let idleId;
+    let timerId;
+
+    const run = () => {
+      if (cancelled || secondaryStartedRef.current) return;
+      secondaryStartedRef.current = true;
+      fetch('/api/needs').then((r) => r.json()).then((j) => { if (!cancelled) setNeeds(j.people || []); }).catch(() => {});
+      fetch('/api/suggestions').then((r) => r.json()).then((j) => { if (!cancelled) setSuggestions(j.people || []); }).catch(() => {});
+      fetch('/api/eco', { method: 'POST' }).catch(() => {});
+      fetch('/api/andamento').then((r) => r.json()).then((j) => { if (!cancelled) setAndamento(j.andamento || []); }).catch(() => {});
+      fetch('/api/momentos').then((r) => r.json()).then((j) => {
+        if (!cancelled) setMomentos({ transformacoes: j.transformacoes || [], amanha: j.amanha || [], retornos: j.retornos || [], recomendacoes: j.recomendacoes || [] });
+      }).catch(() => {});
+    };
+
+    if ('requestIdleCallback' in window) idleId = window.requestIdleCallback(run, { timeout: 1200 });
+    else timerId = window.setTimeout(run, 250);
+
+    return () => {
+      cancelled = true;
+      if (idleId !== undefined) window.cancelIdleCallback(idleId);
+      if (timerId !== undefined) window.clearTimeout(timerId);
+    };
+  }, [started]);
+
   useEffect(() => {
     const el = sentinel.current;
     if (!el) return;
@@ -990,7 +1016,15 @@ export default function FeedClient({ labels }) {
         </button>
       </div>
 
-      <section id="feed" className={`feed-stream${focusMode ? ' focus-mode' : ''}`}>
+      <section id="feed" className={`feed-stream${focusMode ? ' focus-mode' : ''}`} aria-busy={!started}>
+        {!started && (
+          <div className="feed-initial-loading" role="status" aria-live="polite" aria-label="Carregando publicações">
+            <span className="feed-loading-avatar" />
+            <span className="feed-loading-line feed-loading-name" />
+            <span className="feed-loading-line feed-loading-title" />
+            <span className="feed-loading-media" />
+          </div>
+        )}
         {started && items.length === 0 && (
           <div className="feed-invite">
             <LoopMarca size={132} />

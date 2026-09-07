@@ -5531,6 +5531,9 @@ h1 { letter-spacing: -0.03em; }
 .adm-nota{color:var(--muted);font-size:13.5px;line-height:1.6;margin:14px 0}
 .adm-nota code{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 5px}
 .adm-recado{color:var(--orange,#C16F54);font-size:13.5px;font-weight:600;margin:10px 0}
+.adm-recado.ok{color:#52664D}
+.adm-prof-request{display:grid;gap:5px;margin:12px 0 2px;padding:12px 14px;border:1px solid rgba(132,149,126,.3);border-radius:13px;background:#F3F7F0;color:var(--ink)}
+.adm-prof-request>strong{font-size:13.5px;color:#52664D}.adm-prof-request>span,.adm-prof-request>a,.adm-prof-request>p{font-size:12.5px;line-height:1.42}.adm-prof-request>span{color:var(--muted)}.adm-prof-request>a{width:fit-content;color:var(--link);font-weight:750}.adm-prof-request>p{margin:3px 0 0;color:var(--ink);white-space:pre-wrap}
 
 .adm-cartoes{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
 .adm-cartao{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;
@@ -14481,3 +14484,29 @@ body:has(.feed-page),
   .feed-page .feed-routine-card h3{font-size:19px}
   .feed-page .feed-routine-versions{grid-template-columns:1fr}
 }
+.feed-initial-loading{
+  display:grid;
+  grid-template-columns:44px 1fr;
+  gap:11px 12px;
+  padding:16px;
+  margin-bottom:16px;
+  border:1px solid var(--one-line,var(--line));
+  border-radius:18px;
+  background:var(--one-surface,#fff);
+  overflow:hidden;
+}
+.feed-loading-avatar,
+.feed-loading-line,
+.feed-loading-media{
+  display:block;
+  background:linear-gradient(90deg,#f0ede8 20%,#f8f6f2 42%,#f0ede8 64%);
+  background-size:220% 100%;
+  animation:feed-loading-shimmer 1.35s ease-in-out infinite;
+}
+.feed-loading-avatar{grid-row:1 / span 2;width:44px;height:44px;border-radius:50%}
+.feed-loading-line{height:10px;border-radius:999px;align-self:center}
+.feed-loading-name{width:min(42%,160px)}
+.feed-loading-title{width:min(68%,280px)}
+.feed-loading-media{grid-column:1 / -1;height:clamp(210px,52vw,330px);border-radius:14px}
+@keyframes feed-loading-shimmer{to{background-position:-220% 0}}
+@media(prefers-reduced-motion:reduce){.feed-loading-avatar,.feed-loading-line,.feed-loading-media{animation:none}}

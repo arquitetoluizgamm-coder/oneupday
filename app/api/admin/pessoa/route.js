@@ -37,7 +37,7 @@ export async function POST(req) {
   }
 
   const { data: alvo } = await admin.from('profiles')
-    .select('id, handle, name, suspenso_em, is_professional_verified').eq('id', id).maybeSingle();
+    .select('id, handle, name, suspenso_em, is_professional_verified, professional_title').eq('id', id).maybeSingle();
   if (!alvo) return NextResponse.json({ error: 'nao encontrado' }, { status: 404 });
 
   const registrar = async (motivo) => {
@@ -49,6 +49,33 @@ export async function POST(req) {
     } catch { }
   };
 
+  if (acao === 'aprovar_verificacao_profissional' || acao === 'rejeitar_verificacao_profissional') {
+    const requestId = String(body.request_id || '');
+    if (!requestId) return NextResponse.json({ error: 'pedido_invalido' }, { status: 400 });
+    const { data: verificationRequest, error: requestError } = await admin
+      .from('professional_verification_requests')
+      .select('id, user_id, status')
+      .eq('id', requestId)
+      .maybeSingle();
+    if (requestError || verificationRequest?.user_id !== id || verificationRequest?.status !== 'pending') {
+      return NextResponse.json({ error: 'pedido_invalido' }, { status: 400 });
+    }
+    const aprovado = acao === 'aprovar_verificacao_profissional';
+    const { data, error } = await admin.rpc('review_professional_verification', {
+      p_request_id: requestId,
+      p_reviewer_id: user.id,
+      p_approved: aprovado,
+      p_review_note: String(body.motivo || '').slice(0, 1000),
+    });
+    const reviewed = Array.isArray(data) ? data[0] : data;
+    if (error || !reviewed || reviewed.user_id !== id) {
+      console.error('[admin/pessoa] professional request review failed', { code: error?.code, message: error?.message });
+      return NextResponse.json({ error: 'pedido_invalido' }, { status: 500 });
+    }
+    await registrar(aprovado ? 'solicitação profissional aprovada' : 'solicitação profissional recusada');
+    return NextResponse.json({ ok: true, estado: aprovado ? 'profissional_verificado' : 'solicitacao_recusada' });
+  }
+
   // A criação de Círculos exige uma decisão explícita do dono do ONE.
   // O usuário nunca consegue conceder essa verificação a si mesmo via RLS.
   if (acao === 'verificar_profissional' || acao === 'remover_verificacao_profissional') {
@@ -56,8 +83,13 @@ export async function POST(req) {
     const { error } = await admin.from('profiles').update({
       is_professional_verified: verificado,
       professional_verified_at: verificado ? new Date().toISOString() : null,
+      professional_verified_by: verificado ? user.id : null,
+      professional_title: verificado ? alvo.professional_title : null,
     }).eq('id', id);
-    if (error) return NextResponse.json({ error: 'db', detalhe: error.message }, { status: 500 });
+    if (error) {
+      console.error('[admin/pessoa] professional verification failed', { code: error.code, message: error.message });
+      return NextResponse.json({ error: 'db' }, { status: 500 });
+    }
     await registrar(verificado ? 'perfil profissional verificado para Círculos' : 'verificação profissional removida');
     return NextResponse.json({ ok: true, estado: verificado ? 'profissional_verificado' : 'verificacao_removida' });
   }

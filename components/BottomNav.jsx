@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { createClient } from '../lib/supabase/client';
 import CriarMenu from './CriarMenu';
 
-function ProfileNavAvatar() {
-  const [profile, setProfile] = useState(null);
+function ProfileNavAvatar({ initialProfile = null, userId = null }) {
+  const [profile, setProfile] = useState(initialProfile);
   const [hasNotifications, setHasNotifications] = useState(false);
 
   useEffect(() => {
@@ -12,14 +12,22 @@ function ProfileNavAvatar() {
     (async () => {
       try {
         const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        const { data } = await supabase.from('profiles')
-          .select('name, avatar_url, avatar_color').eq('id', user.id).maybeSingle();
-        if (alive) setProfile(data || { name: user.email || '?' });
+        let resolvedUserId = userId;
+        let fallbackName = '?';
+        if (!resolvedUserId) {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+          resolvedUserId = user.id;
+          fallbackName = user.email || '?';
+        }
+        if (!initialProfile) {
+          const { data } = await supabase.from('profiles')
+            .select('name, avatar_url, avatar_color').eq('id', resolvedUserId).maybeSingle();
+          if (alive) setProfile(data || { name: fallbackName });
+        }
         const { count } = await supabase.from('notifications')
           .select('id', { count: 'exact', head: true })
-          .eq('recipient_id', user.id).eq('read', false);
+          .eq('recipient_id', resolvedUserId).eq('read', false);
         if (alive) setHasNotifications((count || 0) > 0);
       } catch { }
     })();
@@ -41,7 +49,7 @@ function ProfileNavAvatar() {
   );
 }
 
-export default function BottomNav({ active, t }) {
+export default function BottomNav({ active, t, userId = null, initialProfile = null }) {
   const [scrolling, setScrolling] = useState(false);
   useEffect(() => {
     let timer;
@@ -68,7 +76,7 @@ export default function BottomNav({ active, t }) {
       {items.slice(2).map((it) => (
         <a key={it.key} href={it.href} className={active === it.key ? 'on' : ''} aria-label={it.label} title={it.label}>
           {it.avatar
-            ? <ProfileNavAvatar />
+            ? <ProfileNavAvatar userId={userId} initialProfile={initialProfile} />
             : <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={it.d} /></svg>}
         </a>
       ))}

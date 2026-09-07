@@ -35,9 +35,14 @@ import LanguagePicker from './LanguagePicker';
 export default async function AppTop({
   sino = false,            // true só no feed
   backHref = '/home', backLabel,
+  authenticated,
 }) {
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  let user = authenticated ? { id: 'authenticated' } : null;
+  if (authenticated === undefined) {
+    const supabase = createClient();
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  }
   const locale = getLocale();
   const t = getDict(locale);
 

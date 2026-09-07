@@ -9,12 +9,15 @@ export default async function Pessoas() {
     return <p className="fila-vazia">Falta <code>SUPABASE_SERVICE_ROLE_KEY</code> nas variáveis da Vercel.</p>;
   }
 
-  const [{ data: perfis }, { data: jornadas }, { data: posts }, { data: denuncias }] = await Promise.all([
-    sb.from('profiles').select('id, name, handle, created_at, origem, suspenso_em, suspenso_motivo, is_professional_verified')
+  const [{ data: perfis }, { data: jornadas }, { data: posts }, { data: denuncias }, { data: pedidos }] = await Promise.all([
+    sb.from('profiles').select('id, name, handle, created_at, origem, suspenso_em, suspenso_motivo, is_professional_verified, professional_title')
       .order('created_at', { ascending: false }).limit(500),
     sb.from('journeys').select('id, owner_id'),
     sb.from('updates').select('journey_id, created_at'),
     sb.from('reports').select('reporter_id, update_id'),
+    sb.from('professional_verification_requests')
+      .select('id, user_id, profession, credential, evidence_url, message, status, review_note, submitted_at')
+      .order('submitted_at', { ascending: false }).limit(1000),
   ]);
 
   // e-mail mora em auth.users, não em profiles
@@ -49,6 +52,11 @@ export default async function Pessoas() {
     if (alvo) contaDenuncia[alvo] = (contaDenuncia[alvo] || 0) + 1;
   });
 
+  const pedidoPorPessoa = {};
+  (pedidos || []).forEach((pedido) => {
+    if (!pedidoPorPessoa[pedido.user_id]) pedidoPorPessoa[pedido.user_id] = pedido;
+  });
+
   const itens = (perfis || []).map(p => ({
     id: p.id,
     nome: p.name || '',
@@ -63,6 +71,7 @@ export default async function Pessoas() {
     suspenso: !!p.suspenso_em,
     motivo: p.suspenso_motivo || '',
     profissional: p.is_professional_verified === true,
+    pedidoProfissional: pedidoPorPessoa[p.id] || null,
   }));
 
   return <PessoasClient itens={itens} />;

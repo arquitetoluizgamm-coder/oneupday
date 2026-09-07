@@ -34,6 +34,8 @@ import PushToggle from '../../components/PushToggle';
 import EcoToggle from '../../components/EcoToggle';
 import LanguagePicker from '../../components/LanguagePicker';
 import OneSocialLinks from '../../components/OneSocialLinks';
+import ProfessionalBadge from '../../components/ProfessionalBadge';
+import ProfessionalVerificationRequest from '../../components/ProfessionalVerificationRequest';
 import './profile-redesign.css';
 
 export const dynamic = 'force-dynamic';
@@ -43,7 +45,7 @@ const COLORS = ['#C16F54', '#84917A', '#5B7189', '#96523C', '#B3874A', '#A8637A'
 async function ensureProfile(supabase, user) {
   const meta = user.user_metadata || {};
   const googleAvatar = meta.avatar_url || meta.picture || null;
-  const { data: existing } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color, banner_url, notif_paused, eco_on').eq('id', user.id).maybeSingle();
+  const { data: existing } = await supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color, banner_url, notif_paused, eco_on, is_professional_verified, professional_title').eq('id', user.id).maybeSingle();
   if (existing) {
     if (!existing.avatar_url && googleAvatar) {
       await supabase.from('profiles').update({ avatar_url: googleAvatar }).eq('id', user.id);
@@ -68,6 +70,18 @@ export default async function Perfil({ searchParams }) {
   const profile = await ensureProfile(supabase, user);
   const locale = getLocale();
   const t = getDict(locale);
+  let professionalRequest = null;
+  if (!profile.is_professional_verified) {
+    try {
+      const { data } = await supabase.from('professional_verification_requests')
+        .select('id, profession, status, review_note, submitted_at')
+        .eq('user_id', user.id)
+        .order('submitted_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      professionalRequest = data || null;
+    } catch { }
+  }
 
   const { data: journeys } = await supabase.from('journeys').select('*').eq('owner_id', user.id).order('created_at', { ascending: false });
   const list = journeys || [];
@@ -256,6 +270,7 @@ export default async function Perfil({ searchParams }) {
             <div className="pc-meta">
               <div className="pc-name-line">
                 <h1>{profile.name}</h1>
+                {profile.is_professional_verified && <ProfessionalBadge title={profile.professional_title} />}
               </div>
               <div className="pc-sub">
                 <span>{profile.handle}</span>
@@ -304,6 +319,8 @@ export default async function Perfil({ searchParams }) {
             </div>
           </div>
         </section>
+
+        {!profile.is_professional_verified && <ProfessionalVerificationRequest initialRequest={professionalRequest} />}
 
         <a className="tree-shortcut" href="/arvore" aria-label={t.treeTab} title={t.treeTab}>
           <span className="tree-shortcut-icon" aria-hidden="true">

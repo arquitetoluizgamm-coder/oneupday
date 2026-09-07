@@ -19,7 +19,7 @@ export default function PessoasClient({ itens }) {
   const [conf, setConf] = useState('');
   const [motivo, setMotivo] = useState('');
   const [ocupado, setOcupado] = useState('');
-  const [recado, setRecado] = useState('');
+  const [recado, setRecado] = useState(null);
 
   const vistos = useMemo(() => {
     const q = busca.trim().toLowerCase();
@@ -28,33 +28,47 @@ export default function PessoasClient({ itens }) {
       if (filtro === 'ativos' && p.suspenso) return false;
       if (filtro === 'sem_jornada' && p.jornadas > 0) return false;
       if (filtro === 'denunciados' && !p.denuncias) return false;
+      if (filtro === 'profissionais_pendentes' && p.pedidoProfissional?.status !== 'pending') return false;
       if (!q) return true;
       return [p.nome, p.handle, p.email, p.origem].join(' ').toLowerCase().includes(q);
     });
   }, [lista, busca, filtro]);
 
   async function agir(p, acao) {
-    setOcupado(p.id); setRecado('');
+    setOcupado(p.id); setRecado(null);
     const r = await fetch('/api/admin/pessoa', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ acao, id: p.id, motivo, confirmacao: conf }),
+      body: JSON.stringify({ acao, id: p.id, motivo, confirmacao: conf, request_id: p.pedidoProfissional?.id || null }),
     });
     const d = await r.json().catch(() => ({}));
     setOcupado('');
     if (!r.ok) {
-      setRecado(d.error === 'confirmacao'
+      setRecado({ id: p.id, type: 'error', text: d.error === 'confirmacao'
         ? `Para excluir, digite exatamente ${d.esperado}`
         : d.error === 'voce mesmo' ? 'Você não pode excluir a própria conta por aqui.'
-        : 'Não deu certo. Tente de novo.');
+        : d.error === 'sem chave de servico' ? 'A chave administrativa não está disponível na produção.'
+        : d.error === 'pedido_invalido' ? 'Esta solicitação já foi analisada ou não existe mais.'
+        : 'Não foi possível salvar. O erro foi registrado para diagnóstico.' });
       return;
     }
     if (acao === 'excluir') setLista(l => l.filter(x => x.id !== p.id));
     else setLista(l => l.map(x => x.id === p.id ? {
       ...x,
       suspenso: acao === 'suspender' ? true : acao === 'reativar' ? false : x.suspenso,
-      profissional: acao === 'verificar_profissional' ? true : acao === 'remover_verificacao_profissional' ? false : x.profissional,
+      profissional: ['verificar_profissional', 'aprovar_verificacao_profissional'].includes(acao) ? true : acao === 'remover_verificacao_profissional' ? false : x.profissional,
+      pedidoProfissional: ['aprovar_verificacao_profissional', 'rejeitar_verificacao_profissional'].includes(acao)
+        ? { ...x.pedidoProfissional, status: acao === 'aprovar_verificacao_profissional' ? 'approved' : 'rejected', review_note: motivo }
+        : x.pedidoProfissional,
       motivo,
     } : x));
+    const successText = acao === 'aprovar_verificacao_profissional' || acao === 'verificar_profissional'
+      ? 'Profissional verificado. O selo já está ativo no perfil.'
+      : acao === 'rejeitar_verificacao_profissional'
+        ? 'Solicitação recusada. A pessoa poderá enviar novos dados.'
+        : acao === 'remover_verificacao_profissional'
+          ? 'Verificação profissional removida.'
+          : 'Alteração salva.';
+    setRecado({ id: p.id, type: 'success', text: successText });
     setAberto(null); setConf(''); setMotivo('');
   }
 
@@ -69,9 +83,9 @@ export default function PessoasClient({ itens }) {
           <option value="suspensos">Suspensos</option>
           <option value="sem_jornada">Sem jornada</option>
           <option value="denunciados">Com denúncia</option>
+          <option value="profissionais_pendentes">Solicitações profissionais</option>
         </select>
       </div>
-      {recado && <p className="adm-recado">{recado}</p>}
 
       {vistos.length === 0 && <p className="fila-vazia">Ninguém aqui com esse filtro.</p>}
 
@@ -85,7 +99,7 @@ export default function PessoasClient({ itens }) {
               {p.profissional && <span className="adm-selo">profissional verificado</span>}
               {p.denuncias > 0 && <span className="adm-selo den">{p.denuncias} denúncia{p.denuncias > 1 ? 's' : ''}</span>}
             </div>
-            <button type="button" className="adm-mais" onClick={() => { setAberto(aberto === p.id ? null : p.id); setConf(''); setMotivo(''); setRecado(''); }}>
+            <button type="button" className="adm-mais" onClick={() => { setAberto(aberto === p.id ? null : p.id); setConf(''); setMotivo(''); setRecado(null); }}>
               {aberto === p.id ? 'fechar' : 'gerenciar'}
             </button>
           </div>
@@ -100,6 +114,16 @@ export default function PessoasClient({ itens }) {
           </div>
 
           {p.suspenso && p.motivo && <p className="adm-motivo">Motivo: {p.motivo}</p>}
+          {p.pedidoProfissional?.status === 'pending' && (
+            <div className="adm-prof-request">
+              <strong>Solicitação de verificação profissional</strong>
+              <span><b>Atuação:</b> {p.pedidoProfissional.profession}</span>
+              {p.pedidoProfissional.credential && <span><b>Registro:</b> {p.pedidoProfissional.credential}</span>}
+              {p.pedidoProfissional.evidence_url && <a href={p.pedidoProfissional.evidence_url} target="_blank" rel="noreferrer">Abrir referência profissional ↗</a>}
+              {p.pedidoProfissional.message && <p>{p.pedidoProfissional.message}</p>}
+            </div>
+          )}
+          {recado?.id === p.id && <p className={`adm-recado ${recado.type === 'success' ? 'ok' : ''}`} role="status">{recado.text}</p>}
 
           {aberto === p.id && (
             <div className="adm-acoes">
@@ -117,10 +141,21 @@ export default function PessoasClient({ itens }) {
                   onClick={() => agir(p, 'suspender')}>Suspender</button>
               )}
 
-              <button type="button" className="fila-btn" disabled={!!ocupado}
-                onClick={() => agir(p, p.profissional ? 'remover_verificacao_profissional' : 'verificar_profissional')}>
-                {p.profissional ? 'Remover verificação profissional' : 'Verificar como profissional'}
-              </button>
+              {p.pedidoProfissional?.status === 'pending' && !p.profissional ? <>
+                <button type="button" className="fila-btn fila-btn-ok" disabled={!!ocupado}
+                  onClick={() => agir(p, 'aprovar_verificacao_profissional')}>
+                  {ocupado === p.id ? 'Salvando…' : 'Aprovar e conceder selo'}
+                </button>
+                <button type="button" className="fila-btn fila-btn-no" disabled={!!ocupado}
+                  onClick={() => agir(p, 'rejeitar_verificacao_profissional')}>
+                  Recusar solicitação
+                </button>
+              </> : (
+                <button type="button" className="fila-btn" disabled={!!ocupado}
+                  onClick={() => agir(p, p.profissional ? 'remover_verificacao_profissional' : 'verificar_profissional')}>
+                  {ocupado === p.id ? 'Salvando…' : p.profissional ? 'Remover verificação profissional' : 'Verificar manualmente'}
+                </button>
+              )}
 
               <div className="adm-perigo">
                 <p>

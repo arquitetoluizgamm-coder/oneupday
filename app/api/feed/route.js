@@ -71,7 +71,7 @@ export async function GET(req) {
   let updates = [];
   if (targetIds.length) {
     let updatesQuery = supabase.from('updates')
-      .select('id, day_number, kind, text, alt, photo_url, video_url, journey_id, created_at, next_step, next_when, closed_by')
+      .select('id, day_number, kind, text, alt, photo_url, video_url, journey_id, created_at, next_step, next_when, closed_by, track_id, track_title, track_artist, track_audio_url, track_start_seconds, track_duration_seconds, track_full, track_volume, video_volume')
       .in('journey_id', targetIds);
 
     if (VALID_KINDS.has(kind)) updatesQuery = updatesQuery.eq('kind', kind);
@@ -103,15 +103,23 @@ export async function GET(req) {
 
   const ownerIds = [...new Set((journeys || []).map((journey) => journey.owner_id))];
   const { data: profiles } = ownerIds.length
-    ? await supabase.from('profiles').select('id, name, avatar_color, avatar_url, handle').in('id', ownerIds)
+    ? await supabase.from('profiles').select('id, name, avatar_color, avatar_url, handle, mood, mood_at').in('id', ownerIds)
     : { data: [] };
   const profileMap = {};
-  (profiles || []).forEach((profile) => { profileMap[profile.id] = profile; });
+  (profiles || []).forEach((profile) => {
+    profileMap[profile.id] = {
+      id: profile.id,
+      name: profile.name,
+      avatar_color: profile.avatar_color,
+      avatar_url: profile.avatar_url,
+      handle: profile.handle,
+    };
+  });
 
   const uids = updates.map((item) => item.id);
   const guard = (pr) => Promise.resolve(pr).then((r) => r).catch(() => ({ data: [] }));
   let mediaQuery = supabase.from('media')
-    .select('*')
+    .select('id, user_id, url, kind, caption, routine_id, created_at, track_id, track_title, track_artist, track_audio_url, track_start_seconds, track_duration_seconds, track_full, track_volume, video_volume')
     .in('visibility', ['public', 'followers']);
   if (scope === 'following') {
     mediaQuery = followedProfiles.length
@@ -119,41 +127,32 @@ export async function GET(req) {
       : null;
   }
 
-  const [encR, tracksR, trackMetaR, trackMixR, supEncR, statsR, moodR, allUpsR, mediaR] = await Promise.all([
-    updates.length ? guard(supabase.from('encouragements').select('update_id').eq('user_id', user.id).in('update_id', uids)) : { data: [] },
-    updates.length ? guard(supabase.from('updates').select('id, track_title, track_artist, track_audio_url').in('id', uids).not('track_audio_url', 'is', null)) : { data: [] },
-    updates.length ? guard(supabase.from('updates').select('id, track_id, track_start_seconds, track_duration_seconds, track_full').in('id', uids).not('track_audio_url', 'is', null)) : { data: [] },
-    updates.length ? guard(supabase.from('updates').select('id, track_volume, video_volume').in('id', uids).not('track_audio_url', 'is', null)) : { data: [] },
+  const [supEncR, statsR, allUpsR, mediaR] = await Promise.all([
     updates.length ? guard(supabase.from('encouragements').select('update_id, user_id').in('update_id', uids)) : { data: [] },
     journeyIds.length ? guard(supabase.from('journey_stats').select('journey_id, current_day, progress_pct').in('journey_id', journeyIds)) : { data: [] },
-    ownerIds.length ? guard(supabase.from('profiles').select('id, mood, mood_at').in('id', ownerIds).not('mood', 'is', null)) : { data: [] },
-    journeyIds.length ? guard(supabase.from('updates').select('id, journey_id, day_number, kind, text, alt, photo_url, video_url, created_at').in('journey_id', journeyIds)) : { data: [] },
+    journeyIds.length ? guard(supabase.from('updates').select('id, journey_id, day_number, kind, text, alt, photo_url, video_url, created_at, track_id, track_title, track_artist, track_audio_url, track_start_seconds, track_duration_seconds, track_full, track_volume, video_volume').in('journey_id', journeyIds)) : { data: [] },
     mediaQuery ? guard(mediaQuery.order('created_at', { ascending: false }).limit(60)) : { data: [] },
   ]);
 
-  const myEnc = new Set((encR.data || []).map((e) => e.update_id));
   const trackByUpdate = {};
-  (tracksR.data || []).forEach((item) => { trackByUpdate[item.id] = { title: item.track_title, artist: item.track_artist, audio_url: item.track_audio_url }; });
-  (trackMetaR.data || []).forEach((item) => {
-    if (!trackByUpdate[item.id]) return;
-    Object.assign(trackByUpdate[item.id], {
+  [...updates, ...(allUpsR.data || [])].forEach((item) => {
+    if (!item.track_audio_url) return;
+    trackByUpdate[item.id] = {
       id: item.track_id,
+      title: item.track_title,
+      artist: item.track_artist,
+      audio_url: item.track_audio_url,
       start_seconds: item.track_start_seconds,
       duration_seconds: item.track_duration_seconds,
       full: item.track_full,
-    });
-  });
-  (trackMixR.data || []).forEach((item) => {
-    if (!trackByUpdate[item.id]) return;
-    Object.assign(trackByUpdate[item.id], {
       track_volume: item.track_volume,
       video_volume: item.video_volume,
-    });
+    };
   });
   const statsByJourney = {};
   (statsR.data || []).forEach((st) => { statsByJourney[st.journey_id] = st; });
   const ownerMoodById = {};
-  (moodR.data || []).forEach((mp) => { if (mp.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) ownerMoodById[mp.id] = mp.mood; });
+  (profiles || []).forEach((mp) => { if (mp.mood && mp.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) ownerMoodById[mp.id] = mp.mood; });
 
   const comebackByUpdate = {};
   {
@@ -179,13 +178,6 @@ export async function GET(req) {
     : { data: [] };
   const routineMap = {};
   (routineR.data || []).forEach((routine) => { routineMap[routine.id] = routine; });
-  if (mediaOwnerIds.length) {
-    const mediaMoodR = await guard(supabase.from('profiles').select('id, mood, mood_at').in('id', mediaOwnerIds).not('mood', 'is', null));
-    (mediaMoodR.data || []).forEach((mp) => {
-      if (mp.mood_at && (Date.now() - new Date(mp.mood_at).getTime() < 30 * 3600 * 1000)) ownerMoodById[mp.id] = mp.mood;
-    });
-  }
-
   // Nivel ONE por dias distintos registrados, nunca por curtidas.
   const levelOwnerIds = [...new Set([...ownerIds, ...mediaOwnerIds])];
   const levelJourneysR = levelOwnerIds.length ? await guard(supabase.from('journeys').select('id, owner_id').in('owner_id', levelOwnerIds)) : { data: [] };
@@ -206,7 +198,7 @@ export async function GET(req) {
 
   const [supProfR, mediaProfR, mediaEncR] = await Promise.all([
     supIds.length ? guard(supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', supIds)) : { data: [] },
-    mediaOwnerIds.length ? guard(supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', mediaOwnerIds)) : { data: [] },
+    mediaOwnerIds.length ? guard(supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color, mood, mood_at').in('id', mediaOwnerIds)) : { data: [] },
     mediaIds.length ? guard(supabase.from('encouragements').select('media_id').eq('user_id', user.id).in('media_id', mediaIds)) : { data: [] },
   ]);
 
@@ -220,7 +212,16 @@ export async function GET(req) {
   });
 
   const mediaProf = {};
-  (mediaProfR.data || []).forEach((pr) => { mediaProf[pr.id] = pr; });
+  (mediaProfR.data || []).forEach((pr) => {
+    mediaProf[pr.id] = {
+      id: pr.id,
+      name: pr.name,
+      handle: pr.handle,
+      avatar_url: pr.avatar_url,
+      avatar_color: pr.avatar_color,
+    };
+    if (pr.mood && pr.mood_at && (Date.now() - new Date(pr.mood_at).getTime() < 30 * 3600 * 1000)) ownerMoodById[pr.id] = pr.mood;
+  });
   const mediaEncSet = new Set((mediaEncR.data || []).map((e) => e.media_id));
 
   // ---- raio: pode desafiar? (seguem um ao outro e sem desafio aberto) ----
@@ -328,11 +329,8 @@ export async function GET(req) {
   // estar velho se a pessoa trocou de handle depois.
   // ============================================================
   const idsParaMencao = [...new Set([...uids, ...dayIds])];
-  const [encAllR, tracksAllR, trackMetaAllR, trackMixAllR, mencoesR] = await Promise.all([
+  const [encAllR, mencoesR] = await Promise.all([
     dayIds.length ? guard(supabase.from('encouragements').select('update_id').eq('user_id', user.id).in('update_id', dayIds)) : { data: [] },
-    dayIds.length ? guard(supabase.from('updates').select('id, track_title, track_artist, track_audio_url').in('id', dayIds).not('track_audio_url', 'is', null)) : { data: [] },
-    dayIds.length ? guard(supabase.from('updates').select('id, track_id, track_start_seconds, track_duration_seconds, track_full').in('id', dayIds).not('track_audio_url', 'is', null)) : { data: [] },
-    dayIds.length ? guard(supabase.from('updates').select('id, track_volume, video_volume').in('id', dayIds).not('track_audio_url', 'is', null)) : { data: [] },
     idsParaMencao.length ? guard(supabase.from('mentions').select('update_id, profile:profiles!mentions_profile_id_fkey(id, name, handle, avatar_color)').in('update_id', idsParaMencao)) : { data: [] },
   ]);
 
@@ -345,23 +343,6 @@ export async function GET(req) {
     (mencoesPorUpdate[m.update_id] ||= {})[chave] = p;
   });
   const myEncAll = new Set((encAllR.data || []).map((e) => e.update_id));
-  (tracksAllR.data || []).forEach((item) => { trackByUpdate[item.id] = { title: item.track_title, artist: item.track_artist, audio_url: item.track_audio_url }; });
-  (trackMetaAllR.data || []).forEach((item) => {
-    if (!trackByUpdate[item.id]) return;
-    Object.assign(trackByUpdate[item.id], {
-      id: item.track_id,
-      start_seconds: item.track_start_seconds,
-      duration_seconds: item.track_duration_seconds,
-      full: item.track_full,
-    });
-  });
-  (trackMixAllR.data || []).forEach((item) => {
-    if (!trackByUpdate[item.id]) return;
-    Object.assign(trackByUpdate[item.id], {
-      track_volume: item.track_volume,
-      video_volume: item.video_volume,
-    });
-  });
 
   // capítulos: quais passos eu acompanho e qual passo cada dia fechou
   const meusPassos = new Set();
@@ -398,7 +379,7 @@ export async function GET(req) {
       track: trackByUpdate[item.id] || null,
       nextStep: item.closed_by ? null : (item.next_step || null), nextWhen: item.next_when || null,
       stepFollowing: meusPassos.has(item.id), closes: passoFechadoPor[item.id] || null,
-      encouraged: myEnc.has(item.id),
+      encouraged: myEncAll.has(item.id),
       supporters: supportersByUpdate[item.id] || [],
       comeback: comebackByUpdate[item.id] || null,
       // { handle: perfil } de quem foi marcado neste registro
