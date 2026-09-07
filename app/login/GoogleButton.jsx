@@ -3,14 +3,18 @@ import { useState } from 'react';
 import { createClient } from '../../lib/supabase/client';
 import LoopMarca from '../../components/LoopMarca';
 
-export default function GoogleButton({ labelIdle, labelLoading, errorMsg }) {
+export default function GoogleButton({ labelIdle, labelLoading, errorMsg, nextPath = '/home' }) {
   const [loading, setLoading] = useState(false);
   async function signIn() {
     setLoading(true);
     const supabase = createClient();
+    const callback = new URL('/auth/callback', window.location.origin);
+    callback.searchParams.set('next', nextPath);
+    const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `oud_auth_next=${encodeURIComponent(nextPath)}; Path=/; Max-Age=900; SameSite=Lax${secure}`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: callback.toString() },
     });
     if (error) { setLoading(false); alert(errorMsg); }
   }

@@ -25,7 +25,7 @@ const ESPERA = 45;   // segundos antes de poder pedir outro código
 const MIN_DIGITOS = 6;
 const MAX_DIGITOS = 10;
 
-export default function EmailLogin({ t }) {
+export default function EmailLogin({ t, nextPath = '/home' }) {
   const [fase, setFase] = useState('email');   // 'email' | 'codigo'
   const [email, setEmail] = useState('');
   const [codigo, setCodigo] = useState('');
@@ -86,7 +86,7 @@ export default function EmailLogin({ t }) {
       return;
     }
     // recarga completa: o servidor precisa enxergar a sessão nova
-    window.location.href = '/home';
+    window.location.href = nextPath;
   }
 
   if (fase === 'codigo') {
