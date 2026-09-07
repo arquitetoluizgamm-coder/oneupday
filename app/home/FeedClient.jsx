@@ -23,6 +23,7 @@ import { MOODS, MOODS_TEXTO, moodGlow } from '../../lib/moods';
 import { comCapa } from '../../lib/media';
 import FollowUserButton from '../[slug]/FollowUserButton';
 import UpiRecommendation from '../../components/UpiRecommendation';
+import ProfessionalBadge from '../../components/ProfessionalBadge';
 import './feed-quote.css';
 
 function OneLevel({ level, labels }) {
@@ -865,6 +866,32 @@ function DemoActions({ item, labels }) {
   );
 }
 
+function FeedProfessionalBadge({ owner }) {
+  if (!owner?.is_professional_verified) return null;
+  return <ProfessionalBadge title={owner.professional_title} compact />;
+}
+
+function CircleAnnouncementCard({ item }) {
+  const owner = item.owner || {};
+  return (
+    <article className="entry circle-feed-card">
+      <a className="entry-head" href={`/${owner.handle || ''}`}>
+        <span className="ava" style={{ background: owner.avatar_color || 'var(--sage)' }}>
+          {owner.avatar_url ? <img src={owner.avatar_url} alt="" /> : (owner.name || '?')[0]}
+        </span>
+        <span className="entry-id"><b>{owner.name || 'Profissional do ONE'}<FeedProfessionalBadge owner={owner} /></b><small>abriu um espaço de acompanhamento</small></span>
+      </a>
+      <div className="circle-feed-body">
+        <span className="circle-feed-private">▣ Círculo privado</span>
+        <h2>{item.circle.name}</h2>
+        <p>{item.circle.description || 'Um espaço de confiança para caminhar com acompanhamento e privacidade.'}</p>
+        <div className="circle-feed-note"><span aria-hidden="true">◇</span><span>Somente esta apresentação está no feed. As conversas e publicações internas continuam privadas.</span></div>
+        <a className="circle-feed-cta" href={item.circle.invite_path}>Conhecer e entrar no Círculo <span aria-hidden="true">›</span></a>
+      </div>
+    </article>
+  );
+}
+
 export default function FeedClient({ labels }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -1036,13 +1063,15 @@ export default function FeedClient({ labels }) {
 
         {items.map((item, idx) => (
           <Fragment key={item.id}>
-          {item.media ? (
+          {item.circleAnnouncement ? (
+          <CircleAnnouncementCard item={item} />
+          ) : item.media ? (
           <article className={`entry entry-photo${item.kind === 'quote' ? ' entry-quote' : ''}${item.kind === 'bible' ? ' entry-quote entry-bible' : ''}${item.routine ? ' entry-routine' : ''}`}>
             <a className="entry-head" href={`/${item.owner.handle || ''}`}>
               <span className={avatarMoodClass(item.owner)} style={avatarMoodStyle(item.owner)}>
                 {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}
               </span>
-              <span className="entry-id"><b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} /></b>{item.kind === 'quote' && labels.quoteLabel && <small className="entry-media-kind">{labels.quoteLabel.replace('{name}', item.owner.name || '')}</small>}{item.kind === 'bible' && labels.bibleLabel && <small className="entry-media-kind">{labels.bibleLabel.replace('{name}', item.owner.name || '')}</small>}{item.routine && <small className="entry-media-kind">{item.routine.label}</small>}<MoodLine mood={item.owner.mood} labels={labels} /></span>
+              <span className="entry-id"><b>{item.owner.name}<FeedProfessionalBadge owner={item.owner} /><OneLevel level={item.owner.one_level} labels={labels} /></b>{item.kind === 'quote' && labels.quoteLabel && <small className="entry-media-kind">{labels.quoteLabel.replace('{name}', item.owner.name || '')}</small>}{item.kind === 'bible' && labels.bibleLabel && <small className="entry-media-kind">{labels.bibleLabel.replace('{name}', item.owner.name || '')}</small>}{item.routine && <small className="entry-media-kind">{item.routine.label}</small>}<MoodLine mood={item.owner.mood} labels={labels} /></span>
             </a>
             <MidiaGaleria item={item} labels={labels} />
             <div className="entry-actions feed-acts">
@@ -1059,7 +1088,7 @@ export default function FeedClient({ labels }) {
                   {item.owner.avatar_url ? <img src={item.owner.avatar_url} alt="" /> : (item.owner.name || '?')[0]}
                 </span>
                 <span className="entry-id">
-                  <b>{item.owner.name}<OneLevel level={item.owner.one_level} labels={labels} />{item.historia && <span className="hist-selo">{labels.histSelo}</span>}</b>
+                  <b>{item.owner.name}<FeedProfessionalBadge owner={item.owner} /><OneLevel level={item.owner.one_level} labels={labels} />{item.historia && <span className="hist-selo">{labels.histSelo}</span>}</b>
                   <MoodLine mood={item.owner.mood} labels={labels} />
                 </span>
               </a>

@@ -1,0 +1,23 @@
+.section{margin:0 0 14px;padding:16px;border:1px solid var(--one-line,var(--line));border-radius:18px;background:var(--one-surface,#fff);box-shadow:var(--one-shadow-card,0 6px 18px rgba(24,36,59,.05))}
+.header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:12px}
+.header span{display:block;margin-bottom:3px;color:var(--sage-deep,#66755d);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.header h2{margin:0;color:var(--ink);font-size:18px;letter-spacing:-.025em}
+.header a{color:var(--sage-deep,#66755d);font-size:12px;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.list{display:grid;gap:10px}
+.card{padding:12px;border:1px solid rgba(132,145,122,.28);border-radius:14px;background:linear-gradient(135deg,rgba(132,145,122,.09),rgba(255,255,255,.94))}
+.circleLink{display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:11px;color:inherit;text-decoration:none}
+.mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#edf2e9;color:var(--sage-deep,#66755d);font-size:24px;font-weight:800}
+.copy{min-width:0}
+.titleLine{display:flex;align-items:center;gap:8px;min-width:0}
+.titleLine h3{min-width:0;margin:0;color:var(--ink);font-size:14px;line-height:1.25;overflow-wrap:anywhere}
+.titleLine span{flex:none;padding:3px 7px;border-radius:999px;background:#e7efe2;color:#52684e;font-size:9px;font-weight:850;text-transform:uppercase;letter-spacing:.05em}
+.copy>p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.4}
+.arrow{color:var(--sage-deep,#66755d);font-size:24px;line-height:1}
+.publication{margin-top:10px;padding-top:10px;border-top:1px solid rgba(132,145,122,.2)}
+.publication button{min-height:38px;padding:8px 11px;border:1px solid var(--sage,#84917a);border-radius:10px;background:var(--sage,#84917a);color:#fff;font:inherit;font-size:11px;font-weight:800;cursor:pointer}
+.publication button:disabled{cursor:wait;opacity:.65}
+.circleLink:focus-visible,.publication button:focus-visible,.header a:focus-visible{outline:3px solid rgba(193,111,84,.28);outline-offset:2px}
+.publication .feedback{margin:7px 0 0;color:#52684e;font-size:11px;font-weight:700;line-height:1.4}
+.publication .error{margin:7px 0 0;color:#9d3f36;font-size:11px;font-weight:700;line-height:1.4}
+.privacy{margin:11px 2px 0!important;color:var(--muted);font-size:10.5px!important;line-height:1.4}
+@media(max-width:420px){.section{padding:14px}.card{padding:11px}.circleLink{grid-template-columns:34px minmax(0,1fr) auto}.mark{width:34px;height:34px}.publication button{width:100%}}

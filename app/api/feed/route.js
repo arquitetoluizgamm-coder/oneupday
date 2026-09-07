@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '../../../lib/supabase/server';
 import { getLocale } from '../../../lib/locale';
 import { buildHistoriaFeedItems } from '../../../lib/historias';
+import { clienteServico } from '../../../lib/dono';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -65,6 +66,30 @@ export async function GET(req) {
       .map((journey) => journey.id);
   }
 
+  // O feed recebe somente a apresentação que o administrador publicou.
+  // Nenhuma consulta é feita a posts, membros ou conversas do Círculo.
+  let circlePublications = [];
+  const feedAdmin = clienteServico();
+  if (feedAdmin && (scope !== 'following' || followedProfiles.length)) {
+    let publicationQuery = feedAdmin.from('circle_feed_publications')
+      .select('id,circle_id,author_id,invite_token,circle_name,circle_description,published_at')
+      .eq('status', 'active')
+      .gt('invite_expires_at', new Date().toISOString())
+      .order('published_at', { ascending: false })
+      .limit(30);
+    if (scope === 'following') publicationQuery = publicationQuery.in('author_id', followedProfiles);
+    const { data } = await publicationQuery;
+    const candidates = (data || []).filter((publication) => !blocked.has(publication.author_id));
+    if (candidates.length) {
+      const { data: activeCircles } = await feedAdmin.from('circles')
+        .select('id')
+        .in('id', candidates.map((publication) => publication.circle_id))
+        .eq('status', 'active');
+      const activeIds = new Set((activeCircles || []).map((circle) => circle.id));
+      circlePublications = candidates.filter((publication) => activeIds.has(publication.circle_id));
+    }
+  }
+
   // pessoas de exemplo removidas do feed: só gente real aqui
   const demoItems = [];
 
@@ -101,9 +126,12 @@ export async function GET(req) {
   const journeyMap = {};
   (journeys || []).forEach((journey) => { journeyMap[journey.id] = journey; });
 
-  const ownerIds = [...new Set((journeys || []).map((journey) => journey.owner_id))];
+  const ownerIds = [...new Set([
+    ...(journeys || []).map((journey) => journey.owner_id),
+    ...circlePublications.map((publication) => publication.author_id),
+  ])];
   const { data: profiles } = ownerIds.length
-    ? await supabase.from('profiles').select('id, name, avatar_color, avatar_url, handle, mood, mood_at').in('id', ownerIds)
+    ? await supabase.from('profiles').select('id, name, avatar_color, avatar_url, handle, mood, mood_at, is_professional_verified, professional_title').in('id', ownerIds)
     : { data: [] };
   const profileMap = {};
   (profiles || []).forEach((profile) => {
@@ -113,6 +141,8 @@ export async function GET(req) {
       avatar_color: profile.avatar_color,
       avatar_url: profile.avatar_url,
       handle: profile.handle,
+      is_professional_verified: profile.is_professional_verified === true,
+      professional_title: profile.professional_title || '',
     };
   });
 
@@ -198,7 +228,7 @@ export async function GET(req) {
 
   const [supProfR, mediaProfR, mediaEncR] = await Promise.all([
     supIds.length ? guard(supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color').in('id', supIds)) : { data: [] },
-    mediaOwnerIds.length ? guard(supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color, mood, mood_at').in('id', mediaOwnerIds)) : { data: [] },
+    mediaOwnerIds.length ? guard(supabase.from('profiles').select('id, name, handle, avatar_url, avatar_color, mood, mood_at, is_professional_verified, professional_title').in('id', mediaOwnerIds)) : { data: [] },
     mediaIds.length ? guard(supabase.from('encouragements').select('media_id').eq('user_id', user.id).in('media_id', mediaIds)) : { data: [] },
   ]);
 
@@ -219,6 +249,8 @@ export async function GET(req) {
       handle: pr.handle,
       avatar_url: pr.avatar_url,
       avatar_color: pr.avatar_color,
+      is_professional_verified: pr.is_professional_verified === true,
+      professional_title: pr.professional_title || '',
     };
     if (pr.mood && pr.mood_at && (Date.now() - new Date(pr.mood_at).getTime() < 30 * 3600 * 1000)) ownerMoodById[pr.id] = pr.mood;
   });
@@ -304,6 +336,19 @@ export async function GET(req) {
     challengeable: canChallenge.has(m.user_id),
   }));
   const mediaTotal = mediaFeed.length;
+  const circleFeed = circlePublications.map((publication) => ({
+    id: `circle-publication-${publication.id}`,
+    circleAnnouncement: true,
+    created_at: publication.published_at,
+    circle: {
+      id: publication.circle_id,
+      name: publication.circle_name,
+      description: publication.circle_description,
+      invite_path: `/circulos/convite/${publication.invite_token}`,
+    },
+    owner: profileMap[publication.author_id] || {},
+    own: publication.author_id === user.id,
+  }));
 
   // ---- a jornada é um post só: dias agrupados, navegáveis no card ----
   const fullDaysByJourney = {};
@@ -387,7 +432,7 @@ export async function GET(req) {
     };
   }).filter(Boolean);
 
-  const merged = [...realItems, ...mediaFeed].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+  const merged = [...realItems, ...mediaFeed, ...circleFeed].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
   // Histórias editoriais entram no mesmo fluxo, mas não ficam coladas umas
   // nas outras. A cada dois posts de pessoas reais, uma jornada editorial

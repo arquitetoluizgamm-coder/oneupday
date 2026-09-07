@@ -36,6 +36,8 @@ import LanguagePicker from '../../components/LanguagePicker';
 import OneSocialLinks from '../../components/OneSocialLinks';
 import ProfessionalBadge from '../../components/ProfessionalBadge';
 import ProfessionalVerificationRequest from '../../components/ProfessionalVerificationRequest';
+import ProfileCircles from '../../components/ProfileCircles';
+import { clienteServico } from '../../lib/dono';
 import './profile-redesign.css';
 
 export const dynamic = 'force-dynamic';
@@ -83,8 +85,30 @@ export default async function Perfil({ searchParams }) {
     } catch { }
   }
 
-  const { data: journeys } = await supabase.from('journeys').select('*').eq('owner_id', user.id).order('created_at', { ascending: false });
+  const [{ data: journeys }, { data: managedMemberships }] = await Promise.all([
+    supabase.from('journeys').select('*').eq('owner_id', user.id).order('created_at', { ascending: false }),
+    supabase.from('circle_members')
+      .select('role,status,circles(id,slug,name,description,status)')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .in('role', ['owner', 'admin']),
+  ]);
   const list = journeys || [];
+  const managedCircles = (managedMemberships || [])
+    .filter((row) => row.circles?.status === 'active')
+    .map((row) => ({ ...row.circles, published: false }));
+  if (managedCircles.length) {
+    const admin = clienteServico();
+    if (admin) {
+      const { data: publications } = await admin.from('circle_feed_publications')
+        .select('circle_id')
+        .in('circle_id', managedCircles.map((circle) => circle.id))
+        .eq('status', 'active')
+        .gt('invite_expires_at', new Date().toISOString());
+      const publishedIds = new Set((publications || []).map((item) => item.circle_id));
+      managedCircles.forEach((circle) => { circle.published = publishedIds.has(circle.id); });
+    }
+  }
   const statsById = {};
   let maxStreak = 0, updatesCount = 0, setbackCount = 0, followers = [];
   const jIds = list.map(j => j.id);
@@ -321,6 +345,8 @@ export default async function Perfil({ searchParams }) {
         </section>
 
         {!profile.is_professional_verified && <ProfessionalVerificationRequest initialRequest={professionalRequest} />}
+
+        <ProfileCircles initialCircles={managedCircles} />
 
         <a className="tree-shortcut" href="/arvore" aria-label={t.treeTab} title={t.treeTab}>
           <span className="tree-shortcut-icon" aria-hidden="true">

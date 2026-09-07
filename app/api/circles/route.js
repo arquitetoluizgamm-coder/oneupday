@@ -129,6 +129,29 @@ export async function PATCH(request) {
 
   const { error } = await admin.from('circles').update(patch).eq('id', circleId);
   if (error) return responseError('circle_update_failed', 500, error.message);
+
+  if (action === 'details') {
+    const { error: publicationError } = await admin.from('circle_feed_publications').update({
+      circle_name: patch.name,
+      circle_description: patch.description,
+    }).eq('circle_id', circleId).eq('status', 'active');
+    if (publicationError) console.error('[circles] feed publication sync failed', { code: publicationError.code, message: publicationError.message });
+  }
+
+  if (action === 'close') {
+    const withdrawnAt = new Date().toISOString();
+    const { data: publications, error: publicationError } = await admin.from('circle_feed_publications')
+      .select('id,invite_id')
+      .eq('circle_id', circleId)
+      .eq('status', 'active');
+    if (!publicationError && publications?.length) {
+      await admin.from('circle_feed_publications').update({ status: 'withdrawn', withdrawn_at: withdrawnAt }).in('id', publications.map((item) => item.id));
+      await admin.from('circle_invites').update({ status: 'revoked', revoked_at: withdrawnAt }).in('id', publications.map((item) => item.invite_id)).eq('status', 'pending');
+    } else if (publicationError) {
+      console.error('[circles] feed publication close failed', { code: publicationError.code, message: publicationError.message });
+    }
+  }
+
   await admin.from('circle_audit_logs').insert({
     circle_id: circleId,
     actor_id: user.id,

@@ -75,3 +75,32 @@ test('feed público não consulta tabelas de Círculos', () => {
   const publicFeed = readFileSync('app/api/feed/route.js', 'utf8');
   assert.doesNotMatch(publicFeed, /circle_posts|circle_comments|circle_members/);
 });
+
+test('anúncio do Círculo expõe somente apresentação e convite controlado', () => {
+  const sql = readFileSync('supabase/migrations/20260907130958_circle_feed_publications.sql', 'utf8');
+  assert.match(sql, /alter table public\.circle_feed_publications enable row level security/);
+  assert.match(sql, /revoke all on table public\.circle_feed_publications from public, anon, authenticated/);
+  assert.doesNotMatch(sql, /grant select[^;]+authenticated/i);
+  assert.doesNotMatch(sql, /body|member|comment|message/);
+});
+
+test('somente administrador ativo publica ou retira Círculo do feed', () => {
+  const route = readFileSync('app/api/circles/feed-publication/route.js', 'utf8');
+  assert.match(route, /canManageCircle\(member\)/);
+  assert.match(route, /p_max_uses: 1000/);
+  assert.match(route, /circle_feed_publications/);
+  assert.match(route, /status: 'revoked'/);
+});
+
+test('perfil mostra Círculos administrados e feed mantém conteúdo interno isolado', () => {
+  const profile = readFileSync('app/perfil/page.js', 'utf8');
+  const profileCircles = readFileSync('components/ProfileCircles.jsx', 'utf8');
+  const feed = readFileSync('app/api/feed/route.js', 'utf8');
+  const card = readFileSync('app/home/FeedClient.jsx', 'utf8');
+  assert.match(profile, /<ProfileCircles initialCircles=\{managedCircles\}/);
+  assert.match(profileCircles, /href=\{`\/circulos\/\$\{circle\.slug\}`\}/);
+  assert.match(profileCircles, /aria-label=\{`Abrir o Círculo \$\{circle\.name\}`\}/);
+  assert.match(feed, /circle_feed_publications/);
+  assert.doesNotMatch(feed, /circle_posts|circle_comments|circle_members/);
+  assert.match(card, /As conversas e publicações internas continuam privadas/);
+});
