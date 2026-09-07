@@ -32,10 +32,12 @@ export async function POST(req) {
   const acao = String(body.acao || '');
   const id = String(body.id || '');
   if (!id) return NextResponse.json({ error: 'sem id' }, { status: 400 });
-  if (id === user.id) return NextResponse.json({ error: 'voce mesmo' }, { status: 400 });
+  if (id === user.id && ['suspender', 'reativar', 'excluir'].includes(acao)) {
+    return NextResponse.json({ error: 'voce mesmo' }, { status: 400 });
+  }
 
   const { data: alvo } = await admin.from('profiles')
-    .select('id, handle, name, suspenso_em').eq('id', id).maybeSingle();
+    .select('id, handle, name, suspenso_em, is_professional_verified').eq('id', id).maybeSingle();
   if (!alvo) return NextResponse.json({ error: 'nao encontrado' }, { status: 404 });
 
   const registrar = async (motivo) => {
@@ -46,6 +48,19 @@ export async function POST(req) {
       });
     } catch { }
   };
+
+  // A criação de Círculos exige uma decisão explícita do dono do ONE.
+  // O usuário nunca consegue conceder essa verificação a si mesmo via RLS.
+  if (acao === 'verificar_profissional' || acao === 'remover_verificacao_profissional') {
+    const verificado = acao === 'verificar_profissional';
+    const { error } = await admin.from('profiles').update({
+      is_professional_verified: verificado,
+      professional_verified_at: verificado ? new Date().toISOString() : null,
+    }).eq('id', id);
+    if (error) return NextResponse.json({ error: 'db', detalhe: error.message }, { status: 500 });
+    await registrar(verificado ? 'perfil profissional verificado para Círculos' : 'verificação profissional removida');
+    return NextResponse.json({ ok: true, estado: verificado ? 'profissional_verificado' : 'verificacao_removida' });
+  }
 
   // ---------- suspender ----------
   if (acao === 'suspender') {

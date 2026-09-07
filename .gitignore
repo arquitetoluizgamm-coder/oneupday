@@ -2,3 +2,5 @@ node_modules/
 .next/
 .vercel
 .env*
+.superdesign/tmp/
+supabase/.temp/

@@ -57,6 +57,12 @@ export default async function Explore({ searchParams }) {
           <input name="q" defaultValue={q} placeholder={t.searchPh} />
         </form>
 
+        <a className="private-circles-entry" href="/circulos">
+          <span className="private-circles-icon" aria-hidden="true">◌</span>
+          <span><b>Círculos</b><small>Espaços privados, acessíveis somente por convite.</small></span>
+          <i aria-hidden="true">›</i>
+        </a>
+
         <section className="communities">
           <h2>{t.groups}</h2>
           <div className="comm-grid">

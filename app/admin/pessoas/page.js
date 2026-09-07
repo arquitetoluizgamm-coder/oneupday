@@ -10,7 +10,7 @@ export default async function Pessoas() {
   }
 
   const [{ data: perfis }, { data: jornadas }, { data: posts }, { data: denuncias }] = await Promise.all([
-    sb.from('profiles').select('id, name, handle, created_at, origem, suspenso_em, suspenso_motivo')
+    sb.from('profiles').select('id, name, handle, created_at, origem, suspenso_em, suspenso_motivo, is_professional_verified')
       .order('created_at', { ascending: false }).limit(500),
     sb.from('journeys').select('id, owner_id'),
     sb.from('updates').select('journey_id, created_at'),
@@ -62,6 +62,7 @@ export default async function Pessoas() {
     denuncias: contaDenuncia[p.id] || 0,
     suspenso: !!p.suspenso_em,
     motivo: p.suspenso_motivo || '',
+    profissional: p.is_professional_verified === true,
   }));
 
   return <PessoasClient itens={itens} />;

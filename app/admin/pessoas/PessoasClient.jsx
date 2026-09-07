@@ -49,7 +49,12 @@ export default function PessoasClient({ itens }) {
       return;
     }
     if (acao === 'excluir') setLista(l => l.filter(x => x.id !== p.id));
-    else setLista(l => l.map(x => x.id === p.id ? { ...x, suspenso: acao === 'suspender', motivo } : x));
+    else setLista(l => l.map(x => x.id === p.id ? {
+      ...x,
+      suspenso: acao === 'suspender' ? true : acao === 'reativar' ? false : x.suspenso,
+      profissional: acao === 'verificar_profissional' ? true : acao === 'remover_verificacao_profissional' ? false : x.profissional,
+      motivo,
+    } : x));
     setAberto(null); setConf(''); setMotivo('');
   }
 
@@ -77,6 +82,7 @@ export default function PessoasClient({ itens }) {
               <strong>{p.nome || 'sem nome'}</strong>
               <span className="adm-arroba">{p.handle}</span>
               {p.suspenso && <span className="adm-selo">suspenso</span>}
+              {p.profissional && <span className="adm-selo">profissional verificado</span>}
               {p.denuncias > 0 && <span className="adm-selo den">{p.denuncias} denúncia{p.denuncias > 1 ? 's' : ''}</span>}
             </div>
             <button type="button" className="adm-mais" onClick={() => { setAberto(aberto === p.id ? null : p.id); setConf(''); setMotivo(''); setRecado(''); }}>
@@ -110,6 +116,11 @@ export default function PessoasClient({ itens }) {
                 <button type="button" className="fila-btn" disabled={!!ocupado}
                   onClick={() => agir(p, 'suspender')}>Suspender</button>
               )}
+
+              <button type="button" className="fila-btn" disabled={!!ocupado}
+                onClick={() => agir(p, p.profissional ? 'remover_verificacao_profissional' : 'verificar_profissional')}>
+                {p.profissional ? 'Remover verificação profissional' : 'Verificar como profissional'}
+              </button>
 
               <div className="adm-perigo">
                 <p>

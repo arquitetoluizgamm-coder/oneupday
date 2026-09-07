@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "targets": {
+    "/circulos": {
+      "targetKind": "new-ui",
+      "projectId": "934c7526-ebea-471f-911f-84701c782319",
+      "activeDraftId": "53e25260-5cff-4fef-878d-7d2bd53a038e",
+      "designSystemPath": ".superdesign/design-system.md",
+      "referenceIds": [
+        "public-logo-name.png"
+      ],
+      "brandAssets": {
+        "logo": {
+          "assetKey": "public-logo-name.png",
+          "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/projects/934c7526-ebea-471f-911f-84701c782319/brand-assets/public-logo-name.png/logo-name.png",
+          "sourcePath": "public/logo-name.png"
+        }
+      },
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        ".superdesign/init/theme.md",
+        "app/one-tokens.css",
+        "app/globals.css:1:30",
+        "components/AppTop.jsx",
+        "components/BottomNav.jsx",
+        "components/CriarMenu.jsx",
+        "app/explore/page.js",
+        "app/explore/explore-redesign.css",
+        "app/rotinas/RoutinesClientComplete.jsx",
+        "app/rotinas/routines.css"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "9bfe4aab65b05188bf9eed899e917e94cf920d358ace919cf27189f9e3e7272f",
+        ".superdesign/init/theme.md": "cdb75371c7b4b80190f776620efdf680e32cc563d796d207dc130f761c46353b",
+        "app/one-tokens.css": "cc862158082bef95aec99e20bf23720eb9d9a96dad2ebbc52d9662fbf6f4f0e5",
+        "app/globals.css": "b7cb372b89344a33f0f8229a0d4fc0a6ab553156a8ecae8a88a3b022a0883b94",
+        "components/AppTop.jsx": "89e1fd4e34c18db8cc1aeb9cf66673861f2a758170d331091abf01991ce6b8cd",
+        "components/BottomNav.jsx": "09242ea0216ee6c4b2589f020c1d60a9839674c1ef8f3a7b74d5fb65e8fc5157",
+        "components/CriarMenu.jsx": "e20f00b2ed689f81d558cefebd6e41dee52e73953c48eb69224f97f812af0a0f",
+        "app/explore/page.js": "e3f2f225e55ec4e116851c3565c1b8c38da265623471256d09682012fcddf6b1",
+        "app/explore/explore-redesign.css": "fa2c21cc8896002dfd5680af443d0d6a0bdf5180884c1f6f4e4a388ec5e21c1a",
+        "app/rotinas/RoutinesClientComplete.jsx": "ebba48987f78135ebb73560159ec533879511698996d017e25d74ff12f39b5eb",
+        "app/rotinas/routines.css": "23cfe328d6f5ba6028eb78e8184ae7d4f2625d3e3b956eea2f9d14946935f553"
+      },
+      "components": [
+        {
+          "name": "AppTop",
+          "id": "5f7d8e74-7e52-4fdb-be73-5d8ed26a24be",
+          "sourcePath": "components/AppTop.jsx",
+          "logoAssetKey": "public-logo-name.png"
+        },
+        {
+          "name": "BottomNav",
+          "id": "7739df97-15e4-457f-b31d-729705ef2008",
+          "sourcePath": "components/BottomNav.jsx"
+        }
+      ],
+      "drafts": {
+        "53e25260-5cff-4fef-878d-7d2bd53a038e": {
+          "title": "Entrada de Círculos",
+          "visualDirection": "Hub privado mobile integrado à identidade atual do ONE",
+          "currentVersion": 1
+        }
+      },
+      "updatedAt": "2026-09-06T15:06:03.166Z"
+    }
+  }
+}
