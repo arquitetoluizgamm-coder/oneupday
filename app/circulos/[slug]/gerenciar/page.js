@@ -19,17 +19,25 @@ export default async function CircleManagePage({ params }) {
   const { data: membership } = await supabase.from('circle_members').select('role,status')
     .eq('circle_id', circle.id).eq('user_id', user.id).eq('status', 'active').maybeSingle();
   if (!membership || !['owner','admin'].includes(membership.role)) redirect(`/circulos/${circle.slug}`);
-  const [{ data: members }, { data: invites }, { data: rules }, { data: reports }, { data: audit }] = await Promise.all([
+  const postsSince = new Date(Date.now() - 30 * 86400000).toISOString();
+  const [{ data: members }, { data: invites }, { data: rules }, { data: reports }, { data: audit }, { count: recentPosts }] = await Promise.all([
     supabase.from('circle_members').select('id,user_id,role,status,display_name,joined_at,profiles:profiles!circle_members_user_id_fkey(id,name,avatar_url,avatar_color)').eq('circle_id', circle.id).order('joined_at'),
     supabase.from('circle_invites').select('id,invitee_id,expires_at,max_uses,uses,status,created_at').eq('circle_id', circle.id).order('created_at', { ascending: false }).limit(30),
     supabase.from('circle_rules').select('version,rules,requires_reaccept,created_at').eq('circle_id', circle.id).order('version', { ascending: false }).limit(1).maybeSingle(),
     supabase.from('circle_reports').select('id,target_type,target_id,reason,details,status,created_at').eq('circle_id', circle.id).order('created_at', { ascending: false }).limit(30),
     supabase.from('circle_audit_logs').select('id,actor_id,action,target_type,target_id,created_at').eq('circle_id', circle.id).order('created_at', { ascending: false }).limit(40),
+    supabase.from('circle_posts').select('id', { count: 'exact', head: true }).eq('circle_id', circle.id).eq('status', 'published').gte('created_at', postsSince),
   ]);
   const t = getDict(getLocale());
+  const dashboard = {
+    activeMembers: (members || []).filter((item) => item.status === 'active').length,
+    pendingInvites: (invites || []).filter((item) => item.status === 'pending' && Number(item.uses || 0) < Number(item.max_uses || 1) && new Date(item.expires_at).getTime() > Date.now()).length,
+    recentPosts: recentPosts || 0,
+    lastActivity: audit?.[0]?.created_at || null,
+  };
   return <>
     <AppTop backHref={`/circulos/${circle.slug}`} backLabel={t.back} />
-    <main className="circle-shell circle-admin-page"><CircleAdminClient circle={circle} actorRole={membership.role} initialMembers={members || []} initialInvites={invites || []} currentRules={rules || { version: 1, rules: [] }} reports={reports || []} audit={audit || []} /></main>
+    <main className="circle-shell circle-admin-page"><CircleAdminClient circle={circle} actorRole={membership.role} initialMembers={members || []} initialInvites={invites || []} currentRules={rules || { version: 1, rules: [] }} reports={reports || []} audit={audit || []} dashboard={dashboard} /></main>
     <BottomNav active="explore" t={t} />
   </>;
 }

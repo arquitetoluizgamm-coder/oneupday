@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 const ROLE_LABEL = { owner: 'Responsável', admin: 'Administrador', moderator: 'Moderador', member: 'Membro' };
 
-export default function CircleAdminClient({ circle, actorRole, initialMembers, initialInvites, currentRules, reports, audit }) {
+export default function CircleAdminClient({ circle, actorRole, initialMembers, initialInvites, currentRules, reports, audit, dashboard }) {
   const [tab, setTab] = useState('members');
   const [members, setMembers] = useState(initialMembers);
   const [invites, setInvites] = useState(initialInvites);
@@ -61,6 +61,12 @@ export default function CircleAdminClient({ circle, actorRole, initialMembers, i
   const activeMembers = members.filter((item) => item.status === 'active');
   return <>
     <header className="circle-admin-head"><p className="circle-eyebrow">Administração privada</p><h1>{circle.name}</h1><p>Gerencie participantes, convites, regras e permissões sem alterar o restante do ONE.</p></header>
+    <section className="circle-admin-overview" aria-label="Resumo do Círculo">
+      <div><span>Participantes</span><strong>{dashboard?.activeMembers || 0}</strong><small>com acesso ativo</small></div>
+      <div><span>Convites</span><strong>{dashboard?.pendingInvites || 0}</strong><small>pendentes</small></div>
+      <div><span>Atividade</span><strong>{dashboard?.recentPosts || 0}</strong><small>publicações em 30 dias</small></div>
+      <div><span>Última ação</span><strong>{dashboard?.lastActivity ? new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit' }).format(new Date(dashboard.lastActivity)) : '—'}</strong><small>{dashboard?.lastActivity ? 'administração' : 'ainda não registrada'}</small></div>
+    </section>
     <nav className="circle-tabs circle-admin-tabs" aria-label="Administração do Círculo">
       {[['members','Pessoas'],['invites','Convites'],['content','Conteúdo'],['settings','Configurações'],['safety','Segurança']].map(([value,label]) => <button type="button" className={tab === value ? 'on' : ''} onClick={() => setTab(value)} key={value}>{label}</button>)}
     </nav>

@@ -113,3 +113,12 @@ test('menu flutuante abre a área de Círculos e profissionais têm acesso diret
   assert.match(page, /circle-professional-banner/);
   assert.match(page, /href="\/circulos\/novo"/);
 });
+
+test('painel profissional resume o Círculo sem criar nova superfície de dados', () => {
+  const page = readFileSync('app/circulos/[slug]/gerenciar/page.js', 'utf8');
+  const client = readFileSync('app/circulos/[slug]/gerenciar/CircleAdminClient.jsx', 'utf8');
+  assert.match(page, /circle_posts/);
+  assert.match(page, /pendingInvites/);
+  assert.match(client, /circle-admin-overview/);
+  assert.match(client, /publicações em 30 dias/);
+});
