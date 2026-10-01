@@ -125,3 +125,12 @@ test('painel profissional resume o Círculo sem criar nova superfície de dados'
   assert.match(client, /circle-admin-overview/);
   assert.match(client, /publicações em 30 dias/);
 });
+
+test('entrada do Círculo orienta o participante pelas áreas existentes', () => {
+  const client = readFileSync('app/circulos/[slug]/CircleFeed.jsx', 'utf8');
+  const styles = readFileSync('app/circulos/circles.css', 'utf8');
+  assert.match(client, /circle-guide/);
+  assert.match(client, /Comece por aqui/);
+  assert.match(client, /guideItems/);
+  assert.match(styles, /\.circle-guide-grid/);
+});

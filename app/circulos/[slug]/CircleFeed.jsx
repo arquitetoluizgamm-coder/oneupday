@@ -130,12 +130,22 @@ export default function CircleFeed({ circle, membership, currentUserId, initialP
     const data = await response.json().catch(() => ({}));
     if (response.ok) setCheckins((current) => [data.checkin, ...current]);
   }
+  const guideItems = [
+    ['feed', 'Mural', `${posts.length} publicação${posts.length === 1 ? '' : 'ões'}`],
+    ['journeys', 'Jornadas', `${templates.length} disponível${templates.length === 1 ? '' : 'is'}`],
+    ['routines', 'Rotinas', `${routines.length} ativa${routines.length === 1 ? '' : 's'}`],
+    ['resources', 'Recursos', `${resources.length} material${resources.length === 1 ? '' : 'is'}`],
+  ];
   return <>
     <section className="circle-hero" style={circle.cover_url ? { backgroundImage: `linear-gradient(180deg,rgba(13,18,40,.05),rgba(13,18,40,.72)),url(${circle.cover_url})` } : undefined}>
       <span className="circle-private-pill">▣ Círculo privado</span><h1>{circle.name}</h1><p>{circle.description || 'Um espaço de confiança dentro do ONE.'}</p>
       <footer><span>{ROLE_LABEL[membership.role]}</span>{canManage && <a href={`/circulos/${circle.slug}/gerenciar`}>Gerenciar</a>}</footer>
     </section>
     {circle.welcome_message && <aside className="circle-welcome"><span aria-hidden="true">Ü</span><div><b>Boas-vindas</b><p>{circle.welcome_message}</p></div></aside>}
+    <section className="circle-guide" aria-label="Comece por aqui">
+      <header><div><span>Um passo de cada vez</span><h2>Comece por aqui</h2></div><p>Escolha um espaço para acompanhar o que este Círculo está construindo.</p></header>
+      <div className="circle-guide-grid">{guideItems.map(([value, label, detail]) => <button type="button" key={value} className={tab === value ? 'on' : ''} onClick={() => setTab(value)}><b>{label}</b><small>{detail}</small><i aria-hidden="true">›</i></button>)}</div>
+    </section>
     <nav className="circle-tabs circle-section-tabs" aria-label="Conteúdo do Círculo">
       {[['feed','Mural'],['journeys','Jornadas'],['routines','Rotinas'],['resources','Recursos']].map(([value,label]) => <button type="button" key={value} className={tab === value ? 'on' : ''} onClick={() => setTab(value)}>{label}</button>)}
     </nav>
