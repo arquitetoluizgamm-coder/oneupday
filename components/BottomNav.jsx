@@ -60,7 +60,7 @@ export default function BottomNav({ active, t, userId = null, initialProfile = n
 
   const items = [
     { key: 'home', href: '/home', label: t.navHome, d: 'M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z' },
-    { key: 'search', href: '/buscar', label: t.navSearch, d: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm6 12 4 4' },
+    { key: 'circles', href: '/circulos', label: t.navCircles || 'Círculos', d: 'M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3.5 20c.4-3 2.2-5 4.5-5s4.1 2 4.5 5M11.5 20c.4-3 2.2-5 4.5-5s4.1 2 4.5 5' },
     { key: 'explore', href: '/explore', label: t.navExplore, d: 'M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm3 5-2 5-5 2 2-5z' },
     { key: 'profile', href: '/perfil', label: t.navProfile, avatar: true },
   ];
