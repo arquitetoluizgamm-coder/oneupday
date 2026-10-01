@@ -134,3 +134,23 @@ test('entrada do Círculo orienta o participante pelas áreas existentes', () =>
   assert.match(client, /guideItems/);
   assert.match(styles, /\.circle-guide-grid/);
 });
+
+test('aceite de convite encaminha o novo membro para uma orientação inicial', () => {
+  const accept = readFileSync('app/circulos/convite/[token]/AcceptCircleInvite.jsx', 'utf8');
+  const page = readFileSync('app/circulos/[slug]/page.js', 'utf8');
+  const client = readFileSync('app/circulos/[slug]/CircleFeed.jsx', 'utf8');
+  assert.match(accept, /entrada=1/);
+  assert.match(page, /firstVisit=/);
+  assert.match(client, /circle-onboarding/);
+  assert.match(client, /Você entrou/);
+});
+
+test('cabeçalho do Círculo identifica visualmente quem administra o espaço', () => {
+  const page = readFileSync('app/circulos/[slug]/page.js', 'utf8');
+  const client = readFileSync('app/circulos/[slug]/CircleFeed.jsx', 'utf8');
+  const styles = readFileSync('app/circulos/circles.css', 'utf8');
+  assert.match(page, /avatar_url,avatar_color,is_professional_verified/);
+  assert.match(client, /circle-hero-owner/);
+  assert.match(client, /Administrado por/);
+  assert.match(styles, /\.circle-hero-owner/);
+});

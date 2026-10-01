@@ -98,13 +98,14 @@ function PostCard({ initial, currentUserId, canModerate }) {
   </article>;
 }
 
-export default function CircleFeed({ circle, membership, currentUserId, initialPosts, resources, templates, ownJourneys: initialOwnJourneys, routines, ownRoutines: initialOwnRoutines, routineCheckins }) {
+export default function CircleFeed({ circle, membership, currentUserId, initialPosts, resources, templates, ownJourneys: initialOwnJourneys, routines, ownRoutines: initialOwnRoutines, routineCheckins, firstVisit = false }) {
   const router = useRouter();
   const [posts] = useState(initialPosts);
   const [tab, setTab] = useState('feed');
   const [ownJourneys, setOwnJourneys] = useState(initialOwnJourneys);
   const [ownRoutines, setOwnRoutines] = useState(initialOwnRoutines);
   const [checkins, setCheckins] = useState(routineCheckins);
+  const [showOnboarding, setShowOnboarding] = useState(firstVisit);
   const [leaving, setLeaving] = useState(false);
   const canManage = ['owner','admin'].includes(membership.role);
   const canModerate = canManage || membership.role === 'moderator';
@@ -138,10 +139,11 @@ export default function CircleFeed({ circle, membership, currentUserId, initialP
   ];
   return <>
     <section className="circle-hero" style={circle.cover_url ? { backgroundImage: `linear-gradient(180deg,rgba(13,18,40,.05),rgba(13,18,40,.72)),url(${circle.cover_url})` } : undefined}>
-      <span className="circle-private-pill">▣ Círculo privado</span><h1>{circle.name}</h1><p>{circle.description || 'Um espaço de confiança dentro do ONE.'}</p>
+      <span className="circle-private-pill">▣ Círculo privado</span>{circle.owner && <div className="circle-hero-owner"><Avatar profile={circle.owner} /><div><span>Administrado por</span><b>{circle.owner.name || 'Profissional do ONE'}</b>{circle.owner.is_professional_verified && <small>✓ Profissional verificado</small>}</div></div>}<h1>{circle.name}</h1><p>{circle.description || 'Um espaço de confiança dentro do ONE.'}</p>
       <footer><span>{ROLE_LABEL[membership.role]}</span>{canManage && <a href={`/circulos/${circle.slug}/gerenciar`}>Gerenciar</a>}</footer>
     </section>
     {circle.welcome_message && <aside className="circle-welcome"><span aria-hidden="true">Ü</span><div><b>Boas-vindas</b><p>{circle.welcome_message}</p></div></aside>}
+    {showOnboarding && <aside className="circle-onboarding" role="status"><button type="button" className="circle-onboarding-close" aria-label="Fechar orientação" onClick={() => setShowOnboarding(false)}>×</button><div><span>Primeiro passo</span><h2>Você entrou. Comece no seu ritmo.</h2><p>Conheça o que o profissional preparou e escolha uma ação simples para hoje.</p></div><div className="circle-onboarding-actions"><button type="button" onClick={() => { setTab('journeys'); setShowOnboarding(false); }}>Ver jornadas</button><button type="button" onClick={() => { setTab('routines'); setShowOnboarding(false); }}>Ver rotinas</button></div></aside>}
     <section className="circle-guide" aria-label="Comece por aqui">
       <header><div><span>Um passo de cada vez</span><h2>Comece por aqui</h2></div><p>Escolha um espaço para acompanhar o que este Círculo está construindo.</p></header>
       <div className="circle-guide-grid">{guideItems.map(([value, label, detail]) => <button type="button" key={value} className={tab === value ? 'on' : ''} onClick={() => setTab(value)}><b>{label}</b><small>{detail}</small><i aria-hidden="true">›</i></button>)}</div>

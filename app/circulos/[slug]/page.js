@@ -9,7 +9,7 @@ import CircleFeed from './CircleFeed';
 
 export const dynamic = 'force-dynamic';
 
-export default async function CirclePage({ params }) {
+export default async function CirclePage({ params, searchParams }) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=/circulos/${encodeURIComponent(params.slug)}`);
@@ -18,6 +18,9 @@ export default async function CirclePage({ params }) {
     .select('id,owner_id,slug,name,description,welcome_message,cover_path,settings,status,current_rules_version')
     .eq('slug', params.slug).eq('status', 'active').maybeSingle();
   if (!circle) notFound();
+  const { data: owner } = await supabase.from('profiles')
+    .select('id,name,avatar_url,avatar_color,is_professional_verified')
+    .eq('id', circle.owner_id).maybeSingle();
   const { data: membership } = await supabase.from('circle_members')
     .select('id,role,status,display_name,rules_version_accepted,terms_version_accepted')
     .eq('circle_id', circle.id).eq('user_id', user.id).eq('status', 'active').maybeSingle();
@@ -63,7 +66,7 @@ export default async function CirclePage({ params }) {
     <AppTop backHref="/circulos" backLabel={t.back} />
     <main className="circle-shell circle-feed-page">
       <CircleFeed
-        circle={{ ...circle, cover_url: coverUrl }}
+        circle={{ ...circle, cover_url: coverUrl, owner }}
         membership={membership}
         currentUserId={user.id}
         initialPosts={hydratedPosts}
@@ -73,6 +76,7 @@ export default async function CirclePage({ params }) {
         routines={routines || []}
         ownRoutines={ownRoutines || []}
         routineCheckins={routineCheckins || []}
+        firstVisit={searchParams?.entrada === '1'}
       />
     </main>
     <BottomNav active="explore" t={t} />

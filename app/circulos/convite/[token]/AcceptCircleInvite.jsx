@@ -13,7 +13,7 @@ export default function AcceptCircleInvite({ token, circle, rules, owner }) {
     if (!acceptRules || !acceptPrivacy || busy) return;
     setBusy(true); setError('');
     const response = await fetch('/api/circles/invites/accept', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, accept_rules: true, accept_privacy: true, display_name: displayName }) });
-    if (response.ok) { router.push(`/circulos/${circle.slug}`); router.refresh(); return; }
+    if (response.ok) { router.push(`/circulos/${circle.slug}?entrada=1`); router.refresh(); return; }
     setError('Não foi possível aceitar o convite. Ele pode ter expirado ou sido cancelado.'); setBusy(false);
   }
   return <section className="circle-invite-card">
