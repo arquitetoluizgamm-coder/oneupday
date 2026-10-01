@@ -154,3 +154,12 @@ test('cabeçalho do Círculo identifica visualmente quem administra o espaço', 
   assert.match(client, /Administrado por/);
   assert.match(styles, /\.circle-hero-owner/);
 });
+
+test('identidade visual do Círculo usa apenas cores aprovadas', () => {
+  const policy = readFileSync('lib/circles/policy.mjs', 'utf8');
+  const admin = readFileSync('app/circulos/[slug]/gerenciar/CircleAdminClient.jsx', 'utf8');
+  const feed = readFileSync('app/circulos/[slug]/CircleFeed.jsx', 'utf8');
+  assert.match(policy, /accent_color/);
+  assert.match(admin, /Cor de destaque/);
+  assert.match(feed, /circle-theme-/);
+});

@@ -138,7 +138,7 @@ export default function CircleFeed({ circle, membership, currentUserId, initialP
     ['resources', 'Recursos', `${resources.length} material${resources.length === 1 ? '' : 'is'}`],
   ];
   return <>
-    <section className="circle-hero" style={circle.cover_url ? { backgroundImage: `linear-gradient(180deg,rgba(13,18,40,.05),rgba(13,18,40,.72)),url(${circle.cover_url})` } : undefined}>
+    <section className={`circle-hero circle-theme-${circle.settings?.accent_color || 'sage'}`} style={circle.cover_url ? { backgroundImage: `linear-gradient(180deg,rgba(13,18,40,.05),rgba(13,18,40,.72)),url(${circle.cover_url})` } : undefined}>
       <span className="circle-private-pill">▣ Círculo privado</span>{circle.owner && <div className="circle-hero-owner"><Avatar profile={circle.owner} /><div><span>Administrado por</span><b>{circle.owner.name || 'Profissional do ONE'}</b>{circle.owner.is_professional_verified && <small>✓ Profissional verificado</small>}</div></div>}<h1>{circle.name}</h1><p>{circle.description || 'Um espaço de confiança dentro do ONE.'}</p>
       <footer><span>{ROLE_LABEL[membership.role]}</span>{canManage && <a href={`/circulos/${circle.slug}/gerenciar`}>Gerenciar</a>}</footer>
     </section>
