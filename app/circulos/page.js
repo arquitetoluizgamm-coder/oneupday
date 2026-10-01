@@ -38,6 +38,12 @@ export default async function CirclesPage({ searchParams }) {
         </div>
       </header>
 
+      {profile?.is_professional_verified && <section className="circle-professional-banner" aria-label={labels.professionalArea}>
+        <span className="circle-professional-mark" aria-hidden="true">✓</span>
+        <div><b>{labels.professionalArea}</b><p>{labels.professionalAreaText}</p></div>
+        <a href="/circulos/novo">{labels.create}<span aria-hidden="true">›</span></a>
+      </section>}
+
       {(invitesResult.count || 0) > 0 && <section className="circle-invite-notice" aria-label={labels.invites}>
         <span className="circle-notice-icon" aria-hidden="true">✉</span>
         <div><b>Você tem um convite privado</b><p>Abra o link recebido para conhecer o Círculo e aceitar suas regras.</p></div>

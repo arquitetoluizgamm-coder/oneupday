@@ -104,3 +104,12 @@ test('perfil mostra Círculos administrados e feed mantém conteúdo interno iso
   assert.doesNotMatch(feed, /circle_posts|circle_comments|circle_members/);
   assert.match(card, /As conversas e publicações internas continuam privadas/);
 });
+
+test('menu flutuante abre a área de Círculos e profissionais têm acesso direto à criação', () => {
+  const menu = readFileSync('components/CriarMenu.jsx', 'utf8');
+  const page = readFileSync('app/circulos/page.js', 'utf8');
+  assert.match(menu, /href: '\/circulos', icone: 'circulo'/);
+  assert.doesNotMatch(menu, /href: '\/circulos\/publicar', icone: 'circulo'/);
+  assert.match(page, /circle-professional-banner/);
+  assert.match(page, /href="\/circulos\/novo"/);
+});

@@ -33,7 +33,7 @@ export default function CriarMenu({ t, className = 'bn-create', tamanho = 26, ro
     { href: '/futuro', icone: 'futuro', texto: t.futureTitle },
     { href: '/new', icone: 'jornada', texto: t.navJourney },
     { href: '/rotinas', icone: 'rotina', texto: t.navRoutine || 'Nova rotina' },
-    { href: '/circulos/publicar', icone: 'circulo', texto: t.navCircles || 'Círculos' },
+    { href: '/circulos', icone: 'circulo', texto: t.navCircles || 'Círculos' },
   ];
   return <>
     <button type="button" className={className} onClick={() => setAberto(true)} aria-label={rotulo || t.navCreate} title={rotulo || t.navCreate}>
