@@ -163,3 +163,12 @@ test('identidade visual do Círculo usa apenas cores aprovadas', () => {
   assert.match(admin, /Cor de destaque/);
   assert.match(feed, /circle-theme-/);
 });
+
+test('listagem de Círculos reutiliza capa, tema e administrador do espaço', () => {
+  const page = readFileSync('app/circulos/page.js', 'utf8');
+  const styles = readFileSync('app/circulos/circles.css', 'utf8');
+  assert.match(page, /signedCircleMedia/);
+  assert.match(page, /circle-card-owner/);
+  assert.match(page, /circle-card-theme-/);
+  assert.match(styles, /\.circle-card-owner/);
+});
